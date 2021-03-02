@@ -1,4 +1,0 @@
-scripts: env-prod-1, env-perf-1
-aws: env-prod-1, env-cicd, env-int-1, env-perf-1, env-int-2
-k8s: env-prod-1, env-int-1, env-perf-1, env-int-2
-debug: env-prod-1, env-int-2
