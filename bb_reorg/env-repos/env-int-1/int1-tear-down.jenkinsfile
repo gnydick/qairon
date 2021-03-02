@@ -1,4 +1,4 @@
-def notifySlack(String buildStatus = 'STARTED') {
+def notifySlack(ja.String buildStatus = 'STARTED') {
 
     // Build status of null means success.
     buildStatus = buildStatus ?: 'SUCCESS'
