@@ -1,0 +1,8 @@
+template_path: iam-role-yace.yaml
+dependencies:
+  - us-west-2/eks/cluster.yaml
+
+parameters:
+  RoleName: prod-1-cw-exporter
+  PolicyName: allow-get-resources-tags
+  sourceRoleArn: !stack_output us-west-2/util-tier/kiam-role.yaml::KIAMServerRole

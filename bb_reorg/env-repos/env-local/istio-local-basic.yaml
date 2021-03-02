@@ -1,0 +1,351 @@
+#!/bin/bash
+#
+# This deployment configuration was used to try out the Istio service mesh in the local (minikube)
+# environment.  It turned out to be heavy and unreliable for a development environment where
+# developers are constantly deploying and undeploying services.  It is kept here as a resource
+# because we will probably use it for staging and production (and perhaps int-2).
+#
+# Author: Erik K. Worth
+#
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: gateway-ingress
+spec:
+  selector:
+    istio: ingressgateway # use istio default ingress gateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
+    hosts:
+    - "*"
+  - port:
+      number: 8082
+      name: http2-cm
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-gateway-virtual-service
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - gateway-ingress
+  http:
+  - match:
+    - uri:
+        prefix: /cm.v1.ConnectionService/
+    route:
+    - destination:
+        port:
+          number: 8081
+        host: connection-manager.default.svc.cluster.local
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 80
+        host: service-gateway.default.svc.cluster.local
+---
+apiVersion: v1
+data:
+  tls.crt: Q2VydGlmaWNhdGU6CiAgICBEYXRhOgogICAgICAgIFZlcnNpb246IDEgKDB4MCkKICAgICAgICBTZXJpYWwgTnVtYmVyOiAxICgweDEpCiAgICBTaWduYXR1cmUgQWxnb3JpdGhtOiBzaGEyNTZXaXRoUlNBRW5jcnlwdGlvbgogICAgICAgIElzc3VlcjogQz1VUywgU1Q9Q0EsIEw9UGFsbyBBbHRvLCBPPVN0YXlVcCwgQ049Q0EgQWRtaW4vZW1haWxBZGRyZXNzPWFkbWluQHN0YXl1cC56b25lCiAgICAgICAgVmFsaWRpdHkKICAgICAgICAgICAgTm90IEJlZm9yZTogTWFyIDIwIDIzOjM1OjMwIDIwMTggR01UCiAgICAgICAgICAgIE5vdCBBZnRlciA6IE1hciAxNyAyMzozNTozMCAyMDI4IEdNVAogICAgICAgIFN1YmplY3Q6IEM9VVMsIFNUPUNBLCBPPVN0YXlVcCwgQ049c2VydmljZS1nYXRld2F5CiAgICAgICAgU3ViamVjdCBQdWJsaWMgS2V5IEluZm86CiAgICAgICAgICAgIFB1YmxpYyBLZXkgQWxnb3JpdGhtOiByc2FFbmNyeXB0aW9uCiAgICAgICAgICAgICAgICBQdWJsaWMtS2V5OiAoMjA0OCBiaXQpCiAgICAgICAgICAgICAgICBNb2R1bHVzOgogICAgICAgICAgICAgICAgICAgIDAwOmUwOmNlOjYwOjliOjkzOjBiOjQzOmRjOjhhOjA5OjRhOmZkOjc3OjY3OgogICAgICAgICAgICAgICAgICAgIDU1OjE4OjZjOjg2OmE5OjA1OmYxOjUzOmYxOmIxOjE2OjI3OjkxOjIxOmMxOgogICAgICAgICAgICAgICAgICAgIDJhOmJmOjY3Ojc5OjEyOmNkOmNiOmJmOmNjOjY0OjY4OjlmOjczOjllOjQ0OgogICAgICAgICAgICAgICAgICAgIDEzOmQ4OmQ2OjNkOjJhOjE2OjZhOjhlOjlkOmUxOjRlOjNiOjc0OjA1Ojc4OgogICAgICAgICAgICAgICAgICAgIGJiOmNhOmY1OjU5OjM2OjhkOjZkOjIyOjk0OjlkOmUyOjYxOmYzOmI2OmYwOgogICAgICAgICAgICAgICAgICAgIGY0OmQ1OjA1OjJmOjc5OjZkOjc5OjhmOmU0OjI3OjBmOjE5OjkxOmE1OmJjOgogICAgICAgICAgICAgICAgICAgIDBjOjRkOjQwOjQ0OjFhOjAyOmUxOjcwOjg3OmNiOmExOjc5OjUyOmIyOmM5OgogICAgICAgICAgICAgICAgICAgIGY2OjhiOmQ4Ojg0OmRkOmI4OjQzOmE0OjVlOjNlOmM1OjFjOjQwOmNkOjUyOgogICAgICAgICAgICAgICAgICAgIDVlOjhmOmM4OjRjOjA0OmQ0OjViOjZiOjBhOmUzOjQxOjkyOjAzOmExOmNlOgogICAgICAgICAgICAgICAgICAgIDI1OjJlOjAyOjNkOmZiOjMwOjEwOjViOmIzOmM1OmQ1Ojg1OmM3OmQ2OjFkOgogICAgICAgICAgICAgICAgICAgIGU0OmIyOjM5OmM5OmM2OmZhOjBkOmRjOjc2OjI5OjNjOjJlOjVkOmUwOmJjOgogICAgICAgICAgICAgICAgICAgIDQ0OmVmOmI3OmNlOmI3OmJjOjRmOmFlOjA5OmM4OjZjOmE5OjY3Ojg1OjFhOgogICAgICAgICAgICAgICAgICAgIGU4OjM5OmIxOjFjOjZhOjU1OjEwOmVlOjlkOmE1OjBkOjAzOjdmOjQ0OjA0OgogICAgICAgICAgICAgICAgICAgIDBlOjcxOmQ0Ojk1OmIwOmFjOjY3OjliOjkzOmRhOjA5OmJjOjhlOjRmOjE2OgogICAgICAgICAgICAgICAgICAgIDFkOmIxOmUwOjA0OjI0OjFkOjkzOjE0OmI3Ojk1OmZmOmI1OjU0OjUzOjk2OgogICAgICAgICAgICAgICAgICAgIGJiOjNhOmZkOmJiOjU0OmEyOjJmOjM5OmJkOmFhOjFkOjE1OjM4OjQ2OjZjOgogICAgICAgICAgICAgICAgICAgIDU4OmMyOjE4Ojk4OjYzOjU0OmYzOjAwOjQwOmU4OjRmOjUyOmRhOjhjOjFmOgogICAgICAgICAgICAgICAgICAgIDgzOjlmCiAgICAgICAgICAgICAgICBFeHBvbmVudDogNjU1MzcgKDB4MTAwMDEpCiAgICBTaWduYXR1cmUgQWxnb3JpdGhtOiBzaGEyNTZXaXRoUlNBRW5jcnlwdGlvbgogICAgICAgICAzODo5Yzo5MTo1Zjo1ODpjNjo0YzpmMTo1OTo3NzphMDozNTpkMzo3YToyZTo2MzpkNzozNToKICAgICAgICAgOTc6M2Q6YTY6MTA6NmQ6NTI6YzM6MzA6OWE6NDE6NmE6OTM6NjY6ZDI6OTg6MjE6MzE6NTU6CiAgICAgICAgIDZhOmFkOjU0OjBhOjNhOjZjOmI5OjhkOjE0OmQyOjhlOjUzOmVjOjY0OmIwOmNjOjA0OjhjOgogICAgICAgICBkOToyYjo4YTo4YTo5YTowYzpmZjo2ZjpkZTplNjozZjozZDphYTo3ZDpiZDpjNDphNDoxNjoKICAgICAgICAgOTc6MjA6M2Y6NGM6ZGU6YmU6YmE6Yjc6N2Q6N2M6M2Q6NTY6MjU6ODA6YTY6ZTA6OTk6OGI6CiAgICAgICAgIDg5OjJmOjMzOjU5OmJjOjQ0OmRlOmZlOmMyOjY3Ojk5OjdiOmViOjIxOmIzOjM2OjJjOmRkOgogICAgICAgICBkOTo2ODoyMDpjMzpjMjo0Mjo2NTo3MTphYToxZTo5YTpmODo1NToyZDo5ODo0YzpjYzo2NzoKICAgICAgICAgMjg6ZmU6Yzk6MzA6M2E6Yzk6YzY6MDM6NWQ6ZDc6MzY6MzU6NzM6NTE6MDY6MmY6NzE6YTE6CiAgICAgICAgIGMzOjc5OmM2Ojg0OjdlOjgwOjQyOmUwOjQ5OjMzOjhhOmFiOmU4OjQ5OjM1OjU4OmRmOmI1OgogICAgICAgICAyNTowMzoxNjphMDpiODoyMDpiODo2NTpjODoyZToxYjpkNTpkZTozZjpkYzphMDo1OTowZjoKICAgICAgICAgYTQ6Nzc6YWQ6YTc6NWI6NGI6Zjk6MDU6MjM6YTQ6ZDA6Zjc6YTc6Mjc6YTc6ZjM6MTE6NzU6CiAgICAgICAgIDIzOjQ0OmE5OmZlOjE4OmIwOjIyOmI4OjZkOjY2OjhjOjM1Ojc0OmY1OmIyOmE3OjAyOjVkOgogICAgICAgICA5MzpjOTpmNzo1Nzo4MTozZjozMDplYzpkODoxZDphYzozODplZDo5Mzo2MDpjMzpiZjo0OToKICAgICAgICAgZjg6MTc6NDk6YTg6N2I6NjQ6MmQ6NzI6OGE6OTk6MDM6Y2M6Njc6NmY6ODM6NTY6MWU6NTc6CiAgICAgICAgIDY4OjgyOjBkOjllCi0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlETFRDQ0FoVUNBUUV3RFFZSktvWklodmNOQVFFTEJRQXdkREVMTUFrR0ExVUVCaE1DVlZNeEN6QUpCZ05WCkJBZ01Ba05CTVJJd0VBWURWUVFIREFsUVlXeHZJRUZzZEc4eER6QU5CZ05WQkFvTUJsTjBZWGxWY0RFUk1BOEcKQTFVRUF3d0lRMEVnUVdSdGFXNHhJREFlQmdrcWhraUc5dzBCQ1FFV0VXRmtiV2x1UUhOMFlYbDFjQzU2YjI1bApNQjRYRFRFNE1ETXlNREl6TXpVek1Gb1hEVEk0TURNeE56SXpNelV6TUZvd1JURUxNQWtHQTFVRUJoTUNWVk14CkN6QUpCZ05WQkFnTUFrTkJNUTh3RFFZRFZRUUtEQVpUZEdGNVZYQXhHREFXQmdOVkJBTU1EM05sY25acFkyVXQKWjJGMFpYZGhlVENDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFPRE9ZSnVUQzBQYwppZ2xLL1hkblZSaHNocWtGOFZQeHNSWW5rU0hCS3I5bmVSTE55Ny9NWkdpZmM1NUVFOWpXUFNvV2FvNmQ0VTQ3CmRBVjR1OHIxV1RhTmJTS1VuZUpoODdidzlOVUZMM2x0ZVkva0p3OFprYVc4REUxQVJCb0M0WENIeTZGNVVyTEoKOW92WWhOMjRRNlJlUHNVY1FNMVNYby9JVEFUVVcyc0s0MEdTQTZIT0pTNENQZnN3RUZ1enhkV0Z4OVlkNUxJNQp5Y2I2RGR4MktUd3VYZUM4Uk8rM3pyZThUNjRKeUd5cFo0VWE2RG14SEdwVkVPNmRwUTBEZjBRRURuSFVsYkNzClo1dVQyZ204ams4V0hiSGdCQ1Fka3hTM2xmKzFWRk9XdXpyOXUxU2lMem05cWgwVk9FWnNXTUlZbUdOVTh3QkEKNkU5UzJvd2ZnNThDQXdFQUFUQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFPSnlSWDFqR1RQRlpkNkExMDNvdQpZOWMxbHoybUVHMVN3ekNhUVdxVFp0S1lJVEZWYXExVUNqcHN1WTBVMG81VDdHU3d6QVNNMlN1S2lwb00vMi9lCjVqODlxbjI5eEtRV2x5QS9UTjYrdXJkOWZEMVdKWUNtNEptTGlTOHpXYnhFM3Y3Q1o1bDc2eUd6Tml6ZDJXZ2cKdzhKQ1pYR3FIcHI0VlMyWVRNeG5LUDdKTURySnhnTmQxelkxYzFFR0wzR2h3M25HaEg2QVF1QkpNNHFyNkVrMQpXTisxSlFNV29MZ2d1R1hJTGh2VjNqL2NvRmtQcEhldHAxdEwrUVVqcE5EM3B5ZW44eEYxSTBTcC9oaXdJcmh0ClpvdzFkUFd5cHdKZGs4bjNWNEUvTU96WUhhdzQ3Wk5ndzc5SitCZEpxSHRrTFhLS21RUE1aMitEVmg1WGFJSU4Kbmc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBNE01Z201TUxROXlLQ1VyOWQyZFZHR3lHcVFYeFUvR3hGaWVSSWNFcXYyZDVFczNMCnY4eGthSjl6bmtRVDJOWTlLaFpxanAzaFRqdDBCWGk3eXZWWk5vMXRJcFNkNG1IenR2RDAxUVV2ZVcxNWorUW4KRHhtUnBid01UVUJFR2dMaGNJZkxvWGxTc3NuMmk5aUUzYmhEcEY0K3hSeEF6VkplajhoTUJOUmJhd3JqUVpJRApvYzRsTGdJOSt6QVFXN1BGMVlYSDFoM2tzam5KeHZvTjNIWXBQQzVkNEx4RTc3Zk90N3hQcmduSWJLbG5oUnJvCk9iRWNhbFVRN3AybERRTi9SQVFPY2RTVnNLeG5tNVBhQ2J5T1R4WWRzZUFFSkIyVEZMZVYvN1ZVVTVhN092MjcKVktJdk9iMnFIUlU0Um14WXdoaVlZMVR6QUVEb1QxTGFqQitEbndJREFRQUJBb0lCQUVVSlc4V3JESVNVajVkMgovZ3ZUSWVEVVF5NVk4dG1TbVkxeUxUR3VmcEExR0l0Ync3eHM2bER1MXJTOXQxS1p5RUxLaTRLc25XcEcrOFJLClpYRllrME1iZjI1bE1XODZJWHdHMTBrcnhINkh6aE1RUDZaMWRiTHQ0dUUrWVN1VHd1T3A4RER3YnlNVXZyQUgKbUJYMjVsN3R5bDBCNWl5bnBQNkd4a0dkYlUyYmdRSCtpcFk4RCtCWW1WbjcvWXljZmNlWVlBUEZWbWxWWTNEUwpRTXQ1TTNIQnpRdmNGRUpwUWxoNUIrYmZac1IrdENNTWh6Q2lvRG1zTjFMamlvOENuNGVDVW0vQ3p0aWp3RnFFCmJZb2RkMGNLc2FtVk5uSXNMVi9WUzI5UlIvWDYzdHcza3JVTmJQVVl5S0dzcDhRQmtrWmFvRWZPKzY0QVpyQzMKRWtLWFF1RUNnWUVBOFdtWnRiZGt1bTdtOTBSZzVHWC9sSG1kTktHUEJ6SkhTZTA0LzBsQ3hZK0lXeU5mVkJRcApWSHM5ZlBWWE4yaG9hL0JsRWdkTTVXeXRpSlV0QzAwVTB4eVZHbyt6MFlpSzlDYjdGS1l3OWNzMlpYdnB4YlZVCkVkSG5iYVhGanYwd3psNitHVmNMYzkrVFAwMXhOYkdPVE5nRzA0UWdiN1dESHlaOU9ZMmlFamNDZ1lFQTdtUGsKNlhHK0xrVmxsdXNMbjFqRUF1ZXNJcHR4ejR6ZmlYYlNxb1ltZEV6QUU0SkFrdlFQcHB0S3NUNTM3clpqdWJIMQpJTEhzVlBSOWtlQU9Udm13MzF6T3oyMVlBM3UzMEFiM2p3cnRDYU9mZ0RCaEpDbE5wUWQwSnNRcDcyeVlzVGM5CnNBWjlzdk5RNzdwVXpFSmY4QytjTkRkUDhZS0JFK21sTGVJMUJka0NnWUJiOFZ3WldUK0R3YmsxYzFWenAyVXYKcHlHNGFjK1BiaGE0a1NDa0djTFVlMVh6WUFWdWdEODliYko5WlBOU3B2RWVLdkJUYlhSYjdJZ3EvS1dyS0RCRwpOeHlTZ1NoN0pRWEc5eEdwUzZKWitvczlHM1J0V0NJc3AwVDgvYVhBVDYzRzYwNTdXQ3VFZGlJZWVlQWtFdnVmClNLZFE1NEZ6Q2k1bUxzS0NxTzZSQVFLQmdRREZHN3V1ZWVteUFKZGJEY1Z5WDhiU1VCUTRHU2NsWVdtREU4aGsKVHIrRThlRHZRSWQ3K21qbWJRaDVQUm1WT3lHQjdPNnR0ZStlM3Zqa29NbXo2eWlmeHZFSStYUUlqVWNTcm5BSwp5aEhzSW1wRFo3MHFWU3hxQTV1NllmLzZnMlJOUTB1eU8rdTdCd3dvNjN3cDE4ZlRwTW9YTXBUYkwvamlLaEgxCnVrLzFJUUtCZ0dRdzRxRnFqcE1yTVRGK1JCTHNCZmQ0UUoyQ1BqRU0wQmR3N3lIdzU5QlFqM1FwSWQ3M2I5WGUKbnJ0WEZZOUVzTktnWkx5bHM2VGZXdWlwYXB3OWJnVDhCalorNCs2NVFMNzF6clhTcVMrelJCUFZ5RitHWFJuOQpubVprSjd1ck5MYzFCR2JocXBMUGZ5aWdvOWJUZWNsQis1V0Zna0w1MTlwRHNVcjRXdmhaCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+kind: Secret
+metadata:
+  creationTimestamp: 2018-03-21T22:47:05Z
+  name: istio-ingressgateway-certs
+  namespace: istio-system
+  resourceVersion: "18133"
+  selfLink: /api/v1/namespaces/istio-system/secrets/istio-ingressgateway-certs
+  uid: c7903e26-2d59-11e8-ae9d-08002793ac0a
+type: kubernetes.io/tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-gateway
+  labels:
+    component: service-gateway
+    tier: gateway
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    name: api
+  - port: 8080
+    targetPort: 8080
+    name: status
+  selector:
+    component: service-gateway
+    tier: gateway
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: account-manager-mongodb
+  labels:
+    component: mongodb
+    database: account
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    component: mongodb
+    tier: backend
+    account: database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentication-server
+  labels:
+    component: authentication-server
+    tier: authentication
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    name: logs
+  - port: 8080
+    targetPort: 8080
+    name: http-rest
+  - port: 8081
+    targetPort: 8081
+    name: grpc
+  selector:
+    component: authentication-server
+    tier: authentication
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: account-manager
+  labels:
+    component: account-manager
+    tier: account-management
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    name: logs
+  - port: 8080
+    targetPort: 8080
+    name: http-rest
+  - port: 8081
+    targetPort: 8081
+    name: grpc
+  selector:
+    component: account-manager
+    tier: account-management
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: service-gateway-deployment
+  labels:
+    component: service-gateway
+    app: service-gateway
+    version: 1.0.6
+    tier: gateway
+spec:
+  selector:
+    matchLabels:
+      component: service-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: service-gateway
+        app: service-gateway
+        tier: gateway
+    spec:
+      containers:
+      - name: service-gateway
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/service-gateway-int:1.0.6
+        livenessProbe:
+          httpGet:
+            path: /health/v1/lively
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            path: /health/v1/ready
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 2
+        ports:
+        - containerPort: 80
+        - containerPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+  labels:
+    component: mongodb
+    app: mongodb
+    version: 3.6.7
+    tier: backend
+    account: database
+    connection: database
+    example: database
+    content: database
+    gamestate: database
+    session: database
+    transaction: database
+spec:
+  selector:
+    matchLabels:
+      component: mongodb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: mongodb
+        app: mongodb
+        tier: backend
+        account: database
+        connection: database
+        example: database
+        content: database
+        gamestate: database
+        session: database
+        transaction: database
+    spec:
+      containers:
+      - name: mongodb
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/mongodb:4.1.7-v1
+        ports:
+        - containerPort: 27017
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: authentication-server-deployment
+  labels:
+    component: authentication-server
+    app: authentication-server
+    version: 1.0.21
+    tier: authentication
+spec:
+  selector:
+    matchLabels:
+      component: authentication-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: authentication-server
+        app: authentication-server
+        tier: authentication
+    spec:
+      volumes:
+      - name: logs
+        emptyDir: {}
+      containers:
+      - name: authentication-server
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/authentication-server:1.0.22
+        livenessProbe:
+          httpGet:
+            path: /health/v1/lively
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            path: /health/v1/ready
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 2
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        volumeMounts:
+        - name: logs
+          mountPath: /opt/withme/logs
+      - name: authentication-server-logs
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/logmgr-local:1.0.2
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: logs
+          mountPath: /usr/share/nginx/html
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: account-manager-deployment
+  labels:
+    component: account-manager
+    app: account-manager
+    version: 1.0.18
+    tier: account-management
+spec:
+  selector:
+    matchLabels:
+      component: account-manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: account-manager
+        app: account-manager
+        tier: account-management
+    spec:
+      volumes:
+      - name: logs
+        emptyDir: {}
+      containers:
+      - name: account-manager
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/account-manager:1.0.19
+        livenessProbe:
+          httpGet:
+            path: /health/v1/lively
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            path: /health/v1/ready
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 2
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        volumeMounts:
+        - name: logs
+          mountPath: /opt/withme/logs
+      - name: authentication-server-logs
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/logmgr-local:1.0.2
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: logs
+          mountPath: /usr/share/nginx/html

@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS ElastiCache CloudFormation template'
+
+#-------------------------------------------------------------------#
+################################ CloudFormation template parameters #
+
+Parameters:
+
+  ECsecurityGroupName:
+    Type: String
+    Description: Name of security group for ElastiCache
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: The VPC of the k8s worker instances.
+
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: "SubnetIds for AWS Elasticache CacheSubnetGroup"
+
+  EC2SecurityGroupID:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Specifies SG group ID that allowed to communicate with AWS Elasticcache.
+    ConstraintDescription: "Please provide valid ids for the security group(s)."
+
+  ECMultiAZEnabled:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+      - ''
+
+  SnapshotRetentionLimit:
+    Description: 'The number of days for which ElastiCache retains automatic snapshots before deleting them (set to 0 to disable backups).'
+    Type: Number
+
+  TransitEncryption:
+    Description: 'Enable encryption for data in transit? (see https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/in-transit-encryption.html)'
+    Type: 'String'
+    AllowedValues:
+    - 'true'
+    - 'false'
+
+  CacheNodeType:
+    Type: String
+    AllowedValues:
+      - cache.m5.large
+      - cache.m5.xlarge
+      - cache.m5.2xlarge
+      - cache.m5.4xlarge
+      - cache.m5.12xlarge
+      - cache.m5.24xlarge
+      - cache.m4.large
+      - cache.m4.xlarge
+      - cache.m4.2xlarge
+      - cache.m4.4xlarge
+      - cache.m4.10xlarge
+      - cache.t3.micro
+      - cache.t3.small
+      - cache.t3.medium
+      - cache.t2.micro
+      - cache.t2.small
+      - cache.t2.medium
+      - cache.r5.large
+      - cache.r5.xlarge
+      - cache.r5.2xlarge
+      - cache.r5.4xlarge
+      - cache.r5.12xlarge
+      - cache.r5.24xlarge
+      - cache.r4.large
+      - cache.r4.xlarge
+      - cache.r4.2xlarge
+      - cache.r4.4xlarge
+      - cache.r4.8xlarge
+      - cache.r4.16xlarge
+    ConstraintDescription: Must be a valid AWS EC instance type
+    Description: The compute and memory capacity of the nodes in the node group (shard).
+
+  ECName:
+    Type: String
+    Description: Name for ElastiCache cluster Name.
+
+  ECEngine:
+    Type: String
+    AllowedValues:
+      - memcached
+      - redis
+
+  ECEngineVersion:
+    Type: String
+    Description: The version number of the cache engine to be used for this cluster.
+
+  NumReplicas:
+    Type: Number
+    Description: The number of replicas.
+
+  NumShards:
+    Type: Number
+    Description: The number of shard.
+
+  ECPort:
+    Type: Number
+    Description: The port number on which each of the cache nodes accepts connections.
+
+Resources:
+#-------------------------------------------------------------------#
+################################## AWS Elasticache Security Group #
+  awsECdomainSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Ref ECsecurityGroupName
+      GroupDescription: Allow communication to AWS Elasticache
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref ECPort
+          ToPort: !Ref ECPort
+          SourceSecurityGroupId: !Ref EC2SecurityGroupID
+      Tags:
+        - Key: Name
+          Value: !Ref ECsecurityGroupName
+
+#-------------------------------------------------------------------#
+########################################## AWS Elasticache Domain #
+  CacheSubnetGroupName:
+    Type: 'AWS::ElastiCache::SubnetGroup'
+    Properties:
+      Description: !Ref 'AWS::StackName'
+      SubnetIds: !Ref Subnets
+
+  ElasticacheDomain:
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      ReplicationGroupDescription: !Ref 'AWS::StackName'
+      CacheSubnetGroupName: !Ref CacheSubnetGroupName
+      CacheNodeType: !Ref CacheNodeType
+      Engine: !Ref ECEngine
+      EngineVersion: !Ref ECEngineVersion
+      MultiAZEnabled: !Ref ECMultiAZEnabled
+      SnapshotRetentionLimit: !Ref SnapshotRetentionLimit
+      SnapshotWindow: '00:00-03:00'
+      Port: !Ref ECPort
+      ReplicasPerNodeGroup: !Ref NumReplicas
+      NumNodeGroups: !Ref NumShards
+      SecurityGroupIds:
+        - !Ref awsECdomainSG
+      PreferredMaintenanceWindow: 'sat:07:00-sat:08:00'
+      Tags:
+          - Key: Name
+            Value: !Ref ECName
+      TransitEncryptionEnabled: !Ref TransitEncryption
+
+#-------------------------------------------------------------------#
+################################################## Template Outputs #
+Outputs:
+  ClusterName:
+    Description: 'The name of the cluster'
+    Value: !Ref ElasticacheDomain
+  ECPrimaryEndPointAddress:
+    Description: 'The DNS address of the primary read-write cache node.'
+    Value: !GetAtt ElasticacheDomain.ConfigurationEndPoint.Address
+  ECPrimaryEndPointPort:
+    Description: 'The port that the primary read-write cache engine is listening on.'
+    Value: !GetAtt 'ElasticacheDomain.ConfigurationEndPoint.Port'

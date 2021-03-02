@@ -1,0 +1,128 @@
+# Docker image for pod
+image:
+  repository: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/user-behavior-tracker
+  tag: 0.0.58
+
+kind: Deployment
+
+# Replica pod count
+replicas: 2
+
+# Labels
+labels:
+  metricsProm: true
+
+# Update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+# Anti/Affinity rules
+affinity:
+  nodeAffinity:
+    key: int-2-tier
+    values: microservice
+  podAntiAffinity:
+    weight: 100
+    key: app
+    values: user-behavior-tracker
+    topologyKey: kubernetes.io/hostname
+
+# Container startup command
+command:
+  - "/bin/bash"
+  - "-c"
+  - "./start.sh $(JVM_ARGS) -Dlogging.level.com.withme.userbehaviortracker=DEBUG"
+
+# Environment variables for pod
+env:
+  - name: JVM_ARGS
+    value: "-Xmx1000m -Xms1000m"
+  - name: JAEGER_ENABLED
+    value: "true"
+  - name: SPRING_PROFILES_ACTIVE
+    value: "int-2"
+  - name: JAEGER_UDP_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+  - name: EVENTS_CUSTOM_APPLICATION
+    value: "{ 'ego_chat': {'event_type': 'UI', 'event': 'user_chat'}, 'egoapp_metrics_log': {'event_type': 'metric'} }"
+
+# Container Lifecycle Hooks: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+lifecycle:
+  preStop:
+    httpGet:
+      path: lifecycle/v1/preStop
+      port: 8080
+
+# Pod resources
+resources: 
+  requests:
+    cpu: "250m"
+    memory: "1250Mi"
+  limits:
+    # cpu: no limits
+    memory: "1250Mi"
+
+# livenessProbe configuration
+livenessProbe:
+  httpGet:
+    path: /health/v1/lively
+    port: 8080
+  initialDelaySeconds: 40
+  periodSeconds: 10
+  failureThreshold: 10
+
+# livenessProbe configuration
+readinessProbe:
+  httpGet:
+    path: /health/v1/ready
+    port: 8080
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 2
+
+# Container ports
+containerPorts:
+  - containerPort: 8080
+  - containerPort: 8081
+
+# k8s Service
+service:
+  # k8s Service type
+  type: NodePort
+  # k8s Service ports (If you adding new ports make sure that you set them in "containerPorts" too)
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+    - port: 8081
+      targetPort: 8081
+      name: grpc 
+
+##########################
+##########################
+
+# k8s Secret for microservice
+secret:
+  create: true
+  name: "imvu-event-service-secrets"
+  version: 1.0.0
+  secretContents: {}
+    # IMVU_EVENT_SERVICE_SECRET: {}
+    # IMVU_EVENT_SERVICE_CID: {}
+    # BIGQUERY_PRIVATE_KEY: {}
+    # BIGQUERY_PRIVATE_KEY_ID: {}
+
+##########################
+##########################
+
+# K8s ServiceAccount for pod
+serviceAccount:
+  create: false
+  # name: ""
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::407733091588:role/----

@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cleanspeak-database-server
+  labels:
+    component: cleanspeak-database-server
+    tier: cleanspeak-database-server
+spec:
+  type: NodePort
+  ports:
+    - port: 3306
+      targetPort: 3306
+      name: mysql
+  selector:
+    component: cleanspeak-database-server
+    tier: cleanspeak-database-server
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cleanspeak-database-server-deployment
+  labels:
+    component: cleanspeak-database-server
+    tier: cleanspeak-database-server
+spec:
+  selector:
+    matchLabels:
+      component: cleanspeak-database-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: cleanspeak-database-server
+        tier: cleanspeak-database-server
+    spec:
+      containers:
+        - name: cleanspeak-database-server
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/cleanspeak-database-server:3.23.4
+          env:
+            - name: MYSQL_DATABASE
+              value: "cleanspeak"
+            - name: MYSQL_ALLOW_EMPTY_PASSWORD
+              value: "yes"
+            - name: MYSQL_USER
+              value: "cleanspeak"
+            - name: MYSQL_PASSWORD
+              value: "cleanspeak"
+          livenessProbe:
+            exec:
+              command: ["mysqladmin", "ping"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 10
+#            TODO: not working, can't connect to localhost, not sure why
+#          readinessProbe:
+#            exec:
+#              command: ["mysql", "-h", "127.0.0.1", "-e", "SELECT 1"]
+#            initialDelaySeconds: 20
+#            periodSeconds: 5
+#            failureThreshold: 2
+          ports:
+            - containerPort: 3306

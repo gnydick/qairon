@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cleanspeak-search-server
+  labels:
+    component: cleanspeak-search-server
+    tier: cleanspeak-search-server
+spec:
+  type: NodePort
+  ports:
+    - port: 9200
+      targetPort: 9200
+      name: elastic
+  selector:
+    component: cleanspeak-search-server
+    tier: cleanspeak-search-server
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cleanspeak-search-server-deployment
+  labels:
+    component: cleanspeak-search-server
+    tier: cleanspeak-search-server
+spec:
+  selector:
+    matchLabels:
+      component: cleanspeak-search-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: cleanspeak-search-server
+        tier: cleanspeak-search-server
+    spec:
+      initContainers:
+        - name: init-sysctl
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/busybox:1.27.2
+          command:
+            - sysctl
+            - -w
+            - vm.max_map_count=262144
+          securityContext:
+            privileged: true
+      containers:
+        - name: cleanspeak-search-server
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/cleanspeak-search-server:3.23.0
+          ports:
+            - containerPort: 9200

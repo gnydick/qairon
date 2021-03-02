@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-gateway
+  labels:
+    component: service-gateway
+    tier: gateway
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      name: api
+    - port: 8080
+      targetPort: 8080
+      name: status
+    - port: 8082
+      nodePort: 32000
+      targetPort: 8082
+      name: grpc
+    - port: 8083
+      targetPort: 8083
+      name: cs
+  selector:
+    component: service-gateway
+    tier: gateway
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: service-gateway-deployment
+  labels:
+    component: service-gateway
+    tier: gateway
+spec:
+  selector:
+    matchLabels:
+      component: service-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: service-gateway
+        tier: gateway
+    spec:
+      containers:
+        - name: service-gateway
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/service-gateway-int:1.0.60
+          env:
+            - name: JAEGER_ENABLED
+              value: "false"
+            - name: JAEGER_UDP_SERVER
+              value: "jaeger-agent.default.svc.cluster.local"
+          livenessProbe:
+            httpGet:
+              path: /health/v1/lively
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /health/v1/ready
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            failureThreshold: 2
+          ports:
+            - containerPort: 80
+            - containerPort: 8080
+            - containerPort: 8082
+            - containerPort: 8083

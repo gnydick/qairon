@@ -1,0 +1,144 @@
+# Docker image for pod
+image:
+  repository: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/content-manager
+  tag: 1.0.60
+
+kind: Deployment
+
+# Replica pod count
+replicas: 2
+
+# Labels
+labels:
+  metricsProm: true
+
+# Update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+# Anti/Affinity rules
+affinity:
+  nodeAffinity:
+    key: int-2-tier
+    values: microservice
+  podAntiAffinity:
+    weight: 100
+    key: app
+    values: content-manager
+    topologyKey: kubernetes.io/hostname
+
+# Container startup command
+command:
+  - "/bin/bash"
+  - "-c"
+  - "./start.sh $(JVM_ARGS) -Dlogging.level.com.withme.content=DEBUG"
+
+# Environment variales for pod
+env:
+  - name: MAX_UPLOAD_SIZE
+    value: "320MB"
+  - name: EXTERNAL_URL_PREFIX
+    value: https://int-2.withme.com
+  - name: AWS_S3_BUCKET_NAME
+    value: "int-2-content-manager-us-west-2-407733091588"
+  - name: AWS_REGION
+    value: "us-west-2"
+  - name: CONTENT_CACHE_TTL
+    value: "10m"
+  - name: JVM_ARGS
+    value: "-Xmx1000m -Xms1000m"
+  - name: JAEGER_ENABLED
+    value: "true"
+  - name: JAEGER_APPENDER_LOG_LEVEL
+    value: "DEBUG"
+  - name: SPRING_PROFILES_ACTIVE
+    value: "int-2"
+  - name: JAEGER_UDP_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+  - name: SPRING_DATA_MONGODB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: mongo-atlas-auth
+        key: username
+  - name: SPRING_DATA_MONGODB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mongo-atlas-auth
+        key: password
+  - name: SPRING_DATA_MONGODB_URI
+    value: "mongodb+srv://$(SPRING_DATA_MONGODB_USERNAME):$(SPRING_DATA_MONGODB_PASSWORD)@int-2-mongo.gzpfq.mongodb.net/content?retryWrites=true&w=majority"
+
+PodSecurityContext:
+  fsGroup: 65534
+
+ContainerSecurityContext: {}
+
+# Pod resources
+resources: 
+  requests:
+    cpu: "250m"
+    memory: "1250Mi"
+  limits:
+    # cpu: no limits
+    memory: "1250Mi"
+
+# livenessProbe configuration
+livenessProbe:
+  httpGet:
+    path: /health/v1/lively
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 10
+
+# livenessProbe configuration
+readinessProbe:
+  httpGet:
+    path: /health/v1/ready
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 2
+
+# Container ports
+containerPorts:
+  - containerPort: 8080
+  - containerPort: 8081
+
+# k8s Service
+service:
+  # k8s Service type
+  type: NodePort
+  # k8s Service ports (If you adding new ports make sure that you set them in "containerPorts" too)
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+    - port: 8081
+      targetPort: 8081
+      name: grpc 
+
+##########################
+##########################
+
+# k8s Secret for microservice
+secret:
+  create: false
+  # name: "secret-stuff"
+  # version: 1.0.0
+  # secretContents: {}
+
+##########################
+##########################
+
+# K8s ServiceAccount for pod
+serviceAccount:
+  create: true
+  name: "s3-content-manager"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::407733091588:role/int-2-content-manager-s3-rw

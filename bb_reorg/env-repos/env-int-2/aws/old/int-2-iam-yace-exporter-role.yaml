@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Deploy IAM Role with CloudWatch read-only policy'
+
+Parameters:
+
+  RoleName:
+    Type: String
+    Default: int2-cw-exporter
+    Description: yace_exporter Role name
+
+  PolicyName:
+    Type: String
+    Default: allow-get-resources-tags
+    Description: yace_exporter Policy name
+
+Resources:
+#-------------------------------------------------------------------#
+############################################################## Role #
+  int2cwRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service: "ec2.amazonaws.com"
+          Action:
+            - "sts:AssumeRole"
+        - Effect: "Allow"
+          Principal:
+            AWS: "arn:aws:iam::407733091588:role/kiam-server"
+          Action:
+            - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"
+#-------------------------------------------------------------------#
+##################################################### Custom policy #
+  int2cwTagPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Ref PolicyName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "tag:getResources"
+            Resource: "*"
+      Roles:
+        - !Ref int2cwRole
+
+#-------------------------------------------------------------------#
+################################################## Template Outputs #
+Outputs:
+
+  RoleId:
+    Description: The logical ID of the IAM role
+    Value: !Ref int2cwRole
+
+  RoleArn:
+    Description: The ARN of the IAM role
+    Value: !GetAtt [int2cwRole, Arn]

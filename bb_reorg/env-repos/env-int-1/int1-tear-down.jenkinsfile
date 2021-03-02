@@ -1,0 +1,103 @@
+def notifySlack(String buildStatus = 'STARTED') {
+
+    // Build status of null means success.
+    buildStatus = buildStatus ?: 'SUCCESS'
+    def icons
+    if (buildStatus == 'STARTED') {
+        icons = ':biking:'
+    } else if (buildStatus == 'SUCCESS') {
+        icons = ':pusheen_dancing:'
+    } else if (buildStatus == 'ABORTED') {
+        icons = ':thinking_face:'
+    } else {
+        icons = ':twitching:'
+    }
+    def color
+    if (buildStatus == 'STARTED') {
+        color = '#D4DADF'
+    } else if (buildStatus == 'SUCCESS') {
+        color = '#BDFFC3'
+    } else if (buildStatus == 'ABORTED') {
+        color = '#FFFE89'
+    } else {
+        color = '#FF9FA1'
+    }
+    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n<${env.BUILD_URL}console|Watch build console output>"
+    slackSend(color: color, message: msg)
+}
+
+def label = "int-1-automation-tear-down-${UUID.randomUUID().toString()}"
+
+podTemplate(name: 'int-1-automation-tear-down', label: label, yaml: """
+kind: Pod
+metadata:
+  name: microservice-orchestration
+spec:
+  containers:
+  - name: microservice-orchestration
+    image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-cicd/microservice-orchestration:1.0.9
+    imagePullPolicy: Always
+    command:
+    - /bin/cat
+    tty: true
+    env:
+    - name: STACK_NAME
+      value: "env-int-1"
+    - name: CLUSTER_NAME
+      value: "int-1"
+    - name: SUBDOMAIN
+      value: "int-1.withme.com"
+"""
+  ) {
+node(label) {
+    try {
+      def secrets = [[$class: 'VaultSecret', path: 'cicd/aws_keys', secretValues: [
+                      [$class: 'VaultSecretValue', envVar: 'AWS_ACCESS_KEY_ID', vaultKey: 'AWS_ACCESS_KEY_ID'],
+                      [$class: 'VaultSecretValue', envVar: 'AWS_SECRET_ACCESS_KEY', vaultKey: 'AWS_SECRET_ACCESS_KEY']]],
+                    [$class: 'VaultSecret', path: 'cicd/bitbucket', secretValues: [
+                      [$class: 'VaultSecretValue', envVar: 'BITBUCKET_USER', vaultKey: 'BITBUCKET_USER'],
+                      [$class: 'VaultSecretValue', envVar: 'BITBUCKET_APP_PASSWORD', vaultKey: 'BITBUCKET_APP_PASSWORD']]]]
+      wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
+  properties([ disableConcurrentBuilds() ])
+    stage('Configure tools') {
+      notifySlack()
+      slackSend color: 'good', message: "`${env.JOB_NAME}` #${env.BUILD_NUMBER}\nRunning 'Configure tools' stage."
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        /toolbox/set-aws-credentials.sh --key-id ${AWS_ACCESS_KEY_ID} --secret-access-key ${AWS_SECRET_ACCESS_KEY}
+        ## Check IAM user and create kubeconfig for kubectl
+        aws sts get-caller-identity --output text
+        aws eks --region us-west-2 update-kubeconfig --name ${CLUSTER_NAME}
+      '''
+    }}
+    stage('Terminate Route53 records and Ingress Controllers') {
+      slackSend color: 'good', message: "`${env.JOB_NAME}` #${env.BUILD_NUMBER}\nRunning 'Terminate Route53 records and Ingress Controllers' stage."
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        ## Clone repo
+        git clone https://${BITBUCKET_USER}:${BITBUCKET_APP_PASSWORD}@bitbucket.org/imvu/${STACK_NAME}.git
+        ./${STACK_NAME}/update-route53-record-set.sh -n ingress-nginx --namespace ingress-nginx -s ${SUBDOMAIN} -a 'DELETE' ||:
+        ./${STACK_NAME}/update-route53-record-set.sh -n service-gateway-grpc-load-balancer -s cm-${SUBDOMAIN} -a 'DELETE' ||:
+        ### Deleting ELB services before deleting CF stack
+        kubectl delete svc service-gateway-grpc-load-balancer -n default ||:
+        kubectl delete namespaces ingress-nginx ||:
+        echo " Ingress controllers deleted"
+      '''
+    }}
+    stage('Terminate environment') {
+     slackSend color: 'good', message: "`${env.JOB_NAME}` #${env.BUILD_NUMBER}\nRunning 'Terminate environment' stage."
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        cd ${STACK_NAME}/aws && sceptre delete us-west-2 -y
+        echo " ${STACK_NAME} environment deleted"
+      '''
+    }}}}
+    catch (e) {
+        currentBuild.result = 'FAILURE'
+        throw e
+    } finally {
+    notifySlack(currentBuild.result)
+}}}

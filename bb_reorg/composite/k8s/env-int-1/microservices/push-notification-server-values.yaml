@@ -1,0 +1,91 @@
+# Docker image for pod
+image:
+  repository: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/push-notification-server
+  tag: 1.1.61
+
+kind: Deployment
+
+# Replica pod count
+replicas: 1
+
+# Labels
+labels:
+  metricsProm: false
+
+# Update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+# Container startup command
+command:
+  - "/bin/bash"
+  - "-c"
+  - "./start.sh $(JVM_ARGS)"
+
+# Environment variales for pod
+env:
+  - name: JVM_ARGS
+    value: "-Xmx640m -Xms640m -Dlogging.level.com.withme.pushnotification=DEBUG -Dpushnotification.firebase.send_url=http://mock-server:8080/fcm/send"
+  - name: SPRING_PROFILES_ACTIVE
+    value: "int-1"
+
+# livenessProbe configuration
+livenessProbe:
+  httpGet:
+    path: /health/v1/lively
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 10
+
+# livenessProbe configuration
+readinessProbe:
+  httpGet:
+    path: /health/v1/ready
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 2
+
+# Container ports
+containerPorts:
+  - containerPort: 8080
+  - containerPort: 8081
+
+# k8s Service
+service:
+  # k8s Service type
+  type: NodePort
+  # k8s Service ports (If you adding new ports make sure that you set them in "containerPorts" too)
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+    - port: 8081
+      targetPort: 8081
+      name: grpc 
+
+##########################
+##########################
+
+# k8s Secret for microservice
+secret:
+  create: false
+  name: "firebase-secrets"
+  version: 1.0.0
+  secretContents: {}
+    # PRIVATE_KEY_ID: {}
+    # PRIVATE_KEY: {}
+
+##########################
+##########################
+
+# K8s ServiceAccount for pod
+serviceAccount:
+  create: false
+  # name: ""
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::407733091588:role/----

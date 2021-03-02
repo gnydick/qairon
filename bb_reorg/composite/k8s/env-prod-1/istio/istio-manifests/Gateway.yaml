@@ -1,0 +1,48 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: grpc-gateway
+  namespace: default
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+# Configure gRPC gateway
+  - hosts:
+    - 'cm-api.withme.com'
+    port:
+      name: grpc
+      number: 8082
+      protocol: GRPC
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: rest-gateway
+  namespace: default
+spec:
+  selector:
+# We can have multiple Ingress-gateways, "selector" choose a specific "ingress-gateway" by this label.
+    istio: ingressgateway
+  servers:
+# Configure HTTP Gateway
+  - hosts:
+    - 'api.withme.com'
+    - 'cs-api.withme.com'
+    - 'grafana-ui.withme.com'
+    port:
+      name: http2
+      number: 80
+      protocol: HTTP2
+# Redirect all HTTP traffic to HTTPS Gateway
+    tls:
+      httpsRedirect: true
+# Configure HTTPS Gateway
+  - hosts:
+    - 'api.withme.com'
+    - 'cs-api.withme.com'
+    - 'grafana-ui.withme.com'
+    port:
+      name: https
+      number: 443
+      protocol: HTTP

@@ -1,0 +1,276 @@
+def notifySlack(String buildStatus = 'STARTED') {
+
+    // Build status of null means success.
+    buildStatus = buildStatus ?: 'SUCCESS'
+    def icons
+    if (buildStatus == 'STARTED') {
+        icons = ':biking:'
+    } else if (buildStatus == 'SUCCESS') {
+        icons = ':pusheen_dancing:'
+    } else if (buildStatus == 'ABORTED') {
+        icons = ':thinking_face:'
+    } else {
+        icons = ':twitching:'
+    }
+    def color
+    if (buildStatus == 'STARTED') {
+        color = '#D4DADF'
+    } else if (buildStatus == 'SUCCESS') {
+        color = '#BDFFC3'
+    } else if (buildStatus == 'ABORTED') {
+        color = '#FFFE89'
+    } else {
+        color = '#FF9FA1'
+    }
+    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\nSOURCE=${env.SOURCE}\n<${env.BUILD_URL}console|Watch build console output> @here"
+    slackSend(color: color, channel: "#ego-svc-jenkins-ags", message: msg)
+}
+
+def autoCancelled = false
+def label = "game-sever-scale-down-${UUID.randomUUID().toString()}"
+
+podTemplate(name: 'game-sever-scale-down-to-empty', label: label, yaml: """
+kind: Pod
+metadata:
+  name: microservice-orchestration
+spec:
+  containers:
+  - name: microservice-orchestration
+    image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-cicd/microservice-orchestration:1.0.14
+    imagePullPolicy: Always
+    command:
+    - /bin/cat
+    tty: true
+    env:
+    - name: STACK_NAME
+      value: "env-prod-1"
+    - name: CLUSTER_NAME
+      value: "prod-1"
+"""
+  ) {
+node(label) {
+  try {
+    def secrets = [[$class: 'VaultSecret', path: 'cicd/prod-1/aws_keys', secretValues: [
+                    [$class: 'VaultSecretValue', envVar: 'AWS_ACCESS_KEY_ID', vaultKey: 'AWS_ACCESS_KEY_ID'],
+                    [$class: 'VaultSecretValue', envVar: 'AWS_SECRET_ACCESS_KEY', vaultKey: 'AWS_SECRET_ACCESS_KEY']]],
+                  [$class: 'VaultSecret', path: 'cicd/bitbucket', secretValues: [
+                    [$class: 'VaultSecretValue', envVar: 'BITBUCKET_USER', vaultKey: 'BITBUCKET_USER'],
+                    [$class: 'VaultSecretValue', envVar: 'BITBUCKET_APP_PASSWORD', vaultKey: 'BITBUCKET_APP_PASSWORD']]],
+                  [$class: 'VaultSecret', path: 'cicd/artifactory', secretValues: [
+                    [$class: 'VaultSecretValue', envVar: 'ART_BUILD_USER', vaultKey: 'ART_BUILD_USER'],
+                    [$class: 'VaultSecretValue', envVar: 'ART_BUILD_PASSWORD', vaultKey: 'ART_BUILD_PASSWORD']]]]
+
+    withCredentials([string(credentialsId: 'EGO_VAULT_ROLE_ID', variable: 'EGO_VAULT_ROLE_ID'), string(credentialsId: 'EGO_VAULT_SECRET_ID', variable: 'EGO_VAULT_SECRET_ID')]) {
+    echo "${EGO_VAULT_ROLE_ID}"
+
+        wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
+  properties([
+          parameters([choice(choices: ['game-server', 'game-server2'], description: 'The game-server tier', name: 'AGS_TIER_ID'),
+                      string(defaultValue: 'withme', description: 'The publisher organization id', name: 'ORG_ID', trim: true),
+                      string(defaultValue: '', description: 'The source of this build', name: 'SOURCE', trim: true)]),
+          disableConcurrentBuilds()
+      ])
+    env.AGS_TIER_ID = "${params.AGS_TIER_ID}"
+    env.VAULT_APP_ID = "authoritative-game-server-${params.ORG_ID}"
+    env.HELM_VALUES_FILE = "authoritative-${env.AGS_TIER_ID}-${params.ORG_ID}-values.yaml"
+    env.SCEPTRE_VALUES_FILE = "nodes.yaml"
+    if (env.AGS_TIER_ID == 'game-server2') {
+      env.SCEPTRE_VALUES_FILE = "nodes2.yaml"
+    }
+    env.APP_NAME = "authoritative-${env.AGS_TIER_ID}-${params.ORG_ID}"
+    env.POD_NAME = "${env.AGS_TIER_ID}-${params.ORG_ID}"
+    env.JOB_NAME = "${env.JOB_NAME}"
+    env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    env.REPLICAS = "${params.REPLICAS}"
+    env.SOURCE = "${params.SOURCE}"
+    currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}`"
+    env.GIT_BRANCH = "master"
+
+    stage('Configure aws account and kubectl config') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eox pipefail
+        /toolbox/set-aws-credentials.sh --key-id ${AWS_ACCESS_KEY_ID} --secret-access-key ${AWS_SECRET_ACCESS_KEY}
+        /toolbox/add-aws-profile-credentials.sh --profile-name prod --key-id ${AWS_ACCESS_KEY_ID} --secret-access-key ${AWS_SECRET_ACCESS_KEY}
+        ### Check IAM user
+        aws sts get-caller-identity --output text
+        ### Configure kubectl
+        aws eks --region us-west-2 update-kubeconfig --name ${CLUSTER_NAME}
+        ### Check kubectl context
+        kubectl config current-context
+      '''
+    }}
+    stage('Validate AGS state') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        source /toolbox/automation-scripts/autoscaling-group-functions.sh
+        ### Make sure the AWS EC2 Autoscaling Group exists
+        getAwsAutoscalingGroup "_autoscaling_group" ${CLUSTER_NAME} "${AGS_TIER_ID}-tier"
+        if [[ "${_autoscaling_group}" != *"game-server"* ]]; then
+          echo "Autoscaling group: ${_autoscaling_group}"
+          echo "No AWS EC2 Autoscaling Group found for cluster [${CLUSTER_NAME}] and node group [${AGS_TIER_ID}-tier]."
+          exit 1
+        fi
+        declare -A _autoscaling_group_status
+        getAwsAutoscalingGroupStatus "_autoscaling_group_status" ${_autoscaling_group}
+        echo "Autoscaling group status:"
+        for statusKey in "${!_autoscaling_group_status[@]}"; do
+          echo "${statusKey}: ${_autoscaling_group_status[${statusKey}]}"
+        done
+
+        ### Show how many Kubernetes Nodes there are
+        k8sNodeCount=$(kubectl -n default get nodes -l prod-1-tier=${AGS_TIER_ID} | grep Ready | wc -l)
+        echo "Ready Kubernetes Nodes: ${k8sNodeCount}"
+
+        ### Make sure the Kubernetes Statefulset exists.
+        statefulset=$(kubectl -n default get statefulset ${POD_NAME} | grep $POD_NAME)
+        if [[ -z "${statefulset}" ]]; then
+          echo "No Statefulset found with name ${POD_NAME} in the cluster."
+          exit 1
+        fi
+        replicas=$(kubectl -n default get statefulset ${POD_NAME} -o jsonpath='{.status.replicas}')
+        echo "Statefulset status:"
+        if [[ -z "${replicas}" ]]; then
+          echo "There are no ready replicas to scale down."
+        else
+          echo "There are ${replicas} replicas ready that will be scaled down to zero."
+        fi
+      '''
+    }}
+    stage('Scale down game server tier') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        source /toolbox/automation-scripts/autoscaling-group-functions.sh
+        _LOOP_DONE="done"
+        function waitForDesiredReadyNodes() {
+          local _result_var=$1
+          local _counter=0
+          local _loopStatus="continue"
+          local _result="success"
+          echo "Wait for the Kubernetes Nodes to scale down to ${_AGS_BASE_STATE[${_ASG_DESIRED_SIZE}]}"
+          local _nodeCount=$(kubectl -n default get nodes -l prod-1-tier=${AGS_TIER_ID} | grep Ready | wc -l)
+          until [ "${_loopStatus}" == "${_LOOP_DONE}" ]; do
+            if [[ "${_AGS_BASE_STATE[${_ASG_DESIRED_SIZE}]}" -ge "${_nodeCount}" ]]; then
+              echo "Done. The actual size ${_nodeCount} is at or below the desired size ${_AGS_BASE_STATE[${_ASG_DESIRED_SIZE}]}."
+              _loopStatus="${_LOOP_DONE}"
+            else
+              if [[ "${_counter}" -lt 24 ]]; then
+                sleep 5
+                _nodeCount=$(kubectl -n default get nodes -l prod-1-tier=${AGS_TIER_ID} | grep Ready | wc -l)
+                echo "${_counter}. Ready Nodes: ${_nodeCount}.  Waiting for a total of ${_AGS_BASE_STATE[${_ASG_DESIRED_SIZE}]}..."
+              else
+                # Break out of the loop with result set to failure
+                echo "Expected ${_AGS_BASE_STATE[${_ASG_DESIRED_SIZE}]} but ${_nodeCount} were still ready after two minutes."
+                _result="failure"
+                _loopStatus="${_LOOP_DONE}"
+              fi
+            fi
+            _counter=$(( _counter + 1))
+          done
+          echo "Result from waiting for ready nodes: ${_result}"
+          eval $_result_var="'${_result}'"
+        }
+        ### Clone repo environment repository
+        git clone https://${BITBUCKET_USER}:${BITBUCKET_APP_PASSWORD}@bitbucket.org/imvu/${STACK_NAME}.git && cd ${STACK_NAME}
+        git fetch && git checkout ${GIT_BRANCH}
+        ### Pull EGO Helm charts from Artifactory Helm repo
+        helm repo add ego-helm-release https://withme.jfrog.io/withme/ego-helm-release/ --username $ART_BUILD_USER --password $ART_BUILD_PASSWORD && helm repo update
+
+        ### Fetch credentials from Vault
+        echo "Get credentials from Vault"
+        vault_token=$(vault write -address="https://vault.withme.com/" -format=json auth/approle/login role_id=${EGO_VAULT_ROLE_ID} secret_id=${EGO_VAULT_SECRET_ID} | jq .auth.client_token | sed -e 's/^"//' -e 's/"$//')
+        vault login -address="https://vault.withme.com/" token=${vault_token} > /dev/null 2>&1
+        fetchedSecrets=$(vault kv get -address="https://vault.withme.com/" -format=json cicd/${CLUSTER_NAME}/base64/${VAULT_APP_ID} | jq -r '.data | to_entries | .[] | .key + "=" + .value' | sed "s/^/--set-string secret.secretContents./g" | xargs)
+
+        ### Edit the number of replicas in the AGS helm "values.yaml" file
+        values_file="k8s/game-server-tier/${HELM_VALUES_FILE}"
+        echo "Edit ${values_file} to set the replicas to 0:"
+        sed -i 's/replicas: .*/replicas: '0'/g' ${values_file}
+        git --no-pager diff ${values_file}
+
+        ### Scale down the AGS pods to the base level
+        echo "Scale down the game servers to 0 replicas."
+        helm upgrade ${POD_NAME} ego-helm-release/authoritative-game-server -f ${values_file} --namespace=default --reuse-values --atomic --wait --timeout 1800s --install ${fetchedSecrets} || true
+        replicas=$(kubectl -n default get statefulset ${POD_NAME} -o jsonpath='{.status.replicas}')
+        if [[ -z "${replicas}" ]]; then
+          replicas="0"
+        fi
+        echo "successfully scaled down the ${POD_NAME} Pod count to ${replicas}"
+
+        ### Show the AWS Autoscaling Group Size
+        getAwsAutoscalingGroup "_autoscaling_group" ${CLUSTER_NAME} "${AGS_TIER_ID}-tier"
+        if [[ "${_autoscaling_group}" != *"game-server"* ]]; then
+          echo "Autoscaling group: ${_autoscaling_group}"
+          echo "No AWS EC2 Autoscaling Group found for cluster [${CLUSTER_NAME}] and node group [${AGS_TIER_ID}-tier]."
+          exit 1
+        fi
+        getAwsAutoscalingGroupCurrentSize "_autoscaling_group_size" ${_autoscaling_group}
+        echo "Autoscaling Group [${_autoscaling_group}] has ${_autoscaling_group_size} instances."
+
+        ### Scale down the AWS Autoscaling Group to the Base state
+        sceptreValuesFile="aws/config/us-west-2/game-server-tier/${SCEPTRE_VALUES_FILE}"
+        echo "Edit ${sceptreValuesFile} to set NodeAutoScalingGroupDesiredCapacity to ${_AGS_BASE_STATE[${_ASG_DESIRED_SIZE}]}:"
+        sed -i "s/NodeAutoScalingGroupDesiredCapacity: .*/NodeAutoScalingGroupDesiredCapacity: '${_AGS_BASE_STATE[${_ASG_DESIRED_SIZE}]}'/g" ${sceptreValuesFile}
+        git diff ${sceptreValuesFile}
+        pushd aws > /dev/null 2>&1
+        ### This command always returns a non-zero exit code even when it succeeds (see ES-1328)
+        sceptre update us-west-2/game-server-tier/${SCEPTRE_VALUES_FILE} --yes || true
+        popd > /dev/null 2>&1
+
+        ### Wait for the Kubernetes Nodes to scale down
+        waitForDesiredReadyNodes "_nodesReadyResult"
+        k8sNodeCount=$(kubectl -n default get nodes -l prod-1-tier=${AGS_TIER_ID} | grep Ready | wc -l)
+        echo "There are now ${k8sNodeCount} Kubernetes Nodes in the ${AGS_TIER_ID} tier."
+
+        getAwsAutoscalingGroupCurrentSize "_autoscaling_group_size" ${_autoscaling_group}
+        echo "Autoscaling Group [${_autoscaling_group}] has ${_autoscaling_group_size} instances."
+      '''
+    }}
+    stage('Push deployed version to env-prod-1') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        cd ${STACK_NAME} && git checkout ${GIT_BRANCH}
+        git config --global user.name "jenkins"
+        git config --global user.email "jenkins@imvu.com"
+        git diff-index --quiet HEAD || git commit -am "Scaled down ${APP_NAME} to empty. ${JOB_NAME}:#${BUILD_NUMBER}"
+        # Added loop in case if developers push changes to "env-prod-1" repo while AGS pipeline running.
+        COUNTER=0
+        until git push origin ${GIT_BRANCH}
+        do
+          if [[ "${COUNTER}" -eq '120' ]]; then
+            echo "Can't push to ${GIT_BRANCH} branch. Something wrong with Bitbucket or with repository"
+            exit 1
+          else
+            sleep 1s
+            COUNTER=$(( COUNTER + 1))
+            echo "Pull and try again"
+            git pull
+          fi
+        done
+      '''
+    }}}
+    }} catch (e) {
+      if ( autoCancelled ) {
+        currentBuild.result = 'ABORTED'
+        throw e
+      } else {
+        currentBuild.result = 'FAILURE'
+        throw e
+      }
+    } finally {
+      stage('Send notifications') {
+        container('microservice-orchestration')  {
+        if (currentBuild.result == 'ABORTED') {
+          notifySlack(currentBuild.result)
+          slackSend color: '#FFFE89', channel: "#ego-svc-jenkins-ags", message: "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}: \n'AGS version not valid or empty. Pipeline aborted!'"
+        }
+        if (currentBuild.result == 'FAILURE') {
+            notifySlack(currentBuild.result)
+        }
+        if (currentBuild.result != 'FAILURE' && currentBuild.result != 'ABORTED') {
+            notifySlack(currentBuild.result)
+        }}}}
+}}

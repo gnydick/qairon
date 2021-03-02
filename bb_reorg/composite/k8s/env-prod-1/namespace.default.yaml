@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: default
+  annotations:
+    iam.amazonaws.com/permitted: .*
+  labels:
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: database
+  annotations:
+    iam.amazonaws.com/permitted: .*
+  labels:
+    istio-injection: disabled

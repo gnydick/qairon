@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: message-orchestrator-mongodb
+  labels:
+    component: mongodb
+    database: message-orchestrator
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    component: mongodb
+    tier: backend
+    message-orchestrator: database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: message-orchestrator
+  labels:
+    component: message-orchestrator
+    tier: message-orchestrator
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+  selector:
+    component: message-orchestrator
+    tier: message-orchestrator
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: message-orchestrator-deployment
+  labels:
+    component: message-orchestrator
+    tier: message-orchestrator
+spec:
+  selector:
+    matchLabels:
+      component: message-orchestrator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: message-orchestrator
+        tier: message-orchestrator
+    spec:
+      containers:
+        - name: message-orchestrator
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/message-orchestrator:1.0.85
+          command:
+            - "/bin/bash"
+            - "-c"
+            - "./start.sh -Xms640m -Xmx640m -Dspring.profiles.active=local"
+          livenessProbe:
+            httpGet:
+              path: /health/v1/lively
+              port: 8080
+            initialDelaySeconds: 50
+            periodSeconds: 15
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /health/v1/ready
+              port: 8080
+            initialDelaySeconds: 50
+            periodSeconds: 15
+            failureThreshold: 2
+          ports:
+            - containerPort: 8080

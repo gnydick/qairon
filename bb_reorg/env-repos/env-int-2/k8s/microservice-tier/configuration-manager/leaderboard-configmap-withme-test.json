@@ -1,0 +1,282 @@
+{
+  "testSuiteName": "leaderboard-configmap-withme-test",
+  "ruleTestCases": [
+    {
+      "testCaseName": "level-up-test",
+      "metricId": "withme_level",
+      "rollUp": "MAX",
+      "oldValue": 5,
+      "metricValue": 6,
+      "lastUpdated": "2021-02-03T00:00:00.000Z",
+      "existingComputedMetrics": [
+        {
+          "metricId": "withme_level",
+          "metricValue": 5,
+          "rollUp": "MAX",
+          "lastUpdated": "2021-02-01T00:00:00.000Z"
+        }
+      ],
+      "traceLogSettings": [
+        {
+          "logCategory": "declaration.rule.level_up",
+          "level": "TRACE"
+        }
+      ],
+      "expectedRuleActions": {
+        "newMetricsToRecord": [
+          {
+            "metricId": "withme_max_send_kudos_per_day",
+            "metricValue": 4,
+            "rollupOperations": ["MAX"]
+          }
+        ],
+        "messagesToSend": [
+          {
+            "messageType": "level_up",
+            "messageData": {
+              "items": [
+                {
+                  "type": "LONG",
+                  "name": "level",
+                  "value": 6
+                }
+              ]
+            }
+          }
+        ],
+        "pushNotificationsToSend": [
+          {
+            "messageType": "LEVEL_UP",
+            "notificationData": {
+              "items": [
+                {
+                  "type": "LONG",
+                  "name": "level",
+                  "value": 6
+                }
+              ]
+            },
+            "titleResourceKey": "level_up.title",
+            "bodyResourceKey": "level_up.body",
+            "messageArguments": {
+              "items": [
+                {
+                  "type": "LONG",
+                  "name": "level",
+                  "value": 6
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "testCaseName": "level_for_xp-test",
+      "metricId": "withme_xp",
+      "rollUp": "SUM",
+      "oldValue": 100,
+      "metricValue": 120,
+      "lastUpdated": "2021-02-01T00:00:00.000Z",
+      "existingComputedMetrics": [],
+      "traceLogSettings": [
+        {
+          "logCategory": "declaration.rule.withme_xp",
+          "level": "TRACE"
+        },
+        {
+          "logCategory": "declaration.property.xp_config",
+          "level": "TRACE"
+        },
+        {
+          "logCategory": "declaration.progression.xp_for_level",
+          "level": "TRACE"
+        }
+      ],
+      "expectedRuleActions": {
+        "newMetricsToRecord": [
+          {
+            "metricId": "withme_level",
+            "metricValue": 5,
+            "rollupOperations": ["MAX"]
+          }
+        ],
+        "messagesToSend": [],
+        "pushNotificationsToSend": []
+      }
+    },
+    {
+      "testCaseName": "first-time-prop-xp_single-user-test",
+      "metricId": "withme_in_room_prop:doggy_poop:smart_home:lobby:01",
+      "rollUp": "COUNT",
+      "oldValue": 0,
+      "metricValue": 1,
+      "lastUpdated": "2021-02-01T00:00:00.000Z",
+      "existingComputedMetrics": [],
+      "traceLogSettings": [
+        {
+          "logCategory": "declaration.rule.first_time_prop_xp",
+          "level": "TRACE"
+        }
+      ],
+      "expectedRuleActions": {
+        "newMetricsToRecord": [
+          {
+            "metricId": "withme_xp",
+            "metricValue": 10,
+            "rollupOperations": ["SUM"]
+          }
+        ],
+        "messagesToSend": [],
+        "pushNotificationsToSend": []
+      }
+    },
+    {
+      "testCaseName": "first-time-prop-xp_multi-user-test",
+      "metricId": "withme_in_room_prop:trivia:welcomeParty:chatRoom:01",
+      "rollUp": "COUNT",
+      "oldValue": 0,
+      "metricValue": 1,
+      "lastUpdated": "2021-02-01T00:00:00.000Z",
+      "existingComputedMetrics": [],
+      "traceLogSettings": [
+        {
+          "logCategory": "declaration.rule.first_time_prop_xp",
+          "level": "TRACE"
+        },
+        {
+          "logCategory": "declaration.rule.repeatable_multi_user_prop_xp",
+          "level": "TRACE"
+        }
+      ],
+      "expectedRuleActions": {
+        "newMetricsToRecord": [
+          {
+            "metricId": "withme_xp",
+            "metricValue": 5,
+            "rollupOperations": ["SUM", "SUM_PER_DAY"]
+          },
+          {
+            "metricId": "withme_xp",
+            "metricValue": 5,
+            "rollupOperations": ["SUM"]
+          }
+        ],
+        "messagesToSend": [],
+        "pushNotificationsToSend": []
+      }
+    },
+    {
+      "testCaseName": "repeatable_multi_user_prop_xp_at-cap-test",
+      "metricId": "withme_in_room_prop:trivia:welcomeParty:chatRoom:01",
+      "rollUp": "COUNT",
+      "oldValue": 5,
+      "metricValue": 6,
+      "lastUpdated": "2021-02-01T10:00:00.000Z",
+      "existingComputedMetrics": [
+        {
+          "metricId": "withme_xp",
+          "metricValue": 100,
+          "rollUp": "SUM_PER_DAY",
+          "lastUpdated": "2021-02-01T19:05:30.890Z"}
+      ],
+      "traceLogSettings": [
+        {
+          "logCategory": "declaration.rule.repeatable_multi_user_prop_xp",
+          "level": "TRACE"
+        }
+      ],
+      "expectedRuleActions": {
+        "newMetricsToRecord": [],
+        "messagesToSend": [],
+        "pushNotificationsToSend": []
+      }
+    },
+    {
+      "testCaseName": "story_room_first_complete_xp-test",
+      "metricId": "story_room:complete:chem_lab",
+      "rollUp": "COUNT",
+      "oldValue": 0,
+      "metricValue": 1,
+      "lastUpdated": "2021-02-01T10:00:00.000Z",
+      "existingComputedMetrics": [],
+      "traceLogSettings": [
+        {
+          "logCategory": "declaration.rule.story_room_first_complete_xp",
+          "level": "TRACE"
+        },
+        {
+          "logCategory": "declaration.rule.story_room_complete_xp",
+          "level": "TRACE"
+        },
+        {
+          "logCategory": "declaration.property.xp_config",
+          "level": "TRACE"
+        }
+      ],
+      "expectedRuleActions": {
+        "newMetricsToRecord": [
+          {
+            "metricId": "withme_xp",
+            "metricValue": 10,
+            "rollupOperations": ["SUM", "SUM_PER_DAY"]
+          },
+          {
+            "metricId": "withme_xp",
+            "metricValue": 30,
+            "rollupOperations": ["SUM"]
+          }
+        ],
+        "messagesToSend": [],
+        "pushNotificationsToSend": []
+      }
+    },
+    {
+      "testCaseName": "user_enter_app_daily_xp-test",
+      "metricId": "withme_daily_user_enter_app",
+      "rollUp": "COUNT_PER_DAY",
+      "oldValue": 0,
+      "metricValue": 1,
+      "lastUpdated": "2021-02-01T10:00:00.000Z",
+      "existingComputedMetrics": [
+        {
+          "metricId": "withme_level",
+          "metricValue": 5,
+          "rollUp": "MAX",
+          "lastUpdated": "2021-02-01T00:00:00.000Z"
+        }
+      ],
+      "traceLogSettings": [
+        {
+          "logCategory": "declaration.rule.user_enter_app_daily_xp",
+          "level": "TRACE"
+        },
+        {
+          "logCategory": "declaration.property.xp_config",
+          "level": "TRACE"
+        },
+        {
+          "logCategory": "declaration.property.daily_config",
+          "level": "TRACE"
+        }
+      ],
+      "expectedRuleActions": {
+        "newMetricsToRecord": [
+         {
+            "metricId": "withme_xp",
+            "metricValue": 30,
+            "rollupOperations": ["SUM"]
+          }
+        ],
+        "messagesToSend": [],
+        "pushNotificationsToSend": []
+      }
+    }
+  ],
+  "traceLogSettings": [
+    {
+      "logCategory": "declaration",
+      "level": "DEBUG"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+template_path: tier-cfs-quota.yaml
+parameters:
+  ClusterName: !resolver_yaml config/defaults.yml::EKS.ClusterName
+  NodeGroupName: int-2-monitoring
+  NodeInstanceType: 't3.large'
+  NodeImageId: !resolver_yaml config/defaults.yml::EKS.NodeImageId
+  KeyName: kubernetes-int-2-key-pair
+  NodeAutoScalingGroupMinSize: '3'
+  NodeAutoScalingGroupMaxSize: '6'
+  NodeAutoScalingGroupDesiredCapacity: '4'
+  NodeVolumeSize: '64'
+  # Kubelet ARG'S
+  NodeLabelARG: '--node-labels=int-2-tier=monitoring'
+  KubeletReservedARG: '--kube-reserved cpu=250m,memory=1Gi,ephemeral-storage=1Gi'
+  SystemReservedARG: '--system-reserved cpu=250m,memory=0.2Gi,ephemeral-storage=1Gi'
+  EvictionHardARG: '--eviction-hard memory.available<500Mi,nodefs.available<10%'
+  NodeSecurityGroup:  sg-09e0f5294fe12b201
+  VpcId: !stack_output_external int-2-eks-vpc::VpcId
+  Subnets: !stack_output_external int-2-eks-vpc::SubnetIds

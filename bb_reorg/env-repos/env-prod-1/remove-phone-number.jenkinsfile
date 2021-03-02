@@ -1,0 +1,92 @@
+def label = "prod-1-automation-${UUID.randomUUID().toString()}"
+
+podTemplate(name: 'prod-1-automation', label: label, yaml: """
+kind: Pod
+metadata:
+  name: microservice-orchestration
+spec:
+  containers:
+  - name: microservice-orchestration
+    image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-cicd/microservice-orchestration:1.0.13
+    imagePullPolicy: Always
+    command:
+    - /bin/cat
+    tty: true
+    env:
+    - name: STACK_NAME
+      value: "env-prod-1"
+    - name: CLUSTER_NAME
+      value: "prod-1"
+"""
+  ) {
+node(label) {
+  try {
+    def secrets = [[$class: 'VaultSecret', path: 'cicd/prod-1/aws_keys', secretValues: [
+                    [$class: 'VaultSecretValue', envVar: 'AWS_ACCESS_KEY_ID', vaultKey: 'AWS_ACCESS_KEY_ID'],
+                    [$class: 'VaultSecretValue', envVar: 'AWS_SECRET_ACCESS_KEY', vaultKey: 'AWS_SECRET_ACCESS_KEY']]]]
+
+    wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
+    properties([
+            parameters([string(defaultValue: '', description: 'Phone Number to delete', name: 'PHONE_NUMBER', trim: true)]),
+            disableConcurrentBuilds()
+        ])
+    env.PHONE_NUMBER = "${params.PHONE_NUMBER}"
+    env.JOB_NAME = "${env.JOB_NAME}"
+    env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    currentBuild.displayName = "#${env.BUILD_NUMBER} `phone-number-delete`"
+
+    stage('Configure aws account and kubectl config') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eox pipefail
+        /toolbox/set-aws-credentials.sh --key-id ${AWS_ACCESS_KEY_ID} --secret-access-key ${AWS_SECRET_ACCESS_KEY}
+        ### Check IAM user
+        aws sts get-caller-identity --output text
+        ### Configure kubectl
+        aws eks --region us-west-2 update-kubeconfig --name ${CLUSTER_NAME}
+        ### Check kubectl context
+        kubectl config current-context
+    '''
+    }}
+    stage('Delete Phone number') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        function waitport () {
+            local COUNTER=0
+            local ip=$1
+            local port=$2
+            until nc -v -z ${ip} ${port}; do
+              if [[ "${COUNTER}" -lt 24 ]]; then
+                COUNTER=$(( COUNTER + 1))
+                echo "Waiting..."
+                sleep 5
+                continue
+              else
+                echo "+++++Port ${port} on ${ip}: not ready more than 2 minutes!+++++"
+                #break loop
+                return 1
+              fi
+            done
+          }
+          echo "++++++++++++++++++++Additional 'account-manager' port forward enabled++++++++++++++++++++"
+          kubectl -n default port-forward svc/account-manager 9092:8080 &>/dev/null &
+          echo "++++++++++++++++++++Port forward wait++++++++++++++++++++"
+          waitport 127.0.0.1 9092
+          echo "++++++++++++++++++++Port forward works!++++++++++++++++++++"
+          PHONE_NUMBER=$(/toolbox/phone_number_url_encoder.py $PHONE_NUMBER)
+          echo "++++++++Translated phone number is $PHONE_NUMBER ++++++++++"
+          exec 3>&1
+          http_code=$(curl -XDELETE -vo >(cat >&3) -w "%{http_code}" "http://localhost:9092/internal/account/v1/sid?type=PHONE&sid=${PHONE_NUMBER}";)
+          if [[ $http_code -ne 200 ]]; then
+              exit 204
+          fi
+          echo "++++++++++++++++++++REQUEST SUSSEDDED!+++++++++++++++++++++"
+      '''
+    }}}
+    } catch (e) {
+        currentBuild.result = 'FAILURE'
+        throw e
+    }
+  }
+}

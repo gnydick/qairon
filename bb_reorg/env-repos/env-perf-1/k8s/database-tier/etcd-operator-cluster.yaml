@@ -1,0 +1,98 @@
+#
+# This file includes all the manifest to deploy etcd-operator and a 3 member cluster
+#
+
+#
+# etcd-operator-rbac.yaml
+#
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: "etcd-operator"
+rules:
+- apiGroups:
+  - etcd.database.coreos.com
+  resources:
+  - etcdclusters
+  verbs:
+  - "*"
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - endpoints
+  - persistentvolumeclaims
+  - events
+  verbs:
+  - "*"
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - "*"
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: "etcd-operator"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "etcd-operator"
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: "default"
+---
+#
+# etcd-operator.yaml
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcd-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: etcd-operator
+  template:
+    metadata:
+      labels:
+        name: etcd-operator
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - name: etcd-operator
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/etcd-operator:v0.9.4
+        command:
+        - etcd-operator
+        # Uncomment to act for resources in all namespaces. More information in doc/user/clusterwide.md
+        #- -cluster-wide
+        env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: perf-1-tier
+                operator: In
+                values:
+                - database

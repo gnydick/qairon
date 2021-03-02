@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluent-bit-service
+  labels:
+    app: fluent-bit-service
+    k8s-app: fluent-bit-logging
+    # app.kubernetes.io/name: jaeger
+    # app.kubernetes.io/component: agent
+spec:
+  ports:
+    - name: input-tcp
+      port: 5170
+      protocol: TCP
+      targetPort: 5170
+  # type: ClusterIP
+  selector:
+    # app: fluent-bit-service
+    k8s-app: fluent-bit-logging
+    # app.kubernetes.io/name: jaeger
+    # app.kubernetes.io/component: all-in-one

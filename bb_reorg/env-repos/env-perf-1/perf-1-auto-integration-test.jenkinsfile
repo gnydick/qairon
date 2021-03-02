@@ -1,0 +1,284 @@
+def notifySlack(String buildStatus = 'STARTED') {
+
+    // Build status of null means success.
+    buildStatus = buildStatus ?: 'SUCCESS'
+    def icons
+    if (buildStatus == 'STARTED') {
+        icons = ':biking:'
+    } else if (buildStatus == 'SUCCESS') {
+        icons = ':pusheen_dancing:'
+    } else if (buildStatus == 'ABORTED') {
+        icons = ':thinking_face:'
+    } else {
+        icons = ':twitching:'
+    }
+    def color
+    if (buildStatus == 'STARTED') {
+        color = '#D4DADF'
+    } else if (buildStatus == 'SUCCESS') {
+        color = '#BDFFC3'
+    } else if (buildStatus == 'ABORTED') {
+        color = '#FFFE89'
+    } else {
+        color = '#FF9FA1'
+    }
+    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\n<${env.BUILD_URL}console|Watch build console output> @here"
+    slackSend(color: color, channel: "#jnkns_int_tests", message: msg)
+}
+
+def label = "int-1-automation-${UUID.randomUUID().toString()}"
+
+podTemplate(name: 'int-1-automation', label: label, yaml: """
+kind: Pod
+metadata:
+  name: microservice-orchestration
+spec:
+  containers:
+  - name: microservice-orchestration
+    image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-cicd/microservice-orchestration:1.0.5
+    imagePullPolicy: Always
+    command:
+    - /bin/cat
+    tty: true
+    env:
+    - name: STACK_NAME
+      value: "env-int-1"
+    - name: CLUSTER_NAME
+      value: "int-1"
+"""
+  ) {
+node(label) {
+  try {
+  def secrets = [[$class: 'VaultSecret', path: 'cicd/aws_keys', secretValues: [
+                  [$class: 'VaultSecretValue', envVar: 'AWS_ACCESS_KEY_ID', vaultKey: 'AWS_ACCESS_KEY_ID'],
+                  [$class: 'VaultSecretValue', envVar: 'AWS_SECRET_ACCESS_KEY', vaultKey: 'AWS_SECRET_ACCESS_KEY']]],
+                [$class: 'VaultSecret', path: 'cicd/bitbucket', secretValues: [
+                  [$class: 'VaultSecretValue', envVar: 'BITBUCKET_USER', vaultKey: 'BITBUCKET_USER'],
+                  [$class: 'VaultSecretValue', envVar: 'BITBUCKET_APP_PASSWORD', vaultKey: 'BITBUCKET_APP_PASSWORD']]],
+                [$class: 'VaultSecret', path: 'cicd/artifactory', secretValues: [
+                  [$class: 'VaultSecretValue', envVar: 'ART_TOOL_USER', vaultKey: 'ART_TOOL_USER'],
+                  [$class: 'VaultSecretValue', envVar: 'ART_TOOL_PASSWORD', vaultKey: 'ART_TOOL_PASSWORD'],
+                  [$class: 'VaultSecretValue', envVar: 'ART_BUILD_USER', vaultKey: 'ART_BUILD_USER'],
+                  [$class: 'VaultSecretValue', envVar: 'ART_BUILD_PASSWORD', vaultKey: 'ART_BUILD_PASSWORD']]],
+                [$class: 'VaultSecret', path: 'cicd/integration/user-manager', secretValues: [
+                  [$class: 'VaultSecretValue', envVar: 'GOOGLE_APPLICATION_CREDENTIALS', vaultKey: 'GOOGLE_APPLICATION_CREDENTIALS'],
+                  [$class: 'VaultSecretValue', envVar: 'GOOGLE_API_KEY', vaultKey: 'GOOGLE_API_KEY']]]]
+      wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
+  properties([
+          parameters([string(defaultValue: '', description: 'Tested service name', name: 'APP_NAME', trim: true),
+                      string(defaultValue: '', description: 'Tested service version', name: 'APP_VERSION', trim: true),
+                      booleanParam(defaultValue: true, description: 'Trigger next pipeline job?', name: 'TRIGGER_NEXT_JOB')]),
+          disableConcurrentBuilds()
+      ])
+    env.APP_NAME = "${params.APP_NAME}"
+    env.APP_VERSION = "${params.APP_VERSION}"
+    env.JOB_NAME = "${env.JOB_NAME}"
+    env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-v${env.APP_VERSION}`"
+
+    stage('Configure aws account') {
+      if (env.APP_NAME == '' || env.APP_VERSION == '') {
+        return
+      } else {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eox pipefail
+        /toolbox/set-aws-credentials.sh --key-id ${AWS_ACCESS_KEY_ID} --secret-access-key ${AWS_SECRET_ACCESS_KEY}
+        ### Check IAM user
+        aws sts get-caller-identity --output text
+        ### Configure kubectl
+        aws eks --region us-west-2 update-kubeconfig --name ${CLUSTER_NAME}
+      '''
+    }}}
+    stage('Deploy new version of EGO microservice') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        ## Clone environment repository
+        git clone https://${BITBUCKET_USER}:${BITBUCKET_APP_PASSWORD}@bitbucket.org/imvu/${STACK_NAME}.git
+        ## Deploy to k8s cluster function
+        function deploy_to_cluster () {
+          # Update microservice version
+          sed -e "s#${APP_NAME}:[0-9.]\\+#${APP_NAME}:${APP_VERSION}#g" ${WORKSPACE}/${STACK_NAME}/k8s/microservices/${APP_NAME}.yaml | kubectl -n default apply -f - || { echo "Error deploying the ${APP_NAME} service" ; exit 1; }
+          # Readines check
+          kubectl -n default rollout status deployment/${APP_NAME}-deployment
+        }
+        ### Deploy new version of microservice to cluster
+        deploy_to_cluster
+      '''
+    }}
+    stage('Integration tests') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        ### Define variable
+        EGO_LIST=ego_list.txt
+        
+        ### Defining bash functions
+        function retry_command() {
+            local -r __tries="$1"; shift
+            local -r __run="$@"
+            local -i __backoff_delay=2
+        
+            until $__run
+              do
+                  if (( __current_try == __tries ))
+                      then
+                        echo "Tried $__current_try times and failed!"
+                        return 1
+                  else
+                    echo "Retrying ...."
+                    sleep $((((__backoff_delay++)) + ((__current_try++))))
+                  fi
+            done
+          }
+
+        function waitport () {
+            local COUNTER=0
+            local ip=$1
+            local port=$2
+            until nc -v -z ${ip} ${port}; do
+              if [[ "${COUNTER}" -lt 24 ]]; then
+                COUNTER=$(( COUNTER + 1))
+                echo "Waiting..."
+                sleep 5
+                continue
+              else
+                echo "+++++Port ${port} on ${ip}: not ready more than 2 minutes!+++++"
+                #break loop
+                return 1
+              fi
+            done
+          }
+
+        function multiple_microservices_test () {
+          # Create an associative array of all "int-1" microservices $NAME:$VERSION.
+          declare -A MICROSERVICES_LIST
+          #Create microservices list
+          cd ${WORKSPACE}/${STACK_NAME}/k8s
+          ls -l ${WORKSPACE}/${STACK_NAME}/k8s/microservices | awk '{ print $9 }' | awk NF | cut -d'.' -f1 > ${WORKSPACE}/${STACK_NAME}/k8s/${EGO_LIST}
+          # Fill associative array with $MICROSERVICE_NAME:$VERSION
+          while IFS='' read -r line || [[ -n "$line" ]]; do
+            if [[ "$line" == "$APP_NAME" ]]; then
+                DEPENDENCY_VERSION=${APP_VERSION}
+                MICROSERVICES_LIST[${line}]=${DEPENDENCY_VERSION}
+            else
+                DEPENDENCY_VERSION=$(grep 'image' ${WORKSPACE}/${STACK_NAME}/k8s/microservices/"${line}".yaml | awk '{ print $2 }' | cut -d':' -f2-)
+                MICROSERVICES_LIST[${line}]=${DEPENDENCY_VERSION}
+            fi
+          done < "${EGO_LIST}"
+          # Testing the array on emptiness.
+            if [ ${#MICROSERVICES_LIST[@]} -ne 0 ]; then
+            # Print all collected $NAME:$VERSION values.
+              echo "+++++++++MICROSERVICES_LIST++++++++++++"
+                for i in "${!MICROSERVICES_LIST[@]}"
+                do
+                  echo "------------------------"
+                  echo "Microservice  : $i"
+                  echo "Version: ${MICROSERVICES_LIST[$i]}"
+                done
+              echo "+++++++++++++++++++++++++++++++++++++++"
+            # CD to default directory and clone tested microservice repository 
+              cd ${WORKSPACE}
+              git clone https://${BITBUCKET_USER}:${BITBUCKET_APP_PASSWORD}@bitbucket.org/imvu/${APP_NAME}.git
+            # "for" loop with retry function for each associative array element
+                for microservice in "${!MICROSERVICES_LIST[@]}"
+                do
+                  echo "+++++++++INTEGRATION TEST FOR ${microservice} ++++++++++++"
+                  ### Additional port-forward for "account-manager" microservice k8s SVC "rest" and "grpc" ports
+                  if [[ "$microservice" != "account-manager" ]]; then
+                    kubectl -n default port-forward svc/account-manager 9092:8080 &>/dev/null &
+                    kubectl -n default port-forward svc/account-manager 9093:8081 &>/dev/null &
+                  fi
+                  ### Additional port-forward for "messenger-server" microservice k8s SVC "grpc" port
+                  if [[ "$microservice" != "messenger-server" ]]; then
+                    kubectl -n default port-forward svc/messenger-server 9094:8081 &>/dev/null &
+                  fi
+                  ### Start port-forward tested microservice k8s SVC "rest" and "grpc" ports
+                  kubectl -n default port-forward svc/${microservice} 9090:8080 &>/dev/null &
+                  kubectl -n default port-forward svc/${microservice} 9091:8081 &>/dev/null &
+                  # Clone and cd to microservice repo
+                  if [[ "$microservice" != "$APP_NAME" ]]; then
+                    retry_command 5 git clone https://${BITBUCKET_USER}:${BITBUCKET_APP_PASSWORD}@bitbucket.org/imvu/${microservice}.git
+                  fi
+                  cd "${microservice}"
+                  # Checkout microservice Git Tag
+                  git checkout "${microservice}"-v"${MICROSERVICES_LIST[$microservice]}"
+                  cd ./integration
+                  ### Add credentials
+                  echo -e "\nsystemProp.gradle.wrapperUser=${ART_TOOL_USER}\nsystemProp.gradle.wrapperPassword=${ART_TOOL_PASSWORD}\ndevUser=${ART_BUILD_USER}\ndevPassword=${ART_BUILD_PASSWORD}\npublishUser=build\npublishPassword=" >> ./gradle.properties
+                  # Call waitport function to check forwarded port
+                  waitport 127.0.0.1 9090
+                  # Run integration test and cd to default directory
+                  ./gradlew clean build -PtestEnv=${CLUSTER_NAME} --info || exit 1
+                  cd "${WORKSPACE}"
+                  ### Cleanup part
+                  if [[ "$microservice" != "$APP_NAME" ]]; then
+                    rm -rf ${WORKSPACE}/${microservice}
+                  fi
+                  # Kill all background (port-forward) jobs 
+                  jobs -p | xargs kill ||:
+                done
+            else
+              echo "The array is empty, Something went wrong!"
+            fi
+        }
+        ### Test all microservices
+        multiple_microservices_test
+      '''
+    }}
+    stage('Push tested version to env-int-1') {
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        cd ${STACK_NAME} && git checkout master
+        git config --global user.name "jenkins"
+        git config --global user.email "jenkins@imvu.com"
+        sed -i "s#${APP_NAME}:[0-9.]\\+#${APP_NAME}:${APP_VERSION}#g" ./k8s/microservices/${APP_NAME}.yaml
+        git diff-index --quiet HEAD || git commit -am "Up ${APP_NAME} image version to ${APP_VERSION}. ${JOB_NAME}:#${BUILD_NUMBER}"
+        # Added loop in case if developers push changes to "env-int-1" repo while pipeline running.
+        COUNTER=0
+        until git push origin master
+        do
+          if [[ "${COUNTER}" -eq '120' ]]; then
+            echo "Can't push to master branch. Something wrong with Bitbucket or with repository"
+            exit 1
+          else
+            sleep 1s
+            COUNTER=$(( COUNTER + 1))
+            echo "Pull and try again"
+            git pull
+          fi
+        done
+      '''
+    }}
+    stage('Trigger int-2 pipeline') {
+      if (params.TRIGGER_NEXT_JOB.toBoolean()) {
+        build job: 'int-2-auto-integration-test', wait: false, parameters: [string(name: 'APP_NAME', value:"${APP_NAME}"),
+                                                                  string(name: 'APP_VERSION', value: "${APP_VERSION}")]
+        } else {
+          print "int-2 pipeline not triggered"
+    }}
+    }
+    } catch (e) {
+        currentBuild.result = 'FAILURE'
+        throw e
+    } finally {
+      stage('Send notifications') {
+        container('microservice-orchestration')  {
+        if (env.APP_NAME == '' || env.APP_VERSION == '') {
+          currentBuild.result = 'ABORTED'
+          notifySlack(currentBuild.result)
+          return
+        } else {
+            notifySlack(currentBuild.result)
+        }
+        if (currentBuild.result == 'FAILURE') {
+            slackSend color: '#FF9FA1', channel: "#jnkns_int_tests", message: "${currentBuild.result}`${env.JOB_NAME}` ${env.BUILD_DISPLAY_NAME}\nRunning 'Rollback for ${env.APP_NAME} from v${env.APP_VERSION} version to previous' stage."
+            sh '''#!/usr/bin/env bash
+              kubectl -n default rollout undo deployment/${APP_NAME}-deployment
+            '''
+        } else {
+        return
+        }}}}
+}}

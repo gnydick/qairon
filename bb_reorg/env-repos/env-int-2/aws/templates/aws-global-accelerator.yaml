@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template for configuring AWS Global Accelerator
+
+Parameters:
+
+  GAname:
+    Type: String
+    Description: The name of the accelerator. The name must contain only alphanumeric characters or hyphens (-), and must not begin or end with a hyphen.
+
+  GAenabled:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+      - ''
+    Default: ''
+    Description: Indicates whether the accelerator is enabled. The value is true or false. The default value is true.
+
+  ENVprefix:
+    Type: String
+    Description: Environment prefix value for "ENV" Tag.
+
+  TCPendpointId:
+    Type: String
+    Description: Endpoint of LB used for TCP traffic.
+
+
+Resources:
+  #-------------------------------------------------------------------#
+  ################################################ Global Accelerator #
+  GlobalAccelerator:
+    Type: AWS::GlobalAccelerator::Accelerator
+    Properties:
+      Enabled: !Ref GAenabled
+      Name: !Ref GAname
+      Tags:
+        - Key: ENV
+          Value: !Ref ENVprefix
+
+  #-------------------------------------------------------------------#
+  ###################################### Global Accelerator listeners #
+
+  ListenerTCP:
+    Type: AWS::GlobalAccelerator::Listener
+    Properties:
+      AcceleratorArn: !Ref GlobalAccelerator
+      ClientAffinity: SOURCE_IP
+      Protocol: TCP
+      PortRanges:
+      - FromPort: 443
+        ToPort: 443
+      - FromPort: 80
+        ToPort: 80
+      - FromPort: 8082
+        ToPort: 8082
+      - FromPort: 15020
+        ToPort: 15020
+
+  #-------------------------------------------------------------------#
+  ################################## Global Accelerator EndpointGroup #
+  EndpointGroupTCP:
+    Type: AWS::GlobalAccelerator::EndpointGroup
+    Properties:
+      ListenerArn: !Ref ListenerTCP
+      EndpointGroupRegion: !Ref 'AWS::Region'
+      EndpointConfigurations:
+        - EndpointId: !Ref TCPendpointId
+          Weight: 1
+
+#-------------------------------------------------------------------#
+################################################## Template Outputs #
+Outputs:
+  GlobalAcceleratorARN:
+    Description: ARN of the Global Accelerator.
+    Value: !GetAtt 'GlobalAccelerator.AcceleratorArn'
+
+  GlobalAcceleratorDNS:
+    Description: ARN of the Global Accelerator.
+    Value: !GetAtt 'GlobalAccelerator.DnsName'
+
+  TCPendpointGroupARN:
+    Description: ARN of the GA TCP Endpoint Group.
+    Value: !GetAtt 'EndpointGroupTCP.EndpointGroupArn'
+
+  TCPlistenerARN:
+    Description: ARN of the TCP GA Listener.
+    Value: !GetAtt 'ListenerTCP.ListenerArn'

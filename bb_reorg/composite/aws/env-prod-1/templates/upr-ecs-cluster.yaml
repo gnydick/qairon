@@ -1,0 +1,325 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  ECSClusterName:
+    Type: String
+    Description: The ECS Cluster Name
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the ECS instances.
+
+  VpcId:
+    Type: String
+    Description: ID of VPC for ECS ScurityGroup
+
+  AGSsecurityGroupID:
+    Type: String
+    Description: ID of "game-server" tier SG 
+
+  AGS2securityGroupID:
+    Type: String
+    Description: ID of "game-server2" tier SG 
+
+  UtilSecurityGroupID:
+    Type: String
+    Description: ID of "util" tier SG 
+
+  MonitoringSecurityGroupID:
+    Type: String
+    Description: ID of "monitoring" tier SG 
+
+  SubnetId:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Select at least two subnets in your selected VPC.
+
+  DesiredCapacity:
+    Type: Number
+    Description: Number of instances to launch in your ECS cluster.
+
+  MaxSize:
+    Type: Number
+    Description: Maximum number of instances that can be launched in your ECS cluster.
+
+  MinSize:
+    Type: Number
+    Description: Minimum number of instances that can be launched in your ECS cluster.
+
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    AllowedValues: [t3.micro, t3.small, t3.medium, t3.large, m3.medium, m3.large,
+      m3.xlarge, m3.2xlarge, m4.large, m4.xlarge, m4.2xlarge, m4.4xlarge, m4.10xlarge,
+      c5.large, c4.large, c4.xlarge, c4.2xlarge, c4.4xlarge, c4.8xlarge, c3.large, c3.xlarge,
+      c3.2xlarge, c3.4xlarge, c3.8xlarge, r3.large, r3.xlarge, r3.2xlarge, r3.4xlarge,
+      r3.8xlarge, i2.xlarge, i2.2xlarge, i2.4xlarge, i2.8xlarge]
+    ConstraintDescription: Please choose a valid instance type.
+ 
+  UPRImageName:
+    Type: String
+    Description: UPR Docker image to run
+
+  ETCDHost:
+    Type: String
+    Description: ETCD Hostname and Properties
+
+  EC2RoleName:
+    Type: String
+    Description: EC2 Role name for attaching to "Instance Profile"
+
+  ASroleARN:
+    Type: String
+    Description: AutoScaling Role ARN for attaching to "ApplicationAutoScaling"
+
+Mappings:
+  AWSRegionToAMI:
+    us-east-1:
+      AMIID: ami-098616968d61e549e
+    us-east-2:
+      AMIID: ami-0c0415cdff14e2a4a
+    us-west-1:
+      AMIID: ami-0fddd00791ff99163
+    us-west-2:
+      AMIID: ami-014a2e30da708ee8b	
+    eu-west-1:
+      AMIID: ami-0851c53aff84212c3
+    eu-central-1:
+      AMIID: ami-0e2c05064087d4fd7
+    ap-northeast-1:
+      AMIID: ami-00c408a8b71d5c614
+    ap-southeast-1:
+      AMIID: ami-0a47eb5f85b07481e
+    ap-southeast-2:
+      AMIID: ami-03e55a57522b1a61e
+
+Resources:
+
+  UPRsecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: UPR security group
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: !Ref ECSClusterName
+          Value: owned
+        - Key: Name
+          Value: !Sub ${ECSClusterName}-sg
+### Inbound Rules for UPR SG
+  UPRsgIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref UPRsecurityGroup
+      CidrIp: '0.0.0.0/0'
+      Description: 'Allow IPv4 UDP to UPR'
+      IpProtocol: udp
+      FromPort: 2000
+      ToPort: 65535
+
+  UPRsgIngressAGS:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref UPRsecurityGroup
+      Description: 'Allow UPR to assume ALL traffic from game-server tier.'
+      SourceSecurityGroupId: !Ref AGSsecurityGroupID
+      IpProtocol: '-1'
+      FromPort: 0
+      ToPort: 65535
+
+  UPRsgIngressAGS2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref UPRsecurityGroup
+      Description: 'Allow UPR to assume ALL traffic from game-server2 tier.'
+      SourceSecurityGroupId: !Ref AGS2securityGroupID
+      IpProtocol: '-1'
+      FromPort: 0
+      ToPort: 65535
+
+  UPRsgIngressUTIL:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref UPRsecurityGroup
+      Description: 'Allow UPR SG to assume ALL traffic from util tier.'
+      SourceSecurityGroupId: !Ref UtilSecurityGroupID
+      IpProtocol: '-1'
+      FromPort: 0
+      ToPort: 65535
+
+  UPRsgIngressMonitoring:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref UPRsecurityGroup
+      Description: 'Allow Prometheus to scrape metrics from UPR metrics port.'
+      SourceSecurityGroupId: !Ref MonitoringSecurityGroupID
+      IpProtocol: tcp
+      FromPort: 10250
+      ToPort: 10250
+
+### Inbound Rules for other SG
+  AGSsgIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref AGSsecurityGroupID
+      Description: 'Allow game-server tier to assume ALL traffic from UPR.'
+      SourceSecurityGroupId: !Ref UPRsecurityGroup
+      IpProtocol: '-1'
+      FromPort: 0
+      ToPort: 65535
+
+  AGSsgIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref AGS2securityGroupID
+      Description: 'Allow game-server2 tier to assume ALL traffic from UPR.'
+      SourceSecurityGroupId: !Ref UPRsecurityGroup
+      IpProtocol: '-1'
+      FromPort: 0
+      ToPort: 65535
+
+  UTILsgIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref UtilSecurityGroupID
+      Description: 'Allow util tier to assume ALL traffic from UPR.'
+      SourceSecurityGroupId: !Ref UPRsecurityGroup
+      IpProtocol: '-1'
+      FromPort: 0
+      ToPort: 65535
+
+### ECS cluster configuration
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ECSClusterName
+
+  CloudwatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['-', [ECSLogGroup, !Ref 'AWS::StackName']]
+      RetentionInDays: 14
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Join ['', [!Ref 'AWS::StackName', -ecs-upr]]
+      NetworkMode: "host"
+      Cpu: "1024"
+      Memory: "512"
+      ContainerDefinitions:
+      - Name: UPR
+        Memory: 512
+        MemoryReservation: 256
+        Essential: true
+        Image: !Ref UPRImageName
+        Privileged: true
+        Environment:
+          - Name: "ETCD_HOSTS"
+            Value: !Ref ETCDHost
+
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        !Ref SubnetId
+      Tags:
+      - Key: Name
+        Value: !Sub "${ECSClusterName}-Node"
+        PropagateAtLaunch: 'true'
+      LaunchConfigurationName: !Ref ContainerInstances
+      MinSize: !Ref MinSize
+      MaxSize: !Ref MaxSize
+      DesiredCapacity: !Ref DesiredCapacity
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        MaxBatchSize: '1'
+        MinInstancesInService: !Ref DesiredCapacity
+        PauseTime: 'PT5M'
+
+  ContainerInstances:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      AssociatePublicIpAddress: true
+      ImageId: !FindInMap [AWSRegionToAMI, !Ref "AWS::Region", AMIID]
+      SecurityGroups: 
+      - !Ref UPRsecurityGroup
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      KeyName: !Ref KeyName
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+          echo ECS_BACKEND_HOST= >> /etc/ecs/ecs.config 
+
+  ecsService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref 'ECSCluster'
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 25 
+      DesiredCount: 3
+      LaunchType: "EC2"
+      TaskDefinition: !Ref 'TaskDefinition'
+
+  ServiceScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    DependsOn: ecsService
+    Properties:
+      MaxCapacity: 3
+      MinCapacity: 1
+      RoleARN: !Ref ASroleARN
+      ScalableDimension: 'ecs:service:DesiredCount'
+      ServiceNamespace: ecs
+      ResourceId: !Join ['/', [service, !Ref ECSCluster, !GetAtt ecsService.Name]]
+
+  ServiceScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: AStepPolicy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref 'ServiceScalingTarget'
+      StepScalingPolicyConfiguration:
+        AdjustmentType: PercentChangeInCapacity
+        Cooldown: 60
+        MetricAggregationType: Average
+        StepAdjustments:
+        - MetricIntervalLowerBound: 0
+          ScalingAdjustment: 200
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+      - !Ref EC2RoleName
+
+Outputs:
+  ecsClusterNAME:
+    Description: Name of ECS Cluster
+    Value: !Ref 'ECSCluster'
+
+  ecsClusterARN:
+    Description: The ARN of ECS Cluster
+    Value: !GetAtt ECSCluster.Arn
+
+  ecsServiceNAME:
+    Description: Name of ECS Service
+    Value: !GetAtt ecsService.Name
+
+  ecsServiceARN:
+    Description: The ARN of ECS Service
+    Value: !Ref 'ecsService'
+
+  taskDefinitionARN:
+    Description: The ARN of ECS TaskDefinition
+    Value: !Ref 'TaskDefinition'
+
+  AutoScalingGroupNAME:
+    Description: Name of Auto Scaling Group
+    Value: !Ref 'ECSAutoScalingGroup'
+
+  LaunchConfigurationNAME:
+    Description: Name of Launch Configuration
+    Value: !Ref 'ContainerInstances'
+

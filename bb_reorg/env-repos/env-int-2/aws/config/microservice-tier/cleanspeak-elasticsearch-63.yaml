@@ -1,0 +1,24 @@
+template_path: aws-elasticsearch.yaml
+parameters:
+  # Main network parameters for AWS ES Domain
+  VpcId: !stack_output_external int-2-eks-vpc::VpcId
+  Subnets: 'subnet-0d230db11e425696b'
+  # Parameters for ElasticSearch AWS SecurityGroup
+  ## Allow traffic to AWS ES from microservice-tier
+  EC2SecurityGroupID: 'sg-06a1efa9861fcdac6'
+  ESsecurityGroupName: 'int-2-es-cleanspeak-63'
+  ESsecurityGroupPort: '443'
+  # Parameters for AWS ElasticSearch Domain
+  DomainName: 'int-2-es-cleanspeak-63'
+  ESversion: '6.3'
+  ZoneAwareness: 'false'
+  AvailabilityZoneCount: '3'
+  ## Parameters for ES Domain Master Instances
+  DedicatedMaster: 'false'
+  DedicatedMasterCount: '3'
+  DedicatedMasterType: 'm3.medium.elasticsearch'
+  ## Parameters for ES Domain Data Instances
+  ESDataInstanceType: 't2.small.elasticsearch'
+  ESDataInstanceCount: '1'
+  ## Here we set default max value and that value can be tuned after load testing on the production environment.
+  ESDataInstanceVolumeSize: '35'

@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: portal-internal-application-ingress
+  namespace: default
+  annotations:
+   kubernetes.io/ingress.class: nginx-duo
+spec:
+  rules:
+    - host: portal-int.withme.com
+      http:
+        paths:
+          - backend:
+              serviceName: service-gateway
+              servicePort: 80
+            path: /

@@ -1,0 +1,28 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: watch-configmap-role
+  namespace: default
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - watch
+  - list
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: watch-configmap-rolebinding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: watch-configmap-service-account
+  namespace: default
+roleRef:
+  kind: Role
+  name: watch-configmap-role
+  apiGroup: rbac.authorization.k8s.io

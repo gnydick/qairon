@@ -1,0 +1,209 @@
+// Jenkins pipeline runs the performance tests simultaneously on the different pods
+
+// run the performance agent on a separate pod
+def runPerformanceAgent(idx) {
+  return {
+    stage('Agent ' + idx) {
+      podTemplate(name: 'perf-agent-' + idx, label: "pod-" + idx, yaml: """
+kind: Pod
+metadata:
+  name: performance-agent
+spec:
+  containers:
+  - name: performance-agent
+    image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-cicd/microservice-orchestration:1.0.14
+    imagePullPolicy: Always
+    command:
+    - /bin/cat
+    tty: true
+"""
+      ) {
+        node("pod-" + idx) {
+
+          // prepare Vault secrets
+          def secrets = [
+            [
+              $class: 'VaultSecret', path: 'cicd/aws_keys', secretValues: [
+                [$class: 'VaultSecretValue', envVar: 'INT_AWS_ACCESS_KEY_ID', vaultKey: 'AWS_ACCESS_KEY_ID'],
+                [$class: 'VaultSecretValue', envVar: 'INT_AWS_SECRET_ACCESS_KEY', vaultKey: 'AWS_SECRET_ACCESS_KEY']
+              ]
+            ],
+            [
+              $class: 'VaultSecret', path: 'cicd/prod-1/aws_keys', secretValues: [
+                [$class: 'VaultSecretValue', envVar: 'PROD_AWS_ACCESS_KEY_ID', vaultKey: 'AWS_ACCESS_KEY_ID'],
+                [$class: 'VaultSecretValue', envVar: 'PROD_AWS_SECRET_ACCESS_KEY', vaultKey: 'AWS_SECRET_ACCESS_KEY']
+              ]
+            ],
+            [
+              $class: 'VaultSecret', path: 'cicd/bitbucket', secretValues: [
+                [$class: 'VaultSecretValue', envVar: 'BITBUCKET_USER', vaultKey: 'BITBUCKET_USER'],
+                [$class: 'VaultSecretValue', envVar: 'BITBUCKET_APP_PASSWORD', vaultKey: 'BITBUCKET_APP_PASSWORD']
+              ]
+            ],
+            [
+              $class: 'VaultSecret', path: 'cicd/artifactory', secretValues: [
+                [$class: 'VaultSecretValue', envVar: 'ART_TOOL_USER', vaultKey: 'ART_TOOL_USER'],
+                [$class: 'VaultSecretValue', envVar: 'ART_TOOL_PASSWORD', vaultKey: 'ART_TOOL_PASSWORD'],
+                [$class: 'VaultSecretValue', envVar: 'ART_BUILD_USER', vaultKey: 'ART_BUILD_USER'],
+                [$class: 'VaultSecretValue', envVar: 'ART_BUILD_PASSWORD', vaultKey: 'ART_BUILD_PASSWORD']
+              ]
+            ]
+          ]
+          withCredentials([
+              string(credentialsId: 'EGO_VAULT_ROLE_ID', variable: 'EGO_VAULT_ROLE_ID'),
+              string(credentialsId: 'EGO_VAULT_SECRET_ID', variable: 'EGO_VAULT_SECRET_ID')
+          ]) {
+            wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
+
+              stage('[' + idx + '] Configure aws account') {
+                container('performance-agent')  {
+                  sh '''#!/usr/bin/env bash
+                    set -eox pipefail
+                    if [[ "$CLUSTER_NAME" =~ ^prod* ]]; then
+                      /toolbox/set-aws-credentials.sh --key-id ${PROD_AWS_ACCESS_KEY_ID} --secret-access-key ${PROD_AWS_SECRET_ACCESS_KEY}
+                    else
+                      /toolbox/set-aws-credentials.sh --key-id ${INT_AWS_ACCESS_KEY_ID} --secret-access-key ${INT_AWS_SECRET_ACCESS_KEY}
+                    fi
+                    ### Check IAM user
+                    aws sts get-caller-identity --output text
+                    ### Configure kubectl
+                    aws eks --region us-west-2 update-kubeconfig --name ${CLUSTER_NAME}
+                    ### Check kubectl context
+                    kubectl config current-context
+                  '''
+                } // END container
+              } // END stage
+
+
+              stage('[' + idx + '] Performance test') {
+                container('performance-agent') {
+                  sh '''#!/usr/bin/env bash
+                    set -eo pipefail
+
+                    ### Clone microservice repo (master branch)
+                    git clone https://${BITBUCKET_USER}:${BITBUCKET_APP_PASSWORD}@bitbucket.org/imvu/performance-tests.git && cd performance-tests
+
+                    ### Add credentials
+                    echo -e "\nsystemProp.gradle.wrapperUser=${ART_TOOL_USER}\nsystemProp.gradle.wrapperPassword=${ART_TOOL_PASSWORD}\ndevUser=${ART_BUILD_USER}\ndevPassword=${ART_BUILD_PASSWORD}\npublishUser=build\npublishPassword=" >> ./gradle.properties
+
+                    ### Additional port-forward for k8s microservices for internal REST port (9000-9039)
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/abuse-reporter           9000:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/account-manager          9001:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/appsflyer-consumer       9002:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/atlas                    9003:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/authentication           9004:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/catalog-server           9005:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/category-manager         9006:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/configuration-manager    9007:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/connection-manager       9008:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/content-manager          9009:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/creator-manager          9010:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/data-aggregation         9011:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/game-server-manager      9012:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/game-state-manager       9013:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/leaderboard              9014:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/license-manager          9015:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/message-orchestrator     9016:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/messenger-server         9017:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/possession-manager       9018:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/push-notification        9019:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/relationship-manager     9020:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/support-action-manager   9021:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/user-behavior-tracker    9022:8080 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/user-manager             9023:8080 &>/dev/null &
+
+                    ### Additional port-forward for k8s microservices for gRPC port (9040-9079)
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/abuse-reporter           9040:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/account-manager          9041:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/appsflyer-consumer       9042:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/atlas                    9043:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/authentication           9044:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/catalog-server           9045:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/category-manager         9046:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/configuration-manager    9047:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/connection-manager       9048:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/content-manager          9049:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/creator-manager          9050:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/data-aggregation         9051:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/game-server-manager      9052:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/game-state-manager       9053:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/leaderboard              9054:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/license-manager          9055:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/message-orchestrator     9056:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/messenger-server         9057:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/possession-manager       9058:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/push-notification        9059:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/relationship-manager     9060:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/support-action-manager   9061:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/user-behavior-tracker    9062:8081 &>/dev/null &
+                    kubectl -n default port-forward --pod-running-timeout=2m0s service/user-manager             9063:8081 &>/dev/null &
+
+                    ### Run performance test
+                    ./gradlew performanceTest -PtestEnv=${CLUSTER_NAME} -PthreadNumber=${THREAD_NUMBER} -PwarmTimeSec=${WARM_TIME_SEC} -PtestTimeSec=${TEST_DURATION_SEC} --info
+
+                    ### Kill all background (port-forward) jobs
+                    jobs -p | xargs kill ||:
+                  '''
+                } // END container
+              } // END stage
+
+
+            } // END VaultBuildWrapper
+          } // END withCredentials
+
+        } // END node
+      } // END podTemplate
+    } // END stage
+
+  } // END return
+}
+
+
+
+
+script {
+  try {
+
+      properties([
+          parameters([
+            choice(choices: ['perf-1', 'int-1', 'int-2', 'prod-1'], description: 'Environment to test', name: 'CLUSTER_NAME'),
+            choice(choices: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], description: 'Quantity of test agent pods', name: 'POD_COUNT'),
+            string(defaultValue: '1000', description: 'Thread number', name: 'THREAD_NUMBER', trim: true),
+            string(defaultValue: '120', description: 'Warm time, seconds', name: 'WARM_TIME_SEC', trim: true),
+            string(defaultValue: '300', description: 'Test duration, seconds', name: 'TEST_DURATION_SEC', trim: true)
+          ]),
+          disableConcurrentBuilds()
+      ])
+
+      // Set and print input parameters
+      env.CLUSTER_NAME = "${params.CLUSTER_NAME}"
+      env.POD_COUNT = "${params.POD_COUNT}"
+      env.THREAD_NUMBER = "${params.THREAD_NUMBER}"
+      env.WARM_TIME_SEC = "${params.WARM_TIME_SEC}"
+      env.TEST_DURATION_SEC = "${params.TEST_DURATION_SEC}"
+
+      echo "Running performance tests with parameters:"
+      echo "pods = " + env.POD_COUNT.toInteger()
+      echo "Thread number = " + env.THREAD_NUMBER.toInteger()
+      echo "Warm time, seconds = " + env.WARM_TIME_SEC.toInteger()
+      echo "Test duration, seconds = " + env.TEST_DURATION_SEC.toInteger()
+
+      currentBuild.displayName = "#${env.BUILD_NUMBER} ${env.CLUSTER_NAME}, ${env.POD_COUNT} pods, ${env.THREAD_NUMBER} threads"
+
+      // build POD_COUNT parallel stages
+      def stepsForParallel = [:]
+      for (int i = 0; i < env.POD_COUNT.toInteger(); i++) {
+        stepsForParallel[i] = runPerformanceAgent(i)
+      }
+
+      // Run all tests
+      stage('Run Tests') {
+        parallel ( stepsForParallel )
+      }
+      echo "Performance tests done"
+
+    } catch (ex) {
+      currentBuild.result = 'FAILURE'
+      throw ex
+    }
+}

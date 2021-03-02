@@ -1,0 +1,99 @@
+# Docker image for pod
+image:
+  repository: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/portal-internal-application
+  tag: 0.13.0
+
+kind: Deployment
+
+# Replica pod count
+replicas: 1
+
+# Labels
+labels:
+  metricsProm: false
+
+# Update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+# Anti/Affinity rules
+affinity:
+  nodeAffinity:
+    key: int-2-tier
+    values: microservice
+  podAntiAffinity:
+    weight: 100
+    key: app
+    values: portal-internal
+    topologyKey: kubernetes.io/hostname
+
+# Environment variables for pod
+env:
+  - name: LOG_LEVEL
+    value: 'debug'
+
+command: []
+
+# Pod resources
+resources:
+  requests:
+    cpu: "150m"
+    memory: "250Mi"
+  limits:
+    cpu: "350m"
+    memory: "750Mi"
+
+# livenessProbe configuration
+livenessProbe:
+  httpGet:
+    path: /internal-portal/api/health/v1/lively
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 10
+
+# readinessProbe configuration
+readinessProbe:
+  httpGet:
+    path: /internal-portal/api/health/v1/ready
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 2
+
+# Container ports
+containerPorts:
+  - containerPort: 8080
+
+# k8s Service
+service:
+  # k8s Service type
+  type: NodePort
+  # k8s Service ports (If you adding new ports make sure that you set them in "containerPorts" too)
+  ports:
+    - port: 80
+      targetPort: 8080
+      name: http-rest
+
+##########################
+##########################
+
+# k8s Secret for microservice
+secret:
+  create: false
+  # name: "secret-stuff"
+  # version: 1.0.0
+  # secretContents: {}
+
+##########################
+##########################
+
+# K8s ServiceAccount for pod
+serviceAccount:
+  create: false
+  # name: ""
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::407733091588:role/----

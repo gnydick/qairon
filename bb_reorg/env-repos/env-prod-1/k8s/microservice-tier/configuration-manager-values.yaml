@@ -1,0 +1,117 @@
+# controlVersion: 2
+# Docker image for pod
+image:
+  repository: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/configuration-manager
+  tag: 1.0.16
+
+kind: Deployment
+
+# Replica pod count
+replicas: 3
+
+# Labels
+labels:
+  metricsProm: true
+
+# Update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+
+# Anti/Affinity rules
+affinity:
+  nodeAffinity:
+    key: prod-1-tier
+    values: microservice
+  podAntiAffinity:
+    weight: 100
+    key: app
+    values: configuration-manager
+    topologyKey: kubernetes.io/hostname
+
+# Container startup command
+command:
+  - "/bin/bash"
+  - "-c"
+  - "./start.sh $(JVM_ARGS) -Dlogging.level.com.withme.configurationmanager=DEBUG -Dlogging.level.com.withme.k8swatcher=DEBUG -Dlogging.level.com.withme.filebasedrepo=DEBUG"
+
+# Environment variables for pod
+env:
+  # TLSv1.3 is not yet supported for the Kubernetes API so it is set here to 1.2
+  - name: JVM_ARGS
+    value: "-Xmx1000m -Xms1000m -Djdk.tls.client.protocols=TLSv1.2"
+  - name: SPRING_PROFILES_ACTIVE
+    value: "prod"
+  - name: JAEGER_ENABLED
+    value: "true"
+  - name: JAEGER_UDP_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+
+# Pod resources
+resources: 
+  requests:
+    cpu: "250m"
+    memory: "1250Mi"
+  limits:
+    # cpu: no limits
+    memory: "1250Mi"
+
+# livenessProbe configuration
+livenessProbe:
+  httpGet:
+    path: /health/v1/lively
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 10
+
+# readinessProbe configuration
+readinessProbe:
+  httpGet:
+    path: /health/v1/ready
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 2
+
+# Container ports
+containerPorts:
+  - containerPort: 8080
+  - containerPort: 8081
+
+# k8s Service
+service:
+  # k8s Service type
+  type: NodePort
+  # k8s Service ports (If you adding new ports make sure that you set them in "containerPorts" too)
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+    - port: 8081
+      targetPort: 8081
+      name: grpc 
+
+##########################
+##########################
+
+# k8s Secret for microservice
+secret:
+  create: false
+  # name: "secret-stuff"
+  # version: 1.0.0
+  # secretContents: {}
+
+##########################
+##########################
+
+# K8s ServiceAccount for pod
+serviceAccount:
+  create: true
+  name: "watch-configmap-service-account"
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::407733091588:role/----

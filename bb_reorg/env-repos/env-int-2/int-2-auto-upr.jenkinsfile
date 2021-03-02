@@ -1,0 +1,146 @@
+def notifySlack(String buildStatus = 'STARTED') {
+
+    // Build status of null means success.
+    buildStatus = buildStatus ?: 'SUCCESS'
+    def icons
+    if (buildStatus == 'STARTED') {
+        icons = ':biking:'
+    } else if (buildStatus == 'SUCCESS') {
+        icons = ':pusheen_dancing:'
+    } else if (buildStatus == 'ABORTED') {
+        icons = ':thinking_face:'
+    } else {
+        icons = ':twitching:'
+    }
+    def color
+    if (buildStatus == 'STARTED') {
+        color = '#D4DADF'
+    } else if (buildStatus == 'SUCCESS') {
+        color = '#BDFFC3'
+    } else if (buildStatus == 'ABORTED') {
+        color = '#FFFE89'
+    } else {
+        color = '#FF9FA1'
+    }
+    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\n<${env.BUILD_URL}console|Watch build console output>"
+    slackSend(color: color, channel: "#ego-svc-jenkins-upr", message: msg)
+}
+
+def label = "int-2-upr-server-${UUID.randomUUID().toString()}"
+
+podTemplate(name: 'int-2-upr-server', label: label, yaml: """
+kind: Pod
+metadata:
+  name: microservice-orchestration
+spec:
+  containers:
+  - name: microservice-orchestration
+    image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-cicd/microservice-orchestration:1.0.10
+    imagePullPolicy: Always
+    command:
+    - /bin/cat
+    tty: true
+    env:
+    - name: STACK_NAME
+      value: "env-int-2"
+    - name: CLUSTER_NAME
+      value: "int-2"
+"""
+  ) {
+node(label) {
+  try {
+    def secrets = [[$class: 'VaultSecret', path: 'cicd/aws_keys', secretValues: [
+                    [$class: 'VaultSecretValue', envVar: 'AWS_ACCESS_KEY_ID', vaultKey: 'AWS_ACCESS_KEY_ID'],
+                    [$class: 'VaultSecretValue', envVar: 'AWS_SECRET_ACCESS_KEY', vaultKey: 'AWS_SECRET_ACCESS_KEY']]],
+                  [$class: 'VaultSecret', path: 'cicd/bitbucket', secretValues: [
+                    [$class: 'VaultSecretValue', envVar: 'BITBUCKET_USER', vaultKey: 'BITBUCKET_USER'],
+                    [$class: 'VaultSecretValue', envVar: 'BITBUCKET_APP_PASSWORD', vaultKey: 'BITBUCKET_APP_PASSWORD']]]]
+    wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
+    properties([
+          parameters([string(defaultValue: '', description: 'Latest UPR version', name: 'APP_VERSION', trim: true),
+                      booleanParam(defaultValue: false, description: 'Trigger prod-1 UPR pipeline job?', name: 'TRIGGER_NEXT_JOB')]),
+          disableConcurrentBuilds()
+      ])
+    env.APP_NAME = "udp-packet-router"
+    env.APP_VERSION = "${params.APP_VERSION}"
+    env.JOB_NAME = "${env.JOB_NAME}"
+    env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-${env.APP_VERSION}`"
+
+    stage('Configure aws account') {
+      notifySlack()
+      slackSend color: 'good', channel: "#ego-svc-jenkins-upr", message: "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Configure aws account' stage."
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eox pipefail
+        /toolbox/set-aws-credentials.sh --key-id ${AWS_ACCESS_KEY_ID} --secret-access-key ${AWS_SECRET_ACCESS_KEY}
+        ### Check IAM user
+        aws sts get-caller-identity --output text
+      '''
+    }}
+    stage('Deploy new version of UPR') {
+      slackSend color: 'good', channel: "#ego-svc-jenkins-upr", message: "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Deploy ${env.APP_NAME}' stage."
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        ### Clone repo environment repository
+        git clone https://${BITBUCKET_USER}:${BITBUCKET_APP_PASSWORD}@bitbucket.org/imvu/${STACK_NAME}.git && cd ${STACK_NAME}/aws
+        ### Update sceptre stack parameters file
+        sceptre_stack_config="${WORKSPACE}/${STACK_NAME}/aws/config/udp-routing/upr-ecs.yaml"
+        sed -i "s#407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/upr:[0-9.]\\+#407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/upr:${APP_VERSION}#g" ${sceptre_stack_config}
+        ### Update "UPR" AWS CloudFormation Stack with new version of "UPR" 
+        sceptre update udp-routing/upr-ecs.yaml -y
+        '''
+    }}
+    stage('Push changes in parameters.json to env-int-2 repository') {
+      slackSend color: 'good', channel: "#ego-svc-jenkins-upr", message: "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Push deployed version ${env.APP_NAME}:${env.APP_VERSION} image tag in `parameters.json` file' stage."
+      container('microservice-orchestration')  {
+      sh '''#!/usr/bin/env bash
+        set -eo pipefail
+        cd ${STACK_NAME} && git checkout master
+        git config --global user.name "jenkins"
+        git config --global user.email "jenkins@imvu.com"
+        git diff-index --quiet HEAD || git commit -am "Up ${APP_NAME} image version to ${APP_VERSION}. ${JOB_NAME}:#${BUILD_NUMBER}"
+        # Added loop in case if developers push changes to "env-int-2" repo while pipeline running.
+        COUNTER=0
+        until git push origin master
+        do
+          if [[ "${COUNTER}" -eq '120' ]]; then
+            echo "Can't push to master branch. Something wrong with Bitbucket or with repository"
+            exit 1
+          else
+            sleep 1s
+            COUNTER=$(( COUNTER + 1))
+            echo "Pull and try again"
+            git pull
+          fi
+        done
+      '''
+    }}
+    stage('Trigger prod-1 UPR pipeline') {
+        if (params.TRIGGER_NEXT_JOB.toBoolean()) {
+          slackSend color: 'good', message: "`${env.JOB_NAME}` ${env.BUILD_DISPLAY_NAME}\nTriggering prod-1 UPR pipeline."
+          build job: 'prod-1-auto-deploy-upr', wait: false, parameters: [string(name: 'APP_VERSION', value: "${APP_VERSION}")]
+        } else {
+            print "prod-1 UPR pipeline not triggered"
+        }
+    }
+    } // End wrap
+    } catch (e) {
+        currentBuild.result = 'FAILURE'
+        throw e
+    } finally {
+      stage('Send notifications') {
+        container('microservice-orchestration')  {
+        if (currentBuild.result == 'FAILURE') {
+            notifySlack(currentBuild.result)
+            slackSend color: '#D4DADF', channel: "#ego-svc-jenkins-upr", message: "${env.BUILD_DISPLAY_NAME} @here \n ${env.JOB_NAME}Pipeline failure!"
+        }
+        if (currentBuild.result != 'FAILURE') {
+            notifySlack(currentBuild.result)
+            slackSend color: '#D4DADF', channel: "#ego-svc-jenkins-upr", message: "${env.BUILD_DISPLAY_NAME} @here \n ${env.JOB_NAME} Pipeline success!"
+        }
+        }
+      }
+    }
+}}

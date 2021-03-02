@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: license-manager
+  labels:
+    component: license-manager
+    tier: license
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+    - port: 8081
+      targetPort: 8081
+      name: grpc
+  selector:
+    component: license-manager
+    tier: license
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: license-manager-deployment
+  labels:
+    component: license-manager
+    tier: license
+spec:
+  selector:
+    matchLabels:
+      component: license-manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: license-manager
+        tier: license
+    spec:
+      containers:
+        - name: license-manager
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/license-manager:1.0.8
+          command:
+            - "/bin/bash"
+            - "-c"
+            - "./start.sh -Xms640m -Xmx640m -Dspring.profiles.active=local -Dlogging.level.com.withme.licensemanager=DEBUG"
+          livenessProbe:
+            httpGet:
+              path: /health/v1/lively
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /health/v1/ready
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 2
+          ports:
+            - containerPort: 8080
+            - containerPort: 8081

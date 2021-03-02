@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-action-manager-mongodb
+  labels:
+    component: mongodb
+    database: support-action
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    component: mongodb
+    tier: backend
+    support-action: database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-action-manager
+  labels:
+    component: support-action-manager
+    tier: support-action-manager
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+    - port: 8081
+      targetPort: 8081
+      name: grpc
+  selector:
+    component: support-action-manager
+    tier: support-action-manager
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: support-action-manager-deployment
+  labels:
+    component: support-action-manager
+    tier: support-action-manager
+spec:
+  selector:
+    matchLabels:
+      component: support-action-manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: support-action-manager
+        tier: support-action-manager
+    spec:
+      containers:
+        - name: support-action-manager
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/support-action-manager:1.0.23
+          env:
+            - name: CS_USER_ACCOUNT_ID
+              value: "test"
+          command:
+            - "/bin/bash"
+            - "-c"
+            - "./start.sh -Xms640m -Xmx640m -Dspring.profiles.active=local"
+          livenessProbe:
+            httpGet:
+              path: /health/v1/lively
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /health/v1/ready
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            failureThreshold: 2
+          ports:
+            - containerPort: 8080
+            - containerPort: 8081

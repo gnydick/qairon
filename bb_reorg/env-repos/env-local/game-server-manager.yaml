@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-server-manager-mongodb
+  labels:
+    component: mongodb
+    database: session
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    component: mongodb
+    tier: backend
+    session: database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-server-manager
+  labels:
+    component: game-server-manager
+    tier: game-session
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http-rest
+  - port: 8081
+    targetPort: 8081
+    name: grpc
+  selector:
+    component: game-server-manager
+    tier: game-session
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: game-server-manager-deployment
+  labels:
+    component: game-server-manager
+    app: game-server-manager
+    version: 1.0.28
+    tier: game-session
+spec:
+  selector:
+    matchLabels:
+      component: game-server-manager
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+  template:
+    metadata:
+      labels:
+        component: game-server-manager
+        tier: game-session
+    spec:
+      containers:
+      - name: game-server-manager
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/game-server-manager:1.0.106
+        command:
+          - "/bin/bash"
+          - "-c"
+          - "./start.sh -Xms640m -Xmx640m -Dspring.profiles.active=local -Dlogging.level.com.withme.gameservermanager=DEBUG"
+        env:
+          - name: EMPTY_DEDICATED_SERVER_WAIT_SEC
+            value: "10"
+          - name: ETCD_CLUSTER_CLIENT_SERVICE_PORT
+            value: "2379"
+          - name: CONNECTION_MANAGER_SERVICE_PORT_GRPC
+            value: "8081"
+        lifecycle:
+          preStop:
+            httpGet:
+              path: lifecycle/v1/preStop
+              port: 8080
+        livenessProbe:
+          httpGet:
+            path: /health/v1/lively
+            port: 8080
+          initialDelaySeconds: 50
+          periodSeconds: 15
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            path: /health/v1/ready
+            port: 8080
+          initialDelaySeconds: 50
+          periodSeconds: 15
+          failureThreshold: 2
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081

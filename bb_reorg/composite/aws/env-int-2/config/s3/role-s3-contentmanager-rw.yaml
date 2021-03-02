@@ -1,0 +1,11 @@
+template_path: aws-iam-serviceaccount-s3-rw.yaml
+
+parameters:
+  S3bucketARN: !stack_output s3/bucket-content-manager.yaml::BucketARN
+  RWroleName: int-2-content-manager-s3-rw
+  RWpolicyName: content-manager-s3-rw
+  # Preconfigured OIDC 
+  OIDCprovider: !resolver_oidc "config/defaults.yml::EKS.ClusterName"
+  # k8s ServiceAccount values
+  SAname: s3-content-manager
+  SAnamespace: default

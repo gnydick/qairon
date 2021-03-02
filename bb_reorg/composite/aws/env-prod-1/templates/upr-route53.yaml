@@ -1,0 +1,44 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Route53 Private HostedZone for k8s ETCD svc AWS NLB.
+
+Parameters:
+
+  vpcID:
+    Description: ID of VPC where that private Route53 record will work.
+    Type: AWS::EC2::VPC::Id
+
+  HostedZoneName:
+    Description: HostedZone name for ETCD LB 
+    Type: String
+  
+Resources: 
+
+  route53HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties: 
+      Name: !Ref HostedZoneName
+      HostedZoneConfig:
+        Comment: Route53 HostedZone for k8s svc ETCD.
+      VPCs:
+        - 
+          VPCId: !Ref vpcID
+          VPCRegion: !Sub ${AWS::Region}
+      HostedZoneTags:
+        - 
+          Key: "env"
+          Value: "prod-1"
+
+Outputs:
+
+  HostedZoneID:
+    Description: The hosted zone ID
+    Value: !Ref route53HostedZone
+
+  HostedZoneDNS:
+    Description: DNS of HostedZone
+    Value: !Ref HostedZoneName
+
+  HostedZoneDNSandPORT:
+    Description: DNS of HostedZone
+    Value: !Join [':', [!Ref HostedZoneName, 2379]]

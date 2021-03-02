@@ -1,0 +1,7 @@
+template_path: aws-s3.yaml
+
+parameters:
+  S3bucketName: prod-1-kubedb-backups
+  BucketEncryption: 'true'
+  LifecycleConfiguration: 'true'
+  LifecycleExpirationInDays: '30'

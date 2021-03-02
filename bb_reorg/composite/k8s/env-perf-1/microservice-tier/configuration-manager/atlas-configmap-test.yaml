@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-test
+  namespace: default
+  labels:
+    owned-by-microservice: configuration-manager
+    repo: property
+data:
+  atlas_Test.yaml: |
+    atlas:
+      client_and_server:
+        perm:
+          201224:
+            property:
+              destination_unlock:
+                welcome_party:       "0"
+                cafe_cooking__easy:  "5"
+                arcade:              "5"
+                beach:               "5"
+                stealth_room:        "7"
+                smart_home:          "7"
+                __all__:             "9"

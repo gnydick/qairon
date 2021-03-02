@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+  labels:
+    component: mongodb
+    tier: backend
+    account: database
+    connection: database
+    example: database
+    content: database
+    gamestate: database
+    session: database
+    atlas: database
+    messenger: database
+    relationship: database
+    message-orchestrator: database
+    catalog: database
+    appsflyer-consumer: database
+    category: database
+    support-action: database
+    usermanager: database
+    possession: database
+    transaction: database
+spec:
+  selector:
+    matchLabels:
+      component: mongodb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: mongodb
+        tier: backend
+        account: database
+        connection: database
+        example: database
+        content: database
+        gamestate: database
+        session: database
+        atlas: database
+        messenger: database
+        relationship: database
+        leaderboard: database
+        message-orchestrator: database
+        catalog: database
+        appsflyer-consumer: database
+        category: database
+        support-action: database
+        usermanager: database
+        possession: database
+        transaction: database
+    spec:
+      containers:
+        - name: mongodb
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/mongodb:4.1.7-v1
+          ports:
+            - containerPort: 27017

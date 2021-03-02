@@ -1,0 +1,18 @@
+template_path: eks.yaml
+parameters:
+  ClusterName: !resolver_yaml config/defaults.yml::EKS.ClusterName
+  ClusterVersion: !resolver_yaml config/defaults.yml::EKS.ClusterVersion
+  VpcId: !stack_output us-west-2/network/vpc.yaml::VpcId
+  PublicSubnet01id: !stack_output us-west-2/network/vpc.yaml::PubSubnet01ID
+  PublicSubnet02id: !stack_output us-west-2/network/vpc.yaml::PubSubnet02ID
+  PublicSubnet03id: !stack_output us-west-2/network/vpc.yaml::PubSubnet03ID
+  PrivateSubnet01id: !stack_output us-west-2/network/vpc.yaml::PrivSubnet01ID
+  PrivateSubnet02id: !stack_output us-west-2/network/vpc.yaml::PrivSubnet02ID
+  PrivateSubnet03id: !stack_output us-west-2/network/vpc.yaml::PrivSubnet03ID
+
+hooks:
+  after_create:
+    - !hook_eks ConfigMap::apply::aws-auth-create
+    - !hook_eks IAM::create::OIDC
+  before_delete:
+    - !hook_eks IAM::delete::OIDC

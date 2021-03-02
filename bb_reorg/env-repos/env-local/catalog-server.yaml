@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-server-mongodb
+  labels:
+    component: mongodb
+    database: catalog
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    component: mongodb
+    tier: backend
+    catalog: database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-server
+  labels:
+    component: catalog-server
+    tier: catalog-server
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+  selector:
+    component: catalog-server
+    tier: catalog-server
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: catalog-server-deployment
+  labels:
+    component: catalog-server
+    tier: catalog-server
+spec:
+  selector:
+    matchLabels:
+      component: catalog-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: catalog-server
+        tier: catalog-server
+    spec:
+      containers:
+        - name: catalog-server
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/catalog-server:1.0.14
+          command:
+            - "/bin/bash"
+            - "-c"
+            - "./start.sh -Xms640m -Xmx640m -Dspring.profiles.active=local"
+          livenessProbe:
+            httpGet:
+              path: /health/v1/lively
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /health/v1/ready
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            failureThreshold: 2
+          ports:
+            - containerPort: 8080
+            - containerPort: 8081

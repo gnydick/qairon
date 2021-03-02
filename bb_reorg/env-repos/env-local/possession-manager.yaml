@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: possession-manager-mongodb
+  labels:
+    component: mongodb
+    database: possession
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    component: mongodb
+    tier: backend
+    possession: database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: possession-manager
+  labels:
+    component: possession-manager
+    tier: possession-manager
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http-rest
+  - port: 8081
+    targetPort: 8081
+    name: grpc
+  selector:
+    component: possession-manager
+    tier: possession-manager
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: possession-manager-deployment
+  labels:
+    component: possession-manager
+    tier: possession-manager
+spec:
+  selector:
+    matchLabels:
+      component: possession-manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: possession-manager
+        tier: possession-manager
+    spec:
+      containers:
+      - name: possession-manager
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/possession-manager:1.0.18
+        command:
+          - "/bin/bash"
+          - "-c"
+          - "./start.sh -Xms640m -Xmx640m -Dspring.profiles.active=local -Dlogging.level.com.withme.possessionmanager=DEBUG"
+        livenessProbe:
+          httpGet:
+            path: /health/v1/lively
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            path: /health/v1/ready
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 2
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081

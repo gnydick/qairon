@@ -1,0 +1,19 @@
+template_path: tier.yaml
+parameters:
+  ClusterName: cicd
+  NodeGroupName: cicd-util
+  NodeInstanceType: 't3.large'
+  NodeImageId: ami-065418523a44331e5
+  KeyName: kubernetes-cicd-key-pair
+  NodeAutoScalingGroupMinSize: '3'
+  NodeAutoScalingGroupMaxSize: '9'
+  NodeAutoScalingGroupDesiredCapacity: '4'
+  NodeVolumeSize: '120'
+  NodeSecurityGroup:  sg-00d43519b1fd6c18d
+  VpcId: !stack_output_external env-cicd::VpcId
+  Subnets: !stack_output_external env-cicd::PrivateSubnetIds
+  # Kubelet ARG'S
+  NodeLabelARG: '--node-labels=cicd-tier=util'
+  KubeletReservedARG: '--kube-reserved cpu=250m,memory=1Gi,ephemeral-storage=1Gi'
+  SystemReservedARG: '--system-reserved cpu=250m,memory=0.2Gi,ephemeral-storage=1Gi'
+  EvictionHardARG: '--eviction-hard memory.available<500Mi,nodefs.available<10%'

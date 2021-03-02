@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-state-manager-mongodb
+  labels:
+    component: mongodb
+    database: gamestate
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    component: mongodb
+    tier: backend
+    gamestate: database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-state-manager
+  labels:
+    component: game-state-manager
+    tier: game-state-manager
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http-rest
+  - port: 8081
+    targetPort: 8081
+    name: grpc
+  selector:
+    component: game-state-manager
+    tier: game-state-manager
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: game-state-manager-deployment
+  labels:
+    component: game-state-manager
+    tier: game-state-manager
+spec:
+  selector:
+    matchLabels:
+      component: game-state-manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: game-state-manager
+        tier: game-state-manager
+    spec:
+      containers:
+      - name: game-state-manager
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/game-state-manager:1.0.40
+        command:
+          - "/bin/bash"
+          - "-c"
+          - "./start.sh -Xms640m -Xmx640m -Dspring.profiles.active=local -Dlogging.level.com.withme.gamestatemanager=DEBUG"
+        livenessProbe:
+          httpGet:
+            path: /health/v1/lively
+            port: 8080
+          initialDelaySeconds: 50
+          periodSeconds: 15
+          failureThreshold: 10
+        readinessProbe:
+          httpGet:
+            path: /health/v1/ready
+            port: 8080
+          initialDelaySeconds: 50
+          periodSeconds: 15
+          failureThreshold: 2
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081

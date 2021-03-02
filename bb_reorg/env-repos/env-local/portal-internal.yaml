@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: portal-internal
+  labels:
+    app: portal-internal
+    version: 0.0.4
+spec:
+  type: NodePort
+  ports:
+  - name: http-rest
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: portal-internal
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: portal-internal-deployment
+  labels:
+    app: portal-internal
+    version: 0.0.4
+spec:
+  selector:
+    matchLabels:
+      app: portal-internal
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: portal-internal
+        version: 0.0.4
+    spec:
+      containers:
+        - name: portal-internal
+          image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/portal-internal-application:0.0.4
+          resources:
+            limits:
+              cpu: 350m
+              memory: 750Mi
+            requests:
+              cpu: 150m
+              memory: 250Mi
+          ports:
+            - containerPort: 8080

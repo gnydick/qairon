@@ -1,0 +1,98 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-gateway-rest
+  namespace: default
+spec:
+  hosts:
+  - "api.withme.com"
+  gateways:
+  - rest-gateway
+  http:
+# We can add more complicated "match" rules: headers, URI, pod labels, etc.
+  - match:
+    - uri:
+        prefix: /
+    route:
+# The rule that route matched traffic to needed service and port
+    - destination:
+        port:
+          number: 80
+        host: service-gateway.default.svc.cluster.local
+---
+# Routing REST requests to "cs-api.withme.com" after they hit "rest-gateway"
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-gateway-cs-rest
+  namespace: default
+spec:
+  hosts:
+  - "cs-api.withme.com"
+  gateways:
+  - rest-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 8083
+        host: service-gateway.default.svc.cluster.local
+
+---
+# Routing GRPC requests to "cm-api.withme.com" after they hit "grpc-gateway"
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: game-server-manager-grpc
+  namespace: default
+spec:
+  hosts:
+  - "cm-api.withme.com"
+  gateways:
+  - grpc-gateway
+  http:
+  - name: "grpcGSM"
+    match:
+    - uri:
+        prefix: "/gsm.session.v1.SessionActivityAndControlService/"
+    route:
+    - destination:
+        port:
+          number: 8081
+        host: game-server-manager.default.svc.cluster.local
+  - name: "grpcCM"
+    match:
+    - uri:
+        prefix: "/cm.v1.ConnectionService/"
+    route:
+    - destination:
+        host: connection-manager.default.svc.cluster.local
+        port:
+          number: 8081
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: grafana-rest
+  namespace: default
+spec:
+  hosts:
+  - "grafana-ui.withme.com"
+  gateways:
+  - rest-gateway
+  http:
+# We can add more complicated "match" rules: headers, URI, pod labels, etc.
+  - match:
+    - uri:
+        prefix: /
+    route:
+# The rule that route matched traffic to needed service and port
+    - destination:
+        port:
+          number: 80
+        host: prom-stack-grafana.monitoring.svc.cluster.local
