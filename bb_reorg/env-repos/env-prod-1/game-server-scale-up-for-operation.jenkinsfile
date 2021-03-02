@@ -1,30 +1,8 @@
-def notifySlack(String buildStatus = 'STARTED') {
+def slackChannel = '#ego-svc-jenkins-ags'
 
-    // Build status of null means success.
-    buildStatus = buildStatus ?: 'SUCCESS'
-    def icons
-    if (buildStatus == 'STARTED') {
-        icons = ':biking:'
-    } else if (buildStatus == 'SUCCESS') {
-        icons = ':pusheen_dancing:'
-    } else if (buildStatus == 'ABORTED') {
-        icons = ':thinking_face:'
-    } else {
-        icons = ':twitching:'
-    }
-    def color
-    if (buildStatus == 'STARTED') {
-        color = '#D4DADF'
-    } else if (buildStatus == 'SUCCESS') {
-        color = '#BDFFC3'
-    } else if (buildStatus == 'ABORTED') {
-        color = '#FFFE89'
-    } else {
-        color = '#FF9FA1'
-    }
-    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\nSOURCE=${env.SOURCE}\n<${env.BUILD_URL}console|Watch build console output> @here"
-    slackSend(color: color, channel: "#ego-svc-jenkins-ags", message: msg)
-}
+def msg = "${buildStatus}${icons}: `${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\nSOURCE=${env.SOURCE}\n<${env.BUILD_URL}console|Watch build console output> @here"
+
+common = load "lib/common.groovy"
 
 def autoCancelled = false
 def label = "game-server-scale-up-${UUID.randomUUID().toString()}"
@@ -310,13 +288,13 @@ node(label) {
       stage('Send notifications') {
         container('microservice-orchestration')  {
         if (currentBuild.result == 'ABORTED') {
-          notifySlack(currentBuild.result)
-          slackSend color: '#FFFE89', channel: "#ego-svc-jenkins-ags", message: "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}: \n'AGS version not valid or empty. Pipeline aborted!'"
+            common.notifySlack(currentBuild.result, slackChannel, "", msg)
+            common.notifySlack(currentBuild.result, slackChannel, '#FFFE89', "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}: \n'AGS version not valid or empty. Pipeline aborted!'")
         }
         if (currentBuild.result == 'FAILURE') {
-            notifySlack(currentBuild.result)
+            common.notifySlack(currentBuild.result, slackChannel)
         }
         if (currentBuild.result != 'FAILURE' && currentBuild.result != 'ABORTED') {
-            notifySlack(currentBuild.result)
+            common.notifySlack(currentBuild.result, slackChannel)
         }}}}
 }}

@@ -1,31 +1,7 @@
 /* groovylint-disable CompileStatic, CouldBeSwitchStatement, DuplicateStringLiteral, GStringExpressionWithinString, LineLength, MethodReturnTypeRequired, NestedBlockDepth, NoDef, ParameterReassignment, SpaceAfterClosingBrace, SpaceBeforeClosingBrace, VariableTypeRequired */
-def notifySlack(String buildStatus = 'STARTED') {
 
-    // Build status of null means success.
-    buildStatus = buildStatus ?: 'SUCCESS'
-    def icons
-    if (buildStatus == 'STARTED') {
-        icons = ':biking:'
-    } else if (buildStatus == 'SUCCESS') {
-        icons = ':pusheen_dancing:'
-    } else if (buildStatus == 'ABORTED') {
-        icons = ':thinking_face:'
-    } else {
-        icons = ':twitching:'
-    }
-    def color
-    if (buildStatus == 'STARTED') {
-        color = '#D4DADF'
-    } else if (buildStatus == 'SUCCESS') {
-        color = '#BDFFC3'
-    } else if (buildStatus == 'ABORTED') {
-        color = '#FFFE89'
-    } else {
-        color = '#FF9FA1'
-    }
-    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n<${env.BUILD_URL}console|Watch build console output>"
-    slackSend(color: color, message: msg)
-}
+common = load "lib/common.groovy"
+
 
 def label = "perf-1-tear-down-${UUID.randomUUID().toString()}"
 
@@ -61,7 +37,7 @@ node(label) {
       wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
   properties([ disableConcurrentBuilds() ])
     stage('Configure tools') {
-      notifySlack()
+      common.notifySlack()
       slackSend color: 'good', message: "`${env.JOB_NAME}` #${env.BUILD_NUMBER}\nRunning 'Configure tools' stage."
       container('microservice-orchestration')  {
       sh '''#!/usr/bin/env bash
@@ -102,5 +78,5 @@ node(label) {
         currentBuild.result = 'FAILURE'
         throw e
     } finally {
-    notifySlack(currentBuild.result)
+    common.notifySlack(currentBuild.result)
 }}}

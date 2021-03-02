@@ -1,30 +1,4 @@
-def notifySlack(String buildStatus = 'STARTED') {
-
-    // Build status of null means success.
-    buildStatus = buildStatus ?: 'SUCCESS'
-    def icons
-    if (buildStatus == 'STARTED') {
-        icons = ':biking:'
-    } else if (buildStatus == 'SUCCESS') {
-        icons = ':pusheen_dancing:'
-    } else if (buildStatus == 'ABORTED') {
-        icons = ':thinking_face:'
-    } else {
-        icons = ':twitching:'
-    }
-    def color
-    if (buildStatus == 'STARTED') {
-        color = '#D4DADF'
-    } else if (buildStatus == 'SUCCESS') {
-        color = '#BDFFC3'
-    } else if (buildStatus == 'ABORTED') {
-        color = '#FFFE89'
-    } else {
-        color = '#FF9FA1'
-    }
-    def msg = "${buildStatus}${icons}: `${env.JOB_NAME} in the ${env.CLUSTER_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\n<${env.BUILD_URL}console|Watch build console output> @here"
-    slackSend(color: color, channel: "#jnkns_int_tests", message: msg)
-}
+common = load "lib/common.groovy" #jnkns_int_tests
 
 def label = "int-test-automation-${UUID.randomUUID().toString()}"
 

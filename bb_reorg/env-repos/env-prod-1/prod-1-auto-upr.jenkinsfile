@@ -1,30 +1,6 @@
-def notifySlack(String buildStatus = 'STARTED') {
+common = load "lib/common.groovy"
+def slackChannel = "#ego-svc-jenkins-upr"
 
-    // Build status of null means success.
-    buildStatus = buildStatus ?: 'SUCCESS'
-    def icons
-    if (buildStatus == 'STARTED') {
-        icons = ':biking:'
-    } else if (buildStatus == 'SUCCESS') {
-        icons = ':pusheen_dancing:'
-    } else if (buildStatus == 'ABORTED') {
-        icons = ':thinking_face:'
-    } else {
-        icons = ':twitching:'
-    }
-    def color
-    if (buildStatus == 'STARTED') {
-        color = '#D4DADF'
-    } else if (buildStatus == 'SUCCESS') {
-        color = '#BDFFC3'
-    } else if (buildStatus == 'ABORTED') {
-        color = '#FFFE89'
-    } else {
-        color = '#FF9FA1'
-    }
-    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\n<${env.BUILD_URL}console|Watch build console output>"
-    slackSend(color: color, channel: "#ego-svc-jenkins-upr", message: msg)
-}
 
 def label = "prod-1-upr-server-${UUID.randomUUID().toString()}"
 
@@ -48,41 +24,43 @@ spec:
     - name: AWS_REGION
       value: "us-west-2"    
 """
-  ) {
-node(label) {
-  try {
-    def secrets = [[$class: 'VaultSecret', path: 'cicd/prod-1/aws_keys', secretValues: [
+) {
+    node(label) {
+        try {
+            def secrets = [[$class: 'VaultSecret', path: 'cicd/prod-1/aws_keys', secretValues: [
                     [$class: 'VaultSecretValue', envVar: 'AWS_ACCESS_KEY_ID', vaultKey: 'AWS_ACCESS_KEY_ID'],
                     [$class: 'VaultSecretValue', envVar: 'AWS_SECRET_ACCESS_KEY', vaultKey: 'AWS_SECRET_ACCESS_KEY']]],
-                  [$class: 'VaultSecret', path: 'cicd/bitbucket', secretValues: [
-                    [$class: 'VaultSecretValue', envVar: 'BITBUCKET_USER', vaultKey: 'BITBUCKET_USER'],
-                    [$class: 'VaultSecretValue', envVar: 'BITBUCKET_APP_PASSWORD', vaultKey: 'BITBUCKET_APP_PASSWORD']]]]
-        wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
-  properties([
-          parameters([string(defaultValue: '', description: 'Latest UPR version', name: 'APP_VERSION', trim: true)]),
-          disableConcurrentBuilds()
-      ])
-    env.APP_NAME = "udp-packet-router"
-    env.APP_VERSION = "${params.APP_VERSION}"
-    env.JOB_NAME = "${env.JOB_NAME}"
-    env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
-    currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-${env.APP_VERSION}`"
+                           [$class: 'VaultSecret', path: 'cicd/bitbucket', secretValues: [
+                                   [$class: 'VaultSecretValue', envVar: 'BITBUCKET_USER', vaultKey: 'BITBUCKET_USER'],
+                                   [$class: 'VaultSecretValue', envVar: 'BITBUCKET_APP_PASSWORD', vaultKey: 'BITBUCKET_APP_PASSWORD']]]]
+            wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
+                properties([
+                        parameters([string(defaultValue: '', description: 'Latest UPR version', name: 'APP_VERSION', trim: true)]),
+                        disableConcurrentBuilds()
+                ])
+                env.APP_NAME = "udp-packet-router"
+                env.APP_VERSION = "${params.APP_VERSION}"
+                env.JOB_NAME = "${env.JOB_NAME}"
+                env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
+                currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-${env.APP_VERSION}`"
 
-    stage('Configure aws account') {
-      notifySlack()
-      slackSend color: 'good', channel: "#ego-svc-jenkins-upr", message: "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Configure aws account' stage."
-      container('microservice-orchestration')  {
-      sh '''#!/usr/bin/env bash
+                stage('Configure aws account') {
+                    common.notifySlack(currentBuild.result, slackChannel)
+                    common.notifySlack(currentBuild.result, slackChannel, 'good', "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Configure aws account' stage.")
+
+                    container('microservice-orchestration') {
+                        sh '''#!/usr/bin/env bash
         set -eox pipefail
         /toolbox/set-aws-credentials.sh --key-id ${AWS_ACCESS_KEY_ID} --secret-access-key ${AWS_SECRET_ACCESS_KEY}
         ### Check IAM user
         aws sts get-caller-identity --output text
       '''
-    }}
-    stage('Deploy new version of UPR') {
-      slackSend color: 'good', channel: "#ego-svc-jenkins-upr", message: "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Deploy ${env.APP_NAME}' stage."
-      container('microservice-orchestration')  {
-      sh '''#!/usr/bin/env bash
+                    }
+                }
+                stage('Deploy new version of UPR') {
+                    common.notifySlack(currentBuild.result, slackChannel, 'good', "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Deploy ${env.APP_NAME}' stage.")
+                    container('microservice-orchestration') {
+                        sh '''#!/usr/bin/env bash
         set -eo pipefail
         ### Clone repo environment repository
         git clone https://${BITBUCKET_USER}:${BITBUCKET_APP_PASSWORD}@bitbucket.org/imvu/${STACK_NAME}.git && cd ${STACK_NAME}/aws
@@ -92,11 +70,12 @@ node(label) {
         ### Update "UPR" AWS CloudFormation Stack with new version of "UPR" 
         sceptre update ${AWS_REGION}/udp-routing/upr-ecs.yaml -y
         '''
-    }}
-    stage('Push changes in parameters.json to env-prod-1 repository') {
-      slackSend color: 'good', channel: "#ego-svc-jenkins-upr", message: "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Push deployed version ${env.APP_NAME}:${env.APP_VERSION} image tag in `parameters.json` file' stage."
-      container('microservice-orchestration')  {
-      sh '''#!/usr/bin/env bash
+                    }
+                }
+                stage('Push changes in parameters.json to env-prod-1 repository') {
+                    common.notifySlack(currentBuild.result, slackChannel, 'good', "`${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}\nRunning 'Push deployed version ${env.APP_NAME}:${env.APP_VERSION} image tag in `parameters.json` file' stage.")
+                    container('microservice-orchestration') {
+                        sh '''#!/usr/bin/env bash
         set -eo pipefail
         cd ${STACK_NAME} && git checkout master
         git config --global user.name "jenkins"
@@ -117,19 +96,18 @@ node(label) {
           fi
         done
       '''
-    }}}
-    } catch (e) {
-        currentBuild.result = 'FAILURE'
-        throw e
-    } finally {
-      stage('Send notifications') {
-        container('microservice-orchestration')  {
-        if (currentBuild.result == 'FAILURE') {
-            notifySlack(currentBuild.result)
-            slackSend color: '#D4DADF', channel: "#ego-svc-jenkins-upr", message: "${env.BUILD_DISPLAY_NAME} @here \n ${env.JOB_NAME}Pipeline failure!"
+                    }
+                }
+            }
+        } catch (e) {
+            currentBuild.result = 'FAILURE'
+            throw e
+        } finally {
+            stage('Send notifications') {
+                container('microservice-orchestration') {
+                    common.notifySlack(currentBuild.result, slackChannel, '#D4DADF', "${env.BUILD_DISPLAY_NAME} @here \n ${env.JOB_NAME}Pipeline ${currentBuild.result}!" )
+                }
+            }
         }
-        if (currentBuild.result != 'FAILURE') {
-            notifySlack(currentBuild.result)
-            slackSend color: '#D4DADF', channel: "#ego-svc-jenkins-upr", message: "${env.BUILD_DISPLAY_NAME} @here \n ${env.JOB_NAME} Pipeline success!"
-        }}}}
-}}
+    }
+}

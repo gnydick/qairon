@@ -1,31 +1,5 @@
 /* groovylint-disable CompileStatic, CouldBeSwitchStatement, DuplicateStringLiteral, GStringExpressionWithinString, LineLength, MethodReturnTypeRequired, NestedBlockDepth, NoDef, ParameterReassignment, SpaceAfterClosingBrace, SpaceBeforeClosingBrace, VariableTypeRequired */
-def notifySlack(String buildStatus = 'STARTED') {
-
-    // Build status of null means success.
-    buildStatus = buildStatus ?: 'SUCCESS'
-    def icons
-    if (buildStatus == 'STARTED') {
-        icons = ':biking:'
-    } else if (buildStatus == 'SUCCESS') {
-        icons = ':pusheen_dancing:'
-    } else if (buildStatus == 'ABORTED') {
-        icons = ':thinking_face:'
-    } else {
-        icons = ':twitching:'
-    }
-    def color
-    if (buildStatus == 'STARTED') {
-        color = '#D4DADF'
-    } else if (buildStatus == 'SUCCESS') {
-        color = '#BDFFC3'
-    } else if (buildStatus == 'ABORTED') {
-        color = '#FFFE89'
-    } else {
-        color = '#FF9FA1'
-    }
-    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\n<${env.BUILD_URL}console|Watch build console output> @here"
-    slackSend(color: color, channel: "#jnkns_int_tests", message: msg)
-}
+common = load "lib/common.groovy"
 
 def label = "int-1-automation-${UUID.randomUUID().toString()}"
 
@@ -307,10 +281,10 @@ node(label) {
       container('microservice-orchestration')  {
         if (env.APP_NAME == '' || env.APP_VERSION == '') {
           currentBuild.result = 'ABORTED'
-          notifySlack(currentBuild.result)
+          common.notifySlack(currentBuild.result)
           return
         } else {
-            notifySlack(currentBuild.result)
+            common.notifySlack(currentBuild.result)
         }
         if (currentBuild.result == 'FAILURE') {
           slackSend color: '#FF9FA1', channel: "#jnkns_int_tests", message: "${currentBuild.result}`${env.JOB_NAME}` ${env.BUILD_DISPLAY_NAME}\nRunning 'Rollback for ${env.APP_NAME} from v${env.APP_VERSION} version to previous' stage."
