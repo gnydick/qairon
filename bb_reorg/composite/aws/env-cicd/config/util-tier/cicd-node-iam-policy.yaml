@@ -1,5 +1,0 @@
-template_path: cicd-node-iam-policy.yaml
-parameters:
-  PolicyNameDynamoDB: dynamodb-rw
-  PolicyNameKMS: KMSvaultRead
-  RoleName: !stack_output util-tier/nodes.yaml::NodeInstanceRoleName

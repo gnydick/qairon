@@ -2,7 +2,7 @@ def slackChannel = '#ego-svc-jenkins-ags'
 
 def msg = "${buildStatus}${icons}: `${env.JOB_NAME}`\n ${env.BUILD_DISPLAY_NAME}:\nSOURCE=${env.SOURCE}\n<${env.BUILD_URL}console|Watch build console output> @here"
 
-common = load "lib/common.groovy"
+common = load "../lib/common.groovy"
 
 def autoCancelled = false
 def label = "game-server-scale-up-${UUID.randomUUID().toString()}"

@@ -1,5 +1,0 @@
-template_path: aws-iam-s3-rw.yaml
-parameters:
-  S3bucketARN: !stack_output kubedb-backups/s3-bucket.yaml::BucketARN
-  RWroleName: int2-mongors-s3-rw
-  RWpolicyName: mongors-s3-rw

@@ -1,5 +1,5 @@
 /* groovylint-disable CompileStatic, CouldBeSwitchStatement, DuplicateStringLiteral, GStringExpressionWithinString, LineLength, MethodReturnTypeRequired, NestedBlockDepth, NoDef, ParameterReassignment, SpaceAfterClosingBrace, SpaceBeforeClosingBrace, VariableTypeRequired */
-common = load "lib/common.groovy"
+common = load "../lib/common.groovy"
 
 
 

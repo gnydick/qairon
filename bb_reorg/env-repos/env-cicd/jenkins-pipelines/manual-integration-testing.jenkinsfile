@@ -1,6 +1,6 @@
 
 
-common = load "lib/common.groovy"
+common = load "../lib/common.groovy"
 
 def label = "int-test-automation-${UUID.randomUUID().toString()}"
 

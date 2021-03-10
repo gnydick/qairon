@@ -1,4 +1,4 @@
-common = load "lib/common.groovy"
+common = load "../lib/common.groovy"
 
 def slackChannel = "#ego-svc-jenkins-upr"
 

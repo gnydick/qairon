@@ -1,6 +1,6 @@
 def slackChannel = "#ego-svc-jenkins-ags"
 
-common = load "lib/common.groovy"
+common = load "../lib/common.groovy"
 
 def autoCancelled = false
 def alredyDeployed = false
