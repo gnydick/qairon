@@ -21,7 +21,8 @@ pipeline {
         }
 
         stage('launch node') {
-            node('jenkins-agent') {
+            node {
+                agent 'jenkins-agent'
                 steps {
 
 
