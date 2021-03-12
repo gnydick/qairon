@@ -10,12 +10,13 @@ properties ([
 
 pipeline {
     agent none
-
     stages {
         stage('Gather Parameters') {
 
             steps {
-                sh: '''echo hello'''
+                script {
+                    sh: '''echo hello'''
+                }
             }
         }
 
