@@ -12,22 +12,29 @@ pipeline {
     agent none
     stages {
         stage('Gather Parameters') {
-            agent any
-            steps {
-                script {
-                    sh: '''echo hello'''
-                }
-            }
-        }
-        stage('launch node') {
-            agent {
-                label 'jenkins-agent'
-                steps {
-                    def qairon = load "../../lib/jenkins/qairon/"
-                    common = load "../lib/qairon.src.common.groovy"
-                }
-            }
 
         }
+        stage('launch node') {
+
+            label 'jenkins-agent'
+
+
+        }
+    }
+}
+
+stage('Gather Parameters') {
+    node('master') {
+        script {
+            sh: '''echo hello'''
+        }
+    }
+}
+stage('launch node') {
+    node('jenkins-agent') {
+
+        def qairon = load "../../lib/jenkins/qairon/"
+        common = load "../lib/qairon.src.common.groovy"
+
     }
 }
