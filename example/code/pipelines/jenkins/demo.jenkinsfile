@@ -1,6 +1,5 @@
 package jenkins
 
-@Load('qairon')
 
 properties(
         [
@@ -87,14 +86,14 @@ properties(
 
 stage('Gather Parameters') {
     node('master') {
-        script {
+
             sh: '''echo hello'''
-        }
+
     }
 }
 stage('launch node') {
     node('jenkins-agent') {
-
+        @Load('qairon')
         def qairon = load "../../lib/jenkins/qairon/"
         common = load "../lib/qairon.src.common.groovy"
 
