@@ -1,6 +1,7 @@
 package jenkins
 
-properties([parameters([string(defaultValue: '', description: '', name: 'SERVICE_ID', trim: true), [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'BUILD_ID', randomName: 'choice-parameter-4620443893435', referencedParameters: 'SERVICE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: '''
+pipeline {
+    properties([parameters([string(defaultValue: '', description: '', name: 'SERVICE_ID', trim: true), [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'BUILD_ID', randomName: 'choice-parameter-4620443893435', referencedParameters: 'SERVICE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """import groovy.json.JsonSlurper
 
 svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
 
@@ -33,13 +34,7 @@ try {
     print(e)
 }
 
-''']]], [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'RELEASE_ID', randomName: 'choice-parameter-4620449435654', referencedParameters: 'BUILD_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: '''import groovy.json.JsonSlurper''']]]])])
-
-
-node('jenkins-agent') {
-    stage('Gather Parameters') {
-        def qairon = load "../../lib/jenkins/qairon/"
-        common = load "../lib/qairon.src.common.groovy"
+"""]]], [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'RELEASE_ID', randomName: 'choice-parameter-4620449435654', referencedParameters: 'BUILD_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """import groovy.json.JsonSlurper
 
 build_ids = groovy.json.JsonOutput.toJson(BUILD_ID.split(","))
 
@@ -75,7 +70,7 @@ try {
     print(e)
 }
 
-''']]], [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'DEPLOYMENT_ID', randomName: 'choice-parameter-4620453824735', referencedParameters: 'SERVICE_ID,RELEASE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: '''import groovy.json.JsonSlurper
+"""]]], [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'DEPLOYMENT_ID', randomName: 'choice-parameter-4620453824735', referencedParameters: 'SERVICE_ID,RELEASE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """import groovy.json.JsonSlurper
 
 svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
 rel_ids = groovy.json.JsonOutput.toJson(RELEASE_ID.split(","))
@@ -111,6 +106,13 @@ try {
 }
 
 
+"""]]]])])
+}
+
+node('jenkins-agent') {
+    stage('Gather Parameters') {
+        def qairon = load "../../lib/jenkins/qairon/"
+        common = load "../lib/qairon.src.common.groovy"
 
     }
 }
