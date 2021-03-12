@@ -2,6 +2,8 @@ import groovy.json.JsonSlurper
 
 svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
 
+qairon = load "../qairon/base.groovy"
+
 try {
     List<String> resultArray = new ArrayList<String>()
     url = 'http://qairon:5001/api/rest/v1/build?q={"filters":[{"name":"service_id","op":"in","val":' + svc_ids + '}]}'
