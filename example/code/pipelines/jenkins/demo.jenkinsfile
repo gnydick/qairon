@@ -26,8 +26,7 @@ properties(
                                                  sandbox  : false,
 
                                                  script   : """
-                                                    @Library('qairon')
-                                                    import qairon.QueryFilter
+                                                   
                                                     def base = load('../base.groovy')
                                                     def svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
                                                     def qf = QueryFilter('service_id','in', svc_ids)
