@@ -8,18 +8,6 @@ properties([
 
 ])
 
-pipeline {
-    agent none
-    stages {
-        stage('Gather Parameters') {
-
-        }
-        stage('launch node') {
-
-
-        }
-    }
-}
 
 stage('Gather Parameters') {
     node('master') {
