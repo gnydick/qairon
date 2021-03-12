@@ -26,7 +26,7 @@ properties(
                                                  sandbox  : false,
 
                                                  script   : """
-                                                   
+                                                    @Library('qairon')
                                                     import qairon.QueryFilter
                                                     def base = load('../base.groovy')
                                                     def svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
@@ -92,14 +92,9 @@ properties(
 
 
 node('jenkins-agent') {
-    container(name: 'helm') {
+    container(name: 'jnlp') {
         stage('launch node') {
-            checkout changelog: false, poll: false,
-                    scm: [$class: 'GitSCM',
-                          branches: [[name: 'main']],
-                          extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: ''],
-                                       [$class: 'CloneOption', noTags: false, reference: '']],
-                          userRemoteConfigs: [[credentialsId: 'bitbucket_ssh_key', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
+            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'main']], extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'withme-ops']], userRemoteConfigs: [[credentialsId: 'bitbucket_ssh_key', name: 'origin', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
             sh returnStdout: true, script: 'find .'
 
             def common = load "${WORKSPACE}/withme-ops/example/code/lib/jenkins/common.groovy"
