@@ -1,5 +1,6 @@
 package jenkins
 
+import qairon.QueryFilter
 
 properties(
         [
@@ -24,7 +25,11 @@ properties(
                                          script        : [
                                                  classpath: [],
                                                  sandbox  : false,
-                                                 script   : """ """
+                                                 script   : """
+                                                    def base = load('../base.groovy')
+                                                    def svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
+                                                    def qf = QueryFilter('service_id','in', ${svc_ids})
+                                                """
                                          ]
                                  ]
                          ],
@@ -93,7 +98,9 @@ stage('Gather Parameters') {
 }
 stage('launch node') {
     node('jenkins-agent') {
-        @Library('qairon')
+        script {
+            import
+        }
         def qairon = load "../../lib/jenkins/qairon/"
         common = load "../lib/qairon.src.common.groovy"
 
