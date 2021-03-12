@@ -25,7 +25,9 @@ properties(
                                          script        : [
                                                  classpath: [],
                                                  sandbox  : false,
+
                                                  script   : """
+                                                    library identifier: 'qairon', retriever: modernSCM([$class: 'GitSCMSource', credentialsId: 'bitbucket_ssh_key', remote: 'git@bitbucket.org:imvu/withme-ops.git', traits: [gitBranchDiscovery(), [$class: 'SparseCheckoutPathsTrait', extension: [sparseCheckoutPaths: [[path: 'example/code/lib/jenkins/qairon']]]]]])
                                                     def base = load('../base.groovy')
                                                     def svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
                                                     def qf = QueryFilter('service_id','in', ${svc_ids})
