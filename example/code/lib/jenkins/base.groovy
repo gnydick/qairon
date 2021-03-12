@@ -1,7 +1,7 @@
 package qairon
 
 import groovy.json.JsonSlurper
-@Library('qairon')
+@Library('qairon@main')
 import qairon.QueryFilter
 
 
