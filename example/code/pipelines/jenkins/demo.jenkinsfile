@@ -90,14 +90,6 @@ properties(
         ]
 )
 
-
-stage('Gather Parameters') {
-    node('master') {
-
-        sh: '''echo hello'''
-
-    }
-}
 stage('launch node') {
     node('jenkins-agent') {
         container(name: 'helm') {
