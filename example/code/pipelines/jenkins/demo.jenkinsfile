@@ -98,9 +98,6 @@ stage('Gather Parameters') {
 }
 stage('launch node') {
     node('jenkins-agent') {
-        script {
-            import
-        }
         def qairon = load "../../lib/jenkins/qairon/"
         common = load "../lib/qairon.src.common.groovy"
 
