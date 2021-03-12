@@ -1,19 +1,16 @@
 package jenkins
 
 pipeline {
+    stages {
+        stage('Gather Parameters') {
+            agent {
+                label "master"
+                parameters([string(defaultValue: '', description: '', name: 'SERVICE_ID', trim: true),
+                            [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'BUILD_ID', randomName: 'choice-parameter-4620443893435', referencedParameters: 'SERVICE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """ """]]],
+                            [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'RELEASE_ID', randomName: 'choice-parameter-4620449435654', referencedParameters: 'BUILD_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """ """]]],
+                            [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'DEPLOYMENT_ID', randomName: 'choice-parameter-4620453824735', referencedParameters: 'SERVICE_ID,RELEASE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """ """]]]])
 
 
-    agent {
-        label "master"
-        parameters([string(defaultValue: '', description: '', name: 'SERVICE_ID', trim: true),
-                    [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'BUILD_ID', randomName: 'choice-parameter-4620443893435', referencedParameters: 'SERVICE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """ """]]],
-                    [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'RELEASE_ID', randomName: 'choice-parameter-4620449435654', referencedParameters: 'BUILD_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """ """]]],
-                    [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'DEPLOYMENT_ID', randomName: 'choice-parameter-4620453824735', referencedParameters: 'SERVICE_ID,RELEASE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """ """]]]])
-
-        stages {
-
-
-            stage('Gather Parameters') {
                 steps {
                     node('jenkins-agent') {
                         def qairon = load "../../lib/jenkins/qairon/"
