@@ -1,4 +1,4 @@
-common = load "../lib/common.groovy"
+qairon.src.common = load "../lib/qairon.src.common.groovy"
 
 def label = "int-test-automation-${UUID.randomUUID().toString()}"
 def slackChannel = "#jnkns_int_tests"
@@ -162,13 +162,13 @@ spec:
                     container('microservice-orchestration') {
                         if (env.APP_NAME == '' || env.APP_VERSION == '') {
                             currentBuild.result = 'ABORTED'
-                            common.notifySlack(currentBuild.result)
+                            qairon.src.common.notifySlack(currentBuild.result)
                             return
                         } else {
-                            common.notifySlack(currentBuild.result)
+                            qairon.src.common.notifySlack(currentBuild.result)
                         }
                         if (currentBuild.result == 'FAILURE') {
-                            common.notifySlack(currentBuild.result, slackChannel, '#FF9FA1', "${currentBuild.result}`${env.JOB_NAME}` ${env.BUILD_DISPLAY_NAME}\nRunning '${env.APP_NAME}-v${env.APP_VERSION} failed integration test.'")
+                            qairon.src.common.notifySlack(currentBuild.result, slackChannel, '#FF9FA1', "${currentBuild.result}`${env.JOB_NAME}` ${env.BUILD_DISPLAY_NAME}\nRunning '${env.APP_NAME}-v${env.APP_VERSION} failed integration test.'")
                         } else {
                             return
                         }

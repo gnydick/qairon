@@ -3,7 +3,7 @@ package jenkins
 node('jenkins-agent') {
     stage('Gather Parameters') {
         def qairon = load "../../lib/jenkins/qairon/"
-        common = load "../lib/common.groovy"
+        common = load "../lib/qairon.src.common.groovy"
         properties([parameters([string(defaultValue: '', description: '', name: 'SERVICE_ID', trim: true), [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'BUILD_ID', randomName: 'choice-parameter-4620443893435', referencedParameters: 'SERVICE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: '''import groovy.json.JsonSlurper
 
 svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))

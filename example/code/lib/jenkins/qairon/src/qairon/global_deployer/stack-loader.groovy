@@ -1,4 +1,4 @@
-package GlobalDeployer
+package qairon.global_deployer
 
 import groovy.json.JsonSlurper
 

@@ -1,24 +1,24 @@
+package qairon.global_deployer
+
 import groovy.json.JsonSlurper
-import java.util.logging.Logger
 
-Logger logger = Logger.getLogger('org.biouno.unochoice')
+build_ids = groovy.json.JsonOutput.toJson(BUILD_ID.split(","))
 
-envs = groovy.json.JsonOutput.toJson(ENVIRONMENTS.split(","))
-logger.info(envs)
 
 try {
     List<String> resultArray = new ArrayList<String>()
-    url = 'http://qairon:5001/api/rest/v1/deployment_target?q={"filters":[{"name":"environment_id","op":"in","val":'+ envs + '}]}'
-    logger.info(url)
+    url = 'http://qairon:5001/api/rest/v1/release?q={"filters":[{"name":"build_id","op":"in","val":' + build_ids + '}]}'
+
+
     HttpURLConnection connection = new URL(url).openConnection()
     connection.connect()
     if (connection.responseCode == 200) {
         jsonSlurper = new JsonSlurper()
         // get the JSON response
         inStream = connection.inputStream
-        stacks = jsonSlurper.parse(inStream).objects
-        stacks.objects
-        stacks.each { stack  -> resultArray.add(stack.id)}
+        releases = jsonSlurper.parse(inStream).objects
+        releases.objects
+        releases.each { release -> resultArray.add(release.id) }
         connection.disconnect()
 
         return resultArray
@@ -28,7 +28,6 @@ try {
         print connection.responseCode + ": " + connection.inputStream.text
 
     }
-
 
 
 } catch (e) {
