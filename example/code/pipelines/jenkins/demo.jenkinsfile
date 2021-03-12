@@ -95,11 +95,12 @@ node('jenkins-agent') {
     container(name: 'helm') {
         stage('launch node') {
             checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'main']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: ''], [$class: 'CloneOption', noTags: false, reference: '', shallow: true]], userRemoteConfigs: [[credentialsId: 'bitbucket_ssh_key', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
-            def common = load "${WORKSPACE}/withme-ops/example/code/lib/jenkins/common.groovy"
-            def base = load "${WORKSPACE}/withme-ops/example/code/lib/jenkins/base.groovy"
             sh: '''
                 find .
             '''
+
+            def common = load "${WORKSPACE}/withme-ops/example/code/lib/jenkins/common.groovy"
+            def base = load "${WORKSPACE}/withme-ops/example/code/lib/jenkins/base.groovy"
 
         }
     }
