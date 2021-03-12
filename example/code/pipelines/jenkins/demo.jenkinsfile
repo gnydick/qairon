@@ -9,17 +9,15 @@ pipeline {
                          [$class: 'CascadeChoiceParameter', choiceType: 'PT_MULTI_SELECT', description: '', filterLength: 3, filterable: true, name: 'DEPLOYMENT_ID', randomName: 'choice-parameter-4620453824735', referencedParameters: 'SERVICE_ID,RELEASE_ID', script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''], script: [classpath: [], sandbox: false, script: """ """]]]])])
 
     stages {
-        stage('gather params') {
 
 
-            stage('Gather Parameters') {
-                agent {
-                    label "master"
-                    steps {
-                        node('jenkins-agent') {
-                            def qairon = load "../../lib/jenkins/qairon/"
-                            common = load "../lib/qairon.src.common.groovy"
-                        }
+        stage('Gather Parameters') {
+            agent {
+                label "master"
+                steps {
+                    node('jenkins-agent') {
+                        def qairon = load "../../lib/jenkins/qairon/"
+                        common = load "../lib/qairon.src.common.groovy"
                     }
                 }
             }
