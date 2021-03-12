@@ -12,11 +12,14 @@ pipeline {
 
 
                 steps {
-                    node('jenkins-agent') {
-                        def qairon = load "../../lib/jenkins/qairon/"
-                        common = load "../lib/qairon.src.common.groovy"
-                    }
+                  sh: '''echo hello'''
                 }
+            }
+        }
+        stage('launch node') {
+            node('jenkins-agent') {
+                def qairon = load "../../lib/jenkins/qairon/"
+                common = load "../lib/qairon.src.common.groovy"
             }
         }
     }
