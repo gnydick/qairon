@@ -1,5 +1,7 @@
 package jenkins
-@Library('qairon') import qairon.QueryFilter
+
+def qairon = library 'qairon'
+
 
 properties(
         [
