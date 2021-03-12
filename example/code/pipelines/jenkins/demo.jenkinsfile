@@ -1,6 +1,6 @@
 package jenkins
 
-node('jenkins-agent') {
+node('master') {
     stage('Gather Parameters') {
         def qairon = load "../../lib/jenkins/qairon/"
         common = load "../lib/qairon.src.common.groovy"
