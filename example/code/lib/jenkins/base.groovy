@@ -4,11 +4,11 @@ import groovy.json.JsonSlurper
 @Library('qairon@main') import qairon.QueryFilter
 
 
-ArrayList<String> query(String resource, QueryFilter filter) {
+ArrayList<String> query(String resource, String filter) {
     try {
         ArrayList<String> resultArray = new ArrayList<String>()
-        def filterString = filter.getFilter()
-        def url = "http://qairon:5001/api/rest/v1/${resource}?q={\"filters\":${filterString}}"
+
+        def url = "http://qairon:5001/api/rest/v1/${resource}?q={\"filters\":${filter}}"
 
         HttpURLConnection connection = new URL(url).openConnection()
         connection.connect()
