@@ -16,8 +16,6 @@ pipeline {
         }
         stage('launch node') {
 
-            label 'jenkins-agent'
-
 
         }
     }
