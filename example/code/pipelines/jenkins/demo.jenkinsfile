@@ -1,6 +1,6 @@
 package jenkins
 
-library identifier: 'qairon@main', retriever: modernSCM([$class: 'GitSCMSource', credentialsId: 'bitbucket_ssh_key', remote: 'git@bitbucket.org:imvu/withme-ops.git', traits: [gitBranchDiscovery(), [$class: 'SparseCheckoutPathsTrait', extension: [sparseCheckoutPaths: [[path: '${WORKSPACE}/example/code/lib/jenkins/qairon']]]]]])
+library identifier: 'qairon@main', retriever: modernSCM([$class: 'GitSCMSource', credentialsId: 'bitbucket_ssh_key', remote: 'git@bitbucket.org:imvu/withme-ops.git', traits: [gitBranchDiscovery(), [$class: 'SparseCheckoutPathsTrait', extension: [sparseCheckoutPaths: [[path: 'example/code/lib/jenkins/qairon']]]]]])
 
 properties(
         [
