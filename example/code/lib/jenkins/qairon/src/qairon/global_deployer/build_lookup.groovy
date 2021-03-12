@@ -4,7 +4,7 @@ import groovy.json.JsonSlurper
 
 svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
 
-qairon = load "../qairon/base.groovy"
+def common = load "../common.groovy"
 
 try {
     List<String> resultArray = new ArrayList<String>()

@@ -1,5 +1,3 @@
-package qairon.global_deployer
-
 import groovy.json.JsonSlurper
 
 build_ids = groovy.json.JsonOutput.toJson(BUILD_ID.split(","))
@@ -7,7 +5,8 @@ build_ids = groovy.json.JsonOutput.toJson(BUILD_ID.split(","))
 
 try {
     List<String> resultArray = new ArrayList<String>()
-    url = 'http://qairon:5001/api/rest/v1/release?q={"filters":[{"name":"build_id","op":"in","val":' + build_ids + '}]}'
+    url = 'http://qairon:5001/api/rest/v1/release?q={"filters":[{"name":"build_id","op":"in","val":'+ build_ids + '}]}'
+
 
 
     HttpURLConnection connection = new URL(url).openConnection()
@@ -18,7 +17,7 @@ try {
         inStream = connection.inputStream
         releases = jsonSlurper.parse(inStream).objects
         releases.objects
-        releases.each { release -> resultArray.add(release.id) }
+        releases.each { release  -> resultArray.add(release.id)}
         connection.disconnect()
 
         return resultArray
@@ -28,6 +27,7 @@ try {
         print connection.responseCode + ": " + connection.inputStream.text
 
     }
+
 
 
 } catch (e) {
