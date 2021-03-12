@@ -94,8 +94,10 @@ properties(
 node('jenkins-agent') {
     container(name: 'helm') {
         stage('launch node') {
-            def qairon = load "../../lib/jenkins/qairon/"
-            common = load "../lib/qairon.src.common.groovy"
+
+            def common = load "example/code/lib/jenkins/common.groovy"
+            def base = load "example/code/lib/jenkins/base.groovy"
+
         }
     }
 }
