@@ -21,7 +21,7 @@ pipeline {
         }
 
         stage('launch node') {
-            node {
+
                 agent 'jenkins-agent'
                 steps {
 
@@ -29,7 +29,7 @@ pipeline {
                     def qairon = load "../../lib/jenkins/qairon/"
                     common = load "../lib/qairon.src.common.groovy"
                 }
-            }
+
         }
     }
 }
