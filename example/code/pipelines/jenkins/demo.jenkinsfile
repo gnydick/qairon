@@ -22,12 +22,14 @@ pipeline {
 
         stage('launch node') {
 
-                agent 'jenkins-agent'
-                steps {
+                agent {
+                    label 'jenkins-agent'
+                    steps {
 
 
-                    def qairon = load "../../lib/jenkins/qairon/"
-                    common = load "../lib/qairon.src.common.groovy"
+                        def qairon = load "../../lib/jenkins/qairon/"
+                        common = load "../lib/qairon.src.common.groovy"
+                    }
                 }
 
         }
