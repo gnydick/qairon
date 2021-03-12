@@ -99,7 +99,7 @@ stage('Gather Parameters') {
     }
 }
 stage('launch node') {
-    node('jenkins-jenkins-agent') {
+    node('jenkins-agent') {
         def qairon = load "../../lib/jenkins/qairon/"
         common = load "../lib/qairon.src.common.groovy"
 
