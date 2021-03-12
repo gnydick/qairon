@@ -18,7 +18,7 @@ pipeline {
         }
         stage('launch node') {
             node('jenkins-agent') {
-                step {
+                steps {
 
 
                     def qairon = load "../../lib/jenkins/qairon/"
