@@ -15,7 +15,7 @@ node('master') {
 properties(
         [
                 parameters(
-                        [string(defaultValue: '', description: '', name: 'SERVICE_ID', trim: true),
+
                          [
                                  $class              : 'CascadeChoiceParameter',
                                  choiceType          : 'PT_MULTI_SELECT',
