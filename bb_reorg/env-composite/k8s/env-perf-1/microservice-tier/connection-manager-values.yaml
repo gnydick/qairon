@@ -1,0 +1,100 @@
+# Docker image for pod
+image:
+  repository: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/connection-manager
+  tag: 1.0.39
+
+kind: Deployment
+
+# Replica pod count
+replicas: 1
+
+# Labels
+labels:
+  metricsProm: false
+
+# Update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+# Container startup command
+command:
+  - "/bin/bash"
+  - "-c"
+  - "./start.sh $(JVM_ARGS)"
+
+# Environment variales for pod
+env:
+  - name: JVM_ARGS
+    value: "-Xmx1000m -Xms1000m"
+  - name: SPRING_PROFILES_ACTIVE
+    value: "int-1"
+  - name: SPRING_DATA_MONGODB_URI
+    value: "mongodb://mongodb.database:27017"
+
+# Pod resources
+resources: 
+  requests:
+    cpu: "250m"
+    memory: "1250Mi"
+  limits:
+    cpu: "400m"
+    memory: "1250Mi"
+
+# livenessProbe configuration
+livenessProbe:
+  httpGet:
+    path: /health/v1/lively
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 10
+
+# livenessProbe configuration
+readinessProbe:
+  httpGet:
+    path: /health/v1/ready
+    port: 8080
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 2
+
+# Container ports
+containerPorts:
+  - containerPort: 8080
+  - containerPort: 8081
+
+# k8s Service
+service:
+  # k8s Service type
+  type: NodePort
+  # k8s Service ports (If you adding new ports make sure that you set them in "containerPorts" too)
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+    - port: 8081
+      targetPort: 8081
+      name: grpc 
+
+##########################
+##########################
+
+# k8s Secret for microservice
+secret:
+  create: false
+  # name: "secret-stuff"
+  # version: 1.0.0
+  # secretContents: {}
+
+##########################
+##########################
+
+# K8s ServiceAccount for pod
+serviceAccount:
+  create: false
+  # name: ""
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::407733091588:role/----

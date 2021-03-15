@@ -1,0 +1,9 @@
+template_path: aws-iam-role-s3.yaml
+dependencies:
+  - us-west-2/eks/cluster.yaml
+
+parameters:
+  S3bucketARN: !stack_output us-west-2/s3/bucket-kubedb.yaml::BucketARN
+  RWroleName: prod-1-kubedb-s3-rw
+  RWpolicyName: kubedb-s3-rw
+  sourceRoleArn: !stack_output us-west-2/util-tier/kiam-role.yaml::KIAMServerRole

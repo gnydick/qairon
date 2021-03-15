@@ -1,0 +1,24 @@
+---
+# Source: istio/charts/kiali/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kiali
+  namespace: istio-system
+  labels:
+    app: kiali
+    chart: kiali
+    heritage: Tiller
+    release: istio
+data:
+  config.yaml: |
+    istio_namespace: istio-system
+    server:
+      port: 20001
+    external_services:
+      istio:
+        url_service_version: http://istio-pilot:8080/version
+      jaeger:
+        url: 
+      grafana:
+        url: 

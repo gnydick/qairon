@@ -1,0 +1,20 @@
+template_path: aws-elasticache.yaml
+parameters:
+    # Main network parameters for AWS EC Domain
+  VpcId: !stack_output us-west-2/network/vpc.yaml::VpcId
+  ECsecurityGroupName: 'prod-1-elasticache'
+  EC2SecurityGroupID: !stack_output us-west-2/microservice-tier/nodes.yaml::CustomSecurityGroup
+  ECMultiAZEnabled: 'true'
+  TransitEncryption: 'false'
+  CacheNodeType: 'cache.t3.medium'
+  ECName: 'prod-1-elasticache'
+  ECEngine: 'redis'
+  ECEngineVersion: '5.0.6'
+  NumReplicas: '2'
+  NumShards: '3'
+  ECPort: '11211'
+  SnapshotRetentionLimit: '10'
+  Subnets:
+    - !stack_output us-west-2/network/vpc.yaml::PrivSubnet01ID
+    - !stack_output us-west-2/network/vpc.yaml::PrivSubnet02ID
+    - !stack_output us-west-2/network/vpc.yaml::PrivSubnet03ID

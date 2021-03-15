@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-gateway-deployment
+  labels:
+    component: service-gateway
+    tier: gateway
+spec:
+  selector:
+    matchLabels:
+      component: service-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: service-gateway
+        tier: gateway
+    spec:
+      affinity:
+        nodeAffinity:
+          # Schedule on nodes where nodeClass=service-small
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: failure-domain.beta.kubernetes.io/zone
+                    operator: In
+                    values:
+                      - us-west-2a
+                      - us-west-2b
+        podAntiAffinity:
+          # Don't schedule pods on the same node
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - service-gateway
+                topologyKey: kubernetes.io/hostname
+      containers:
+      - name: service-gateway
+        image: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/service-gateway-int:1.0.60
+        ports:
+        - containerPort: 80
+        - containerPort: 8080
+        - containerPort: 8082
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-gateway
+  labels:
+    component: service-gateway
+    tier: gateway
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    name: api
+  - port: 8080
+    targetPort: 8080
+    name: status
+  selector:
+    component: service-gateway
+    tier: gateway
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: service-gateway-ingress
+spec:
+  rules:
+  - host: int-1.withme.com
+    http:
+      paths:
+      - backend:
+          serviceName: service-gateway
+          servicePort: 80
+  tls:
+  - hosts:
+    - int-1.withme.com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
+  labels:
+    component: service-gateway
+    tier: load-balancer
+  name: service-gateway-grpc-load-balancer
+spec:
+  externalTrafficPolicy: Local
+  ports:
+  - name: grpc
+    port: 8082
+    protocol: TCP
+    targetPort: 8082
+  selector:
+    component: service-gateway
+    tier: gateway
+  type: LoadBalancer

@@ -1,0 +1,7 @@
+template_path: upr-iam.yaml
+
+parameters:
+  # EC2 Role Name
+  EC2roleName: upr-int-2-instanceprofile-role
+  # Autoscaling Role name
+  ASroleName: upr-int-2-autoscaling-role

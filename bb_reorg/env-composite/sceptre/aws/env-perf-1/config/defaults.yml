@@ -1,0 +1,6 @@
+EKS:
+  ClusterName: perf-1
+  ClusterVersion: '1.16'
+  NodeImageId: ami-099339e81c9156a3f
+
+FetchSavePath: "../k8s"

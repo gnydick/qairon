@@ -1,0 +1,88 @@
+---
+# Source: istio/charts/prometheus/templates/deployment.yaml
+# TODO: the original template has service account, roles, etc
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: istio-system
+  labels:
+    app: prometheus
+    chart: prometheus
+    heritage: Tiller
+    release: istio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        chart: prometheus
+        heritage: Tiller
+        release: istio
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: "407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-cicd/istio/prometheus:v2.3.1"
+          imagePullPolicy: IfNotPresent
+          args:
+            - '--storage.tsdb.retention=6h'
+            - '--config.file=/etc/prometheus/prometheus.yml'
+          ports:
+            - containerPort: 9090
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9090
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+          resources:
+            requests:
+              cpu: 10m
+
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/prometheus
+          - mountPath: /etc/istio-certs
+            name: istio-certs
+      volumes:
+      - name: config-volume
+        configMap:
+          name: prometheus
+      - name: istio-certs
+        secret:
+          defaultMode: 420
+          secretName: istio.default
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: istio
+                operator: In
+                values:
+                - cp
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: istio
+                operator: In
+                values:
+                - cp
+          - weight: 2
+            preference:
+              matchExpressions:
+              - key: int-2-tier
+                operator: In
+                values:
+                - util

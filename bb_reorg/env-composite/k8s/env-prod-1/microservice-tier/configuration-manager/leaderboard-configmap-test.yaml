@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: leaderboard-test
+  namespace: default
+  labels:
+    owned-by-microservice: configuration-manager
+    repo: property
+data:
+  leaderboard_Test.yaml: |
+    leaderboard:
+      client_and_server:
+        perm:
+          201112:
+            progression:
+              xp_for_level:
+                1:    "0"
+                2:   "20"
+                3:   "60"
+
+      server_only:
+        perm:
+          201112:
+            lookup:
+              supported_metrics:
+                test_metric_id: "1"
+            property:
+              xp_config:
+                first_time_xp: "20"
+            rule:
+              supported_metrics_count:
+                match_metric: "COUNT#[*]"
+                condition: "lookup('supported_metrics', '[metric-name]') > 0"
+                do_reward:
+                  __captured_from_match__:
+                    prefix: "withme_supported_"
+                    roll_ups: "COUNT"
+                    value: "1"
+              supported_metric_xp:
+                match_metric: "COUNT#withme_supported_*"
+                with_config: "xp_config"
+                condition: "thisMetricOldValue() < 1 and thisMetricNewValue() >= 1"
+                do_reward:
+                  withme_xp:
+                    roll_ups: "SUM"
+                    value: "configAsLong('first_time_xp')"
+              level_for_xp:
+                match_metric: "SUM#withme_xp"
+                condition: "thisMetricNewValue() > thisMetricOldValue()"
+                do_reward:
+                  withme_level:
+                    roll_ups: "MAX"
+                    value: "progression('xp_for_level','SUM#withme_xp')"
+              level_up:
+                match_metric: "MAX#withme_level"
+                condition: "thisMetricNewValue() > thisMetricOldValue()"
+                do_reward:
+                  withme_max_send_kudos_per_day:
+                    roll_ups: "MAX"
+                    value: "progression('level_for_daily_kudos','MAX#withme_level')"
+                do_send_message:
+                  level_up:
+                    data:
+                      level:
+                        type: "long"
+                        expression: "thisMetricNewValue()"
+                do_send_notification:
+                  level_up:
+                    data:
+                      level:
+                        type: "long"
+                        expression: "thisMetricNewValue()"
+                    title: "level_up.title"
+                    body: "level_up.body"
+                    arguments:
+                      level:
+                        type: "long"
+                        expression: "thisMetricNewValue()"
+
+      client_only:
+        perm:
+          201225:
+            property:
+              level_up_message:
+                2:
+                  en: "Two more levels to unlock Kudos"
+                3:
+                  en: "You reached level 3"

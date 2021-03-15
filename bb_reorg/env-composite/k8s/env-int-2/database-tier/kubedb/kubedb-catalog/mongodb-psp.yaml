@@ -1,0 +1,54 @@
+---
+# Source: kubedb-catalog/templates/mongodb-psp.yaml
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: mongodb-db
+  labels:
+    chart: "kubedb-catalog-v0.13.0-rc.0"
+    app: "kubedb-catalog"
+    release: "kubedb-catalog"
+    heritage: "Tiller"
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  volumes:
+  - "*"
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: mongodb-snapshot
+  labels:
+    chart: "kubedb-catalog-v0.13.0-rc.0"
+    app: "kubedb-catalog"
+    release: "kubedb-catalog"
+    heritage: "Tiller"
+spec: #same spec as db
+  privileged: false
+  allowPrivilegeEscalation: false
+  volumes:
+  - "*"
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny

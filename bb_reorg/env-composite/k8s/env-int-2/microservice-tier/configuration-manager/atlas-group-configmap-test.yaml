@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-group-test
+  namespace: default
+  labels:
+    owned-by-microservice: configuration-manager
+    repo: group
+data:
+  atlas-group_Test.json: |
+    {
+      "groups": [{"name": "AtlasGroupConfig", "expression": "'atlas-server' == #context['microservice']", "expressionLanguage": "SPEL","propertyRegex": "^atlas.*server.*$"}]
+    }

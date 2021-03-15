@@ -1,0 +1,84 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-gateway-rest
+  namespace: default
+spec:
+  hosts:
+  - "perf-1.withme.com"
+  gateways:
+  - rest-gateway
+  http:
+# We can add more complicated "match" rules: headers, URI, pod labels, etc.
+  - match:
+    - uri:
+        prefix: /
+    route:
+# The rule that route matched traffic to needed service and port
+    - destination:
+        port:
+          number: 80
+        host: service-gateway.default.svc.cluster.local
+
+---
+# Routing GRPC requests to "cm-api.withme.com" after they hit "grpc-gateway"
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-gateway-grpc
+  namespace: default
+spec:
+  hosts:
+  - "cm-perf-1.withme.com"
+  gateways:
+  - grpc-gateway
+  http:
+  - route:
+    - destination:
+        port:
+          number: 8082
+        host: service-gateway.default.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: grafana-rest
+  namespace: default
+spec:
+  hosts:
+  - "grafana-perf-1.withme.com"
+  gateways:
+  - rest-gateway
+  http:
+# We can add more complicated "match" rules: headers, URI, pod labels, etc.
+  - match:
+    - uri:
+        prefix: /
+    route:
+# The rule that route matched traffic to needed service and port
+    - destination:
+        port:
+          number: 80
+        host: prom-stack-grafana.monitoring.svc.cluster.local
+---
+# Routing REST requests to "cs-perf-1.withme.com" after they hit "rest-gateway"
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-gateway-cs-rest
+  namespace: default
+spec:
+  hosts:
+  - "cs-perf-1.withme.com"
+  gateways:
+  - rest-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 8083
+        host: service-gateway.default.svc.cluster.local

@@ -1,0 +1,13 @@
+template_path: aws-iam-role-sa.yaml
+dependencies:
+  - us-west-2/eks/cluster.yaml
+
+parameters:
+  S3bucketARN: !stack_output us-west-2/s3/bucket-content-manager.yaml::BucketARN
+  RWroleName: prod-1-content-manager-s3-rw
+  RWpolicyName: content-manager-s3-rw
+  # Preconfigured OIDC 
+  OIDCprovider: !resolver_oidc "config/defaults.yml::EKS.ClusterName"
+  # k8s ServiceAccount values
+  SAname: s3-content-manager
+  SAnamespace: default

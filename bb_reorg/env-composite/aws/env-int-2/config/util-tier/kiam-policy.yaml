@@ -1,0 +1,4 @@
+template_path: kiam-policy.yaml
+parameters:
+  PolicyName: kiam-assume-role
+  RoleName: !stack_output util-tier/nodes.yaml::NodeInstanceRoleName

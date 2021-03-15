@@ -1,0 +1,107 @@
+# controlVersion: 1
+# Environment name
+environment: prod-1
+
+# Docker image for pod
+image:
+  repository: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/authoritative-game-server
+  tag: 4587-release-beta-36-godot_release-beta-36_c0a6b14-ego_app_release-beta-36_2896490-v8
+
+# Replica pod count
+replicas: 0
+
+# Labels configuration
+labels:
+  # Add label "metrics: prometheus"
+  metricsProm: false
+
+# Controls how pods are launched or terminated.  Choose "OrderedReady" or "Parallel".
+podManagementPolicy: "Parallel"
+
+# Update strategy
+strategy:
+  type: RollingUpdate
+
+# Anti/Affinity rules
+affinity:
+  nodeAffinity:
+    key: prod-1-tier
+    values: game-server2
+
+# Pod annotations
+annotations:
+  sidecar.istio.io/inject: "false"
+
+# Container startup command
+command:
+  - "/bin/bash"
+  - "-c"
+  - "./start.sh"
+
+# Environment variales for pod
+env:
+  - name: EGO_GAME_SERVER_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.podIP
+  - name: EGO_GAME_SERVER_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.name
+  - name: EGO_GAME_SERVER_PORT
+    value: "12367"
+  - name: EGO_REST_API_HOST
+    value: "api.withme.com"
+  - name: EGO_GRPC_API_HOST
+    value: "cm-api.withme.com"
+  - name: EGO_CS_REST_API_HOST
+    value: "cs-api.withme.com"
+
+# Pod resources
+resources: []
+
+# livenessProbe configuration
+livenessProbe: []
+
+# livenessProbe configuration
+readinessProbe: []
+
+# Container ports
+containerPorts:
+  - containerPort: 12367
+
+##########################
+##########################
+
+# K8s ServiceAccount for pod
+serviceAccount:
+  create: true
+  name: "" # .Release.name by default
+  annotations: {}
+    # eks.amazonaws.com/role-arn: arn:aws:iam::407733091588:role/prod-1-kubedb-s3-rw
+
+##########################
+##########################
+
+# k8s Service for AGS sts
+service:
+  clusterIP: None
+  # k8s Service ports (If you adding new ports make sure that you set them in "containerPorts" too)
+  ports:
+    - port: 12367
+      targetPort: 12367
+
+##########################
+##########################
+
+# k8s Secret for microservice
+secret:
+  # If "true" Helm will create k8s Secret and add "secretKeyRef" in deployment.yaml "env"
+  create: true
+  # Name of k8s Secret (if not set ".Release.Name" will be used)
+  name: ""
+  # Version of k8s Secret will be added to k8s Secret label "version: $version"
+  version: 1.0.0
+  # Set "key: value" for secret.
+  secretContents: {}
+    # EGO_ORGANIZATION_PASSWORD: "42"

@@ -1,0 +1,57 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Custom IAM Policy with AssumeRole for Kiam Server NodeGroup IAM Role
+
+Parameters:
+
+  PolicyName:
+    Description: Kiam inline IAM Policy name
+    Type: String
+
+  RoleName:
+    Description: Worker-group IAM Role name that will use that IAM policy
+    Type: String
+
+  SourceRoleArn:
+    Description: Arn of the source role allowed to assume this role
+    Type: String    
+
+Resources:
+  KIAMServerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action: sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            AWS: !Ref SourceRoleArn
+          Action: sts:AssumeRole
+
+  KIAMServerPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Ref PolicyName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Resource: '*'
+      Roles:
+        - !Ref RoleName
+
+#-------------------------------------------------------------------#
+################################################## Template Outputs #
+Outputs:
+
+  KIAMServerRole:
+    Description: The ARN of the IAM role
+    Value: !GetAtt KIAMServerRole.Arn

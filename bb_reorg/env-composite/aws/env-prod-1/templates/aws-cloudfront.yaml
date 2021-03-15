@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CI/CD optimized AWS CloudFormation Sample Template for AWS CloudFront Distribution with Custom Origin'
+
+#-------------------------------------------------------------------#
+################################ CloudFormation template parameters #
+Parameters:
+
+  DNSName:
+    Description:    DNS name of applicatoion.
+    Type:           String
+
+  OriginPath:
+    Description:    Path to contentmanager.
+    Type:           String
+
+  AlternateDomainNames:
+    Description:    CNAMEs (alternate domain names), if any, for the distribution. Example. mydomain.com
+    Type:           String
+
+  AcmCertificateArn:
+    Description:    certificate for CNAMEs
+    Type:           String
+
+  SslSupportMethod:
+    Description:    Specifies how CloudFront serves HTTPS requests.
+    Type:           String
+    AllowedValues:
+      - 'sni-only'
+      - 'vip'
+
+  MinimumProtocolVersion:
+    Description:    The minimum version of the SSL protocol that you want CloudFront to use for HTTPS connections.
+    Type:           String
+    AllowedValues:
+      - 'TLSv1'
+      - 'TLSv1.2_2018'
+      - 'TLSv1.1_2016'
+      - 'TLSv1_2016'
+      - 'SSLv3'
+
+  OriginProtocolPolicy:
+    Description:    CloudFront Origin Protocol Policy to apply to your origin.
+    Type:           String
+    AllowedValues:
+      - 'http-only'
+      - 'match-viewer'
+      - 'https-only'
+
+  OriginKeepaliveTimeout:
+    Description:    You can create a custom keep-alive timeout. All timeout units are in seconds. The default keep-alive timeout is 5 seconds, but you can configure custom timeout lengths. The minimum timeout length is 1 second; the maximum is 60 seconds.
+    Type:           String
+
+  OriginReadTimeout:
+    Description:    You can create a custom origin read timeout. All timeout units are in seconds. The default origin read timeout is 30 seconds, but you can configure custom timeout lengths. The minimum timeout length is 4 seconds; the maximum is 60 seconds.
+    Type:           String
+
+  ViewerProtocolPolicy:
+    Description:    The protocol that users can use to access the files in the origin that you specified in the TargetOriginId property when the default cache behavior is applied to a request.
+    Type:           String
+    AllowedValues:
+      - 'redirect-to-https'
+      - 'allow-all'
+      - 'https-only'
+
+  PriceClass:
+    Description:    The price class that corresponds with the maximum price that you want to pay for CloudFront service. If you specify PriceClass_All, CloudFront responds to requests for your objects from all CloudFront edge locations.
+    Type:           String
+    AllowedValues:
+      - 'PriceClass_All'
+      - 'PriceClass_100'
+      - 'PriceClass_200'
+
+  HTTPPort:
+    Description:    Http port for cloudfront
+    Type:           String
+
+  HTTPSPort:
+    Description:    Http port for cloudfront
+    Type:           String
+
+  DistributionConfigEnabled:
+    Type:           String
+    AllowedValues:
+      - 'true'
+      - 'false'
+
+  ForwardedValuesQueryString:
+    Type:           String
+    AllowedValues:
+      - 'true'
+      - 'false'
+
+Resources:
+  cloudfrontdistribution:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref 'AlternateDomainNames'
+        ViewerCertificate:
+          AcmCertificateArn: !Ref AcmCertificateArn
+          SslSupportMethod:  !Ref 'SslSupportMethod'
+          MinimumProtocolVersion: !Ref 'MinimumProtocolVersion'
+        Comment: 'Cloudfront Distribution pointing ALB Origin'
+        Origins:
+          - DomainName: !Ref 'DNSName'
+            Id: !Ref 'DNSName'
+            OriginPath : !Ref 'OriginPath'
+            CustomOriginConfig:
+              HTTPPort: !Ref 'HTTPPort'
+              HTTPSPort: !Ref 'HTTPSPort'
+              OriginProtocolPolicy: !Ref 'OriginProtocolPolicy'
+              OriginKeepaliveTimeout: !Ref 'OriginKeepaliveTimeout'
+              OriginReadTimeout: !Ref 'OriginReadTimeout'
+              OriginSSLProtocols:
+                - 'TLSv1'
+                - 'TLSv1.1'
+                - 'TLSv1.2'
+                - 'SSLv3'
+        Enabled: !Ref 'DistributionConfigEnabled'
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - 'GET'
+            - 'HEAD'
+            - 'OPTIONS'
+          TargetOriginId: !Ref 'DNSName'
+          ForwardedValues:
+            QueryString: !Ref 'ForwardedValuesQueryString'
+            Headers:
+              - 'Authorization'
+              - 'Accept'
+              - 'X-Forwarded-For'
+              - 'User-Agent'
+          ViewerProtocolPolicy: !Ref 'ViewerProtocolPolicy'
+        PriceClass: !Ref 'PriceClass'
+
+#-------------------------------------------------------------------#
+################################################## Template Outputs #
+Outputs:
+
+  CloudfrontID:
+    Value: !Ref cloudfrontdistribution
+    Description: Cloudfront ID
+
+  CloudfrontDomain:
+    Value: !GetAtt cloudfrontdistribution.DomainName
+    Description: Cloudfront Domain

@@ -1,0 +1,36 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Custom IAM Policy with AssumeRole for Kiam Server NodeGroup IAM Role
+
+Parameters:
+
+  PolicyName:
+    Description: Kiam inline IAM Policy name
+    Type: String
+
+  RoleName:
+    Description: Worker-group IAM Role name that will use that IAM policy
+    Type: String
+
+Resources:
+
+  KiamPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Ref PolicyName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Resource: '*'
+      Roles:
+        - !Ref RoleName
+
+Outputs:
+
+  IAMpolicyName:
+    Description: Kiam assume-role Policy Name
+    Value: !Ref KiamPolicy

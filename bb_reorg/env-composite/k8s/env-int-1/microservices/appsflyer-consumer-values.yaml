@@ -1,0 +1,98 @@
+# Docker image for pod
+image:
+  repository: 407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/appsflyer-consumer
+  tag: 1.0.37
+
+kind: Deployment
+
+# Replica pod count
+replicas: 1
+
+# Labels
+labels:
+  metricsProm: true
+
+# Update strategy
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+# Container startup command
+command:
+  - "/bin/bash"
+  - "-c"
+  - "./start.sh $(JVM_ARGS)"
+
+# Environment variales for pod
+env:
+  - name: JVM_ARGS
+    value: "-Xmx640m -Xms640m -Dlogging.level.com.withme.appsflyerconsumer=TRACE"
+  - name: SPRING_PROFILES_ACTIVE
+    value: "int-1"
+  - name: APPSFLYER_IOS_APP_ID
+    value: "test-app-id"
+  - name: APSSFLYER_PULL_API_TOKEN
+    value: "test-token"
+  - name: SPRING_DATA_MONGODB_URI
+    value: "mongodb://mongodb.database:27017"
+  - name: FLUENT_BIT_HOST
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+
+# livenessProbe configuration
+livenessProbe:
+  httpGet:
+    path: /health/v1/lively
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 10
+
+# livenessProbe configuration
+readinessProbe:
+  httpGet:
+    path: /health/v1/ready
+    port: 8080
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  failureThreshold: 2
+
+# Container ports
+containerPorts:
+  - containerPort: 8080
+
+# k8s Service
+service:
+  # k8s Service type
+  type: NodePort
+  # k8s Service ports (If you adding new ports make sure that you set them in "containerPorts" too)
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http-rest
+
+##########################
+##########################
+
+# k8s Secret for microservice
+secret:
+  create: false
+  name: "appsflyer-credentials"
+  version: 1.0.0
+  secretContents: {}
+    # APPSFLYER_IOS_APP_ID: {}
+    # APPSFLYER_PULL_API_TOKEN: {}
+
+
+##########################
+##########################
+
+# K8s ServiceAccount for pod
+serviceAccount:
+  create: false
+  # name: ""
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::407733091588:role/----

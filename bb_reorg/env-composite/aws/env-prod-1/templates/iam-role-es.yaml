@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Deploy IAM Role for FluentBit Service Account'
+
+Parameters:
+  ElasticsearchARN:
+    Type: String
+    Description: ARN of AWS Elasticsearch
+
+  RWroleName:
+    Type: String
+    Description: Name of AWS Elasticsearch Role 
+
+  RWpolicyName:
+    Type: String
+    Description: Name AWS Elasticsearch RW policy
+
+  OIDCprovider:
+    Type: String
+    Description: OIDC identity provider
+
+  SAname:
+    Type: String
+    Description: k8s ServiceAccount name
+
+  SAnamespace:
+    Type: String
+    Description: k8s ServiceAccount namespace in cluster
+
+Resources:
+#-------------------------------------------------------------------#
+############################################################## Role #
+  IAMroleESrw:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RWroleName
+      AssumeRolePolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "arn:aws:iam::${AWS::AccountId}:oidc-provider/${OIDCprovider}"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "${OIDCprovider}:sub": "system:serviceaccount:${SAnamespace}:${SAname}"
+                }
+              }
+            }
+          ]
+        }
+      Path: "/"
+#-------------------------------------------------------------------#
+############################################ Inline Policy for Role #
+  ESReadWritePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Ref RWpolicyName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "es:*"
+            Resource:
+              - !Sub '${ElasticsearchARN}/*'
+      Roles:
+        - !Ref IAMroleESrw
+
+#-------------------------------------------------------------------#
+################################################## Template Outputs #
+Outputs:
+
+  RoleId:
+    Description: The logical ID of the IAM role
+    Value: !Ref IAMroleESrw
+
+  RoleArn:
+    Description: The ARN of the IAM role
+    Value: !GetAtt IAMroleESrw.Arn

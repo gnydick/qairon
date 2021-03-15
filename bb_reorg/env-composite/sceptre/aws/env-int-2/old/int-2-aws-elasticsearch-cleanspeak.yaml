@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Cleanspeak AWS Elasticsearch with VPC Endpoint for int-2 environment'
+
+#-------------------------------------------------------------------#
+############################ AWS Elasticsearch Domain Configuration #
+
+Parameters:
+
+  Region:
+    Default: us-west-2
+    Description: 'Type region. "us-west-2" by default'
+    Type: String
+
+  VpcId:
+    Description: The VPC of the k8s worker instances
+    Default: vpc-0f10c447370df38fb
+    Type: AWS::EC2::VPC::Id
+
+  Subnet:
+    Description: SubnetId for assosiation AWS ES VPC Endpoint
+    Default: subnet-0d230db11e425696b
+    Type: AWS::EC2::Subnet::Id
+
+  EC2SecurityGroupID:
+    Description: Specifies the database instance SG. Default is "int-2-microserivce-a-nodes-NodeSecurityGroup".
+    Default: sg-02c6cfeb93d001152
+    Type: AWS::EC2::SecurityGroup::Id
+    ConstraintDescription: "Please provide valid ids for the security group(s)."
+
+  DomainName:
+    Type: String
+    Default: int-2-cleanspeak
+    Description: Name for ElasticsearchDomain Cluster
+
+  esSGname:
+    Description: 'Name of security group for Elasticsearch'
+    Type: String
+    Default: 'int-2-cleanspeak-es'
+
+  DedicatedMaster:
+    Type: String
+    Default: false
+    AllowedValues: [true, false]
+    Description: That template for "int" environments for production usage must be edited. In prodution we will use that parameter.
+
+  ESversion:
+    Type: String
+    Default: 6.5
+    AllowedValues:
+      - 7.1
+      - 6.8
+      - 6.7
+      - 6.5
+      - 6.4
+      - 6.3
+      - 6.2
+    Description: Elasticsearch Version
+
+  ESDataInstanceCount:
+    Type: Number
+    Default: 1
+    Description: The number of data nodes for your cluster
+
+  ESDataInstanceType:
+    Type: String
+    Default: t2.small.elasticsearch
+    AllowedValues:
+      - t2.small.elasticsearch
+      - t2.medium.elasticsearch
+      - m3.medium.elasticsearch
+      - m3.large.elasticsearch
+      - m3.xlarge.elasticsearch
+      - m3.2xlarge.elasticsearch
+      - m4.large.elasticsearch
+      - m4.xlarge.elasticsearch
+      - m4.2xlarge.elasticsearch
+      - m4.4xlarge.elasticsearch
+      - m4.10xlarge.elasticsearch
+      - c4.large.elasticsearch
+      - c4.xlarge.elasticsearch
+      - c4.2xlarge.elasticsearch
+      - c4.4xlarge.elasticsearch
+      - c4.8xlarge.elasticsearch
+      - r3.large.elasticsearch
+      - r3.xlarge.elasticsearch
+      - r3.2xlarge.elasticsearch
+      - r3.4xlarge.elasticsearch
+      - r3.8xlarge.elasticsearch
+      - r4.large.elasticsearch
+      - r4.xlarge.elasticsearch
+      - r4.2xlarge.elasticsearch
+    ConstraintDescription: Must be a valid AWS ES instance type
+    Description: Type of AWS ES instance for the Data instances.
+
+  ESDataInstanceVolumeSize:
+    Type: Number
+    Default: 35
+    ConstraintDescription: Must be a valid for choosed AWS ES instance type.
+    Description: Size for node volumes GB
+
+Resources:
+#-------------------------------------------------------------------#
+################################## AWS Elasticsearch Security Group #
+  awsESdomainSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Ref esSGname
+      GroupDescription: Allow 443 port from int-2-microserivce-a SG
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          SourceSecurityGroupId: !Ref EC2SecurityGroupID
+      Tags:
+        - Key: Name
+          Value: !Ref esSGname
+
+#-------------------------------------------------------------------#
+########################################## AWS Elasticsearch Domain #
+  ElasticsearchDomain:
+    Type: AWS::Elasticsearch::Domain
+    DependsOn: awsESdomainSG
+    Properties:
+      DomainName: !Ref DomainName
+      ElasticsearchClusterConfig:
+        DedicatedMasterEnabled: "false"
+        InstanceCount: !Ref ESDataInstanceCount
+        InstanceType: !Ref ESDataInstanceType
+      ElasticsearchVersion: !Ref ESversion
+      EBSOptions:
+        EBSEnabled: true
+        Iops: 0
+        VolumeSize: !Ref ESDataInstanceVolumeSize
+        VolumeType: "gp2"
+      SnapshotOptions:
+        AutomatedSnapshotStartHour: "0"
+      AccessPolicies:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: '*'
+            Action: 'es:*'
+            Resource: '*'
+      AdvancedOptions:
+        rest.action.multi.allow_explicit_index: "true"
+      Tags:
+        - Key: Domain
+          Value: !Ref DomainName
+      VPCOptions:
+        SubnetIds:
+          - !Ref Subnet
+        SecurityGroupIds:
+          - !Ref awsESdomainSG
+
+#-------------------------------------------------------------------#
+################################################## Template Outputs #
+Outputs:
+  DomainArn:
+    Value: !GetAtt ElasticsearchDomain.DomainArn
+
+  DomainEndpoint:
+    Value: !GetAtt ElasticsearchDomain.DomainEndpoint

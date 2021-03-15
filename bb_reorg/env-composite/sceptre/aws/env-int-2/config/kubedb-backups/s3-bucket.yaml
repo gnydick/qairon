@@ -1,0 +1,3 @@
+template_path: aws-s3.yaml
+parameters:
+  S3bucketName: int2-kubedb-backups

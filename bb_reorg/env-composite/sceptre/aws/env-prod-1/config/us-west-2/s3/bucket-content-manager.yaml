@@ -1,0 +1,7 @@
+template_path: aws-s3.yaml
+
+parameters:
+  S3bucketName: prod-1-content-manager
+  BucketEncryption: 'false'
+  LifecycleConfiguration: 'false'
+  LifecycleExpirationInDays: '0'

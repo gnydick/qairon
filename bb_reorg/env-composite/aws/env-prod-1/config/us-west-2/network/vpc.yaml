@@ -1,0 +1,15 @@
+template_path: vpc.yaml
+parameters:
+  ClusterName: !resolver_yaml config/defaults.yml::EKS.ClusterName
+  VPCCIDR: 10.132.0.0/16
+  PublicSubnet01CIDR: 10.132.192.0/20
+  PublicSubnet02CIDR: 10.132.208.0/20
+  PublicSubnet03CIDR: 10.132.224.0/20
+  PrivateSubnet01CIDR: 10.132.0.0/18
+  PrivateSubnet02CIDR: 10.132.64.0/18
+  PrivateSubnet03CIDR: 10.132.128.0/18
+  # Enabling VPC Routes for MongoDB Atlas VPCpeering.
+  # If "AtlasVPCpeeringEnabled" is 'false', "AtlasVPCpeeringID" & "AtlasVpcCIDR" will be ignored.
+  AtlasVPCpeeringEnabled: 'true'
+  AtlasVPCpeeringID: pcx-08da7b7a302008ba5
+  AtlasVpcCIDR: 10.133.0.0/21

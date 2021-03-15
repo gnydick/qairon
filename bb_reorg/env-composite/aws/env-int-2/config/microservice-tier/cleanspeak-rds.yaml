@@ -1,0 +1,37 @@
+template_path: aws-rds.yaml
+parameters:
+  # Main network parameters
+  VpcId: !stack_output_external int-2-eks-vpc::VpcId
+  Subnets:
+    - subnet-0d230db11e425696b
+    - subnet-01ec607e5d14ce9f3
+    - subnet-0ed064ab8ac4e4dcc
+  EC2SecurityGroupID: 'sg-06a1efa9861fcdac6'
+  # RDS config 
+  EnvName: 'int-2'
+  RDSsecurityGroupName: 'int-2-rds-cleanspeak'
+  RDSsecurityGroupPort: '3306'
+  RDSmultiAZ: 'false'
+  ## The number of days for which automated backups are retained.
+  BackupRetentionPeriod: '2'
+  ## by UTC timezone from 01:00 to 03:00 AM by PST
+  PreferredBackupWindow: '09:00-11:00'
+  ## RDS instance EBS size in GB.
+  RDSvolumeSize: '30'
+  RDSstorageType: 'gp2'
+  DBname: 'cleanspeak'
+  ## RDS instance type.
+  DBinstanceType: 'db.t3.medium'
+  DBengine: 'MySQL'
+  DBengineVer: '5.7.22'
+  ## MySQL credentials config.
+  RdsMasterUsername: 'administrator'
+  ### Password will be fetched by automation (Jenkins pipeline or etc.) from Vault and passed trough env variable
+  ### Password will be masked in CloudFormation outputs.
+  MasterUserPassword: !environment_variable CLEANSPEAK_DATABASE_PASSWORD
+  # Enable Cleanspeak DB Parameter group. If "true" Scepter will create Cleanspeak DB parameter group and apply it to RDS.
+  DBenableParameterGroup: 'true'
+  ## DB Parameter group configuration.
+  DBParamGroupName: 'cleanspeak-services-int-2'
+  DBParamGroupFamily: 'mysql5.7'
+

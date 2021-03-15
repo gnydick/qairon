@@ -1,0 +1,36 @@
+template_path: upr-ecs-cluster.yaml
+
+parameters:
+  # The ECS Cluster Name
+  ECSClusterName: int-2-upr-cluster
+  # Name of an existing EC2 KeyPair to enable SSH access to the ECS instances.
+  KeyName: kubernetes-int-2-key-pair
+  # VPC for UPR Security group.
+  VpcId: !stack_output_external int-2-eks-vpc::VpcId
+  # Select at least two subnets in your selected VPC.
+  SubnetId: !stack_output_external int-2-eks-vpc::SubnetIds
+  # ID of "game-server" tier SG
+  AGSsecurityGroupID: sg-055f8fd1f0161d501
+  # ID of "util" tier SG
+  UtilSecurityGroupID: sg-06492f12cc7958f69
+  # ID of "monitoring" tier SG
+  MonitoringSecurityGroupID: sg-09e0f5294fe12b201
+  # Number of instances to launch in your ECS cluster.
+  DesiredCapacity: '3'
+  # Maximum number of instances that can be launched in your ECS cluster.
+  MaxSize: '12'
+  # Minimum number of instances that can be launched in your ECS cluster.
+  MinSize: '3'
+  # Type of EC2 instance for ECS Cluster Node
+  # When beta testing user base will grow (and routing requests to AGS will grow too)
+  # we can migrate to'c5' instance type with bigger Network Performance.
+  InstanceType: 't3.small'
+  # EC2 Role name for attaching to "Instance Profile"
+  EC2RoleName: !stack_output udp-routing/upr-iam.yaml::EC2roleNAME
+  # AutoScaling Role ARN for attaching to "ApplicationAutoScaling"
+  ASroleARN: !stack_output udp-routing/upr-iam.yaml::ASroleARN
+  # UPR Docker image to run
+  UPRImageName: '407733091588.dkr.ecr.us-west-2.amazonaws.com/ego-server/upr:0.2.9'
+  # NLB DNS to ETCD k8s Service Hostname and Properties
+  ETCDHost: !stack_output udp-routing/upr-r53.yaml::HostedZoneDNSandPORT
+  HealthCheckPort: '8080'

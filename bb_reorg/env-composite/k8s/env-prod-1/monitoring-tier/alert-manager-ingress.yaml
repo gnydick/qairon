@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: alert-manager-ingress
+  namespace: monitoring
+  annotations:
+   kubernetes.io/ingress.class: nginx-duo
+spec:
+  rules:
+    - host: alertmanager-ui.withme.com
+      http:
+        paths:
+          - backend:
+              serviceName: prom-stack-kube-prometheus-alertmanager
+              servicePort: 9093
+            path: /

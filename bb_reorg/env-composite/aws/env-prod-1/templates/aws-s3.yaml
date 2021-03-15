@@ -1,0 +1,85 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: S3 Bucket template for storing data
+
+Parameters:
+  S3bucketName:
+    Type: String
+    Description: Name for s3 bucket 
+
+  BucketEncryption:
+    Type: String
+    AllowedValues: 
+      - true
+      - false
+      - ''
+    Default: ''
+    Description: Enable BucketEncryption
+
+  LifecycleConfiguration:
+    Type: String
+    AllowedValues: 
+      - true
+      - false
+      - ''
+    Default: ''
+    Description: Enable LifecycleConfiguration for automation of deleting old s3 files 
+
+  LifecycleExpirationInDays:
+    Type: Number
+    Default: 30
+    Description: Files older than that value (in days) will be automatically deleted from s3.
+
+
+#-------------------------------------------------------------------#
+############################################### Template Conditions #
+Conditions:
+  UseLifecycle: !Equals [ !Ref LifecycleConfiguration, true ]
+  UseEncryption: !Equals [ !Ref BucketEncryption, true ]
+
+Resources:
+#-------------------------------------------------------------------#
+############################################################## Role #
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: Private
+      BucketName: !Sub '${S3bucketName}-${AWS::Region}-${AWS::AccountId}'
+      BucketEncryption:
+        !If
+          - UseEncryption
+          - 
+            ServerSideEncryptionConfiguration:
+              - ServerSideEncryptionByDefault:
+                  SSEAlgorithm: AES256
+          - !Ref "AWS::NoValue"
+      LifecycleConfiguration:
+        !If
+          - UseLifecycle
+          - 
+            Rules:
+            - Id: DeleteContentAfter30Days
+              Status: 'Enabled'
+              ExpirationInDays: !Ref LifecycleExpirationInDays
+          - !Ref "AWS::NoValue"
+    DeletionPolicy: Delete
+
+#-------------------------------------------------------------------#
+################################################## Template Outputs #
+Outputs:
+
+  BucketName:
+    Value: !Ref 'S3Bucket'
+    Description: Name of Amazon S3 bucket
+
+  BucketARN:
+    Value: !GetAtt S3Bucket.Arn
+    Description: Amazon Resource Name (ARN) of the specified bucket.
+
+  BucketURL:
+    Value: !GetAtt S3Bucket.DomainName
+    Description: IPv4 DNS name of the specified bucket.
+
+  BucketRegionalURL:
+    Value: !GetAtt S3Bucket.RegionalDomainName
+    Description: Returns the regional domain name of the specified bucket.
