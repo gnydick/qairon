@@ -2,11 +2,17 @@ package jenkins.base_jobs
 
 import groovy.json.JsonSlurper
 
-def hi = load ("base_jobs/helm_installer.groovy")
+def hi = load("base_jobs/helm_installer.groovy")
+
+parameters(
+        [string(defaultValue: '', description: 'Comma separated list of IDs, no spaces.', name: 'DEPLOYMENT_IDS', trim: true)])
+
+
+import groovy.json.JsonSlurper
 
 stage('Parallel Helm Install') {
     def jobs = [:]
-    dep_ids = groovy.json.JsonOutput.toJson(DEPLOYMENT_ID.split(","))
+    dep_ids = groovy.json.JsonOutput.toJson(DEPLOYMENT_IDS.split(","))
 
     for (int i = 0; i < dep_ids.size(); ++i) {
         def dep = dep_ids[i].trim()
