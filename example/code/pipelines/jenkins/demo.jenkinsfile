@@ -1,8 +1,17 @@
 package jenkins
 
 def qairon = library 'qairon'
-
-
+def build_lookup
+def release_lookup
+def deployment_lookup
+node('master') {
+    script {
+        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'main']], extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'withme-ops']], userRemoteConfigs: [[credentialsId: 'bitbucket_ssh_key', name: 'origin', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
+        build_lookup = load('withme-ops/example/code/pipelines/jenkins/global_deployer/build_lookup.groovy')
+        release_lookup = load('withme-ops/example/code/pipelines/jenkins/global_deployer/release_lookup.groovy')
+        deployment_lookup = load('withme-ops/example/code/pipelines/jenkins/global_deployer/deployment_lookup.groovy')
+    }
+}
 properties(
         [
                 parameters(
@@ -27,46 +36,7 @@ properties(
                                                  classpath: [],
                                                  sandbox  : false,
 
-                                                 script   : """
-                                                    package qairon.global_deployer
-
-import groovy.json.JsonSlurper
-
-svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
-
-def common = load "../common.groovy"
-
-try {
-    List<String> resultArray = new ArrayList<String>()
-    url = 'http://qairon:5001/api/rest/v1/build?q={"filters":[{"name":"service_id","op":"in","val":' + svc_ids + '}]}'
-
-    HttpURLConnection connection = new URL(url).openConnection()
-    connection.connect()
-    if (connection.responseCode == 200) {
-        jsonSlurper = new JsonSlurper()
-        // get the JSON response
-        inStream = connection.inputStream
-        builds = jsonSlurper.parse(inStream).objects
-        builds.objects
-        builds.each { build -> resultArray.add(build.id) }
-        connection.disconnect()
-
-        return resultArray
-
-
-    } else {
-        print connection.responseCode + ": " + connection.inputStream.text
-
-    }
-
-
-} catch (e) {
-    print(e)
-}
-
-
-                                                    
-                                                """
+                                                 script   : build_lookup
                                          ]
                                  ]
                          ],
@@ -89,46 +59,7 @@ try {
                                          script        : [
                                                  classpath: [],
                                                  sandbox  : false,
-                                                 script   : """
-
-import groovy.json.JsonSlurper
-
-build_ids = groovy.json.JsonOutput.toJson(BUILD_ID.split(","))
-
-
-try {
-    List<String> resultArray = new ArrayList<String>()
-    url = 'http://qairon:5001/api/rest/v1/release?q={"filters":[{"name":"build_id","op":"in","val":'+ build_ids + '}]}'
-
-
-
-    HttpURLConnection connection = new URL(url).openConnection()
-    connection.connect()
-    if (connection.responseCode == 200) {
-        jsonSlurper = new JsonSlurper()
-        // get the JSON response
-        inStream = connection.inputStream
-        releases = jsonSlurper.parse(inStream).objects
-        releases.objects
-        releases.each { release  -> resultArray.add(release.id)}
-        connection.disconnect()
-
-        return resultArray
-
-
-    } else {
-        print connection.responseCode + ": " + connection.inputStream.text
-
-    }
-
-
-
-} catch (e) {
-    print(e)
-}
-
-
-"""
+                                                 script   : release_lookup
                                          ]
                                  ]
 
@@ -152,46 +83,7 @@ try {
                                          script        : [
                                                  classpath: [],
                                                  sandbox  : false,
-                                                 script   : """
-import groovy.json.JsonSlurper
-
-svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
-rel_ids = groovy.json.JsonOutput.toJson(RELEASE_ID.split(","))
-
-
-try {
-    List<String> resultArray = new ArrayList<String>()
-    url = 'http://qairon:5001/api/rest/v1/deployment?q={"filters":[{"name":"service_id","op":"in","val":'+ svc_ids + '},{"name":"release_id","op":"in","val":'+ rel_ids + '}]}'
-
-    HttpURLConnection connection = new URL(url).openConnection()
-    connection.connect()
-    if (connection.responseCode == 200) {
-        jsonSlurper = new JsonSlurper()
-        // get the JSON response
-        inStream = connection.inputStream
-        deployments = jsonSlurper.parse(inStream).objects
-        deployments.objects
-        deployments.each { deployment  -> resultArray.add(deployment.id)}
-        connection.disconnect()
-
-        return resultArray
-
-
-    } else {
-        print connection.responseCode + ": " + connection.inputStream.text
-
-    }
-
-
-
-} catch (e) {
-    print(e)
-}
-
-
-
-
-"""
+                                                 script   : deployment_lookup
                                          ]
                                  ]
 
