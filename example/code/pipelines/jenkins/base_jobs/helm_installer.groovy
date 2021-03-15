@@ -25,20 +25,3 @@ def helm_install(deployment_descriptor) {
         }
     }
 }
-
-
-stage('Parallel Helm Install') {
-    def jobs = [:]
-    dep_ids = groovy.json.JsonOutput.toJson(DEPLOYMENT_ID.split(","))
-
-    for (int i = 0; i < dep_ids.size(); ++i) {
-        def dep = dep_ids[i].trim()
-        jobs[dep] = {
-            node(dep) {
-                helm_install(dep)
-            }
-        }
-    }
-
-    parallel(jobs)
-}
