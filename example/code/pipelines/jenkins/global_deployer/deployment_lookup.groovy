@@ -1,6 +1,5 @@
 import groovy.json.JsonSlurper
 
-svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))
 rel_ids = groovy.json.JsonOutput.toJson(RELEASE_ID.split(","))
 
 
