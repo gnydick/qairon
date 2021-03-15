@@ -1,5 +1,3 @@
-package qairon.global_deployer
-
 import groovy.json.JsonSlurper
 
 svc_ids = groovy.json.JsonOutput.toJson(SERVICE_ID.split(","))

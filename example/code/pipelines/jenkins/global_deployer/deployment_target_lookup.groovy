@@ -1,5 +1,3 @@
-package qairon.global_deployer
-
 import groovy.json.JsonSlurper
 import java.util.logging.Logger
 
