@@ -3,13 +3,13 @@ package jenkins.base_jobs
 import groovy.json.JsonSlurper
 
 def helm_install(deployment_descriptor) {
-    node('jenkins-jenkins-agent') {
-        container(name: 'helm') {
-            stage(name: 'parallelize helm installations') {
 
-                // feed in release id's to download helm archives, then loop over the shell command
+    container(name: 'helm') {
+        stage(name: 'parallelize helm installations') {
 
-                sh '''
+            // feed in release id's to download helm archives, then loop over the shell command
+
+            sh '''
             set -x
             
             HELM_SOURCE=$(curl -s qairon:5001/api/rest/v1/service/${SERVICE_ID} | jq -r  '.defaults | fromjson | .releases.helm')
@@ -22,7 +22,6 @@ def helm_install(deployment_descriptor) {
             helm repo update
             helm upgrade --install $ARTIFACT $REPO/$ARTIFACT
         '''
-            }
         }
     }
 }
@@ -35,7 +34,9 @@ stage('Parallel Helm Install') {
     for (int i = 0; i < dep_ids.size(); ++i) {
         def dep = dep_ids[i].trim()
         jobs[dep] = {
-            helm_install(dep)
+            node(dep) {
+                helm_install(dep)
+            }
         }
     }
 
