@@ -1,11 +1,11 @@
 import groovy.json.JsonSlurper
 
-rel_ids = groovy.json.JsonOutput.toJson(RELEASE_ID.split(","))
+dt_ids = groovy.json.JsonOutput.toJson(DEPLOYMENT_TARGET_ID.split(","))
 
 
 try {
     List<String> resultArray = new ArrayList<String>()
-    url = 'http://qairon:5001/api/rest/v1/deployment?q={"filters":[{"name":"release_id","op":"in","val":'+ rel_ids + '}]}'
+    url = 'http://qairon:5001/api/rest/v1/deployment?q={"filters":[{"name":"deployment_target_id","op":"in","val":'+ dt_ids + '}]}'
 
     HttpURLConnection connection = new URL(url).openConnection()
     connection.connect()
