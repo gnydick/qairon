@@ -1,37 +1,22 @@
-package jenkins
+node('jenkins-jenkins-agent') {
+    container(name: 'helm') {
+        stage(name: 'parallelize helm installations') {
 
-import groovy.json.JsonSlurper
+            // feed in release id's to download helm archives, then loop over the shell command
 
-
-def deployIt(dep_id) {
-    node('jenkins-agent') {
-        container(name: 'helm') {
-            stage(name: 'parallelize helm installations') {
-
-                // feed in release id's to download helm archives, then loop over the shell command
-
-                sh '''
+            sh '''
             set -x
-            SERVICE_ID = $(curl -s qairon:5001/api/rest/v1/deployment/${dep_id}/service | jq -r  '.id')
-            HELM_CHART=$(curl -s qairon:5001/api/rest/v1/service/${SERVICE_ID} | jq -r  '.defaults | fromjson | .releases.helm')
-            REPO=$(echo $HELM_CHART | jq -r .repo)
+            
+            HELM_SOURCE=$(curl -s qairon:5001/api/rest/v1/service/${SERVICE_ID} | jq -r  '.defaults | fromjson | .releases.helm')
+            REPO=$(echo $HELM_SOURCE | jq -r .repo)
             URL=$(curl -s qairon:5001/api/rest/v1/repo/helm:${REPO} | jq -r .url)
-            ARTIFACT=$(echo ${HELM_CHART} | jq -r .artifact)
+            ARTIFACT=$(echo ${HELM_SOURCE} | jq -r .artifact)
             echo "ideally we would download a specifically packaged helm chart based on the build rolled into a release archive"
             echo "also, we would use the specified deployment target from the specified deployment"
             helm repo add $REPO $URL
             helm repo update
             helm upgrade --install $ARTIFACT $REPO/$ARTIFACT
         '''
-            }
         }
     }
-}
-
-def jobs=[:]
-
-dep_ids = groovy.json.JsonOutput.toJson(DEPLOYMENT_ID.split(","))
-
-for (int i = 0; i < dep_ids.size()-1; i++) {
-    jobs[i] = deployIt(dep_ids[i])
 }
