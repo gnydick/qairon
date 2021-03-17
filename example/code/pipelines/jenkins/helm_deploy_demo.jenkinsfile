@@ -1,4 +1,4 @@
-node('jenkins-jenkins-agent') {
+node('jenkins-agent') {
     container(name: 'helm') {
         stage(name: 'parallelize helm installations') {
 
