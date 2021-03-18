@@ -32,7 +32,7 @@ echo <module>-3.8.8 > <module_base_dir>/.python-version
 
 # Tooling
 Tools are installed in one of two ways
-## Version independent
+## Version Independent
 ```
 ${HOME}/tools/<tool_binary>
 
@@ -40,7 +40,7 @@ e.g.
 ${HOME}/tools/jenkins-cli.jar
 ```
 
-## Version specific
+## Version Specific
 ```
 ${HOME}/tools/<tool_binary>/<version>/<tool_binary>
 
