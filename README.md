@@ -32,8 +32,9 @@ echo <module>-3.8.8 > <module_base_dir>/.python-version
 ```
 
 # Tooling
+## Installation Types
 Tools are installed in one of two ways
-## Version Independent
+### Version Independent
 ```
 ${HOME}/tools/<tool_binary>
 
@@ -41,14 +42,15 @@ e.g.
 ${HOME}/tools/jenkins-cli.jar
 ```
 
-## Version Specific
+### Version Specific
 ```
 ${HOME}/tools/<tool_binary>/<version>/<tool_binary>
 
 e.g.
 ${HOME}/tools/kubectl/1.20.2/kubectl
 ```
-## direnv
+## Tools
+### direnv
 ***direnv*** keeps your environment setup to point to the right resources and configurations. We arrange our directories hierarchically in order to represent the hierarchy of configurations.
 
 In order to take advantage of the version of tool you need for any context, update environment
@@ -64,3 +66,7 @@ source_env ..
 ```
 
 This will set your kubectl version when you go into the cluster-foo directory then reevaluate the PATH env var to point to the right binary
+
+### minikube
+#### installing multiple versions of k8s
+***TBD***
