@@ -1,3 +1,36 @@
+# Migration Paths
+root for all new content starts in `nextgen`
+```
+nextgen
+├── docker
+│         ├── bin
+│         └── defs
+├── helm
+│         ├── charts
+│         └── values
+├── jenkins
+├── kube
+├── ops
+├── packer
+│         └── defs
+│             ├── amazon-eks-ami
+│             │         ├── files
+│             │         ├── log-collector-script
+│             │         │         ├── linux
+│             │         │         └── windows
+│             │         └── scripts
+│             └── fork-example-amazon-eks-ami
+│                 ├── files
+│                 ├── log-collector-script
+│                 │         ├── linux
+│                 │         └── windows
+│                 └── scripts
+├── sceptre
+├── terraform
+└── tools
+
+```
+
 # Languages
 ## Python - 3.8.8
 3.9.x has some incompatibilities with our code
@@ -70,3 +103,12 @@ This will set your kubectl version when you go into the cluster-foo directory th
 ### minikube
 #### installing multiple versions of k8s
 ***TBD***
+
+# How To
+## aws common cli tasks
+
+Login to the aws ecr taking advantage of our environment driven config
+
+```
+aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+```
