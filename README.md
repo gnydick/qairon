@@ -3,34 +3,21 @@ root for all new content starts in `nextgen`
 ```
 nextgen
 ├── docker
-│         ├── bin
-│         └── defs
+│     ├── bin
+│     └── defs
 ├── helm
-│         ├── charts
-│         └── values
+│     ├── charts
+│     └── values
 ├── jenkins
 ├── kube
 ├── ops
 ├── packer
-│         └── defs
-│             ├── amazon-eks-ami
-│             │         ├── files
-│             │         ├── log-collector-script
-│             │         │         ├── linux
-│             │         │         └── windows
-│             │         └── scripts
-│             └── fork-example-amazon-eks-ami
-│                 ├── files
-│                 ├── log-collector-script
-│                 │         ├── linux
-│                 │         └── windows
-│                 └── scripts
+│     └── defs
 ├── sceptre
 ├── terraform
 └── tools
 
 ```
-
 # Languages
 ## Python - 3.8.8
 3.9.x has some incompatibilities with our code
