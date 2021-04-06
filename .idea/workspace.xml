@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="36f630e0-614b-486c-8410-c0cecbd264cf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/nextgen/terraform/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/.envrc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,6 +39,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -156,7 +157,7 @@
       <workItem from="1616180627225" duration="45000" />
       <workItem from="1616180685645" duration="11818000" />
       <workItem from="1617648555098" duration="1084000" />
-      <workItem from="1617659949886" duration="9664000" />
+      <workItem from="1617659949886" duration="11600000" />
     </task>
     <servers />
   </component>
