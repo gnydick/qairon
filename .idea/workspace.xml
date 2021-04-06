@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="36f630e0-614b-486c-8410-c0cecbd264cf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/nextgen/docker/bin/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bb_reorg/bb_reorg.iml" beforeDir="false" afterPath="$PROJECT_DIR$/bb_reorg/bb_reorg.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nextgen/docker/bin/dpub.sh" beforeDir="false" afterPath="$PROJECT_DIR$/nextgen/docker/bin/dpub.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nextgen/docker/bin/test.sh" beforeDir="false" afterPath="$PROJECT_DIR$/nextgen/docker/bin/test.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +44,7 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Groovy" />
     <property name="jdk.selected.PYTHON_MODULE" value="Python 3.9 (qairon-3.9.2)" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/nextgen/helm/values/us-west-1/eks1" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.idea" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -62,18 +59,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/.idea" />
       <recent name="$PROJECT_DIR$/nextgen/helm/values/us-west-1/eks1" />
       <recent name="$PROJECT_DIR$/example/code/pipelines/jenkins" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/example/code/lib/jenkins/qairon/resources" />
-      <recent name="$PROJECT_DIR$/example/code/lib/jenkins/qairon/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/nextgen/ops" />
       <recent name="$PROJECT_DIR$/example/code/pipelines/jenkins" />
       <recent name="$PROJECT_DIR$/example/code/lib/jenkins" />
       <recent name="$PROJECT_DIR$/example/code" />
       <recent name="$PROJECT_DIR$/example/code/scripts" />
-      <recent name="$PROJECT_DIR$/example/code/jenkins/pipelines" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
@@ -158,7 +155,7 @@
       <workItem from="1616180627225" duration="45000" />
       <workItem from="1616180685645" duration="11818000" />
       <workItem from="1617648555098" duration="1084000" />
-      <workItem from="1617659949886" duration="5729000" />
+      <workItem from="1617659949886" duration="6086000" />
     </task>
     <servers />
   </component>

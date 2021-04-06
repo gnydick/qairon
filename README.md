@@ -19,9 +19,11 @@ nextgen
 
 ```
 # Languages
-## Python - 3.8.8
-3.9.x has some incompatibilities with our code
-
+## Python - 3.8
+* 3.9.x has some incompatibilities with our code
+* if different toolsets/directories use different versions/venv of python a `.python-version` file
+should be dropped in to automatically switch to it. look for those files to indicate what's in use.
+  there isn't one global venv we have to be locked on.
 ### pyenv - latest
 **Installation**
 
