@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="groovy-2.4.17" level="application" />
     <orderEntry type="library" name="groovy-2.4.17" level="application" />
+    <orderEntry type="library" name="groovy-2.4.21" level="application" />
   </component>
 </module>

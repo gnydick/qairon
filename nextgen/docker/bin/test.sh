@@ -10,7 +10,6 @@ else
     VERFILE=".version"
 fi
 
-export DOCKER_REGISTRY=966494614521.dkr.ecr.us-west-2.amazonaws.com
 echo "1) Current version: "$(cat defs/$IMG/$VERFILE)
 echo "2) Update tag on current version"
 echo "3) Upload other version..."
