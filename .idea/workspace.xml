@@ -2,7 +2,249 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="36f630e0-614b-486c-8410-c0cecbd264cf" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/agnostic-utils/file_in_temp_dir/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/agnostic-utils/file_in_temp_dir/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/agnostic-utils/file_in_temp_dir/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/README" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/acm/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/acm/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/acm/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/acm/versions.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudformation-20190211/amazon-eks-nodegroup.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudformation-20190211/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudformation-20190211/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudformation-20190211/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudfront-s3/cloudfront.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudfront-s3/data-global.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudfront-s3/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudfront-s3/route53.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudfront-s3/s3.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudfront-s3/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cloudfront-s3/versions.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cost_management/bucket_policy.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cost_management/create_table.ddl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cost_management/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cost_management/user_policy.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/cost_management/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/global.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/acm.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/cloudwatch.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/eks-dr.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/eks.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/iam.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/iqbot.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/networking-dr.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/networking.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/rds-mssql.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/route53.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/data/remote-state/waf.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ecr/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ecr/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ecr/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks-security-group/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks-security-group/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks-security-group/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks/security_groups/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks/security_groups/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks/security_groups/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/eks/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/host_dns/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/host_dns/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/host_dns/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/hosts/bastion.tpl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/hosts/docker_host_start.tpl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/hosts/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/hosts/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/hosts/rancher_agent_register_kube.tpl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/hosts/rancher_server_start.tpl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/hosts/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_ingress_elb/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_ingress_elb/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_ingress_elb/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_ingress_nlb/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_ingress_nlb/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_ingress_nlb/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_roles/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_roles/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_roles_per_cluster/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/k8s_roles_per_cluster/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/multiple_eks/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/multiple_eks/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/multiple_eks/security_groups/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/multiple_eks/security_groups/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/multiple_eks/security_groups/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/multiple_eks/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/networking-single-az-gws/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/networking-single-az-gws/private_subnet/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/networking-single-az-gws/public_subnet/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/networking-single-az-gws/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/networking/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/networking/private_subnet/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/networking/public_subnet/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/networking/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/nlb/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/nlb/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/nlb/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/nodegroup-pair-sgs/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/nodegroup-pair-sgs/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/opentsdb/aws_cli.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/opentsdb/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/opentsdb/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/openvpn/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/openvpn/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/policy/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/policy/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_alias/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_alias/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_alias/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_cname/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_cname/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_cname/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_private_zone/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_private_zone/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_private_zone/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_zone/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_zone/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_zone/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_zone_record/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_zone_record/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/route53_zone_record/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/s3_bucket/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/s3_bucket/output.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/s3_bucket/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ses/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ses/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ses/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ses/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ssl_certificate/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ssl_certificate/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ssl_certificate/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ssl_private_key/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ssl_private_key/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/ssl_private_key/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/subnet-addon/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/subnet-addon/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/user/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/user/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/velero/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/velero/policy.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/velero/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc-peering-accepter/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc-peering-accepter/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc-peering-accepter/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc-peering-accepter/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc-peering-requester/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc-peering-requester/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc-peering-requester/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc-peering-requester/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/modules/aws/vpc/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/ark/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/ark/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/ark/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/backend.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ecr_access.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/README" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/nodegroups.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/openvpn/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/openvpn/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/openvpn/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/openvpn/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/roles/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/roles/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/ng-prod1/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/prod_proxy_can_assume_dev_ecr_access_policy.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/vpc/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/vpc/networking.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/vpc/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2/prod/base/vpc/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/accepter_mod/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/accepter_mod/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/ng-dev1/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/ng-dev1/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/ng-dev1/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/ng-dev1/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/sg_mod/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/sg_mod/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/accepters/sg_mod/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev-new/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev-new/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev-new/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev-new/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev-new/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/leg-dev/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-dev2/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-dev2/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-dev2/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-dev2/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-dev2/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-prod1/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-prod1/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-prod1/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-prod1/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-prod1/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-stage1/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-stage1/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-stage1/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-stage1/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/ng-stage1/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/reqeuster_mod/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/reqeuster_mod/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/reqeuster_mod/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/sg_mod/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/peering/requesters/sg_mod/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/dev/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/dev/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/dev/infra-ng-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/dev/qa.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/dev/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/dev/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/dev/vpc-infra-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/int/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/int/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/int/hub-infra-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/int/infra-ng-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/int/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/int/ng-foo-net.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/int/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/int/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/prod/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/prod/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/prod/infra-ng-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/prod/prod.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/prod/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/prod/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/prod/vpc-infra-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/qa/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/qa/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/qa/infra-ng-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/qa/qa.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/qa/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/qa/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/qa/vpc-infra-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/stage/.envrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/stage/data.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/stage/infra-ng-priv.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/stage/stage.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/stage/terraform.tfvars" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/stage/variables.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nextgen/terraform/provider/aws/route53/us-west-2/stage/vpc-infra-priv.tf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +286,7 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Groovy" />
     <property name="jdk.selected.PYTHON_MODULE" value="Python 3.9 (qairon-3.9.2)" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/.idea" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/nextgen/terraform/modules/aws" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -59,18 +301,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/.idea" />
-      <recent name="$PROJECT_DIR$/nextgen/helm/values/us-west-1/eks1" />
-      <recent name="$PROJECT_DIR$/example/code/pipelines/jenkins" />
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/example/code/lib/jenkins/qairon/resources" />
+      <recent name="$PROJECT_DIR$/nextgen/terraform/modules/aws" />
+      <recent name="$PROJECT_DIR$/nextgen/terraform/modules" />
+      <recent name="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588" />
+      <recent name="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/407733091588/us-west-2" />
+      <recent name="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts/111111111111" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/nextgen/terraform/modules/aws" />
+      <recent name="$PROJECT_DIR$/nextgen/terraform/provider/aws/accounts" />
       <recent name="$PROJECT_DIR$/nextgen/ops" />
       <recent name="$PROJECT_DIR$/example/code/pipelines/jenkins" />
       <recent name="$PROJECT_DIR$/example/code/lib/jenkins" />
-      <recent name="$PROJECT_DIR$/example/code" />
-      <recent name="$PROJECT_DIR$/example/code/scripts" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
@@ -155,7 +397,7 @@
       <workItem from="1616180627225" duration="45000" />
       <workItem from="1616180685645" duration="11818000" />
       <workItem from="1617648555098" duration="1084000" />
-      <workItem from="1617659949886" duration="6086000" />
+      <workItem from="1617659949886" duration="8980000" />
     </task>
     <servers />
   </component>

@@ -1,0 +1,7 @@
+the modules in this directory serve as configuration templates on a per-environment basis.
+
+Networking
+IAM
+RDS
+Security Groups
+etc.

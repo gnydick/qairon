@@ -1,0 +1,2 @@
+variable "clustername" {}
+variable "environment" {}
