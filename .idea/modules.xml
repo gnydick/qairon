@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/bb_reorg/bb_reorg.iml" filepath="$PROJECT_DIR$/bb_reorg/bb_reorg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/example/code/python_artifact/python_artifact.iml" filepath="$PROJECT_DIR$/example/code/python_artifact/python_artifact.iml" />
+      <module fileurl="file://$PROJECT_DIR$/withme-ops.iml" filepath="$PROJECT_DIR$/withme-ops.iml" />
+    </modules>
+  </component>
+</project>
