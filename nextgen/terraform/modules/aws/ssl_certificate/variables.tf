@@ -1,10 +1,20 @@
-variable "region" {}
-variable "environment" {}
-variable "fqdn" {}
-variable "config_name" {}
+variable "region" {
+}
+
+variable "environment" {
+}
+
+variable "fqdn" {
+}
+
+variable "config_name" {
+}
+
 variable "validation_emails" {
-  type = "list"
+  type = list(string)
 }
+
 variable "extra_tags" {
-  type = "map"
+  type = map(string)
 }
+

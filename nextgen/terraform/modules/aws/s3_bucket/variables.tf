@@ -1,1 +1,3 @@
-variable "cluster" {}
+variable "cluster" {
+}
+

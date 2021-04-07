@@ -8,3 +8,4 @@ data "terraform_remote_state" "networking-dr" {
     region  = var.vpc_dr_region
   }
 }
+

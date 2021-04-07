@@ -1,15 +1,27 @@
 resource "aws_acm_certificate" "cert" {
-  domain_name = "${var.fqdn}"
+  domain_name       = var.fqdn
   validation_method = "DNS"
-  tags = "${merge(
-                    map("Region", "${var.region}"),
-                    map("Environment", "${var.environment}"),
-                    map("Name","${var.fqdn}.cert"),
-                    map("Config","${var.config_name}"),
-                    map("GeneratedBy", "terraform"),
-                    "${var.extra_tags}")}"
+  tags = merge(
+    {
+      "Region" = var.region
+    },
+    {
+      "Environment" = var.environment
+    },
+    {
+      "Name" = "${var.fqdn}.cert"
+    },
+    {
+      "Config" = var.config_name
+    },
+    {
+      "GeneratedBy" = "terraform"
+    },
+    var.extra_tags,
+  )
 
   lifecycle {
     create_before_destroy = true
   }
 }
+

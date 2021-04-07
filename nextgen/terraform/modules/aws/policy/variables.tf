@@ -1,2 +1,6 @@
-variable "policy" {}
-variable "name" {}
+variable "policy" {
+}
+
+variable "name" {
+}
+

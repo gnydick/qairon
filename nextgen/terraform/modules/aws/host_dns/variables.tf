@@ -1,7 +1,15 @@
-variable "region" {}
-variable "environment" {}
-variable "vpc_id" {}
+variable "region" {
+}
 
-variable "role" {}
+variable "environment" {
+}
 
-variable "deployment_target" {}
+variable "vpc_id" {
+}
+
+variable "role" {
+}
+
+variable "deployment_target" {
+}
+

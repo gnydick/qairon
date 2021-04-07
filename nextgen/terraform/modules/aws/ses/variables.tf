@@ -1,4 +1,9 @@
-variable "region" {}
+variable "region" {
+}
 
-variable "domain" {}
-variable "cluster" {}
+variable "domain" {
+}
+
+variable "cluster" {
+}
+

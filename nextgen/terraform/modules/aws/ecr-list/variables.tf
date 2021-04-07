@@ -1,2 +1,8 @@
-variable "repos" {type = "list"}
-variable "scan_on_push" {type = "list"}
+variable "repos" {
+  type = list(string)
+}
+
+variable "scan_on_push" {
+  type = list(string)
+}
+
