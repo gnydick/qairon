@@ -1,5 +1,5 @@
 module "accepter" {
-  source = "../../../../../modules/vpc-peering-accepter"
+  source = "../../../../../modules/aws/vpc-peering-accepter"
 
   initiating-cidr = "${var.requesting-cidr}"
   initiating-vpc-id = "${var.requesting-vpc_id}"

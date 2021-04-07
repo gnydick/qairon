@@ -1,27 +1,39 @@
-variable "environment" {}
-variable "config_name" {}
-variable "region" {}
+variable "environment" {
+}
 
+variable "config_name" {
+}
 
-variable "vpc_cidr" {}
+variable "region" {
+}
+
+variable "vpc_cidr" {
+}
 
 variable "azs" {
-  type = "list"
+  type = list(string)
 }
 
+variable "cluster_name" {
+}
 
-variable "cluster_name" {}
+variable "deployment_target" {
+}
 
-variable "deployment_target" {}
+variable "eks_version" {
+}
 
-variable "eks_version" {}
+variable "key_name" {
+}
 
-variable "key_name" {}
-variable "vpc_id" {}
+variable "vpc_id" {
+}
+
 variable "public_subnet_ids" {
-  type = "list"
+  type = list(string)
 }
+
 variable "private_subnet_ids" {
-  type = "list"
+  type = list(string)
 }
 

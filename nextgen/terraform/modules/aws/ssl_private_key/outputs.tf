@@ -1,3 +1,4 @@
 output "private_key" {
-  value = "${tls_private_key.private_key.private_key_pem}"
+  value = tls_private_key.private_key.private_key_pem
 }
+

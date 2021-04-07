@@ -8,3 +8,4 @@ data "terraform_remote_state" "eks-dr" {
     region  = var.vpc_dr_region
   }
 }
+

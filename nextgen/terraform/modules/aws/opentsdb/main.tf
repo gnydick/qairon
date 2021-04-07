@@ -1,6 +1,7 @@
 variable "role" {
   default = "opentsdb"
 }
+
 resource "aws_iam_policy" "opentsdb_emr_policy" {
   policy = <<EOF
 {
@@ -88,6 +89,7 @@ resource "aws_iam_policy" "opentsdb_emr_policy" {
     ]
 }
 EOF
+
 }
 
 resource "aws_iam_policy" "opentsdb_emr_ec2_policy" {
@@ -150,10 +152,11 @@ resource "aws_iam_policy" "opentsdb_emr_ec2_policy" {
 
 
 EOF
+
 }
 
 resource "aws_iam_role" "opentsdb_emr_role" {
-  name = "${var.environment}.${var.region}.opentsdb_emr_role"
+  name               = "${var.environment}.${var.region}.opentsdb_emr_role"
   assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",
@@ -169,11 +172,11 @@ resource "aws_iam_role" "opentsdb_emr_role" {
   ]
 }
 EOF
+
 }
 
-
 resource "aws_iam_role" "opentsdb_emr_ec2_role" {
-  name = "${var.environment}.${var.region}.opentsdb_emr_ec2_role"
+  name               = "${var.environment}.${var.region}.opentsdb_emr_ec2_role"
   assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",
@@ -189,113 +192,111 @@ resource "aws_iam_role" "opentsdb_emr_ec2_role" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_policy_attachment" "emr_attachment" {
-  roles = ["${aws_iam_role.opentsdb_emr_role.name}"]
-  name = "${aws_iam_role.opentsdb_emr_role.name}"
-  policy_arn = "${aws_iam_policy.opentsdb_emr_policy.arn}"
+  roles      = [aws_iam_role.opentsdb_emr_role.name]
+  name       = aws_iam_role.opentsdb_emr_role.name
+  policy_arn = aws_iam_policy.opentsdb_emr_policy.arn
 }
 
 resource "aws_iam_policy_attachment" "emr_ec2_attachment" {
-  roles = ["${aws_iam_role.opentsdb_emr_ec2_role.name}"]
-  name = "${aws_iam_role.opentsdb_emr_ec2_role.name}"
-  policy_arn = "${aws_iam_policy.opentsdb_emr_ec2_policy.arn}"
+  roles      = [aws_iam_role.opentsdb_emr_ec2_role.name]
+  name       = aws_iam_role.opentsdb_emr_ec2_role.name
+  policy_arn = aws_iam_policy.opentsdb_emr_ec2_policy.arn
 }
 
 resource "aws_iam_instance_profile" "emr_instance_profile" {
   name = "${aws_iam_role.opentsdb_emr_ec2_role.name}.profile"
-  role = "${aws_iam_role.opentsdb_emr_ec2_role.name}"
+  role = aws_iam_role.opentsdb_emr_ec2_role.name
 }
-
 
 resource "aws_emr_cluster" "opentsdb" {
-  name = "${var.environment}.${var.region}.opentsdb"
-  release_label = "${var.emr_version}"
-  service_role = "${aws_iam_role.opentsdb_emr_role.name}"
-  termination_protection = "${var.termination_protection}"
+  name                   = "${var.environment}.${var.region}.opentsdb"
+  release_label          = var.emr_version
+  service_role           = aws_iam_role.opentsdb_emr_role.name
+  termination_protection = var.termination_protection
   applications = [
-    "HBase", "Hadoop", "Hue", "Hive", "Pig"
-    ]
+    "HBase",
+    "Hadoop",
+    "Hue",
+    "Hive",
+    "Pig",
+  ]
 
-  instance_group {
-    instance_role = "CORE"
-    instance_type = "${var.core_instance_type}"
-    instance_count = "${var.emr_core_count}"
+  core_instance_group {
+    instance_type  = var.core_instance_type
+    instance_count = var.emr_core_count
 
     ebs_config {
-      size = "${var.ebs_core_size}"
-      type = "${var.ebs_core_type}"
-      volumes_per_instance = "${var.volumes_per_core_instance}"
+      size                 = var.ebs_core_size
+      type                 = var.ebs_core_type
+      volumes_per_instance = var.volumes_per_core_instance
     }
   }
 
-  instance_group {
-    instance_role = "MASTER"
-    instance_type = "${var.core_instance_type}"
+  master_instance_group {
+    instance_type  = var.core_instance_type
     instance_count = "1"
     ebs_config {
-      size = "${var.ebs_master_size}"
-      type = "${var.ebs_master_type}"
-      volumes_per_instance = "${var.volumes_per_core_instance}"
+      size                 = var.ebs_master_size
+      type                 = var.ebs_master_type
+      volumes_per_instance = var.volumes_per_core_instance
     }
   }
 
-
   ec2_attributes {
-    subnet_id = "${var.subnet_id}"
-    instance_profile = "${aws_iam_instance_profile.emr_instance_profile.name}"
-    key_name = "${var.key_name}"
-    emr_managed_master_security_group = "${aws_security_group.emr_master.id}"
-    emr_managed_slave_security_group = "${aws_security_group.emr_slave.id}"
-    service_access_security_group = "${aws_security_group.service_access_security_group.id}"
-
+    subnet_id                         = var.subnet_id
+    instance_profile                  = aws_iam_instance_profile.emr_instance_profile.name
+    key_name                          = var.key_name
+    emr_managed_master_security_group = aws_security_group.emr_master.id
+    emr_managed_slave_security_group  = aws_security_group.emr_slave.id
+    service_access_security_group     = aws_security_group.service_access_security_group.id
   }
+
   //"m4.xlarge"
 
-  ebs_root_volume_size = "${var.root_ebs_size}"
-  log_uri = "s3://aws-logs-${var.account_no}-${var.region}/elasticmapreduce/"
-
-
+  ebs_root_volume_size = var.root_ebs_size
+  log_uri              = "s3://aws-logs-${var.account_no}-${var.region}/elasticmapreduce/"
 }
 
-
-
 resource "aws_security_group" "emr_master" {
-  name        = "${var.environment}.${var.region}.emr_master.sg"
-  vpc_id      = "${var.vpc_id}"
+  name   = "${var.environment}.${var.region}.emr_master.sg"
+  vpc_id = var.vpc_id
 
-  tags {
-    Region = "${var.region}"
-    Environment = "${var.environment}"
+  tags = {
+    Region      = var.region
+    Environment = var.environment
     Name        = "${var.environment}.${var.region}.emr_master.sg"
-    Config      = "${var.config_name}"
+    Config      = var.config_name
     GeneratedBy = "terraform"
   }
 }
 
 resource "aws_security_group" "emr_slave" {
-  name        = "${var.environment}.${var.region}.emr_slave.sg"
-  vpc_id      = "${var.vpc_id}"
+  name   = "${var.environment}.${var.region}.emr_slave.sg"
+  vpc_id = var.vpc_id
 
-  tags {
-    Region = "${var.region}"
-    Environment = "${var.environment}"
+  tags = {
+    Region      = var.region
+    Environment = var.environment
     Name        = "${var.environment}.${var.region}.emr_slave.sg"
-    Config      = "${var.config_name}"
+    Config      = var.config_name
     GeneratedBy = "terraform"
   }
 }
 
 resource "aws_security_group" "service_access_security_group" {
-  name        = "${var.environment}.${var.region}.service_access_security_group.sg"
-  vpc_id      = "${var.vpc_id}"
+  name   = "${var.environment}.${var.region}.service_access_security_group.sg"
+  vpc_id = var.vpc_id
 
-  tags {
-    Region = "${var.region}"
-    Environment = "${var.environment}"
+  tags = {
+    Region      = var.region
+    Environment = var.environment
     Name        = "${var.environment}.${var.region}.service_access_security_group.sg"
-    Config      = "${var.config_name}"
+    Config      = var.config_name
     GeneratedBy = "terraform"
   }
 }
+

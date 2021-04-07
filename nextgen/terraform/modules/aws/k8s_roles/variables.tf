@@ -1,2 +1,6 @@
-variable "clustername" {}
-variable "environment" {}
+variable "clustername" {
+}
+
+variable "environment" {
+}
+

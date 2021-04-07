@@ -1,2 +1,6 @@
-variable "cluster_name" {}
-variable "cluster_arn" {}
+variable "cluster_name" {
+}
+
+variable "cluster_arn" {
+}
+
