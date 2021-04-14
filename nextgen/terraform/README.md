@@ -11,3 +11,5 @@
 
 ## General
 * use `terraform_remote_state` to store and lookup values between unrelated modules, for example, needing a `vpc_id` from the `vpc` implemented module
+
+* always have different CIDR for each VPC
