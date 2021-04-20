@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "../../../../../../../modules/aws/vpc"
+  source = "../../../../../../../../modules/aws/vpc"
   config_name = "${var.config_name}"
   cidr = "${var.vpc_cidr}"
   region = "${var.region}"

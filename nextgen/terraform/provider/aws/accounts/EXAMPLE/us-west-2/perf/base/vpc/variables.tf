@@ -4,19 +4,22 @@ variable "region" {}
 
 
 variable "vpc_cidr" {}
-
 variable "azs" {
-  type = "list"
+  type = list
 }
 
-
 variable "extra_tags" {
-  type = "map"
+  type = map
 }
 
 variable "vpc_number" {}
 variable "vpc_add_cidrs" {
-  type = "map"
+  type = map
 }
-variable "public_subnet_cidrs" {type="list"}
-variable "private_subnet_cidrs" {type="list"}
+variable "public_subnet_cidrs" {
+  type=list
+}
+
+variable "private_subnet_cidrs" {
+  type=list
+}
