@@ -5,7 +5,6 @@
 
 # Node artifact files
 node_modules/
-dist/
 
 # Compiled Java class files
 *.class
@@ -49,7 +48,6 @@ Thumbs.db
 *.wmv
 
 *.ipr
-*.iws
 **/*~
 build
 out
@@ -129,3 +127,6 @@ fabric.properties
 
 # terraform init cache
 **/.terraform
+
+# community aws terraform modules
+nextgen/terraform/modules/aws/public/
