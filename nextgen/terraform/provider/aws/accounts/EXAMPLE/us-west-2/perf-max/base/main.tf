@@ -1,20 +1,24 @@
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
 
 module "vpc" {
   source = "./vpc"
-  azs = "${var.azs}"
-  config_name = "${var.config_name}"
-  region = "${var.region}"
-  vpc_cidr = "${var.vpc_cidr}"
-  vpc_add_cidrs = "${var.vpc_add_cidr}"
-  environment = "${var.environment}"
-  extra_tags = {}
-  vpc_number = "1"
-  private_subnet_cidrs = "${var.private_subnet_cidrs["perf-1"]}"
-  public_subnet_cidrs = "${var.public_subnet_cidrs["perf-1"]}"
+  vpc_cidr = "10.10.0.0/8"
+  environment = var.environment
+  region = var.region
+
+  # azs = "${var.azs}"
+  # config_name = "${var.config_name}"
+  # region = "${var.region}"
+  # vpc_cidr = "${var.vpc_cidr}"
+  # vpc_add_cidrs = "${var.vpc_add_cidr}"
+  # environment = "${var.environment}"
+  # extra_tags = {}
+  # vpc_number = "1"
+  # private_subnet_cidrs = "${var.private_subnet_cidrs["perf-1"]}"
+  # public_subnet_cidrs = "${var.public_subnet_cidrs["perf-1"]}"
 }
 
 
@@ -105,5 +109,3 @@ module "vpc" {
 //  roles = [
 //    "${aws_iam_role.proxy_role_for_prod.name}"]
 //}
-
-

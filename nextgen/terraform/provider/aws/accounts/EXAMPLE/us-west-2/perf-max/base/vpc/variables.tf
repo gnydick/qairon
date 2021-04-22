@@ -1,25 +1,16 @@
-variable "environment" {}
-variable "config_name" {}
-variable "region" {}
-
-
-variable "vpc_cidr" {}
-variable "azs" {
-  type = list
+variable "vpc_cidr" {
+  description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by AWS and should be overridden"
+  type        = string
 }
 
-variable "extra_tags" {
-  type = map
+variable "environment" {
+  description = "Name of current environment"
+  type        = string
+  default     = ""
 }
 
-variable "vpc_number" {}
-variable "vpc_add_cidrs" {
-  type = map
-}
-variable "public_subnet_cidrs" {
-  type=list
-}
-
-variable "private_subnet_cidrs" {
-  type=list
+variable "region" {
+  description = "Name of current region"
+  type        = string
+  default     = ""
 }
