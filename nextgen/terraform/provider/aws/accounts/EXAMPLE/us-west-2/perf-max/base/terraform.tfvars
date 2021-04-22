@@ -12,7 +12,7 @@
 # change is reflected when doing `terraform remote config` and
 # `terraform push` commands - changing this WILL affect your
 # terraform.tfstate file, so use caution
-environment = "prod"
+environment = "perf-1"
 config_name = "default"
 
 region = "us-west-2"
@@ -66,9 +66,9 @@ public_subnet_cidrs = {
 
 }
 
-clusters = [
-  "perf-1",
-  ]
+//  clusters = [
+//    "perf-1",
+//    ]
 
 
 

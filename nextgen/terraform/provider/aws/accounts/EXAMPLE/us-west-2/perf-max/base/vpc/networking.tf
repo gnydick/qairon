@@ -1,5 +1,5 @@
 module "networking" {
-  source = "../../../../../../../../modules/aws/networking-single-az-gws"
+  source = "../../../../../../../../modules/aws/networking"
 
   vpc_id = "${module.vpc.vpc_id}"
   region = "${var.region}"

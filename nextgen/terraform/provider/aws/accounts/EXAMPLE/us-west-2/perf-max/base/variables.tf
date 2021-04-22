@@ -7,14 +7,14 @@ variable "environment" {}
 
 
 variable "vpc_add_cidr" {
-  type=map
+  type= map
 }
 
 variable "private_subnet_cidrs" {
-  type = map
+  type = list(string)
 }
 variable "public_subnet_cidrs" {
-  type = map
+  type = list(string)
 }
 variable "region" {}
 
