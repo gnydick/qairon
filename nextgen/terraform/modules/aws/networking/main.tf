@@ -1,7 +1,3 @@
-locals {
-  prefix = "${var.environment}.${var.region}.${var.vpc_id}"
-}
-
 module "public" {
   source      = "./public_subnet"
   region      = var.region
@@ -303,26 +299,6 @@ resource "aws_route_table_association" "private" {
 //  subnet_id = "${element(module.private.private_subnet_ids, count.index)}"
 //  route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
 //}
-
-output "private_subnet_ids" {
-  value = [
-    module.private.private_subnet_ids,
-  ]
-}
-
-output "public_subnet_ids" {
-  value = [
-    module.public.public_subnet_ids,
-  ]
-}
-
-output "private_route_table_ids" {
-  value = aws_route_table.private.*.id
-}
-
-output "public_route_table_ids" {
-  value = aws_route_table.public.*.id
-}
 
 //extra_tags = {
 //  public = {

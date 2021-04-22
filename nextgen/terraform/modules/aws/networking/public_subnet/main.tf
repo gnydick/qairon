@@ -2,32 +2,6 @@
 # This module creates all resources necessary for a public
 # subnet
 #--------------------------------------------------------------
-variable "config_name" {
-}
-
-variable "vpc_id" {
-}
-
-variable "azs" {
-  type = list(string)
-}
-
-variable "public_subnet_cidrs" {
-  type = list(string)
-}
-
-locals {
-  prefix = "${var.environment}.${var.region}.${var.vpc_id}"
-}
-
-variable "extra_tags" {
-  type = map(string)
-}
-
-variable "kube_extra_tags" {
-  type = map(string)
-}
-
 resource "aws_subnet" "public" {
   vpc_id                  = var.vpc_id
   cidr_block              = element(var.public_subnet_cidrs, count.index)
@@ -71,14 +45,3 @@ resource "aws_subnet" "public" {
     create_before_destroy = true
   }
 }
-
-variable "environment" {
-}
-
-variable "region" {
-}
-
-output "public_subnet_ids" {
-  value = [aws_subnet.public.*.id]
-}
-
