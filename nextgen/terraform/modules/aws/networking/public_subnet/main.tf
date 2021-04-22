@@ -1,47 +1,59 @@
-#--------------------------------------------------------------
-# This module creates all resources necessary for a public
-# subnet
-#--------------------------------------------------------------
+#################
+# Private subnet
+#################
 resource "aws_subnet" "public" {
-  vpc_id                  = var.vpc_id
-  cidr_block              = element(var.public_subnet_cidrs, count.index)
-  availability_zone       = element(var.azs, count.index)
-  count                   = length(var.public_subnet_cidrs)
-  map_public_ip_on_launch = true
+  vpc_id                          = var.vpc_id
+  cidr_block                      = element(concat(var.public_subnets, [""]), count.index)
+  availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
+  availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
+  map_public_ip_on_launch         = var.map_public_ip_on_launch
 
   tags = merge(
-    {
-      "Region" = var.region
-    },
-    {
-      "Environment" = var.environment
-    },
-    {
-      "Name" = "${local.prefix}.${element(var.azs, count.index)}.${count.index}.public.subnet"
-    },
-    {
-      "Config" = var.config_name
-    },
-    {
-      "GeneratedBy" = "terraform"
-    },
-    {
-      "AZ" = element(var.azs, count.index)
-    },
-    {
-      "SubnetIndex" = count.index
-    },
-    {
-      "Tier" = "public"
-    },
-    {
-      "kubernetes.io/role/elb" = ""
-    },
-    var.kube_extra_tags,
-    var.extra_tags,
+  {
+    "Name" = format(
+    "%s-${var.public_subnet_suffix}-%s",
+    var.name,
+    element(var.azs, count.index),
+    )
+  },
+  var.tags,
+  var.public_subnet_tags,
   )
+}
 
-  lifecycle {
-    create_before_destroy = true
+###################
+# Internet Gateway
+###################
+resource "aws_internet_gateway" "this" {
+  vpc_id = var.vpc_id
+  tags = merge(
+  {
+    "Name" = format("%s", var.name)
+  },
+  var.tags,
+  var.igw_tags,
+  )
+}
+
+################
+# Public routes
+################
+resource "aws_route_table" "public" {
+  vpc_id = var.vpc_id
+  tags = merge(
+  {
+    "Name" = format("%s-${var.public_subnet_suffix}", var.name)
+  },
+  var.tags,
+  var.public_route_table_tags,
+  )
+}
+
+resource "aws_route" "public_internet_gateway" {
+  route_table_id         = aws_route_table.public[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this[0].id
+  timeouts {
+    create = "5m"
   }
 }
