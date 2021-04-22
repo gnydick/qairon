@@ -1,9 +1,8 @@
-//
-//terraform {
-//  backend "s3" {
-//    bucket         = "${var.backend_bucket}"
-//    key            = "${var.statefile_name}"
-//    region         = "${var.region}"
-//    dynamodb_table = "${var.locking_dsn}"
-//  }
-//}
+terraform {
+  backend "s3" {
+    bucket         = "terraform-state-backend-407733091588"
+    key            = "${var.region}/${var.evironment}"
+    region         = "${var.region}"
+    dynamodb_table = "terraform-lock-state"
+  }
+}

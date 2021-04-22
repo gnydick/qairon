@@ -3,7 +3,10 @@ variable "azs" {
 }
 variable "config_name" {}
 
-variable "environment" {}
+variable "environment" {
+  type = string
+  default = "perf-max"
+}
 
 
 variable "vpc_add_cidr" {
@@ -16,7 +19,10 @@ variable "private_subnet_cidrs" {
 variable "public_subnet_cidrs" {
   type = list(string)
 }
-variable "region" {}
+variable "region" {
+  type = string
+  default = "us-west-2"
+}
 
 
 variable "vpc_cidr" {}
