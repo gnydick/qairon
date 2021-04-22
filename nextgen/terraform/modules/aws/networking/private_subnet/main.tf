@@ -4,7 +4,7 @@
 resource "aws_subnet" "private" {
 
   vpc_id                          = var.vpc_id
-  cidr_block                      = var.private_subnets[count.index]
+  cidr_block                      = var.private_subnets_cidr[count.index]
   availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
   availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
 
@@ -17,7 +17,7 @@ resource "aws_subnet" "private" {
     )
   },
   var.tags,
-  var.private_subnet_tags,
+  var.private_subnets_tags,
   )
 }
 #################

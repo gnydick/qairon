@@ -3,8 +3,8 @@ variable "azs" {
   type        = list(string)
   default     = []
 }
-variable "private_subnets" {
-  description = "A list of private subnets inside the VPC"
+variable "private_subnets_cidr" {
+  description = "A list of private subnets CIDR"
   type        = list(string)
   default     = []
 }
@@ -17,4 +17,19 @@ variable "vpc_id" {
   description = "The VPC Id"
   type        = string
   default     = ""
+}
+variable "name" {
+  description = "Name to be used on all the resources as identifier"
+  type        = string
+  default     = ""
+}
+variable "tags" {
+  description = "A map of tags to add to subnets"
+  type        = map(string)
+  default     = {}
+}
+variable "private_subnets_tags" {
+  description = "A map of tags to add to subnets"
+  type        = map(string)
+  default     = {}
 }
