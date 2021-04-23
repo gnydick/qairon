@@ -5,10 +5,8 @@ provider "aws" {
 
 module "vpc" {
   source = "./vpc"
-  vpc_cidr = "10.0.0.0/16"
   environment = var.environment
   region = var.region
-  azs = var.azs
 }
 
 
