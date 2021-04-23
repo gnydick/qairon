@@ -1,32 +1,66 @@
-variable "public_subnet_cidrs" {
-  type = list(string)
-}
-
-variable "private_subnet_cidrs" {
-  type = list(string)
-}
-
-variable "region" {
-}
-
-variable "config_name" {
-}
-
-variable "azs" {
-  type = list(string)
-}
-
 variable "environment" {
+  description = "Name of current environment"
+  type        = string
+  default     = ""
 }
 
 variable "vpc_id" {
+  description = "ID of VPC for subnets"
+  type        = string
+  default     = ""
 }
 
-variable "extra_tags" {
-  type = map(string)
+variable "azs" {
+  description = "A list of availability zones names or ids in the region"
+  type        = list(string)
+  default     = []
 }
 
-variable "kube_extra_tags" {
-  type = map(string)
+variable "public_subnet_cidr" {
+  description = "A list of public subnets CIDR"
+  type        = list(string)
+  default     = []
+}
+
+variable "private_subnet_cidr" {
+  description = "A list of private subnets CIDR"
+  type        = list(string)
+  default     = []
+}
+
+variable "map_public_ip_on_launch" {
+  description = "Should be false if you do not want to auto-assign public IP on launch"
+  type        = bool
+  default     = true
+}
+
+variable "public_subnet_suffix" {
+  description = "Suffix to append to public subnets name"
+  type        = string
+  default     = "public"
+}
+
+variable "private_subnet_suffix" {
+  description = "Suffix to append to private subnets name"
+  type        = string
+  default     = "private"
+}
+
+variable "public_subnet_tags" {
+  description = "A map of tags to add to subnets"
+  type        = map(string)
+  default     = {}
+}
+
+variable "private_subnet_tags" {
+  description = "A map of tags to add to subnets"
+  type        = map(string)
+  default     = {}
+}
+
+variable "tags" {
+  description = "A map of tags to add to subnets"
+  type        = map(string)
+  default     = {}
 }
 
