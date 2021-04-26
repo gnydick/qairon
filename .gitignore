@@ -3,6 +3,10 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+
+# ops skeleton
+!nextgen/ops/skel/**/**
+
 # Node artifact files
 node_modules/
 dist/
@@ -56,6 +60,7 @@ out
 logs
 .gradle
 .gitignore~
+
 
 ## intellij-ifying
 # User-specific stuff
