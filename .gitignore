@@ -134,4 +134,5 @@ fabric.properties
 **/.terraform
 
 # ops skeleton
-!nextgen/ops/skel/
+!nextgen/ops/skel/**
+

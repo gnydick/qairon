@@ -1,0 +1,12 @@
+variable "region" {}
+variable "role" {}
+variable "environment" {}
+variable "config_tag" {}
+variable "name" {}
+variable "org" {}
+variable "stream_view_type" {}
+variable "stream_enabled" {}
+variable "billing_mode" {}
+variable "hash_key" {}
+variable "hash_key_type" {}
+variable "write_capacity" {}
