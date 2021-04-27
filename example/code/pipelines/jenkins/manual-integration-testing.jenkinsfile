@@ -1,4 +1,4 @@
-qairon.src.common = load "../lib/qairon.src.common.groovy"
+qairon.src.common = load "../qairon.src.common.groovy"
 
 def label = "int-test-automation-${UUID.randomUUID().toString()}"
 def slackChannel = "#jnkns_int_tests"

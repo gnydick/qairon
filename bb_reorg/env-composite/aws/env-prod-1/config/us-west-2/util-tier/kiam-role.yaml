@@ -1,8 +1,0 @@
-template_path: kiam-role.yaml
-dependencies:
-  - us-west-2/eks/cluster.yaml
-
-parameters:
-  RoleName: prod-1-kiam-server
-  PolicyName: prod-1-kiam-server
-  SourceRoleArn: !stack_output us-west-2/util-tier/nodes.yaml::NodeInstanceRole

@@ -1,8 +1,0 @@
-template_path: upr-route53.yaml
-
-parameters:
-# VPC ID in which that Private Route53 HostedZone will work.
-# Quantity of HostedZone VPC's can be increased for serving more VPC's even in different regions. 
-  vpcID: !stack_output us-west-2/network/vpc.yaml::VpcId
-# DNS name for Private HostedZone
-  HostedZoneName: prod-1.etcd.upr

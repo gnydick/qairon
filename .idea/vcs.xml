@@ -2,5 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/nextgen/ops/aws/407733091588/build_user/us-west-2/int-1/env-int-1" vcs="Git" />
   </component>
 </project>
