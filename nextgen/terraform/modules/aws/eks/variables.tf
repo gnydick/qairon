@@ -3,7 +3,7 @@ variable "environment" {
   type        = string
   default     = ""
 }
-
+# "config_name"???????
 variable "config_name" {
 }
 
@@ -73,12 +73,6 @@ variable "cluster_endpoint_private_access" {
   description = "Indicates whether or not the Amazon EKS private API server endpoint is enabled."
   type        = bool
   default     = false
-}
-
-variable "cluster_create_security_group" {
-  description = "Whether to create a security group for the cluster or attach the cluster to `cluster_security_group_id`."
-  type        = bool
-  default     = true
 }
 
 variable "tags" {
