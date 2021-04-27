@@ -1,13 +1,11 @@
-output "cp_sg_id" {
-  value = module.sg.cp_sg_id
-}
-
-output "cp_sg_arn" {
-  value = module.sg.cp_sg_arn
-}
-
 output "cluster_name" {
+  description = "Name of the EKS Cluster"
   value = aws_eks_cluster.cluster.name
+}
+
+output "cluster_arn" {
+  description = "The Amazon Resource Name (ARN) of the cluster."
+  value       = element(concat(aws_eks_cluster.cluster.*.arn, [""]), 0)
 }
 
 output "cluster_endpoint" {
@@ -18,11 +16,6 @@ output "cluster_endpoint" {
 output "cluster_version" {
   description = "The Kubernetes server version for the EKS cluster."
   value       = element(concat(aws_eks_cluster.cluster[*].version, [""]), 0)
-}
-
-output "cluster_arn" {
-  description = "The Amazon Resource Name (ARN) of the cluster."
-  value       = element(concat(aws_eks_cluster.cluster.*.arn, [""]), 0)
 }
 
 output "cluster_iam_role_name" {
@@ -37,4 +30,14 @@ output "cluster_iam_role_arn" {
 
 output "kubeconfig-certificate-authority-data" {
   value = aws_eks_cluster.cluster.certificate_authority[0].data
+}
+
+output "cluster_security_group_id" {
+  description = "Security group ID attached to the EKS cluster. On 1.14 or later, this is the 'Additional security groups' in the EKS console."
+  value       = aws_security_group.cluster.id
+}
+
+output "nodes_security_group_id" {
+  description = "Default Security group ID for all Worker Node groups in cluster"
+  value       = aws_security_group.nodes.id
 }

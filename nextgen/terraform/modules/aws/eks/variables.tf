@@ -63,10 +63,10 @@ variable "private_subnets_ids" {
   type = list(string)
 }
 
-variable "cluster_service_ipv4_cidr" {
-  description = "service ipv4 cidr for the kubernetes cluster"
-  type        = string
-  default     = null
+variable "cluster_egress_cidrs" {
+  description = "List of CIDR blocks that are permitted for cluster egress traffic."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
 
 variable "cluster_endpoint_private_access" {
