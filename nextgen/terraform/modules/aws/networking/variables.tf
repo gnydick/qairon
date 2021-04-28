@@ -58,6 +58,24 @@ variable "private_subnet_tags" {
   default     = {}
 }
 
+variable "public_route_table_tags" {
+  description = "Additional tags for the public route tables"
+  type        = map(string)
+  default     = {}
+}
+
+variable "private_route_table_tags" {
+  description = "Additional tags for the private route tables"
+  type        = map(string)
+  default     = {}
+}
+
+variable "nat_gateway_tags" {
+  description = "Additional tags for the NAT gateways"
+  type        = map(string)
+  default     = {}
+}
+
 variable "tags" {
   description = "A map of tags to add to subnets"
   type        = map(string)
