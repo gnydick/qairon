@@ -3,10 +3,10 @@
 #################
 resource "aws_subnet" "private" {
 
-  count = length(var.private_subnet_cidr)
+  count = length(var.private_subnets)
 
   vpc_id                          = var.vpc_id
-  cidr_block                      = var.private_subnet_cidr[count.index]
+  cidr_block                      = var.private_subnets[count.index]
   availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
   availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
 

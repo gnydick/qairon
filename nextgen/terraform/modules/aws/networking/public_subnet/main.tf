@@ -3,10 +3,10 @@
 #################
 resource "aws_subnet" "public" {
 
-  count = length(var.public_subnet_cidr)
+  count = length(var.public_subnets)
 
   vpc_id                          = var.vpc_id
-  cidr_block                      = var.public_subnet_cidr[count.index]
+  cidr_block                      = var.public_subnets[count.index]
   availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
   availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
   map_public_ip_on_launch         = var.map_public_ip_on_launch

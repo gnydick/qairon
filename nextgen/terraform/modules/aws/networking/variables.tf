@@ -16,14 +16,14 @@ variable "azs" {
   default     = []
 }
 
-variable "public_subnet_cidr" {
-  description = "A list of public subnets CIDR"
+variable "public_subnets" {
+  description = "A list of public subnets inside the VPC"
   type        = list(string)
   default     = []
 }
 
-variable "private_subnet_cidr" {
-  description = "A list of private subnets CIDR"
+variable "private_subnets" {
+  description = "A list of private subnets inside the VPC"
   type        = list(string)
   default     = []
 }
