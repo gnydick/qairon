@@ -28,13 +28,13 @@ variable "map_public_ip_on_launch" {
   default     = true
 }
 
-variable "public_subnets_cidr" {
+variable "public_subnets" {
   description = "A list of public subnets CIDR"
   type        = list(string)
   default     = ["20.10.11.0/24", "20.10.12.0/24", "20.10.13.0/24"]
 }
 
-variable "private_subnets_cidr" {
+variable "private_subnets" {
   description = "A list of private subnets CIDR"
   type        = list(string)
   default     = ["20.10.1.0/24", "20.10.2.0/24", "20.10.3.0/24"]

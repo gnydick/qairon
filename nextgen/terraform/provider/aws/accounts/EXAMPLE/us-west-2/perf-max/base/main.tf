@@ -2,14 +2,11 @@ provider "aws" {
   region = var.region
 }
 
-
 module "vpc" {
   source = "./vpc"
   environment = var.environment
   region = var.region
 }
-
-
 
 # module "perf-1" {
 #   source = "./perf-1"
