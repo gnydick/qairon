@@ -1,4 +1,4 @@
-package qairon
+package lib.qairon
 
 import groovy.json.JsonSlurper
 

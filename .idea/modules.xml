@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/nextgen/jenkins/jenkins.iml" filepath="$PROJECT_DIR$/nextgen/jenkins/jenkins.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nextgen/ops/ops.iml" filepath="$PROJECT_DIR$/nextgen/ops/ops.iml" />
       <module fileurl="file://$PROJECT_DIR$/example/code/python_artifact/python_artifact.iml" filepath="$PROJECT_DIR$/example/code/python_artifact/python_artifact.iml" />
       <module fileurl="file://$PROJECT_DIR$/withme-ops.iml" filepath="$PROJECT_DIR$/withme-ops.iml" />
     </modules>

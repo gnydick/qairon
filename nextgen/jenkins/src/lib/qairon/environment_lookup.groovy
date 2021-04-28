@@ -1,23 +1,19 @@
-package qairon
+package lib.qairon
 
 import groovy.json.JsonSlurper
-
-dt_ids = groovy.json.JsonOutput.toJson(DEPLOYMENT_TARGET_ID.split(","))
 
 
 try {
     List<String> resultArray = new ArrayList<String>()
-    url = 'http://qairon:5001/api/rest/v1/deployment?q={"filters":[{"name":"deployment_target_id","op":"in","val":'+ dt_ids + '}]}'
-
-    HttpURLConnection connection = new URL(url).openConnection()
+    HttpURLConnection connection = new URL("http://qairon:5001/api/rest/v1/environment").openConnection()
     connection.connect()
     if (connection.responseCode == 200) {
         jsonSlurper = new JsonSlurper()
         // get the JSON response
         inStream = connection.inputStream
-        deployments = jsonSlurper.parse(inStream).objects
-        deployments.objects
-        deployments.each { deployment  -> resultArray.add(deployment.id)}
+        environments = jsonSlurper.parse(inStream).objects
+        environments.objects
+        environments.each { environment  -> resultArray.add(environment.id)}
         connection.disconnect()
 
         return resultArray
@@ -33,5 +29,4 @@ try {
 } catch (e) {
     print(e)
 }
-
 
