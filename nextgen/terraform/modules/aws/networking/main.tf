@@ -53,7 +53,7 @@ resource "aws_route" "public_internet_gateway" {
 
 resource "aws_route_table_association" "public" {
   count = length(var.public_subnets) > 0 ? length(var.public_subnets) : 0
-  subnet_id      = module.public.public_subnets_ids
+  subnet_id      = element(module.public.public_subnets_ids, count.index)
   route_table_id = aws_route_table.public_rt.id
 }
 
@@ -98,6 +98,10 @@ resource "aws_nat_gateway" "nat_gtw" {
   depends_on = [aws_internet_gateway.igw]
 }
 
+################
+# Private routes
+################
+
 resource "aws_route_table" "private_rt" {
   count = length(var.private_subnets) > 0 ? length(var.private_subnets) : 0
 
@@ -117,7 +121,7 @@ resource "aws_route_table" "private_rt" {
 }
 
 resource "aws_route" "private_nat_gateway" {
-  count = element(module.public.public_subnets_ids) >= 0
+  count = length(var.private_subnets) > 0 ? length(var.private_subnets) : 0
 
   route_table_id         = element(aws_route_table.private_rt.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
