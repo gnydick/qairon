@@ -53,7 +53,7 @@ resource "aws_route" "public_internet_gateway" {
 
 resource "aws_route_table_association" "public" {
   count = length(var.public_subnets) > 0 ? length(var.public_subnets) : 0
-  subnet_id      = element(module.public.public_subnets_ids, count.index)
+  subnet_id      = module.public.public_subnets_ids
   route_table_id = aws_route_table.public_rt.id
 }
 
