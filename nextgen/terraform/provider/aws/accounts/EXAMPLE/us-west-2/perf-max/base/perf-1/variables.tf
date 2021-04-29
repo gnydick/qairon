@@ -1,26 +1,20 @@
 variable "environment" {
-  default = "prod"
+  default = "perf-1"
 }
 
-variable "config_name" {
-}
+#variable "config_name" {
+#}
 
 variable "region" {
-}
-
-variable "vpc_cidr" {
+  description = "AWS region"
+  type        = string
+  default     = "us-west-2"
 }
 
 variable "azs" {
-  type = list(string)
-}
-
-variable "private_subnet_cidrs" {
-  type = list(string)
-}
-
-variable "public_subnet_cidrs" {
-  type = list(string)
+  description = "A list of availability zones names or ids in the region"
+  type        = list(string)
+  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
 }
 
 variable "cluster_number" {
@@ -30,97 +24,44 @@ variable "cluster_number" {
   type = map(string)
 }
 
-variable "deployment_target" {
-  default = "perf-1-us-west-2-eks"
-}
+#variable "deployment_target" {
+#  default = "perf-1-us-west-2-eks"
+#}
 
 variable "vpc_id" {
+  description = "ID of the VPC"
+  type        = string
+  default     = ""
 }
 
-variable "key_name" {
-  default = "perf-1"
+variable "cluster_endpoint_public_access_cidrs" {
+  description = "List of CIDR blocks which can access the Amazon EKS public API server endpoint."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
 
-variable "nodegroup_number" {
-  default = 1
+variable "cluster_log_retention_in_days" {
+  default     = 90
+  description = "Number of days to retain log events. Default retention - 90 days."
+  type        = number
 }
 
 variable "extra_tags" {
   type = map(string)
 }
 
-variable "cp_sg_id" {
-}
-
-variable "private_subnet_ids" {
+variable "public_subnets_ids" {
+  description = "ID's of the Public subnets in the VPC"
   type = list(string)
 }
 
-variable "public_subnet_ids" {
+variable "private_subnets_ids" {
+  description = "ID's of the Private subnets in the VPC"
   type = list(string)
-}
-
-variable "nodegroup_count" {
-  default = 2
-}
-
-variable "root_ebs_size" {
-  default = 10
-}
-
-variable "node_volume_size" {
-  default = 1024
-}
-
-variable "infra_nodegroup_ami" {
-  default = "ami-086d9c07b8773c87d"
-}
-
-variable "infra_max_size" {
-  default = 8
-}
-
-variable "infra_scaling_desired_capacity" {
-  default = 6
-}
-
-variable "infra_min_size" {
-  default = 1
-}
-
-variable "infra_bootstrap_arguments" {
-  default = "--kubelet-extra-args --node-labels=role=infra,jenkins=true --enable-docker-bridge true --client-ca-file=$CA_CERTIFICATE_FILE_PATH"
-}
-
-variable "infra_instance_type" {
-  default = "m5.large"
-}
-
-variable "foo_nodegroup_ami" {
-  default = "ami-086d9c07b8773c87d"
-}
-
-variable "foo_max_size" {
-  default = 12
-}
-
-variable "foo_scaling_desired_capacity" {
-  default = 6
-}
-
-variable "foo_min_size" {
-  default = 1
-}
-
-variable "foo_bootstrap_arguments" {
-  default = "--kubelet-extra-args --node-labels=role=foo  --client-ca-file=$CA_CERTIFICATE_FILE_PATH"
-}
-
-variable "foo_instance_type" {
-  default = "m5.4xlarge"
 }
 
 variable "eks_version" {
-  default = 1.12
+  description = "Kubernetes version to use for the EKS cluster."
+  type        = string
 }
 
