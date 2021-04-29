@@ -24,6 +24,8 @@ profiles = {
 
 
 def process_dir(dir, iter):
+    if iter >= len(__levels__):
+        return
     source_dir = os.path.sep.join(__levels__[0:iter + 1])
     with os.scandir(dir) as scan_it:
         shutil.copy(os.path.sep.join([source_dir, '.envrc']), dir)
