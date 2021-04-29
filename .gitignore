@@ -3,7 +3,8 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
-
+# don't include transient files
+generated
 
 # Node artifact files
 node_modules/
