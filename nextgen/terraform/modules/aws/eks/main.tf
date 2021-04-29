@@ -6,7 +6,7 @@ resource "aws_eks_cluster" "cluster" {
   tags                      = var.tags
 
   vpc_config {
-    security_group_ids      = aws_security_group.cluster.id
+    security_group_ids      = compact([aws_security_group.cluster.id])
     subnet_ids              = concat(var.private_subnets_ids, var.public_subnets_ids)
     endpoint_private_access = var.cluster_endpoint_private_access
     endpoint_public_access  = var.cluster_endpoint_public_access
@@ -29,7 +29,7 @@ resource "aws_eks_cluster" "cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "cluster" {
-  count             = length(var.cluster_enabled_log_types) > 0
+  count             = length(var.cluster_enabled_log_types) > 0 ? 1 : 0
   name              = "/aws/eks/${var.cluster_name}/cluster"
   retention_in_days = var.cluster_log_retention_in_days
   tags              = var.tags
@@ -82,7 +82,7 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSServicePolicy" {
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSVPCResourceControllerPolicy" {
-  policy_arn = data.aws_iam_policy.AmazonEKSVPCResourceController
+  policy_arn = data.aws_iam_policy.AmazonEKSVPCResourceController.arn
   role       = aws_iam_role.eks_service_role.name
 }
 

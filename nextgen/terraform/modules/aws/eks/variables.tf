@@ -3,9 +3,9 @@ variable "environment" {
   type        = string
   default     = ""
 }
-# "config_name"???????
-variable "config_name" {
-}
+## "config_name"???????
+#variable "config_name" {
+#}
 
 variable "region" {
   description = "AWS region"
@@ -30,16 +30,16 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "deployment_target" {
-}
+#variable "deployment_target" {
+#}
 
 variable "eks_version" {
   description = "Kubernetes version to use for the EKS cluster."
   type        = string
 }
 
-variable "key_name" {
-}
+#variable "key_name" {
+#}
 
 variable "cluster_endpoint_public_access" {
   description = "Indicates whether or not the Amazon EKS public API server endpoint is enabled."
