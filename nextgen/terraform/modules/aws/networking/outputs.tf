@@ -1,9 +1,9 @@
 output "private_subnets_ids" {
-  value = module.private.private_subnets_ids
+  value = aws_subnet.private.*.id
 }
 
 output "public_subnets_ids" {
-  value = module.public.public_subnets_ids
+  value = aws_subnet.public.*.id
 }
 
 #output "private_route_table_ids" {
