@@ -49,24 +49,6 @@ resource "aws_subnet" "private" {
   )
 }
 
-#module "public" {
-#  source      = "./public_subnet"
-#  environment = var.environment
-#  azs = var.azs
-#  vpc_id = var.vpc_id
-#  public_subnets = var.public_subnets
-#  public_subnet_tags = var.public_subnet_tags
-#}
-#
-#module "private" {
-#  source = "./private_subnet"
-#  environment = var.environment
-#  azs = var.azs
-#  vpc_id = var.vpc_id
-#  private_subnets = var.private_subnets
-#  private_subnet_tags = var.private_subnet_tags
-#}
-
 ###################
 # Internet Gateway
 ###################
