@@ -41,3 +41,8 @@ output "nodes_security_group_id" {
   description = "Default Security group ID for all Worker Node groups in cluster"
   value       = aws_security_group.nodes.id
 }
+
+output "cluster_oidc_issuer_url" {
+  description = "The URL on the EKS cluster OIDC Issuer"
+  value       = flatten(concat(aws_eks_cluster.cluster[*].identity[*].oidc.0.issuer, [""]))[0]
+}
