@@ -14,13 +14,13 @@
 
 # terraform.tfstate file, so use caution
 environment = "sandbox"
-config      = "default"
-org         = "withme"
-region      = "us-west-2"
-dept        = "services"
+config = "default"
+org = "withme"
+region = "us-west-2"
+dept = "services"
 
 #dynamodb_table
-stream_enabled   = true
+stream_enabled = true
 stream_view_type = "NEW_AND_OLD_IMAGES"
-billing_mode     = "PAY_PER_REQUEST"
-role             = "tfstate"
+billing_mode = "PAY_PER_REQUEST"
+role = "tfstate"
