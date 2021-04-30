@@ -13,16 +13,13 @@
 # `terraform push` commands - changing this WILL affect your
 # terraform.tfstate file, so use caution
 environment = "sandbox"
-config_tag = "default"
+config = "default"
 org = "withme"
 region = "us-west-2"
-role = "infra"
+dept = "services"
 
 #dynamodb_table
-stream_enabled = false
-stream_view_type = ""
+stream_enabled = true
+stream_view_type = "NEW_AND_OLD_IMAGES"
 billing_mode = "PAY_PER_REQUEST"
-tflock_dynamodb_table_name = "tfstate"
-tflock_dynamodb_hash_key = "LockID"
-tflock_dynamodb_hash_key_type = "S"
-tflock_dynamodb_write_capacity = 0
+role = "tfstate"

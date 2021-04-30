@@ -1,8 +1,7 @@
 variable "region" {}
-variable "role" {}
+variable "dept" {}
 variable "environment" {}
-variable "config_tag" {}
-variable "name" {}
+variable "config" {}
 variable "org" {}
 variable "stream_view_type" {}
 variable "stream_enabled" {}
@@ -10,3 +9,5 @@ variable "billing_mode" {}
 variable "hash_key" {}
 variable "hash_key_type" {}
 variable "write_capacity" {}
+variable "table_prefix" {}
+variable "tags" {}

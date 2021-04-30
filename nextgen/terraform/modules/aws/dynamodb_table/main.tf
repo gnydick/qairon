@@ -1,7 +1,6 @@
 locals {
-  name = "${var.org}.${var.environment}.${var.region}.${var.name}.${var.config_tag}.dynamodb_table"
+  name = "${var.table_prefix}.dynamodb-table"
 }
-
 
 resource "aws_dynamodb_table" "dynamodb_table" {
   name             = local.name
@@ -23,4 +22,11 @@ resource "aws_dynamodb_table" "dynamodb_table" {
   replica {
     region_name = "us-west-1"
   }
+
+  tags = merge(
+  var.tags,
+  {
+    "Name" = local.name
+  }
+  )
 }
