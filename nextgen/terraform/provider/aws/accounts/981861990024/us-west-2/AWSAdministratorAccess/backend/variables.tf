@@ -1,18 +1,9 @@
-
-
-
-variable "stream_view_type"  {}
-variable "stream_enabled"  {}
-variable "billing_mode"  {}
+variable "billing_mode" {}
+variable "config" {}
+variable "dept" {}
+variable "environment" {}
+variable "org" {}
+variable "region" {}
 variable "role" {}
-
-variable "org" {
-}
-variable "dept" {
-}
-variable "environment" {
-}
-variable "region" {
-}
-variable "config" {
-}
+variable "stream_enabled" {}
+variable "stream_view_type" {}
