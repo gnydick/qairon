@@ -38,19 +38,14 @@ variable "eks_version" {
   type        = string
 }
 
-#variable "key_name" {
-#}
-
 variable "cluster_endpoint_public_access" {
   description = "Indicates whether or not the Amazon EKS public API server endpoint is enabled."
   type        = bool
-  default     = true
 }
 
 variable "cluster_endpoint_public_access_cidrs" {
   description = "List of CIDR blocks which can access the Amazon EKS public API server endpoint."
   type        = list(string)
-  default     = ["0.0.0.0/0"]
 }
 
 variable "public_subnets_ids" {
@@ -66,7 +61,6 @@ variable "private_subnets_ids" {
 variable "cluster_egress_cidrs" {
   description = "List of CIDR blocks that are permitted for cluster egress traffic."
   type        = list(string)
-  default     = ["0.0.0.0/0"]
 }
 
 variable "cluster_endpoint_private_access" {
@@ -100,7 +94,6 @@ variable "cluster_delete_timeout" {
 }
 
 variable "cluster_log_retention_in_days" {
-  default     = 90
   description = "Number of days to retain log events. Default retention - 90 days."
   type        = number
 }
