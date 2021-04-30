@@ -67,6 +67,7 @@ logs
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/**/aws.xml
 
 # Generated files
 .idea/**/contentModel.xml
