@@ -34,8 +34,20 @@ variable "vpc_id" {
   default     = ""
 }
 
+variable "cluster_endpoint_public_access" {
+  description = "Indicates whether or not the Amazon EKS public API server endpoint is enabled."
+  type        = bool
+  default     = true
+}
+
 variable "cluster_endpoint_public_access_cidrs" {
   description = "List of CIDR blocks which can access the Amazon EKS public API server endpoint."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "cluster_egress_cidrs" {
+  description = "List of CIDR blocks that are permitted for cluster egress traffic."
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
@@ -65,3 +77,8 @@ variable "eks_version" {
   type        = string
 }
 
+variable "cluster_iam_role_name" {
+  description = "IAM role name for the cluster."
+  type        = string
+  default     = ""
+}
