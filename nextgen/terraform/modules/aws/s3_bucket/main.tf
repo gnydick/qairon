@@ -1,39 +1,26 @@
-variable "region" {
-  default = ""
+locals {
+  bucket = "${var.bucket_prefix}.s3-bucket"
 }
 
-variable "s3_acl" {
-  default = ""
+resource "aws_s3_bucket_public_access_block" "example" {
+  bucket = aws_s3_bucket.bucket.id
+
+  block_public_acls   = true
+  block_public_policy = true
+  ignore_public_acls = true
+  restrict_public_buckets = true
+
 }
+resource "aws_s3_bucket" "bucket" {
+  bucket = local.bucket
+  acl = var.s3_acl
 
-variable "bucket" {
-  default = ""
-}
 
-variable "role" {
-  default = ""
-}
-
-variable "environment" {
-  default = ""
-}
-
-variable "config_name" {
-  default = ""
-}
-
-resource "aws_s3_bucket" "rancher-server-access-logs" {
-  bucket = var.bucket
-  region = var.region
-  acl    = var.s3_acl
-
-  tags = {
-    Region                                  = var.region
-    Environment                             = var.environment
-    Name                                    = "${var.environment}.${var.region}.rancher-server-access-logs.s3_bucket"
-    Config                                  = var.config_name
-    GeneratedBy                             = "terraform"
-    "kubernetes.io/cluster/prod1-us-west-2" = "owned"
+  tags = merge(
+  var.tags,
+  {
+    "Name" = local.bucket
   }
+  )
 }
 

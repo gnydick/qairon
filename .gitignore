@@ -3,6 +3,8 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+
+
 # Node artifact files
 node_modules/
 dist/
@@ -57,6 +59,7 @@ logs
 .gradle
 .gitignore~
 
+
 ## intellij-ifying
 # User-specific stuff
 .idea/**/workspace.xml
@@ -64,6 +67,7 @@ logs
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/**/aws.xml
 
 # Generated files
 .idea/**/contentModel.xml
@@ -129,3 +133,7 @@ fabric.properties
 
 # terraform init cache
 **/.terraform
+
+# ops skeleton
+!nextgen/ops/skel/**
+
