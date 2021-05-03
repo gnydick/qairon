@@ -5,29 +5,29 @@ provider "aws" {
 
 module "tfstate_s3_bucket" {
   source = "../../../../../../../modules/aws/s3_bucket"
-  region = var.region
-
-  config_tag = var.config_tag
-  environment = var.environment
-  name = "tfstate"
-  role = ""
-  s3_acl = "private"
   org = var.org
+  config = var.config
+  environment = var.environment
+  s3_acl = "private"
+  dept = "services"
+  bucket_prefix = local.global_prefix
+  tags = local.global_tags
 }
 
 
 module "tfstate_dyndb_lock" {
   source = "../../../../../../../modules/aws/dynamodb_table"
   billing_mode = var.billing_mode
-  config_tag = var.config_tag
+  config = var.config
   environment = var.environment
-  name = var.tflock_dynamodb_table_name
+  table_prefix = local.regional_prefix
   org = var.org
   region = var.region
-  role = var.role
   stream_enabled = var.stream_enabled
   stream_view_type = var.stream_view_type
-  hash_key = var.tflock_dynamodb_hash_key
-  hash_key_type = var.tflock_dynamodb_hash_key_type
-  write_capacity = var.tflock_dynamodb_write_capacity
+  hash_key = "LockID"
+  hash_key_type = "S"
+  write_capacity = 0
+  dept = var.dept
+  tags = local.global_tags
 }
