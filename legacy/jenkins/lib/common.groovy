@@ -1,5 +1,3 @@
-package lib
-
 def notifySlack(String buildStatus = 'STARTED', String channel, String color = null, String message = null) {
 
     // Build status of null means success.
@@ -33,7 +31,7 @@ def notifySlack(String buildStatus = 'STARTED', String channel, String color = n
     slackSend(color: color, channel: channel, message: msg)
 }
 
-def node_with_secrets = { name, nodeLabel, container, function ->
+def node_with_secrets(String name, String nodeLabel, String container, Closure funk) {
     timestamps {
 
         podTemplate(name: name, label: nodeLabel, yaml: """
@@ -86,8 +84,8 @@ spec:
 
                     stage('Configure aws account and kubectl config') {
 
-                        container(container) {
-                            function()
+                        container('jnlp') {
+                            funk.cal()
                         }
 
 
@@ -98,3 +96,4 @@ spec:
         }
     }
 }
+return this;
