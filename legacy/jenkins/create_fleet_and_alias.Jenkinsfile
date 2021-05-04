@@ -6,3 +6,5 @@ def run_sceptre(params) {
         ls $WORKSPACE
     '''
 }
+
+common.node_with_secrets('test', 'microservice-orchestration', run_sceptre())
