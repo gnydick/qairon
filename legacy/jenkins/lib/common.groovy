@@ -33,7 +33,8 @@ def notifySlack(String buildStatus = 'STARTED', String channel, String color = n
     slackSend(color: color, channel: channel, message: msg)
 }
 
-def node_with_secrets(nodeLabel, container, function) {
+def node_with_secrets = { nodeLabel, container, function
+    ->
     node(nodeLabel) {
         try {
             def secrets = [[$class: 'VaultSecret', path: 'cicd/aws_keys', secretValues: [
@@ -60,5 +61,5 @@ def node_with_secrets(nodeLabel, container, function) {
             notifySlack(currentBuild.result)
         }
     }
-}
 
+}
