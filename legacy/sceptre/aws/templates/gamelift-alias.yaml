@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Create GameLift alias'
+
+Parameters:
+  AliasId:
+    Type: String
+  Name:
+    Type: String
+  FleetId:
+    Type: String
+  Message:
+    Type: String
+  RoutingStrategyType:
+    Type: String
+
+Resources:
+  GameLiftAlias:
+    Type: AWS::GameLift::Alias
+    Properties:
+      Description: "Fleet Alias"
+      AliasId: !Ref AliasId
+      Name: !Ref Name
+      RoutingStrategy:
+        FleetId: !Ref FleetId
+        Message: !Ref Message
+        Type: !Ref RoutingStrategyType

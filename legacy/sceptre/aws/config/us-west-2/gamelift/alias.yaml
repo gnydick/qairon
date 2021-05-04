@@ -1,0 +1,8 @@
+template_path: gamelift-alias.yaml
+
+parameters:
+  FleetId: {{ var.fleet_id }}
+  Name: {{ var.name }}
+  Message: {{ var.message }}
+  RoutingStrategyType: {{ var.routing_strategy_type }}
+  AliasId: {{ var.alias_id }}

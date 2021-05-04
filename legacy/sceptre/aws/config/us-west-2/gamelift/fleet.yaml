@@ -1,0 +1,13 @@
+template_path: gamelift-fleet.yaml
+
+parameters:
+  BuildId: {{ var.build_id }}
+  EC2InstanceType: {{ var.ec2_instance_type }}
+  InstanceCount: {{ var.instance_count }}
+  FleetType: {{ var.fleet_type }}
+  NewGameSessionsPerCreator: {{ var.new_game_sessions_per_creator }}
+  PolicyPeriodInMinutes: {{ var.policy_period_in_minutes }}
+  MaxSize: {{ var.max_size }}
+  MinSize: {{ var.min_size }}
+  Name: {{ var.name }}
+  NewGameSessionProtectionPolicy: {{ var.new_game_session_protection_policy }}

@@ -1,0 +1,3 @@
+project_code: {{ var.environment }}
+profile: default
+region: us-west-2
