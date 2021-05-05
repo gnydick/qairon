@@ -1,0 +1,11 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1538083051897",
+      "Action": "s3:*",
+      "Effect": "Allow",
+      "Resource": "${bucket_arn}"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+variable "policy" {
+}
+
+variable "name" {
+}
+

@@ -1,0 +1,6 @@
+variable "clustername" {
+}
+
+variable "environment" {
+}
+

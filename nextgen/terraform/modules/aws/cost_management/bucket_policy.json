@@ -1,0 +1,26 @@
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": ["arn:aws:iam::386209384616:root","${cost_mgmt_user}"]
+      },
+      "Action": [
+        "s3:GetBucketAcl",
+        "s3:GetBucketPolicy"
+      ],
+      "Resource": "${bucket_arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": ["arn:aws:iam::386209384616:root","${cost_mgmt_user}"]
+      },
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": "${bucket_arn}/*"
+    }
+  ]
+}
