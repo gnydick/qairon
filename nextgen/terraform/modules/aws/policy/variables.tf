@@ -1,6 +1,0 @@
-variable "policy" {
-}
-
-variable "name" {
-}
-
