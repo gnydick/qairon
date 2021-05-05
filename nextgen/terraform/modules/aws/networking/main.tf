@@ -1,336 +1,177 @@
-locals {
-  prefix = "${var.environment}.${var.region}.${var.vpc_id}"
-}
+#################
+# Public subnet
+#################
+resource "aws_subnet" "public" {
 
-module "public" {
-  source      = "./public_subnet"
-  region      = var.region
-  config_name = var.config_name
-  environment = var.environment
-  azs = [
-    var.azs,
-  ]
-  vpc_id = var.vpc_id
-  public_subnet_cidrs = [
-    var.public_subnet_cidrs,
-  ]
-  extra_tags      = var.extra_tags["public"]
-  kube_extra_tags = var.kube_extra_tags["public"]
-}
+  count = length(var.public_subnets)
 
-module "private" {
-  source = "./private_subnet"
-  private_subnet_cidrs = [
-    var.private_subnet_cidrs,
-  ]
-  region      = var.region
-  config_name = var.config_name
-  environment = var.environment
-  azs = [
-    var.azs,
-  ]
-  vpc_id          = var.vpc_id
-  extra_tags      = var.extra_tags["private"]
-  kube_extra_tags = var.kube_extra_tags["private"]
-}
+  vpc_id                          = var.vpc_id
+  cidr_block                      = var.public_subnets[count.index]
+  availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
+  availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
+  map_public_ip_on_launch         = var.map_public_ip_on_launch
 
-resource "aws_network_acl" "allow_all" {
-  vpc_id = var.vpc_id
-  subnet_ids = [
-    module.private.private_subnet_ids,
-    module.public.public_subnet_ids,
-  ]
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
-
-  ingress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
-
-  egress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
   tags = merge(
-    {
-      "Region" = var.region
-    },
-    {
-      "Environment" = var.environment
-    },
-    {
-      "Name" = "${local.prefix}.allow_all.network_acl"
-    },
-    {
-      "Config" = var.config_name
-    },
-    {
-      "GeneratedBy" = "terraform"
-    },
-    {
-      "SubnetIndex" = count.index
-    },
+  {
+    "Name" = format(
+    "%s-${var.public_subnet_suffix}-%s",
+    var.environment,
+    element(var.azs, count.index),
+    )
+  },
+  var.tags,
+  var.public_subnet_tags,
   )
 }
 
-resource "aws_nat_gateway" "inet_access" {
-  count         = length(var.azs)
-  allocation_id = element(aws_eip.nat.*.id, count.index)
-  subnet_id     = element(module.public.public_subnet_ids, count.index)
+#################
+# Private subnet
+#################
+resource "aws_subnet" "private" {
 
-  lifecycle {
-    create_before_destroy = true
+  count = length(var.private_subnets)
 
-    ignore_changes = [tags]
-  }
+  vpc_id                          = var.vpc_id
+  cidr_block                      = var.private_subnets[count.index]
+  availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
+  availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
 
   tags = merge(
-    {
-      "Region" = var.region
-    },
-    {
-      "Environment" = var.environment
-    },
-    {
-      "Name" = "${local.prefix}.nat_gateway"
-    },
-    {
-      "AZ" = element(var.azs, count.index)
-    },
-    {
-      "Config" = var.config_name
-    },
-    {
-      "GeneratedBy" = "terraform"
-    },
-    {
-      "SubnetIndex" = count.index
-    },
-    {
-      "Tier" = "public"
-    },
-    var.extra_tags["public"],
+  {
+    "Name" = format(
+    "%s-${var.private_subnet_suffix}-%s",
+    var.environment,
+    element(var.azs, count.index),
+    )
+  },
+  var.tags,
+  var.private_subnet_tags,
   )
 }
 
-resource "aws_route" "private_def_nat_gw" {
-  count                  = length(var.private_subnet_cidrs)
-  route_table_id         = element(aws_route_table.private.*.id, count.index)
+###################
+# Internet Gateway
+###################
+resource "aws_internet_gateway" "igw" {
+  count =  length(var.public_subnets) > 0 ? 1 : 0
+  vpc_id = var.vpc_id
+  tags = merge(
+  {
+    "Name" = format("%s", var.environment)
+  },
+  var.tags,
+  )
+}
+
+################
+# Public routes
+################
+resource "aws_route_table" "public_rt" {
+  count = length(var.public_subnets) > 0 ? 1 : 0
+  vpc_id = var.vpc_id
+  tags = merge(
+  {
+    "Name" = format("%s-${var.public_subnet_suffix}", var.environment)
+  },
+  var.tags,
+  )
+}
+
+resource "aws_route" "public_internet_gateway" {
+  count = length(var.public_subnets) > 0 ? 1 : 0
+  route_table_id         = aws_route_table.public_rt[0].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = element(aws_nat_gateway.inet_access.*.id, count.index)
-}
-
-resource "aws_eip" "nat" {
-  count = length(var.azs)
-  vpc   = true
-  lifecycle {
-    create_before_destroy = true
-    ignore_changes        = [tags]
+  gateway_id             = aws_internet_gateway.igw[0].id
+  timeouts {
+    create = "5m"
   }
-
-  tags = merge(
-    {
-      "Region" = var.region
-    },
-    {
-      "Environment" = var.environment
-    },
-    {
-      "Name" = "${local.prefix}.${element(var.azs, count.index)}.nat.eip"
-    },
-    {
-      "AZ" = element(var.azs, count.index)
-    },
-    {
-      "Config" = var.config_name
-    },
-    {
-      "GeneratedBy" = "terraform"
-    },
-    {
-      "SubnetIndex" = count.index
-    },
-  )
-}
-
-resource "aws_route" "public_def_gw" {
-  count                  = length(aws_route_table.public)
-  route_table_id         = element(aws_route_table.public.*.id, count.index)
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = element(aws_internet_gateway.public.*.id, count.index)
-}
-
-resource "aws_internet_gateway" "public" {
-  count  = length(var.azs)
-  vpc_id = var.vpc_id
-  tags = merge(
-    {
-      "Region" = var.region
-    },
-    {
-      "Environment" = var.environment
-    },
-    {
-      "Name" = "${local.prefix}.public.${element(var.azs, count.index)}.internet_gateway"
-    },
-    {
-      "Config" = var.config_name
-    },
-    {
-      "AZ" = element(var.azs, count.index)
-    },
-    {
-      "GeneratedBy" = "terraform"
-    },
-    {
-      "SubnetIndex" = count.index
-    },
-    {
-      "Tier" = "public"
-    },
-    var.extra_tags["public"],
-  )
 }
 
 resource "aws_route_table_association" "public" {
-  count          = length(var.public_subnet_cidrs)
-  subnet_id      = element(module.public.public_subnet_ids, count.index)
-  route_table_id = element(aws_route_table.public.*.id, count.index)
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  count = length(var.public_subnets) > 0 ? length(var.public_subnets) : 0
+  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  route_table_id = element(aws_route_table.public_rt.*.id, count.index)
 }
 
-resource "aws_route_table" "public" {
-  count  = length(var.azs)
-  vpc_id = var.vpc_id
+##########################################
+# NAT Gateways
+##########################################
 
+resource "aws_eip" "nat" {
+  count = var.enable_nat_gateway ? local.nat_gateway_count : 0
+
+  vpc = true
   tags = merge(
-    {
-      "Region" = var.region
-    },
-    {
-      "Environment" = var.environment
-    },
-    {
-      "Name" = "${local.prefix}.${element(var.azs, count.index)}.public.route_table"
-    },
-    {
-      "Config" = var.config_name
-    },
-    {
-      "AZ" = element(var.azs, count.index)
-    },
-    {
-      "GeneratedBy" = "terraform"
-    },
-    {
-      "SubnetIndex" = count.index
-    },
-    {
-      "Tier" = "public"
-    },
-    var.extra_tags["public"],
+  {
+    "Name" = format(
+    "%s-%s",
+    var.environment,
+    element(var.azs, count.index),
+    )
+  },
+  var.tags,
   )
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
-resource "aws_route_table" "private" {
-  count  = length(var.azs)
-  vpc_id = var.vpc_id
+resource "aws_nat_gateway" "nat_gtw" {
+  count = var.enable_nat_gateway ? local.nat_gateway_count : 0
 
+  allocation_id = element(local.nat_gateway_ips, count.index)
+  subnet_id = element(aws_subnet.public.*.id, count.index)
   tags = merge(
-    {
-      "Region" = var.region
-    },
-    {
-      "Environment" = var.environment
-    },
-    {
-      "Name" = "${local.prefix}.${element(var.azs, count.index)}.private.route_table"
-    },
-    {
-      "AZ" = element(var.azs, count.index)
-    },
-    {
-      "Config" = var.config_name
-    },
-    {
-      "GeneratedBy" = "terraform"
-    },
-    {
-      "SubnetIndex" = count.index
-    },
-    {
-      "Tier" = "private"
-    },
-    var.extra_tags["private"],
+  {
+    "Name" = format(
+    "%s-%s",
+    var.environment,
+    element(var.azs, count.index),
+    )
+  },
+  var.tags,
+  var.nat_gateway_tags,
   )
 
-  lifecycle {
-    create_before_destroy = true
+  depends_on = [aws_internet_gateway.igw]
+}
+
+################
+# Private routes
+################
+
+resource "aws_route_table" "private_rt" {
+  count = local.max_subnet_length > 0 ? local.nat_gateway_count : 0
+
+  vpc_id = var.vpc_id
+  tags = merge(
+  {
+    "Name" = format(
+    "%s-${var.private_subnet_suffix}-%s",
+    var.environment,
+    element(var.azs, count.index),
+    )
+  },
+  var.tags,
+  var.private_route_table_tags,
+  )
+}
+
+resource "aws_route" "private_nat_gateway" {
+  count = length(var.private_subnets) > 0 ? length(var.private_subnets) : 0
+
+  route_table_id         = element(aws_route_table.private_rt.*.id, count.index)
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = element(aws_nat_gateway.nat_gtw.*.id, count.index)
+
+  timeouts {
+    create = "5m"
   }
 }
 
 resource "aws_route_table_association" "private" {
-  count          = length(var.private_subnet_cidrs)
-  subnet_id      = element(module.private.private_subnet_ids, count.index)
-  route_table_id = element(aws_route_table.private.*.id, count.index)
+  count = length(var.private_subnets) > 0 ? length(var.private_subnets) : 0
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  subnet_id = element(aws_subnet.private.*.id, count.index)
+  route_table_id = element(
+  aws_route_table.private_rt.*.id,
+  count.index,
+  )
 }
-
-// duplicate
-//resource "aws_route_table_association" "priv_to_nat" {
-//  count = "${length(var.private_subnet_cidrs)}"
-//  subnet_id = "${element(module.private.private_subnet_ids, count.index)}"
-//  route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
-//}
-
-output "private_subnet_ids" {
-  value = [
-    module.private.private_subnet_ids,
-  ]
-}
-
-output "public_subnet_ids" {
-  value = [
-    module.public.public_subnet_ids,
-  ]
-}
-
-output "private_route_table_ids" {
-  value = aws_route_table.private.*.id
-}
-
-output "public_route_table_ids" {
-  value = aws_route_table.public.*.id
-}
-
-//extra_tags = {
-//  public = {
-//    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-//    "kubernetes.io/role/elb" = ""
-//  },
-//  private = {
-//    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-//    "kubernetes.io/role/internal-elb" = ""
-//  }
-//}

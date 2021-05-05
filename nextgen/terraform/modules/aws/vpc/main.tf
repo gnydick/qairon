@@ -1,42 +1,17 @@
-#--------------------------------------------------------------
-# This module creates all resources necessary for a VPC
-#--------------------------------------------------------------
+######
+# VPC
+######
+resource "aws_vpc" "this" {
 
-resource "aws_vpc" "vpc" {
-  cidr_block           = var.cidr
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+  cidr_block                       = var.cidr
+  enable_dns_hostnames             = var.enable_dns_hostnames
+  enable_dns_support               = var.enable_dns_support
 
   tags = merge(
     {
-      "Region" = var.region
+      "Name" = format("%s", var.name)
     },
-    {
-      "Environment" = var.environment
-    },
-    {
-      "Name" = "${var.environment}.${var.region}.${var.vpc_number}.vpc"
-    },
-    {
-      "Config" = var.config_name
-    },
-    {
-      "GeneratedBy" = "terraform"
-    },
-    var.extra_tags,
+    var.tags,
+    var.vpc_tags,
   )
-
-  lifecycle {
-    create_before_destroy = true
-    ignore_changes        = [tags]
-  }
 }
-
-output "vpc_id" {
-  value = aws_vpc.vpc.id
-}
-
-output "vpc_cidr" {
-  value = aws_vpc.vpc.cidr_block
-}
-

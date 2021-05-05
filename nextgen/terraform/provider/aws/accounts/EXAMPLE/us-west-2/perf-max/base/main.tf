@@ -1,40 +1,25 @@
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
-
 
 module "vpc" {
   source = "./vpc"
-  azs = "${var.azs}"
-  config_name = "${var.config_name}"
-  region = "${var.region}"
-  vpc_cidr = "${var.vpc_cidr}"
-  vpc_add_cidrs = "${var.vpc_add_cidr}"
-  environment = "${var.environment}"
-  extra_tags = {}
-  vpc_number = "1"
-  private_subnet_cidrs = "${var.private_subnet_cidrs["perf-1"]}"
-  public_subnet_cidrs = "${var.public_subnet_cidrs["perf-1"]}"
+  environment = var.environment
+  region = var.region
 }
 
-
-
-# module "perf-1" {
-#   source = "./perf-1"
-#   azs = "${var.azs}"
-#   config_name = "${var.config_name}"
-#   cp_sg_id = "${module.perf-1.control_sg_id}"
-#   environment = "${var.environment}"
-#   extra_tags = {}
-#   private_subnet_ids = "${module.vpc.private_subnet_ids}"
-#   public_subnet_ids = "${module.vpc.public_subnet_ids}"
-#   region = "${var.region}"
-#   vpc_cidr = "${var.vpc_cidr}"
-#   vpc_id = "${module.vpc.vpc_id}"
-
-#   private_subnet_cidrs = "${var.private_subnet_cidrs["perf-1"]}"
-#   public_subnet_cidrs = "${var.public_subnet_cidrs["perf-1"]}"
-# }
+ module "perf-1" {
+   source = "./perf-1"
+#   config_name = var.config_name
+   environment = var.environment
+   extra_tags = {}
+   private_subnets_ids = module.vpc.private_subnet_ids
+   public_subnets_ids = module.vpc.public_subnet_ids
+   region = var.region
+   vpc_id = module.vpc.vpc_id
+   eks_version = "1.19"
+   cluster_log_retention_in_days = "90"
+ }
 
 
 # data "template_file" "dev_ecr_access_policy" {
@@ -105,5 +90,3 @@ module "vpc" {
 //  roles = [
 //    "${aws_iam_role.proxy_role_for_prod.name}"]
 //}
-
-

@@ -1,18 +1,20 @@
 variable "azs" {
-  type = "list"
+  type = list
 }
 variable "config_name" {}
 
 variable "environment" {}
 
 
-variable "vpc_add_cidr" {type="map"}
+variable "vpc_add_cidr" {
+  type=map
+}
 
 variable "private_subnet_cidrs" {
-  type = "map"
+  type = map
 }
 variable "public_subnet_cidrs" {
-  type = "map"
+  type = map
 }
 variable "region" {}
 
