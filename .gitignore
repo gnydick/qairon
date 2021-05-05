@@ -137,6 +137,3 @@ fabric.properties
 
 # ops skeleton
 !nextgen/ops/skel/**
-
-# community aws terraform modules
-nextgen/terraform/modules/aws/public/
