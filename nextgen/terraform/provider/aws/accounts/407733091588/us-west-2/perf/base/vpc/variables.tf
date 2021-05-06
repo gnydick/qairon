@@ -25,12 +25,12 @@ variable "map_public_ip_on_launch" {
 
 variable "public_subnets" {
   description = "A list of public subnets CIDR"
-  type = map
+  type = map(list(string))
 }
 
 variable "private_subnets" {
   description = "A list of private subnets CIDR"
-  type = map
+  type = map(list(string))
 }
 
 variable "public_subnet_suffix" {
@@ -71,3 +71,24 @@ variable "config" {
 variable "eks_versions" {
   type = map
 }
+
+variable "cluster_endpoint_public_access" {
+  type = map(bool)
+}
+
+variable "global_prefix" {
+  type = string
+}
+
+variable "regional_prefix" {
+  type = string
+}
+
+variable "cluster_enabled_log_types" {
+  type = map(list(string))
+}
+
+variable "eks_targets" {
+  type = list(string)
+}
+
