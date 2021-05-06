@@ -1,17 +1,42 @@
 variable "environment" {
   description = "Name of current environment"
   type        = string
-  default     = "perf-max"
 }
 
 variable "region" {
   description = "Name of current region"
   type        = string
-  default     = "us-west-2"
 }
 
-variable "tags" {
-  description = "A map of tags to add to subnets"
-  type        = map(string)
-  default     = {}
+variable "map_public_ip" {
+  type = map
+  description = "whether or not to map a public IP to the nodes in a target (cluster)"
+}
+variable "config" {
+  type = string
+}
+
+variable "public_subnets" {
+  type = map
+}
+
+variable "private_subnets" {
+  type = map
+}
+
+variable "vpc_cidr" {
+  type = map
+}
+
+
+variable "azs" {
+  type = list
+}
+
+variable "eks_versions" {
+  type = map
+}
+
+variable "role" {
+  type = string
 }
