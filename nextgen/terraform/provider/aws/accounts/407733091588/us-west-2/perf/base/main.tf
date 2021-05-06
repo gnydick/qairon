@@ -2,21 +2,25 @@ provider "aws" {
   region = var.region
 }
 
-module "vpc" {
-  source = "./vpc"
+
+
+module "vpc-1" {
+  source = "./vpc-1"
   environment = var.environment
   region = var.region
+  azs = var.azs
+  map_public_ip_on_launch = false
+  private_subnet_suffix = ""
+  private_subnet_tags = {}
+  private_subnets = values(var.private_subnets["vpc-1"])
+  public_subnet_suffix = ""
+  public_subnet_tags = {}
+  public_subnets = values(var.public_subnets["vpc-1"])
+  tags = local.global_tags
+  vpc_cidr = var.vpc_cidr["vpc-1"]
+  name = local.global_prefix
+  config = var.config
+  eks_versions = var.eks_versions["vpc-1"]
+  number = "1"
 }
 
- module "perf-1" {
-   source = "./perf-1"
-#   config_name = var.config_name
-   environment = var.environment
-   extra_tags = {}
-   private_subnets_ids = module.vpc.private_subnet_ids
-   public_subnets_ids = module.vpc.public_subnet_ids
-   region = var.region
-   vpc_id = module.vpc.vpc_id
-   eks_version = "1.19"
-   cluster_log_retention_in_days = "90"
- }

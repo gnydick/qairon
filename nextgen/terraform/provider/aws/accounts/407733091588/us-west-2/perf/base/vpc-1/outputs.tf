@@ -13,13 +13,6 @@ output "vpc_cidr_block" {
   value       = module.vpc.vpc_cidr_block
 }
 
-output "private_subnet_ids" {
-   value = module.networking.private_subnets_ids
-}
-
-output "public_subnet_ids" {
-   value = module.networking.public_subnets_ids
-}
 
 output "default_security_group_id" {
   description = "The ID of the security group created by default on VPC creation"

@@ -97,9 +97,3 @@ variable "cluster_log_retention_in_days" {
   description = "Number of days to retain log events. Default retention - 90 days."
   type        = number
 }
-
-variable "cluster_iam_role_name" {
-  description = "IAM role name for the cluster."
-  type        = string
-  default     = ""
-}
