@@ -135,6 +135,9 @@ fabric.properties
 # terraform init cache
 **/.terraform
 
+## terrafrom lock file
+**/.terraform.lock.hcl
+
 # ops skeleton
 !nextgen/ops/skel/**
 
