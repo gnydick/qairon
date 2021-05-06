@@ -5,8 +5,10 @@ region = "us-west-2"
 dept = "services"
 role = "dev"
 
-map_public_ip = {
-  "perf-1": false
+map_public_ip_on_launch = {
+  "vpc-1": {
+    "perf-1": false
+  }
 }
 
 vpc_cidrs = {

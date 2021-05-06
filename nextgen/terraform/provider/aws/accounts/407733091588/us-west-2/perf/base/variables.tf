@@ -8,8 +8,8 @@ variable "region" {
   type        = string
 }
 
-variable "map_public_ip" {
-  type = map
+variable "map_public_ip_on_launch" {
+  type = map(map(bool))
   description = "whether or not to map a public IP to the nodes in a target (cluster)"
 }
 variable "config" {

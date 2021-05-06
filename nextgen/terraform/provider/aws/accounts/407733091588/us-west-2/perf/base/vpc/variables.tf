@@ -20,7 +20,7 @@ variable "azs" {
 
 variable "map_public_ip_on_launch" {
   description = "Should be false if you do not want to auto-assign public IP on launch"
-  type = bool
+  type = map(bool)
 }
 
 variable "public_subnets" {

@@ -78,3 +78,7 @@ variable "cluster_enabled_log_types" {
 variable "name" {
   type = string
 }
+
+variable "map_public_ip_on_launch" {
+  type = bool
+}
