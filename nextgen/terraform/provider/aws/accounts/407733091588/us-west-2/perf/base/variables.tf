@@ -17,14 +17,14 @@ variable "config" {
 }
 
 variable "public_subnets" {
-  type = map
+  type = map(map(list(string)))
 }
 
 variable "private_subnets" {
-  type = map
+  type = map(map(list(string)))
 }
 
-variable "vpc_cidr" {
+variable "vpc_cidrs" {
   type = map
 }
 
@@ -39,4 +39,24 @@ variable "eks_versions" {
 
 variable "role" {
   type = string
+}
+
+variable "dept" {
+  type = string
+}
+
+variable "org" {
+  type = string
+}
+
+variable "cluster_endpoint_public_access" {
+  type = map(map(bool))
+}
+
+variable "cluster_enabled_log_types" {
+  type = map(map(list(string)))
+}
+
+variable "structure" {
+  type = map(list(string))
 }

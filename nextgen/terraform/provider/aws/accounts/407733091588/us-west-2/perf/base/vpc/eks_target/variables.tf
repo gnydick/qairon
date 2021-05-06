@@ -68,5 +68,13 @@ variable "eks_version" {
 }
 
 
+variable "name_prefix" {
+}
+
+variable "cluster_enabled_log_types" {
+  type = list
+}
+
 variable "name" {
+  type = string
 }

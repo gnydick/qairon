@@ -3,16 +3,21 @@ config = "default"
 org = "withme"
 region = "us-west-2"
 dept = "services"
-
+role = "dev"
 
 map_public_ip = {
   "perf-1": false
 }
 
-vpc_cidr = {
+vpc_cidrs = {
   "vpc-1": "20.10.0.0/16"
 }
 
+cluster_endpoint_public_access = {
+  "vpc-1": {
+    "perf-1": true
+  }
+}
 
 public_subnets = {
   "vpc-1": {
@@ -38,30 +43,13 @@ eks_versions = {
     "perf-1": 1.19
   }
 }
-//
-//
-//
-//
-//variable "public_subnet_tags" {
-//  description = "A map of tags to add to subnets"
-//  type        = map(string)
-//  default     = {
-//    "kubernetes.io/cluster/perf-1-us-west-2-eks" = "shared"
-//    "kubernetes.io/role/elb" = ""
-//  }
-//}
-//
-//variable "private_subnet_tags" {
-//  description = "A map of tags to add to subnets"
-//  type        = map(string)
-//  default     = {
-//    "kubernetes.io/cluster/perf-1-us-west-2-eks" = "shared"
-//    "kubernetes.io/role/internal-elb" = ""
-//  }
-//}
-//
-//variable "tags" {
-//  description = "A map of tags to add to subnets"
-//  type        = map(string)
-//  default     = {}
-//}
+
+cluster_enabled_log_types = {
+  "vpc-1": {
+    "perf-1": []
+  }
+}
+
+structure = {
+  "vpc-1": ["perf-1"]
+}
