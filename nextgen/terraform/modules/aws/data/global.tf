@@ -7,8 +7,8 @@ data "aws_availability_zones" "available" {
 
 
 locals {
-  global_prefix = "${var.org}.${var.dept}.${var.environment}.${var.role}.${var.config}"
-  regional_prefix = "${var.org}.${var.dept}.${var.environment}.${var.region}.${var.role}.${var.config}"
+  global_prefix = "${var.org}-${var.dept}-${var.environment}-${var.role}-${var.config}"
+  regional_prefix = "${var.org}-${var.dept}-${var.environment}-${var.region}-${var.role}-${var.config}"
   global_tags = {
     Org = var.org
     Dept = var.dept

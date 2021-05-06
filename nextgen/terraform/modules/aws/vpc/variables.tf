@@ -22,8 +22,11 @@ variable "vpc_tags" {
   type        = map(string)
   default     = {}
 }
-variable "name" {
+variable "name_prefix" {
   description = "Name to be used on all the resources as identifier"
   type        = string
-  default     = ""
+}
+
+variable "number" {
+  type = string
 }
