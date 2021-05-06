@@ -29,4 +29,5 @@ module "eks_targets" {
   name_prefix = var.regional_prefix
   name = element(var.eks_targets, count.index)
   cluster_enabled_log_types = lookup(var.cluster_enabled_log_types, element(var.eks_targets, count.index))
+  map_public_ip_on_launch = lookup(var.map_public_ip_on_launch, element(var.eks_targets, count.index))
 }

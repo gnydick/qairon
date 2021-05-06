@@ -9,7 +9,7 @@ module "vpcs" {
   environment = var.environment
   region = var.region
   azs = var.azs
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = lookup(var.map_public_ip_on_launch, element(keys(var.structure), count.index))
   private_subnet_suffix = ""
   private_subnet_tags = {}
   private_subnets = lookup(var.private_subnets, element(keys(var.structure), count.index))
