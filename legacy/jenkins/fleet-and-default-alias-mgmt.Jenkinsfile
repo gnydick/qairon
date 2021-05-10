@@ -28,7 +28,7 @@ spec:
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
                                 parameters([choice(choices: ['--Choose--', 'launch', 'delete', 'update'], description: 'Action to take', name: 'SCEPTRE_ACTION'),
-                                            string(defaultValue: '', description: 'Gamefleet Build ID', name: 'GAMEFLEET_BUILD_ID', trim: true),
+                                            string(defaultValue: '', description: 'GameLift Build ID', name: 'GAMELIFT_BUILD_ID', trim: true),
                                             choice(choices: ['us-west-2'], description: 'AWS Region', name: 'AWS_REGION'),
                                             choice(choices: ['int-3', 'int-1', 'int-2', 'prod-1'], description: 'Against which environment microservice will be tested?', name: 'CLUSTER_NAME')]),
                                 disableConcurrentBuilds()
@@ -37,6 +37,7 @@ spec:
 
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
+                             export GAMELIFT_BUILD_ID=${GAMELIFT_BUILD_ID}
                              sceptre  --var-file varfiles/${AWS_REGION}/${CLUSTER_NAME}/fleet.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet -y
                         """
 
