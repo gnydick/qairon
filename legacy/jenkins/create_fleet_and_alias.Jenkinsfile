@@ -23,6 +23,7 @@ spec:
                     def commonLib = load "${WORKSPACE}/legacy/jenkins/lib/common.groovy"
                     def secrets = commonLib.getSecrets()
 
+
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
                                 parameters([string(defaultValue: '', description: 'Tested microservice name', name: 'APP_NAME', trim: true),
@@ -30,13 +31,13 @@ spec:
                                             choice(choices: ['int-1', 'int-2', 'prod-1'], description: 'Against which environment microservice will be tested?', name: 'CLUSTER_NAME')]),
                                 disableConcurrentBuilds()
                         ])
-                         env.APP_NAME = "${params.APP_NAME}"
-                         env.APP_VERSION  = "${params.APP_VERSION}"
-                         env.STACK_NAME = "env-${params.ENV_NAME}"
-                         env.CLUSTER_NAME = "${params.CLUSTER_NAME}"
-                         env.JOB_NAME = "${env.JOB_NAME}"
-                         env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
-                          currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-v${env.APP_VERSION}`"
+                        env.APP_NAME = "${params.APP_NAME}"
+                        env.APP_VERSION  = "${params.APP_VERSION}"
+                        env.STACK_NAME = "env-${params.ENV_NAME}"
+                        env.CLUSTER_NAME = "${params.CLUSTER_NAME}"
+                        env.JOB_NAME = "${env.JOB_NAME}"
+                        env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
+                        currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-v${env.APP_VERSION}`"
                         echo "Made it!"
 
 
@@ -49,20 +50,3 @@ spec:
         } // End timestamps
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
