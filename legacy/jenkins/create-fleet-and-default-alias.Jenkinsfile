@@ -42,7 +42,7 @@ spec:
                         currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-v${env.APP_VERSION}`"
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
-                             sceptre  --var-file varfiles/${AWS_REGION}/${CLUSTER_NAME}/fleet.yaml  launch ${AWS_REGION}/gamelift-create-fleet
+                             sceptre  --var-file varfiles/${AWS_REGION}/${CLUSTER_NAME}/fleet.yaml  launch ${AWS_REGION}/gamelift-create-fleet -y
                         """
 
                         awsLib.set_aws_creds_and_sh(cmd)
