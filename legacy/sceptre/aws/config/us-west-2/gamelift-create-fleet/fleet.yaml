@@ -1,7 +1,7 @@
 template_path: gamelift-fleet.yaml
 
 parameters:
-  BuildId: {{ var.build_id }}
+  BuildId: {{ environment_variable.GAMELIFT_BUILD_ID }}
   EC2InstanceType: {{ var.ec2_instance_type }}
   InstanceCount: "{{ var.instance_count  }}"
   FleetType: {{ var.fleet_type }}
