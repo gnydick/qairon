@@ -18,10 +18,7 @@ spec:
 
             stage('Configure aws account and kubectl config') {
                 container('microservice-orchestration') {
-                    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'features/JENK-GAMELIFT']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'legacy/jenkins']]]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbckt-org-wm-bldr', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
 
-                    def commonLib = load "${WORKSPACE}/legacy/jenkins/lib/common.groovy"
-                    def secrets = commonLib.getSecrets()
 
 
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
@@ -39,6 +36,10 @@ spec:
                         env.JOB_NAME = "${env.JOB_NAME}"
                         env.BUILD_NUMBER = "${env.BUILD_NUMBER}"
                         currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-v${env.APP_VERSION}`"
+                        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'features/JENK-GAMELIFT']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'legacy/jenkins']]]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbckt-org-wm-bldr', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
+
+                        def commonLib = load "${WORKSPACE}/legacy/jenkins/lib/common.groovy"
+                        def secrets = commonLib.getSecrets()
                         sh """
                              cd ${WORKSPACE}/legacy/sceptre/aws
                              sceptre  --var-file varfiles/${AWS_REGION}/${CLUSTER_NAME}/fleet  launch ${AWS_REGION}/gamelift-create-fleet
