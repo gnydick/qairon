@@ -27,9 +27,9 @@ spec:
 
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
-                                parameters([string(defaultValue: '', description: 'Tested microservice name', name: 'APP_NAME', trim: true),
-                                            string(defaultValue: '', description: 'Tested microservice version', name: 'APP_VERSION', trim: true),
-                                            choice(choices: ['us-west-2'],  description: 'AWS Region', name: 'AWS_REGION'),
+                                parameters([choice(choices: ['--Choose--', 'launch', 'delete', 'update'], description: 'Action to take', name: 'SCEPTRE_ACTION'),
+                                            string(defaultValue: '', description: 'Gamefleet Build ID', name: 'BUILD_ID', trim: true),
+                                            choice(choices: ['us-west-2'], description: 'AWS Region', name: 'AWS_REGION'),
                                             choice(choices: ['int-3', 'int-1', 'int-2', 'prod-1'], description: 'Against which environment microservice will be tested?', name: 'CLUSTER_NAME')]),
                                 disableConcurrentBuilds()
                         ])
@@ -42,7 +42,7 @@ spec:
                         currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-v${env.APP_VERSION}`"
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
-                             sceptre  --var-file varfiles/${AWS_REGION}/${CLUSTER_NAME}/fleet.yaml  launch ${AWS_REGION}/gamelift-create-fleet -y
+                             sceptre  --var-file varfiles/${AWS_REGION}/${CLUSTER_NAME}/fleet.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet -y
                         """
 
                         awsLib.set_aws_creds_and_sh(cmd)
