@@ -28,8 +28,8 @@ spec:
                         properties([
                                 parameters([string(defaultValue: '', description: 'Tested microservice name', name: 'APP_NAME', trim: true),
                                             string(defaultValue: '', description: 'Tested microservice version', name: 'APP_VERSION', trim: true),
-                                            choices(choices: ['us-west-2'], defaultValue: 'us-west-2', description: 'AWS Region', name: 'AWS_REGION', trim: true),
-                                            choices(choices: ['int-3', 'int-1', 'int-2', 'prod-1'], defaultValue: 'int-3', description: 'Against which environment microservice will be tested?', name: 'CLUSTER_NAME')]),
+                                            choice(choices: ['us-west-2'], defaultValue: 'us-west-2', description: 'AWS Region', name: 'AWS_REGION', trim: true),
+                                            choice(choices: ['int-3', 'int-1', 'int-2', 'prod-1'], defaultValue: 'int-3', description: 'Against which environment microservice will be tested?', name: 'CLUSTER_NAME')]),
                                 disableConcurrentBuilds()
                         ])
                         env.APP_NAME = "${params.APP_NAME}"
