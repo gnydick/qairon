@@ -41,7 +41,7 @@ spec:
                         currentBuild.displayName = "#${env.BUILD_NUMBER} `${env.APP_NAME}-v${env.APP_VERSION}`"
                         sh """
                              cd ${WORKSPACE}/legacy/sceptre/aws
-                             sceptre  --var-file varfiles/${REGION}/${CLUSTER_NAME}/fleet  launch us-west-2/gamelift-create-fleet
+                             sceptre  --var-file varfiles/${AWS_REGION}/${CLUSTER_NAME}/fleet  launch us-west-2/gamelift-create-fleet
                         """
 
 
