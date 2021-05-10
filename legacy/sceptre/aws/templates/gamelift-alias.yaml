@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Create GameLift alias'
+Description: 'GameLift alias'
 
 Parameters:
   AliasId:
