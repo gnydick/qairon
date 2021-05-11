@@ -1,6 +1,5 @@
 resource "aws_route53_zone" "zone" {
-  count = length(var.zones)
-  name  = element(var.zones, count.index)
+  name  = var.zone
   tags =  {"Tier": var.tier}
 }
 
