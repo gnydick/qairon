@@ -11,7 +11,7 @@ module "tfstate_s3_bucket" {
   s3_acl = "private"
   dept = "services"
   bucket_prefix = local.global_prefix
-  tags = local.global_tags
+  tags = {}
 }
 
 
