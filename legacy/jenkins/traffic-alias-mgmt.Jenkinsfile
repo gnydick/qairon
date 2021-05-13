@@ -30,7 +30,7 @@ spec:
                                 parameters([choice(choices: ['--Choose--', 'update', 'delete' ], description: 'Action to take', name: 'SCEPTRE_ACTION'),
                                             string(defaultValue: '', description: 'GameLift Alias Name', name: 'ALIAS_NAME', trim: true),
                                             choice(choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default', name: 'AWS_REGION'),
-                                            choice(choices: ['int-3', 'int-1', 'int-2', 'prod-1'], description: 'Against which environment microservice will be tested?', name: 'ENVIRONMENT')]),
+                                            string(defaultValue: '' ,description: "legacy destinations: ['int-3', 'int-1', 'int-2', 'prod-1']", name: 'DEPLOYMENT_TARGET')]),
                                 disableConcurrentBuilds()
                         ])
 
@@ -38,7 +38,7 @@ spec:
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
                              export GAMELIFT_BUILD_ID=${GAMELIFT_BUILD_ID}
-                             sceptre  --var-file varfiles/${AWS_REGION}/${ENVIRONMENT}/traffic-alias.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-update-alias -y
+                             sceptre  --var-file varfiles/${AWS_REGION}/${DEPLOYMENT_TARGET}/traffic-alias.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-update-alias -y
                         """
 
                         awsLib.set_aws_creds_and_sh(cmd)
