@@ -28,7 +28,7 @@ spec:
 
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
-                                parameters([choice(choices: ['--Choose--', 'launch', 'delete' ], description: 'Action to take', name: 'SCEPTRE_ACTION'),
+                                parameters([choice(choices: ['--Choose--', 'launch', 'delete', 'validate' ], description: 'Action to take', name: 'SCEPTRE_ACTION'),
                                             string(defaultValue: '', description: 'GameLift Build ID: build-........-....-....-....-............', name: 'GAMELIFT_BUILD_ID', trim: true),
                                             string(defaultValue: '', description: 'v<major>.<minor>.<micro>', name: 'ALIAS_NAME', trim: true),
                                             choice(choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default', name: 'AWS_REGION'),
