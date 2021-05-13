@@ -24,11 +24,6 @@ variable "tags" {
   type        = map(string)
 }
 
-variable "role_name" {
-  description = "IAM role name"
-  type        = string
-}
-
 variable "role_name_prefix" {
   description = "IAM role name prefix"
   type        = string
