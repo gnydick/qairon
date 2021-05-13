@@ -18,12 +18,13 @@ spec:
 
             stage('Configure aws account and kubectl config') {
                 container('microservice-orchestration') {
+                    def actions_requiring_confirmation = ['launch', 'update', 'delete']
+
                     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'features/JENK-GAMELIFT']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'legacy/jenkins'], [path: 'legacy/sceptre']]]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbckt-org-wm-bldr', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
 
                     def commonLib = load "${WORKSPACE}/legacy/jenkins/lib/common.groovy"
                     def awsLib = load "${WORKSPACE}/legacy/jenkins/lib/aws_util.groovy"
                     def secrets = commonLib.getSecrets()
-
 
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
@@ -39,8 +40,12 @@ spec:
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
                              export GAMELIFT_BUILD_ID=${GAMELIFT_BUILD_ID}
-                             sceptre  --var-file varfiles/${AWS_REGION}/${DEPLOYMENT_TARGET}/fleet.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet -y
-                        """
+                             sceptre  --var-file varfiles/${AWS_REGION}/${DEPLOYMENT_TARGET}/fleet.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet"""
+
+                        if (actions_requiring_confirmation.contains(SCEPTRE_ACTION)) {
+                            cmd += """ -y
+                            """
+                        }
 
                         awsLib.set_aws_creds_and_sh(cmd)
                     }
