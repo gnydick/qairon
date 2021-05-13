@@ -1,2 +1,2 @@
-project_code: {{ var.cluster_name }}
+project_code: {{ var.project_code }}
 region: {{ environment_variable.AWS_REGION }}

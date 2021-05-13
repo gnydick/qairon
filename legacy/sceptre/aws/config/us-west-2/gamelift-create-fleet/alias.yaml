@@ -1,6 +1,8 @@
 template_path: gamelift-alias.yaml
 dependencies:
   - {{ environment_variable.AWS_REGION }}/gamelift-create-fleet/fleet.yaml
+stack_name: {{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ var.mmm_alias }}-{{ var.deployment_tag  | default("default")}}
+
 
 parameters:
   Name: {{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ var.mmm_alias }}
