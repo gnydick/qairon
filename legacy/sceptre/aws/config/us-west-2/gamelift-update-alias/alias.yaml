@@ -1,8 +1,7 @@
 template_path: gamelift-alias-alone.yaml
 
 parameters:
-  AliasId: {{ var.alias_id }}
-  Name: {{ var.name }}
+  Name: {{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ var.traffic_alias }}
   FleetId: {{ environment_variable.FLEET_ID | default("")}}
   Message: {{ var.message }}
   RoutingStrategyType: {{ var.routing_strategy_type }}

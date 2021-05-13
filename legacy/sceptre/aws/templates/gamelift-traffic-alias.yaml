@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'GameLift Service Pointer Alias'
+Description: 'GameLift Traffic Alias'
 
 Parameters:
-  AliasId:
-    Type: String
   Name:
     Type: String
   FleetId:
@@ -14,11 +12,10 @@ Parameters:
     Type: String
 
 Resources:
-  GameLiftAlias:
+  GameLiftTrafficAlias:
     Type: AWS::GameLift::Alias
     Properties:
-      Description: "Fleet Alias"
-      AliasId: !Ref AliasId
+      Description: "Traffic Alias"
       Name: !Ref Name
       RoutingStrategy:
         FleetId: !Ref FleetId

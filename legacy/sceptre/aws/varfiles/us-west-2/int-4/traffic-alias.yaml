@@ -1,4 +1,0 @@
-cluster_name: "int4"
-name: "int4"
-routing_strategy_type: "SIMPLE"
-alias_id: "alias-fleet-int4"

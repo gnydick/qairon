@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'GameLift alias'
+Description: 'GameLift MMM Alias'
 
 Parameters:
-  AliasId:
-    Type: String
   Name:
     Type: String
   FleetId:
@@ -14,11 +12,10 @@ Parameters:
     Type: String
 
 Resources:
-  GameLiftTrafficAlias:
+  GameLiftMMMAlias:
     Type: AWS::GameLift::Alias
     Properties:
-      Description: "Fleet Alias"
-      AliasId: !Ref AliasId
+      Description: "MMM Alias"
       Name: !Ref Name
       RoutingStrategy:
         FleetId: !Ref FleetId
