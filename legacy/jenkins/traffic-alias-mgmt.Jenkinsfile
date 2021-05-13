@@ -27,7 +27,7 @@ spec:
 
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
-                                parameters([choice(choices: ['--Choose--', 'launch', 'delete', 'update'], description: 'Action to take', name: 'SCEPTRE_ACTION'),
+                                parameters([choice(choices: ['--Choose--', 'update', 'delete' ], description: 'Action to take', name: 'SCEPTRE_ACTION'),
                                             string(defaultValue: '', description: 'GameLift Alias Name', name: 'ALIAS_NAME', trim: true),
                                             choice(choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default', name: 'AWS_REGION'),
                                             choice(choices: ['int-3', 'int-1', 'int-2', 'prod-1'], description: 'Against which environment microservice will be tested?', name: 'ENVIRONMENT')]),
