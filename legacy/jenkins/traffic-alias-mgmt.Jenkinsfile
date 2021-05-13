@@ -28,7 +28,6 @@ spec:
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
                                 parameters([choice(choices: ['--Choose--', 'launch', 'delete', 'update'], description: 'Action to take', name: 'SCEPTRE_ACTION'),
-                                            string(defaultValue: '', description: 'GameLift Build ID', name: 'GAMELIFT_BUILD_ID', trim: true),
                                             string(defaultValue: '', description: 'GameLift Alias Name', name: 'ALIAS_NAME', trim: true),
                                             choice(choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default', name: 'AWS_REGION'),
                                             choice(choices: ['int-3', 'int-1', 'int-2', 'prod-1'], description: 'Against which environment microservice will be tested?', name: 'ENVIRONMENT')]),
@@ -39,7 +38,7 @@ spec:
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
                              export GAMELIFT_BUILD_ID=${GAMELIFT_BUILD_ID}
-                             sceptre  --var-file varfiles/${AWS_REGION}/${ENVIRONMENT}/fleet.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet -y
+                             sceptre  --var-file varfiles/${AWS_REGION}/${ENVIRONMENT}/traffic-alias.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-update-alias -y
                         """
 
                         awsLib.set_aws_creds_and_sh(cmd)

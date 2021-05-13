@@ -3,6 +3,6 @@ template_path: gamelift-alias-alone.yaml
 parameters:
   AliasId: {{ var.alias_id }}
   Name: {{ var.name }}
-  FleetId: !stack_output {{ environment_variable.AWS_REGION }}/gamelift-create-fleet/fleet.yaml::FleetId
+  FleetId: {{ environment_variable.FLEET_ID }}
   Message: {{ var.message }}
   RoutingStrategyType: {{ var.routing_strategy_type }}

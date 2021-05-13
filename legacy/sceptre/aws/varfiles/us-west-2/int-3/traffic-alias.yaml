@@ -1,0 +1,3 @@
+name: "int3"
+routing_strategy_type: "SIMPLE"
+alias_id: "alias-fleet-int3"
