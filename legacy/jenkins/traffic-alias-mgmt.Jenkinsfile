@@ -27,8 +27,7 @@ spec:
 
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
-                                parameters([choice(choices: ['--Choose--', 'update', 'delete' ], description: 'Action to take', name: 'SCEPTRE_ACTION'),
-                                            string(defaultValue: '', description: 'Traffic alias, initiall v<major>', name: 'ALIAS_NAME', trim: true),
+                                parameters([choice(choices: ['--Choose--', 'launch', 'update', 'delete' ], description: 'Action to take', name: 'SCEPTRE_ACTION'),
                                             choice(choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default', name: 'AWS_REGION'),
                                             string(defaultValue: '' ,description: "legacy destinations: ['int-3', 'int-1', 'int-2', 'prod-1']", name: 'DEPLOYMENT_TARGET')]),
                                 disableConcurrentBuilds()
