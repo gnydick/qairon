@@ -1,4 +1,4 @@
-environment: "int"
+environment: "int3"
 fleet_type: "ON_DEMAND"
 new_game_sessions_per_creator: "10"
 policy_period_in_minutes: "60"

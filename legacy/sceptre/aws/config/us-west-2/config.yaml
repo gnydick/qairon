@@ -1,2 +1,2 @@
 project_code: {{ var.environment }}
-region: us-west-2
+region: {{ environment_variable.AWS_REGION }}

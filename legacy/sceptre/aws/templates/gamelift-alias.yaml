@@ -14,7 +14,7 @@ Parameters:
     Type: String
 
 Resources:
-  GameLiftAlias:
+  GameLiftTrafficAlias:
     Type: AWS::GameLift::Alias
     Properties:
       Description: "Fleet Alias"

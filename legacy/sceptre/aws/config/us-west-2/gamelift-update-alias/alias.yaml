@@ -1,4 +1,4 @@
-template_path: gamelift-alias.yaml
+template_path: gamelift-alias-alone.yaml
 
 parameters:
   AliasId: {{ var.alias_id }}

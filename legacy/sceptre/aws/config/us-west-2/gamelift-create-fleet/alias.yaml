@@ -1,8 +1,10 @@
 template_path: gamelift-alias.yaml
+dependencies:
+  - {{ environment_variable.AWS_REGION }}/gamelift-create-fleet/fleet.yaml
 
 parameters:
   AliasId: {{ var.alias_id }}
   Name: {{ var.name }}
-  FleetId: !stack_output us-west-2/gamelift-create-fleet/fleet.yaml::FleetId
+  FleetId: !stack_output {{ environment_variable.AWS_REGION }}/gamelift-create-fleet/fleet.yaml::FleetId
   Message: {{ var.message }}
   RoutingStrategyType: {{ var.routing_strategy_type }}
