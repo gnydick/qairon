@@ -30,7 +30,6 @@ spec:
                         properties([
                                 parameters([choice(choices: ['--Choose--', 'launch', 'delete', 'validate' ], description: 'Action to take', name: 'SCEPTRE_ACTION'),
                                             string(defaultValue: '', description: 'GameLift Build ID: build-........-....-....-....-............', name: 'GAMELIFT_BUILD_ID', trim: true),
-                                            string(defaultValue: '', description: 'v<major>.<minor>.<micro>', name: 'ALIAS_NAME', trim: true),
                                             choice(choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default', name: 'AWS_REGION'),
                                             string(defaultValue: '' ,description: "legacy destinations: ['int-3', 'int-1', 'int-2', 'prod-1']", name: 'DEPLOYMENT_TARGET')]),
                                 disableConcurrentBuilds()

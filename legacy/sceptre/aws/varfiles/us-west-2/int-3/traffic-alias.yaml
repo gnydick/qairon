@@ -1,6 +1,0 @@
-deployment_target: "int3"
-routing_strategy_type: "SIMPLE"
-traffic_alias: "v1"
-project_code: "astral"
-game_server_name: "game-server"
-org_id: "withmeint3"
