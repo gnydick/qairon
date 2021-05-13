@@ -39,7 +39,7 @@ spec:
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
                              export GAMELIFT_BUILD_ID=${GAMELIFT_BUILD_ID}
-                             sceptre  --var-file varfiles/${AWS_REGION}/${DEPLOYMENT_TARGET}/fleet.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet"""
+                             sceptre  --var-file varfiles/${AWS_REGION}/${DEPLOYMENT_TARGET}/values.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet"""
 
                         if (actions_requiring_confirmation.contains(SCEPTRE_ACTION)) {
                             cmd += """ -y
