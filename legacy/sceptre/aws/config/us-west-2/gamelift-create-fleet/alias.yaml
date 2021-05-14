@@ -5,7 +5,7 @@ stack_name: mmm-alias-{{ var.project_code }}-{{ var.environment }}-{{ environmen
 
 
 parameters:
-  Name: mmm-alias-{{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ var.deployment_tag  | default("default")}}
+  Name: mmm-alias-{{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ var.default_alias_suffix }}-{{ var.deployment_tag  | default("default")}}
   FleetId: !stack_output {{ environment_variable.AWS_REGION }}/gamelift-create-fleet/fleet.yaml::FleetId
   Message: {{ var.message }}
   RoutingStrategyType: {{ var.routing_strategy_type }}

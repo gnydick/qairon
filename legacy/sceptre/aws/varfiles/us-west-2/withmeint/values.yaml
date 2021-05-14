@@ -10,10 +10,10 @@
 ####
 
 # logical environment, not any specific place or piece of infrastructure
-environment: "prod"
+environment: "int"
 
 # probably the stream name, but this is the first half of the long lived alias
-org_id: "withme"
+org_id: "withmeint"
 
 # used for sceptre and uniquely identifying stack
 project_code: "astral"
@@ -26,7 +26,7 @@ game_server_name: "game-server"
 ######################################################
 # Infrastructure deployment coordinates targeting 
 ####
-deployment_target: "int3"
+deployment_target: "int4"
 
 
 ######################################################
@@ -49,6 +49,7 @@ instance_count: "1"
 ####
 routing_strategy_type: "SIMPLE"
 message: "w00t! - alias"
+default_alias_suffix: v1.2.345
 ######################################################
 
 ######################################################
