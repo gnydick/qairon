@@ -1,7 +1,7 @@
 variable "environment" {
   description = "Name of current environment"
   type        = string
-  default     = "perf-max"
+  default     = "perf-1"
 }
 
 variable "region" {
