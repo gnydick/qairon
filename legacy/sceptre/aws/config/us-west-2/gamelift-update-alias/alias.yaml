@@ -3,7 +3,7 @@ stack_name: traffic-alias-{{ var.project_code }}-{{ var.environment }}-{{ enviro
 
 
 parameters:
-  Name: {{ var.org_id }}-{{ var.traffic_alias }}
+  Name: {{ var.org_id }}-{{ var.traffic_alias_suffix }}
   FleetId: {{ environment_variable.FLEET_ID | default("")}}
   Message: {{ var.message }}
   RoutingStrategyType: {{ var.routing_strategy_type }}

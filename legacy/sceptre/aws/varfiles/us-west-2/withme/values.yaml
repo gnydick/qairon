@@ -1,0 +1,63 @@
+######################################################
+# info
+####
+#  long lived alias = org_id + '-' + traffic_alias_suffix
+#
+#####################################################
+
+######################################################
+# metadata
+####
+
+# logical environment, not any specific place or piece of infrastructure
+environment: "prod"
+
+# probably the stream name, but this is the first half of the long lived alias
+org_id: "withme"
+
+# used for sceptre and uniquely identifying stack
+project_code: "astral"
+
+# our "app name"
+game_server_name: "game-server"
+######################################################
+
+
+######################################################
+# Infrastructure deployment coordinates targeting 
+####
+deployment_target: "int3"
+
+
+######################################################
+
+######################################################
+# GameLift fleet configuration
+####
+fleet_type: "ON_DEMAND"
+new_game_sessions_per_creator: "10"
+policy_period_in_minutes: "60"
+max_size: "1"
+min_size: "0"
+new_game_session_protection_policy: "FullProtection"
+ec2_instance_type: "t2.micro"
+instance_count: "1"
+######################################################
+
+######################################################
+# GameLift default alias configuration
+####
+routing_strategy_type: "SIMPLE"
+message: "w00t! - alias"
+######################################################
+
+######################################################
+# GameLift traffic alias configuration
+####
+
+# for now, we use the major version as a string, but
+# can change if we want, so that's why it's not called
+# major version
+traffic_alias_suffix: "v1"
+######################################################
+
