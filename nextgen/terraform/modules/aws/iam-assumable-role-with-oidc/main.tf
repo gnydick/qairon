@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "assume_role_with_oidc" {
 resource "aws_iam_role" "iam_role" {
   count = var.create_role ? 1 : 0
 
-  name                 = var.role_name
+  name_prefix          = var.role_name_prefix
   description          = var.role_description
   path                 = var.role_path
   max_session_duration = var.max_session_duration
