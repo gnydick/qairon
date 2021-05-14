@@ -14,5 +14,5 @@ module "cluster" {
   cluster_iam_role_name = format("%s-EKS-cluster-role", var.environment)
   cluster_endpoint_public_access = var.cluster_endpoint_public_access
   cluster_egress_cidrs = var.cluster_egress_cidrs
-  cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access
+  cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
 }
