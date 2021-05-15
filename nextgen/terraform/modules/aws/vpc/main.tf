@@ -2,7 +2,7 @@
 # VPC
 ######
 locals {
-  name = "${var.name_prefix}-${var.number}-vpc"
+  name = "${var.global_strings.regional_prefix}-${var.name}-vpc"
 }
 
 resource "aws_vpc" "vpc" {

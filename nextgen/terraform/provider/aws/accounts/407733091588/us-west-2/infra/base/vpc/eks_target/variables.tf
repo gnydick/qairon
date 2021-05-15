@@ -14,9 +14,6 @@ variable "azs" {
   type        = list(string)
 }
 
-variable "cluster_number" {
-  type = string
-}
 
 #variable "deployment_target" {
 #  default = "perf-1-us-west-2-eks"
@@ -68,8 +65,6 @@ variable "eks_version" {
 }
 
 
-variable "name_prefix" {
-}
 
 variable "cluster_enabled_log_types" {
   type = list
@@ -81,4 +76,12 @@ variable "name" {
 
 variable "map_public_ip_on_launch" {
   type = bool
+}
+
+variable "global_strings" {
+  type = map(string)
+}
+
+variable "global_maps" {
+  type = map(map(string))
 }
