@@ -1,11 +1,18 @@
+resource "aws_organizations_organization" "org" {
+  feature_set = "ALL"
+  aws_service_access_principals = [
+    "config.amazonaws.com",
+    "controltower.amazonaws.com",
+    "sso.amazonaws.com",
+  ]
+  enabled_policy_types = [
+    "SERVICE_CONTROL_POLICY",
+    "TAG_POLICY"
+  ]
 
-resource "aws_organizations_account" "account" {
-  name      = var.name
-  email     = var.email
-  role_name = var.organization_role
+}
 
-  # There is no AWS Organizations API for reading role_name
-  lifecycle {
-    ignore_changes = [role_name]
-  }
+module "accounts" {
+  source = "./accounts"
+  accounts = var.accounts
 }
