@@ -11,3 +11,4 @@ variable "hash_key_type" {}
 variable "write_capacity" {}
 variable "table_prefix" {}
 variable "tags" {}
+variable "pit_recovery" {}

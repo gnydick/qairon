@@ -2,7 +2,7 @@ locals {
   bucket = "${var.bucket_prefix}.s3-bucket"
 }
 
-resource "aws_s3_bucket_public_access_block" "example" {
+resource "aws_s3_bucket_public_access_block" "bucket" {
   bucket = aws_s3_bucket.bucket.id
 
   block_public_acls   = true

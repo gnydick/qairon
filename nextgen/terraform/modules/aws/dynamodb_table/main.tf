@@ -2,6 +2,7 @@ locals {
   name = "${var.table_prefix}.dynamodb-table"
 }
 
+
 resource "aws_dynamodb_table" "dynamodb_table" {
   name             = local.name
   hash_key         = var.hash_key
@@ -9,6 +10,9 @@ resource "aws_dynamodb_table" "dynamodb_table" {
   stream_enabled   = var.stream_enabled
   stream_view_type = var.stream_view_type
   write_capacity = var.write_capacity
+  point_in_time_recovery {
+    enabled = var.pit_recovery
+  }
 
   attribute {
     name = var.hash_key
