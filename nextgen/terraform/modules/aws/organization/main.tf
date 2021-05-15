@@ -12,6 +12,7 @@ resource "aws_organizations_organization" "org" {
 
 }
 
+
 module "accounts" {
   source = "./accounts"
   accounts = var.accounts
