@@ -1,5 +1,8 @@
 provider "aws" {
-  region = var.region
+  region="us-west-2"
+  default_tags {
+    tags = local.global_tags
+  }
 }
 
 

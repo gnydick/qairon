@@ -1,3 +1,4 @@
+
 locals {
   name = "${var.table_prefix}.dynamodb-table"
 }
