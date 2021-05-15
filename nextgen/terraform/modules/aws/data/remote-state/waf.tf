@@ -1,15 +1,3 @@
-variable "aws_provider_profile_name" {
-  default = ""
-}
-
-variable "tf_remote_state_s3_bucket_prefix" {
-  default = ""
-}
-
-variable "tf_remote_state_s3_bucket_current_environment_region" {
-  default = ""
-}
-
 data "terraform_remote_state" "waf" {
   backend = "s3"
 
