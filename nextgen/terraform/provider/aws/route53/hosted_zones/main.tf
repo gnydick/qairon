@@ -6,16 +6,16 @@ provider "aws" {
 }
 
 module "route53_hosted_zone" {
-  count = length(var.zones)
+  for_each = var.zones
   source = "../../../../modules/aws/route53_zone"
-  zone = element(var.zones, count.index)
-  tier = "Public"
+  zone = each.key
+  tier = each.value["Tier"]
 }
 
 module "subdomains" {
-  count = length(var.zones)
+  for_each = var.zones
   source = "./subdomains"
   tier = "Public"
-  zones = lookup(var.subdomains, element(var.zones, count.index))
-  parent_zone = element(var.zones,count.index )
+  zones = lookup(var.subdomains, each.key)
+  parent_zone = each.key
 }

@@ -3,7 +3,7 @@ variable "region" {}
 variable "environment" {}
 variable "config" {}
 variable "zones" {
-  type = list(string)
+  type = map(map(string))
 }
 
 variable "tier" {}
@@ -12,5 +12,5 @@ variable "dept" {
 }
 variable "org"{}
 variable "subdomains" {
-  type = map(list(string))
+  type = map(map(map(string)))
 }

@@ -6,46 +6,122 @@ config = "default"
 role = "dns"
 dept = "services"
 org = "withMe"
-zones = ["withme.com", "withme.de"]
+zones = {
+  "withme.com": {
+    "Tier": "Public"
+  },
+  "withme.de": {
+    "Tier": "Public"
+  }
+}
 
 
 subdomains = {
-  "withme.de" = [],
-  "withme.com" = [
-    "alertmanager-ui.withme.com",
-    "api.withme.com",
-    "cicd.withme.com",
-    "cm-api.withme.com",
-    "cm-dev.withme.com",
-    "cm-int-1.withme.com",
-    "cm-int-2.withme.com",
-    "cm-int-m.withme.com",
-    "cm-perf-1.withme.com",
-    "content.withme.com",
-    "cs-api.withme.com",
-    "cs-int-2.withme.com",
-    "cs-perf-1.withme.com",
-    "dev.withme.com",
-    "grafana-cicd.withme.com",
-    "grafana-int-2.withme.com",
-    "grafana-perf-1.withme.com",
-    "grafana-ui.withme.com",
-    "gs-api.withme.com",
-    "gs-int-2-test.withme.com",
-    "gs-int-2.withme.com",
-    "int-1.withme.com",
-    "int-2-portal-int.withme.com",
-    "int-2.withme.com",
-    "int-m.withme.com",
-    "jaeger-elb.withme.com",
-    "jaeger-ui.withme.com",
-    "jaegercollector.withme.com",
-    "jenkins.withme.com",
-    "kibana-elb.withme.com",
-    "kibana-ui.withme.com",
-    "perf-1.withme.com",
-    "portal-int.withme.com",
-    "vault.withme.com"
-  ]
+  "withme.com" = {
+    "alertmanager-ui" = {
+      "Tier" = "Public"
+    },
+    "api" = {
+      "Tier" = "Public"
+    },
+    "cicd" = {
+      "Tier" = "Public"
+    },
+    "cm-api" = {
+      "Tier" = "Public"
+    },
+    "cm-dev" = {
+      "Tier" = "Public"
+    },
+    "cm-int-1" = {
+      "Tier" = "Public"
+    },
+    "cm-int-2" = {
+      "Tier" = "Public"
+    },
+    "cm-int-m" = {
+      "Tier" = "Public"
+    },
+    "cm-perf-1" = {
+      "Tier" = "Public"
+    },
+    "content" = {
+      "Tier" = "Public"
+    },
+    "cs-api" = {
+      "Tier" = "Public"
+    },
+    "cs-int-2" = {
+      "Tier" = "Public"
+    },
+    "cs-perf-1" = {
+      "Tier" = "Public"
+    },
+    "dev" = {
+      "Tier" = "Public"
+    },
+    "grafana-cicd" = {
+      "Tier" = "Public"
+    },
+    "grafana-int-2" = {
+      "Tier" = "Public"
+    },
+    "grafana-perf-1" = {
+      "Tier" = "Public"
+    },
+    "grafana-ui" = {
+      "Tier" = "Public"
+    },
+    "gs-api" = {
+      "Tier" = "Public"
+    },
+    "gs-int-2-test" = {
+      "Tier" = "Public"
+    },
+    "gs-int-2" = {
+      "Tier" = "Public"
+    },
+    "int-1" = {
+      "Tier" = "Public"
+    },
+    "int-2-portal-int" = {
+      "Tier" = "Public"
+    },
+    "int-2" = {
+      "Tier" = "Public"
+    },
+    "int-m" = {
+      "Tier" = "Public"
+    },
+    "jaeger-elb" = {
+      "Tier" = "Public"
+    },
+    "jaeger-ui" = {
+      "Tier" = "Public"
+    },
+    "jaegercollector" = {
+      "Tier" = "Public"
+    },
+    "jenkins" = {
+      "Tier" = "Public"
+    },
+    "kibana-elb" = {
+      "Tier" = "Public"
+    },
+    "kibana-ui" = {
+      "Tier" = "Public"
+    },
+    "perf-1" = {
+      "Tier" = "Public"
+    },
+    "portal-int" = {
+      "Tier" = "Public"
+    },
+    "vault" = {
+      "Tier" = "Public"
+    }
+  }
+
+  "withme.de" = {}
 
 }
