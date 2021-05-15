@@ -62,12 +62,14 @@ variable "name" {
   type = string
 }
 
-
-
-variable "number" {
+variable "global_strings" {
+  type = map(string)
 }
-variable "config" {
+
+variable "global_maps" {
+  type = map(map(string))
 }
+
 variable "eks_versions" {
   type = map
 }
@@ -76,19 +78,12 @@ variable "cluster_endpoint_public_access" {
   type = map(bool)
 }
 
-variable "global_prefix" {
-  type = string
-}
-
-variable "regional_prefix" {
-  type = string
-}
-
 variable "cluster_enabled_log_types" {
   type = map(list(string))
 }
 
 variable "eks_targets" {
-  type = list(string)
+  type = set(string)
 }
 
+variable "config" {}
