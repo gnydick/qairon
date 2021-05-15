@@ -9,8 +9,6 @@ module "cluster" {
   cluster_endpoint_public_access = var.cluster_endpoint_public_access
   cluster_egress_cidrs = var.cluster_egress_cidrs
   cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
-  cluster_number = "1"
-  name_prefix = var.name_prefix
   name = var.name
   cluster_enabled_log_types = var.cluster_enabled_log_types
   cluster_endpoint_private_access = false
@@ -18,4 +16,6 @@ module "cluster" {
   environment = ""
   region = ""
   tags = {}
+  global_maps = var.global_maps
+  global_strings = var.global_strings
 }

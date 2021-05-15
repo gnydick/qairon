@@ -23,18 +23,17 @@ variable "azs" {
   default = []
 }
 
-variable "name_prefix" {
-  description = "Name of the EKS cluster. Also used as a prefix in names of related resources."
-  type = string
+variable "global_strings" {
+  type = map(string)
 }
 
+variable "global_maps" {
+  type = map(map(string))
+}
 variable "name" {
   type = string
 }
 
-variable "cluster_number" {
-  type = string
-}
 
 #variable "deployment_target" {
 #}
