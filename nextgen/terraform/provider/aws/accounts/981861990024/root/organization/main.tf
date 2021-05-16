@@ -21,17 +21,15 @@ module "accounts" {
   role = each.value.role
 
 }
-//
-module "top_level_ous" {
-  for_each = var.top_level_ous
-  source = "../../../../../../modules/aws/ou"
-  name = each.value
+
+
+module "sandbox-ou" {
+  source = "./sandbox"
   parent = module.organization.roots[0].id
 }
-//
-//module "sub_ous" {
-//  depends_on = [module.top_level_ous]
-//  source = "../../../../../../modules/aws/ou"
-//  ous = {}
-//  root =
-//}
+
+module "security-ou" {
+  source = "./security"
+  parent = module.organization.roots[0].id
+
+}
