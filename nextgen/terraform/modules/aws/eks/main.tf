@@ -1,9 +1,9 @@
 resource "aws_eks_cluster" "cluster" {
-  name                      = local.cluster_short_name
+  name                      = var.cluster_name
   enabled_cluster_log_types = var.cluster_enabled_log_types
   role_arn                  = aws_iam_role.eks_service_role.arn
   version                   = var.eks_version
-  tags                      = merge(var.tags, tomap({"Name": local.cluster_long_name}))
+  tags                      = var.tags
 
   vpc_config {
     security_group_ids      = compact([aws_security_group.cluster.id])
@@ -30,7 +30,7 @@ resource "aws_eks_cluster" "cluster" {
 
 resource "aws_cloudwatch_log_group" "cluster" {
   count             = length(var.cluster_enabled_log_types) > 0 ? 1 : 0
-  name              = "/aws/eks/${local.cluster_long_name}/cluster"
+  name              = "/aws/eks/${var.cluster_name}/cluster"
   retention_in_days = var.cluster_log_retention_in_days
   tags              = var.tags
 }
@@ -40,7 +40,7 @@ resource "aws_cloudwatch_log_group" "cluster" {
 ################################
 
 resource "aws_iam_role" "eks_service_role" {
-  name               = "${local.cluster_short_name}-eksServiceRole"
+  name               = "${var.cluster_name}.eksServiceRole"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -127,25 +127,25 @@ resource "aws_iam_role" "example" {
 ################################
 
 resource "aws_security_group" "cluster" {
-  name_prefix = local.cluster_short_name
+  name_prefix = var.cluster_name
   description = "EKS cluster control plane security group."
   vpc_id      = var.vpc_id
   tags = merge(
   var.tags,
   {
-    "Name" = "${local.cluster_short_name}-eks_cluster_sg"
+    "Name" = "${var.cluster_name}-eks_cluster_sg"
   },
   )
 }
 
 resource "aws_security_group" "nodes" {
-  name_prefix = local.cluster_short_name
+  name_prefix = var.cluster_name
   description = "Security group for all nodes in the cluster"
   vpc_id      = var.vpc_id
   tags = merge(
   var.tags,
   {
-    "Name" = "${local.cluster_short_name}-eks_cluster_nodes_sg"
+    "Name" = "${var.cluster_name}-eks_cluster_nodes_sg"
   },
   )
 }
