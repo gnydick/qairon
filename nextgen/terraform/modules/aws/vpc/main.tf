@@ -1,11 +1,7 @@
 ######
 # VPC
 ######
-locals {
-  name = "${var.global_strings.regional_prefix}-${var.name}-vpc"
-}
-
-resource "aws_vpc" "vpc" {
+resource "aws_vpc" "this" {
 
   cidr_block                       = var.cidr
   enable_dns_hostnames             = var.enable_dns_hostnames
@@ -13,10 +9,9 @@ resource "aws_vpc" "vpc" {
 
   tags = merge(
     {
-      "Name" = local.name
+      "Name" = format("%s", var.name)
     },
     var.tags,
     var.vpc_tags,
   )
-
 }

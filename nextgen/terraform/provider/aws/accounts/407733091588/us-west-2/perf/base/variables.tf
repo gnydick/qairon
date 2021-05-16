@@ -34,7 +34,7 @@ variable "azs" {
 }
 
 variable "eks_versions" {
-  type = map(map(string))
+  type = map
 }
 
 variable "role" {
@@ -58,5 +58,5 @@ variable "cluster_enabled_log_types" {
 }
 
 variable "structure" {
-  type = map(set(string))
+  type = map(list(string))
 }
