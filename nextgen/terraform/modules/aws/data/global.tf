@@ -5,6 +5,14 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+variable "org" {}
+variable "dept" {}
+variable "environment" {}
+variable "role" {}
+variable "config" {}
+variable "region" {}
+variable "provider_region" {}
+
 
 locals {
   global_prefix = "${var.org}-${var.dept}-${var.environment}-${var.role}-${var.config}"

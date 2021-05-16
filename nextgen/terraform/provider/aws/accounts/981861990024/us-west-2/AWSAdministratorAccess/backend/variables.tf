@@ -1,9 +1,0 @@
-variable "billing_mode" {}
-variable "config" {}
-variable "dept" {}
-variable "environment" {}
-variable "org" {}
-variable "region" {}
-variable "role" {}
-variable "stream_enabled" {}
-variable "stream_view_type" {}

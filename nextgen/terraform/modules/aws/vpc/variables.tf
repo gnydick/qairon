@@ -25,12 +25,5 @@ variable "vpc_tags" {
 variable "name" {
   description = "Name to be used on all the resources as identifier"
   type        = string
-}
-
-variable "global_strings" {
-  type = map(string)
-}
-
-variable "global_maps" {
-  type = map(map(string))
+  default     = ""
 }
