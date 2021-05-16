@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 module "tfstate_s3_bucket" {
-  source = "../../../../../modules/aws/s3_bucket"
+  source = "../../../../../../modules/aws/s3_bucket"
   s3_acl = "private"
   bucket_prefix = "terraform-state-backend-296547766921"
   tags = local.global_tags
@@ -14,7 +14,7 @@ module "tfstate_s3_bucket" {
 
 
 module "tfstate_dyndb_lock" {
-  source = "../../../../../modules/aws/dynamodb_table"
+  source = "../../../../../../modules/aws/dynamodb_table"
   billing_mode = var.billing_mode
   config = var.config
   environment = var.environment
