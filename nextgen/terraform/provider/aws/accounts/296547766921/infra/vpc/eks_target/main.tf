@@ -1,5 +1,5 @@
 module "cluster" {
-  source             = "../../../../../../../../modules/aws/eks"
+  source             = "../../../../../../../modules/aws/eks"
   eks_version        = var.eks_version
   azs                = var.azs
   vpc_id             = var.vpc_id
