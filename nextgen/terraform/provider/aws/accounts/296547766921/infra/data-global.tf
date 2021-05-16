@@ -1,1 +1,0 @@
-../../../../../modules/aws/data/global.tf
