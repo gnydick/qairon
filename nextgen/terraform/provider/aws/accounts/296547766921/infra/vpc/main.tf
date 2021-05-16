@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "../../../../../../../modules/aws/vpc"
+  source = "../../../../../../modules/aws/vpc"
   cidr = var.vpc_cidr
   name = var.name
   tags = var.tags
