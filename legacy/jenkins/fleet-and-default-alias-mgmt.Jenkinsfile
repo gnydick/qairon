@@ -34,11 +34,15 @@ spec:
                                             string(name: 'DEPLOYMENT_TARGET', defaultValue: '', description: "legacy destinations: ['int-3', 'int-1', 'int-2', 'prod-1']"),
                                             string(name: 'ORG_ID', defaultValue: '', description: "OrgID: e.g. ['withme', 'withmeqa']"),
                                             choice(name: 'COMPAT_VERSION', choices: ['v1'], description: 'Compatibility Version'),
-                                            string(name: 'GAME_SERVER_VERSION', defaultValue: '', description: "Game Server Version"),
                                             string(name: 'DEPLOYMENT_TAG', defaultValue: 'default', description: "Tag to distinguish things like blue, green, default, canary")]),
                                 disableConcurrentBuilds()
                         ])
 
+                        def get_game_version = """
+                            aws gamelift describe-build --build-id ${GAMELIFT_BUILD_ID} | jq -r '.Build.Version'
+                        """
+                        def game_version = awsLib.set_aws_creds_and_sh(get_game_version)
+                        echo game_version
 
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
