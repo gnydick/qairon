@@ -39,15 +39,15 @@ spec:
                         ])
 
                         def get_game_version = """
-                            aws gamelift describe-build --build-id ${GAMELIFT_BUILD_ID} | jq -r '.Build.Version'
+                            aws gamelift describe-build --build-id ${GAMELIFT_BUILD_ID} --region ${AWS_REGION} | jq -r '.Build.Version'
                         """
                         def game_version = awsLib.set_aws_creds_and_sh(get_game_version)
-                        echo game_version
 
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
+                             export GAME_VERSION=${game_version}
                              export GAMELIFT_BUILD_ID=${GAMELIFT_BUILD_ID}
-                             sceptre  --var-file varfiles/fleet-config/${AWS_REGION}/${DEPLOYMENT_TARGET}/values.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet"""
+                             sceptre --var-file varfiles/fleet-config/${AWS_REGION}/${DEPLOYMENT_TARGET}/values.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet"""
 
                         if (actions_requiring_confirmation.contains(SCEPTRE_ACTION)) {
                             cmd += """ -y
