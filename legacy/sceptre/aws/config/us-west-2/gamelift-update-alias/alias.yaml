@@ -1,5 +1,5 @@
 template_path: gamelift-traffic-alias.yaml
-stack_name: traffic-alias-{{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.DEFAULT_TAG }}
+stack_name: traffic-alias-{{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.DEPLOYMENT_TAG }}
 
 
 parameters:
