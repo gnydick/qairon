@@ -8,8 +8,4 @@ module "ou" {
   }
 }
 
-module "imvu-ou" {
-  source = "./imvu"
-  parent = module.ou.id
-}
 

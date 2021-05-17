@@ -18,23 +18,6 @@ account_tags = {
   },
 }
 
-top_level_ous = {
-  "sandbox": "Sandbox",
-  "security": "Security"
-}
-
-sub_ous = {
-  "imvu" = {
-    "name" = "Imvu",
-    "parent" = "sandbox"
-  },
-  "jgelin" = {
-    "name" = "Jgelin",
-    "parent" = "imvu"
-  }
-
-
-}
 
 accounts = {
   "aws_management_sandbox" = {
