@@ -1,20 +1,10 @@
 ######################################################
-# info
-####
-#  long lived alias = org_id + '-' + traffic_alias_suffix
-#
-#####################################################
-
-######################################################
 # metadata
 ####
 
 # logical environment, not any specific place or piece of infrastructure
 environment: "int"
-
-# probably the stream name, but this is the first half of the long lived alias
-org_id: "withmeint"
-
+region: "us-west-2"
 # used for sceptre and uniquely identifying stack
 project_code: "astral"
 
@@ -26,7 +16,7 @@ game_server_name: "game-server"
 ######################################################
 # Infrastructure deployment coordinates targeting 
 ####
-deployment_target: "int4"
+deployment_target: "int-2"
 
 
 ######################################################
@@ -49,16 +39,5 @@ instance_count: "1"
 ####
 routing_strategy_type: "SIMPLE"
 message: "w00t! - alias"
-default_alias_suffix: v1.2.345
-######################################################
-
-######################################################
-# GameLift traffic alias configuration
-####
-
-# for now, we use the major version as a string, but
-# can change if we want, so that's why it's not called
-# major version
-traffic_alias_suffix: "v1"
 ######################################################
 
