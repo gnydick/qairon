@@ -40,8 +40,7 @@ static def notifySlack(String buildStatus = 'STARTED', String channel, String co
             color = '#FF9FA1'
         }
     }
-    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n<${env.BUILD_URL}console|Watch build console output>"
-    slackSend(color: color, message: msg)
+
 
 }
 
