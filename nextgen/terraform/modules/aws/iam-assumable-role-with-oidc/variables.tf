@@ -1,7 +1,6 @@
 variable "create_role" {
   description = "Whether to create a role"
   type        = bool
-  default     = true
 }
 
 variable "provider_url" {

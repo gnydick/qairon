@@ -7,6 +7,7 @@ locals {
 module "iam_role_content_manager" {
   source = "../../../../../../../../modules/aws/iam-assumable-role-with-oidc"
   aws_account_id                = data.aws_caller_identity.current.account_id
+  create_role                   = true
   force_detach_policies         = true
   max_session_duration          = 3600
   number_of_role_policy_arns    = 0
