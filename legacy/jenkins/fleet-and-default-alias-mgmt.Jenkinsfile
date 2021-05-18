@@ -1,3 +1,19 @@
+/*
+This pipeline performs actions on a gamelift fleet-alias pair. The
+sceptre template called here creates a fleet and a default alias
+to point to the fleet. Both have convention driven names
+derived from their contexts'.
+
+This DOES NOT update any aliases that are destinations for traffic.
+
+Actions:
+- launch
+- delete
+- validate
+
+See the 'properties' statement for the list of parameters and their descriptions.
+*/
+
 timestamps {
     podTemplate(name: 'test', label: 'test', yaml: """
 kind: Pod
