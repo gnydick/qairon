@@ -28,8 +28,7 @@ Parameters:
     Type: String
   InstanceRoleArn:
     Type: String
-  ServerProcesses:
-    Type: Number
+
 
 Resources:
   GameLiftFleet:
@@ -40,11 +39,11 @@ Resources:
       DesiredEC2Instances: !Ref InstanceCount
       EC2InboundPermissions:
         - FromPort: '7777'
-          ToPort: '7878'
+          ToPort: '7788'
           IpRange: 0.0.0.0/0
           Protocol: TCP
         - FromPort: '7777'
-          ToPort: '7878'
+          ToPort: '7788'
           IpRange: 0.0.0.0/0
           Protocol: UDP
       EC2InstanceType: !Ref EC2InstanceType
@@ -61,8 +60,25 @@ Resources:
       RuntimeConfiguration:
         ServerProcesses:
           - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
-            Parameters: astral -GameLift -port=7777 -ServerEnvironment=
-            ConcurrentExecutions: !Ref ServerProcesses
+            Parameters: astral -GameLift -port=7777 -ServerEnvironment=prod1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7779 -ServerEnvironment=prod1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7781 -ServerEnvironment=prod1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7783 -ServerEnvironment=prod1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7785 -ServerEnvironment=prod1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7787 -ServerEnvironment=prod1
+            ConcurrentExecutions: 1
+
+
 
 
 Outputs:

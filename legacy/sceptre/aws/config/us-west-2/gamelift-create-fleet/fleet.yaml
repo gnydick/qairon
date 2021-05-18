@@ -1,4 +1,4 @@
-template_path: gamelift-fleet.yaml
+template_path: {{ var.deployment_target }}/gamelift-fleet.yaml
 stack_name: fleet-{{ name_pattern }}
 
 parameters:
@@ -13,4 +13,3 @@ parameters:
   Name: {{ name_pattern }}
   NewGameSessionProtectionPolicy: {{ var.new_game_session_protection_policy }}
   InstanceRoleArn: {{ var.instance_role_arn}}
-  ServerProcesses: {{ var.server_processes }}

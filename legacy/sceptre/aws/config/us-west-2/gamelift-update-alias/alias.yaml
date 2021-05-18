@@ -1,4 +1,4 @@
-template_path: gamelift-traffic-alias.yaml
+template_path: {{ var.deployment_target }}/gamelift-traffic-alias.yaml
 stack_name: traffic-alias-{{ name_pattern }}
 
 

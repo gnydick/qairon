@@ -1,4 +1,4 @@
-template_path: gamelift-alias.yaml
+template_path: {{ var.deployment_target }}/gamelift-alias.yaml
 dependencies:
   - {{ environment_variable.AWS_REGION }}/gamelift-create-fleet/fleet.yaml
 stack_name: mmm-alias-{{ name_pattern }}
