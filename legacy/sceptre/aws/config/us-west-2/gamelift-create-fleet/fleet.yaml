@@ -1,5 +1,5 @@
 template_path: gamelift-fleet.yaml
-stack_name: fleet-{{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.GAME_VERSION}}-{{ environment_variable.DEPLOYMENT_TAG }}
+stack_name: fleet-{{ name_pattern }}
 
 parameters:
   BuildId: {{ environment_variable.GAMELIFT_BUILD_ID }}
@@ -10,5 +10,5 @@ parameters:
   PolicyPeriodInMinutes: "{{ var.policy_period_in_minutes }}"
   MaxSize: "{{ var.max_size }}"
   MinSize: "{{ var.min_size }}"
-  Name: {{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.GAME_VERSION}}-{{ environment_variable.DEPLOYMENT_TAG }}
+  Name: {{ name_pattern }}
   NewGameSessionProtectionPolicy: {{ var.new_game_session_protection_policy }}

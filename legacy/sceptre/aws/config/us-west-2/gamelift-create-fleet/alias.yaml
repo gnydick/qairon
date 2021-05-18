@@ -1,11 +1,11 @@
 template_path: gamelift-alias.yaml
 dependencies:
   - {{ environment_variable.AWS_REGION }}/gamelift-create-fleet/fleet.yaml
-stack_name: mmm-alias-{{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.GAME_VERSION}}-{{ environment_variable.DEPLOYMENT_TAG }}
+stack_name: mmm-alias-{{ name_pattern }}
 
 
 parameters:
-  Name: mmm-alias-{{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.GAME_VERSION}}-{{ environment_variable.DEPLOYMENT_TAG }}
-  FleetId: !stack_output_external fleet-{{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.GAME_VERSION}}-{{ environment_variable.DEPLOYMENT_TAG }}::FleetId
+  Name: mmm-alias-{{ name_pattern }}
+  FleetId: !stack_output_external fleet-{{ name_pattern }}::FleetId
   Message: {{ var.message }}
   RoutingStrategyType: {{ var.routing_strategy_type }}
