@@ -1,6 +1,21 @@
 package lib
 
-def notifySlack(String buildStatus = 'STARTED', String channel, String color = null, String message = null) {
+
+/*
+Convenience method for notifying slack
+----
+buildStatus:
+    default: STARTED
+    desc: jenkins compatible build status
+channel:
+    desc: the slack channel to publish to
+color:
+    default: null
+    desc: color of message
+message:
+    decs: message to send
+ */
+static def notifySlack(String buildStatus = 'STARTED', String channel, String color = null, String message = null) {
 
     // Build status of null means success.
     buildStatus = buildStatus ?: 'SUCCESS'
@@ -25,10 +40,17 @@ def notifySlack(String buildStatus = 'STARTED', String channel, String color = n
             color = '#FF9FA1'
         }
     }
+    def msg = "${buildStatus}${icons}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n<${env.BUILD_URL}console|Watch build console output>"
+    slackSend(color: color, message: msg)
 
 }
 
-def getSecrets() {
+/*
+returns all of the credentials frequently used by pipelines
+YES, NOT GREAT, but an example of refactoring, should be made
+less promiscuous
+* */
+static def getSecrets() {
     return [[$class: 'VaultSecret', path: 'cicd/prod-1/aws_keys', secretValues: [
             [$class: 'VaultSecretValue', envVar: 'AWS_ACCESS_KEY_ID_PROD', vaultKey: 'AWS_ACCESS_KEY_ID'],
             [$class: 'VaultSecretValue', envVar: 'AWS_SECRET_ACCESS_KEY_PROD', vaultKey: 'AWS_SECRET_ACCESS_KEY']]],
