@@ -1,6 +1,6 @@
 module "ou" {
   source = "../../../../../../../modules/aws/ou"
-  name = "Sandbox"
+  name = "All"
   parent = var.parent
   tags = {
     "Org" = "togetherlabs",

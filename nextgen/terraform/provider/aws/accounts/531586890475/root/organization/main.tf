@@ -23,13 +23,17 @@ module "accounts" {
 }
 
 
-//module "sandbox-ou" {
-//  source = "./sandbox"
-//  parent = module.organization.roots[0].id
-//}
-//
-//module "security-ou" {
-//  source = "./security"
-//  parent = module.organization.roots[0].id
-//
-//}
+module "sandbox-ou" {
+  source = "./sandbox"
+  parent = module.organization.roots[0].id
+}
+
+module "security-ou" {
+  source = "./security"
+  parent = module.organization.roots[0].id
+}
+
+module "all-ou" {
+  source = "./all"
+  parent = module.organization.roots[0].id
+}
