@@ -1,3 +1,4 @@
+# TODO: needed feature for attaching multiply "policy documents" (statements) to one policy.
 data "aws_iam_policy_document" "policy_document" {
   statement {
     sid       = var.iam_policy_document_sid
