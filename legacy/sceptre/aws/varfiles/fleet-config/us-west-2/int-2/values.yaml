@@ -30,7 +30,7 @@ policy_period_in_minutes: "60"
 max_size: "1"
 min_size: "0"
 new_game_session_protection_policy: "FullProtection"
-ec2_instance_type: "t2.micro"
+ec2_instance_type: "m5.large"
 instance_count: "1"
 ######################################################
 
