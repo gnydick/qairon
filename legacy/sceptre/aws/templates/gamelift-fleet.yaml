@@ -28,6 +28,8 @@ Parameters:
     Type: String
   InstanceRoleArn:
     Type: String
+  ServerProcesses:
+    Type: Number
 
 Resources:
   GameLiftFleet:
@@ -38,9 +40,13 @@ Resources:
       DesiredEC2Instances: !Ref InstanceCount
       EC2InboundPermissions:
         - FromPort: '7777'
-          ToPort: '7778'
+          ToPort: '7878'
           IpRange: 0.0.0.0/0
           Protocol: TCP
+        - FromPort: '7777'
+          ToPort: '7878'
+          IpRange: 0.0.0.0/0
+          Protocol: UDP
       EC2InstanceType: !Ref EC2InstanceType
       InstanceRoleARN: !Ref InstanceRoleArn
       FleetType: !Ref FleetType
@@ -54,9 +60,9 @@ Resources:
         PolicyPeriodInMinutes: !Ref PolicyPeriodInMinutes
       RuntimeConfiguration:
         ServerProcesses:
-          - LaunchPath: "/local/game/jre/bin/java"
-            Parameters: -showversion -classpath "/local/game/classes:/local/game/config"               -Djava.ext.dirs=/local/game/libraries:/local/game/jre/lib/ext -DGAME_SERVER_PORT=7777                -Dspring.profiles.active=int-1 -DlogPath=/local/game com.withme.testgameserver.TestGameServer
-            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7777 -ServerEnvironment=
+            ConcurrentExecutions: !Ref ServerProcesses
 
 
 Outputs:

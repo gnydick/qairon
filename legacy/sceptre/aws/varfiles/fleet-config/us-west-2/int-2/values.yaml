@@ -33,6 +33,7 @@ new_game_session_protection_policy: "FullProtection"
 ec2_instance_type: "m5.large"
 instance_count: "1"
 instance_role_arn: "arn:aws:iam::407733091588:role/astral-game-server"
+server_processes: "9"
 ######################################################
 
 ######################################################

@@ -13,3 +13,4 @@ parameters:
   Name: {{ name_pattern }}
   NewGameSessionProtectionPolicy: {{ var.new_game_session_protection_policy }}
   InstanceRoleArn: {{ var.instance_role_arn}}
+  ServerProcesses: {{ var.server_processes }}
