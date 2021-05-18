@@ -26,6 +26,8 @@ Parameters:
     Type: String
   NewGameSessionProtectionPolicy:
     Type: String
+  InstanceRoleArn:
+    Type: String
 
 Resources:
   GameLiftFleet:
@@ -40,6 +42,7 @@ Resources:
           IpRange: 0.0.0.0/0
           Protocol: TCP
       EC2InstanceType: !Ref EC2InstanceType
+      InstanceRoleARN: !Ref InstanceRoleArn
       FleetType: !Ref FleetType
       MaxSize: !Ref MaxSize
       MetricGroups: []

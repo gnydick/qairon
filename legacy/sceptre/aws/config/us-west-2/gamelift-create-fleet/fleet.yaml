@@ -12,3 +12,4 @@ parameters:
   MinSize: "{{ var.min_size }}"
   Name: {{ name_pattern }}
   NewGameSessionProtectionPolicy: {{ var.new_game_session_protection_policy }}
+  InstanceRoleArn: {{ var.instance_role_arn}}
