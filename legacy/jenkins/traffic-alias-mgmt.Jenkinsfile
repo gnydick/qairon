@@ -1,5 +1,21 @@
+/*
+This pipeline performs actions on a gamelift fleet-alias pair. The
+sceptre template called here creates a fleet and a default alias
+to point to the fleet. Both have convention driven names
+derived from their contexts'.
+
+This DOES NOT update any aliases that are destinations for traffic.
+
+Actions:
+- launch
+- delete
+- validate
+
+See the 'properties' statement for the list of parameters and their descriptions.
+*/
+
 timestamps {
-    podTemplate(name: 'test', label: 'test', yaml: """
+    podTemplate(name: 'alias-mgmt', label: 'alias-mgmt', yaml: """
 kind: Pod
 metadata:
   name: microservice-orchestration
@@ -13,7 +29,7 @@ spec:
     tty: true
 """
     ) {
-        node('test') {
+        node('alias-mgmt') {
 
 
             stage('Configure aws account and kubectl config') {
@@ -27,9 +43,12 @@ spec:
 
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
                         properties([
-                                parameters([choice(choices: ['--Choose--', 'launch', 'update', 'delete' ], description: 'Action to take', name: 'SCEPTRE_ACTION'),
-                                            choice(choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default', name: 'AWS_REGION'),
-                                            string(defaultValue: '' ,description: "legacy destinations: ['int-3', 'int-1', 'int-2', 'prod-1']", name: 'DEPLOYMENT_TARGET')]),
+                                parameters([choice(name: 'SCEPTRE_ACTION', choices: ['--Choose--', 'launch', 'delete', 'validate'], description: 'Action to take'),
+                                            choice(name: 'AWS_REGION', choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default'),
+                                            string(name: 'DEPLOYMENT_TARGET', defaultValue: '', description: "legacy destinations: ['int-3', 'int-1', 'int-2', 'prod-1']"),
+                                            string(name: 'ORG_ID', defaultValue: '', description: "OrgID: e.g. ['withme', 'withmeqa']"),
+                                            choice(name: 'COMPAT_VERSION', choices: ['v1'], description: 'Compatibility Version'),
+                                            string(name: 'DEPLOYMENT_TAG', defaultValue: 'default', description: "Tag to distinguish things like blue, green, default, canary")]),
                                 disableConcurrentBuilds()
                         ])
 

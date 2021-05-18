@@ -15,7 +15,7 @@ See the 'properties' statement for the list of parameters and their descriptions
 */
 
 timestamps {
-    podTemplate(name: 'test', label: 'test', yaml: """
+    podTemplate(name: 'fleet-mgmt', label: 'fleet-mgmt', yaml: """
 kind: Pod
 metadata:
   name: microservice-orchestration
@@ -29,7 +29,7 @@ spec:
     tty: true
 """
     ) {
-        node('test') {
+        node('fleet-mgmt') {
 
 
             stage('Configure aws account and kubectl config') {
