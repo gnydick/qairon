@@ -18,9 +18,6 @@ zones = {
 
 subdomains = {
   "withme.com" = {
-    "alertmanager-ui" = {
-      "Tier" = "Public"
-    },
     "api" = {
       "Tier" = "Public"
     },
@@ -60,18 +57,6 @@ subdomains = {
     "dev" = {
       "Tier" = "Public"
     },
-    "grafana-cicd" = {
-      "Tier" = "Public"
-    },
-    "grafana-int-2" = {
-      "Tier" = "Public"
-    },
-    "grafana-perf-1" = {
-      "Tier" = "Public"
-    },
-    "grafana-ui" = {
-      "Tier" = "Public"
-    },
     "gs-api" = {
       "Tier" = "Public"
     },
@@ -93,22 +78,7 @@ subdomains = {
     "int-m" = {
       "Tier" = "Public"
     },
-    "jaeger-elb" = {
-      "Tier" = "Public"
-    },
-    "jaeger-ui" = {
-      "Tier" = "Public"
-    },
-    "jaegercollector" = {
-      "Tier" = "Public"
-    },
     "jenkins" = {
-      "Tier" = "Public"
-    },
-    "kibana-elb" = {
-      "Tier" = "Public"
-    },
-    "kibana-ui" = {
       "Tier" = "Public"
     },
     "perf-1" = {
