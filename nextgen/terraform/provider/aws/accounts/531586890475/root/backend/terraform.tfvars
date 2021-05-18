@@ -13,12 +13,12 @@
 # `terraform push` commands - changing this WILL affect your
 
 # terraform.tfstate file, so use caution
-environment = "sandbox"
+environment = "infra"
 config = "default"
-org = "withme"
+org = "togetherlabs"
 region = "us-west-2"
 provider_region = "us-west-2"
-dept = "services"
+dept = "it"
 
 #dynamodb_table
 stream_enabled = true

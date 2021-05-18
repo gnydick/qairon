@@ -8,7 +8,7 @@ provider "aws" {
 module "tfstate_s3_bucket" {
   source = "../../../../../../modules/aws/s3_bucket"
   s3_acl = "private"
-  bucket_prefix = "terraform-state-backend-296547766921"
+  bucket_prefix = "terraform-state-backend-531586890475"
   tags = local.global_tags
 }
 
