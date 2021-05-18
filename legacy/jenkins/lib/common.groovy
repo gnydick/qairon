@@ -15,7 +15,7 @@ color:
 message:
     decs: message to send
  */
-static def notifySlack(String buildStatus = 'STARTED', String channel, String color = null, String message = null) {
+def notifySlack(String buildStatus = 'STARTED', String channel, String color = null, String message = null) {
 
     // Build status of null means success.
     buildStatus = buildStatus ?: 'SUCCESS'
@@ -40,6 +40,8 @@ static def notifySlack(String buildStatus = 'STARTED', String channel, String co
             color = '#FF9FA1'
         }
     }
+    slackSend(color: color, message: message)
+    def msg = "${buildStatus}${icons}: ${env.JOB_NAME} #${env.BUILD_NUMBER}:\n<${env.BUILD_URL}console|Watch build console output>"
 
 
 }
@@ -49,7 +51,7 @@ returns all of the credentials frequently used by pipelines
 YES, NOT GREAT, but an example of refactoring, should be made
 less promiscuous
 * */
-static def getSecrets() {
+def getSecrets() {
     return [[$class: 'VaultSecret', path: 'cicd/prod-1/aws_keys', secretValues: [
             [$class: 'VaultSecretValue', envVar: 'AWS_ACCESS_KEY_ID_PROD', vaultKey: 'AWS_ACCESS_KEY_ID'],
             [$class: 'VaultSecretValue', envVar: 'AWS_SECRET_ACCESS_KEY_PROD', vaultKey: 'AWS_SECRET_ACCESS_KEY']]],
