@@ -4,6 +4,7 @@ resource "aws_organizations_organization" "org" {
     "config.amazonaws.com",
     "controltower.amazonaws.com",
     "sso.amazonaws.com",
+    "member.org.stacksets.cloudformation.amazonaws.com"
   ]
   enabled_policy_types = [
     "SERVICE_CONTROL_POLICY",

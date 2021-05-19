@@ -9,6 +9,7 @@ module "organization" {
   source = "../../../../../../modules/aws/organization"
   global_maps = local.global_maps
   global_strings = local.global_strings
+
 }
 
 

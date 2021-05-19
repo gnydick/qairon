@@ -1,4 +1,9 @@
-
+provider "aws" {
+  region = var.provider_region
+  default_tags {
+    tags = local.global_tags
+  }
+}
 
 module "tfstate_s3_bucket" {
   source = "../../../../../../modules/aws/s3_bucket"

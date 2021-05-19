@@ -1,5 +1,3 @@
-package qairon
-
 def notifySlack(String buildStatus = 'STARTED', String channel, String color = null, String message = null) {
 
     // Build status of null means success.

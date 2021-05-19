@@ -1,0 +1,7 @@
+
+
+variable "zone" {}
+
+
+
+variable "tier" {}

@@ -17,6 +17,8 @@ environment = "sandbox"
 config = "default"
 org = "withme"
 region = "us-west-2"
+provider_region = "us-west-2"
+
 dept = "services"
 
 #dynamodb_table
