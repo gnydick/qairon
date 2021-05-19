@@ -14,6 +14,19 @@ Actions:
 See the 'properties' statement for the list of parameters and their descriptions.
 */
 
+
+properties([
+        parameters([choice(name: 'SCEPTRE_ACTION', choices: ['--Choose--', 'launch', 'delete', 'validate'], description: 'Action to take'),
+                    choice(name: 'AWS_REGION', choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default'),
+                    string(name: 'DEPLOYMENT_TARGET', defaultValue: '', description: "legacy destinations: ['int-3', 'int-1', 'int-2', 'prod-1']"),
+                    string(name: 'ORG_ID', defaultValue: '', description: "OrgID: e.g. ['withme', 'withmeqa']"),
+                    choice(name: 'COMPAT_VERSION', choices: ['v1'], description: 'Compatibility Version'),
+                    string(name: 'DEPLOYMENT_TAG', defaultValue: 'default', description: "Tag to distinguish things like blue, green, default, canary"),
+                    string(name: 'BRANCH', defaultValue: 'main', description: "set to the dev branch you are using when testing"),
+        ]),
+        disableConcurrentBuilds()
+])
+
 timestamps {
     podTemplate(name: 'alias-mgmt', label: 'alias-mgmt', yaml: """
 kind: Pod
@@ -42,15 +55,7 @@ spec:
 
 
                     wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
-                        properties([
-                                parameters([choice(name: 'SCEPTRE_ACTION', choices: ['--Choose--', 'launch', 'delete', 'validate'], description: 'Action to take'),
-                                            choice(name: 'AWS_REGION', choices: ['us-west-2'], description: 'AWS Region - us-west-2 is default'),
-                                            string(name: 'DEPLOYMENT_TARGET', defaultValue: '', description: "legacy destinations: ['int-3', 'int-1', 'int-2', 'prod-1']"),
-                                            string(name: 'ORG_ID', defaultValue: '', description: "OrgID: e.g. ['withme', 'withmeqa']"),
-                                            choice(name: 'COMPAT_VERSION', choices: ['v1'], description: 'Compatibility Version'),
-                                            string(name: 'DEPLOYMENT_TAG', defaultValue: 'default', description: "Tag to distinguish things like blue, green, default, canary")]),
-                                disableConcurrentBuilds()
-                        ])
+
 
 
                         def cmd = """
