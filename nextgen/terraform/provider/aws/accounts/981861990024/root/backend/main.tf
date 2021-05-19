@@ -7,11 +7,7 @@ provider "aws" {
 
 module "tfstate_s3_bucket" {
   source = "../../../../../../modules/aws/s3_bucket"
-  org = var.org
-  config = var.config
-  environment = var.environment
   s3_acl = "private"
-  dept = "services"
   bucket_prefix = "terraform-state-backend-981861990024"
   tags = local.global_tags
 }
