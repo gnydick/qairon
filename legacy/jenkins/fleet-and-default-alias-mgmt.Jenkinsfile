@@ -24,8 +24,7 @@ properties([
                     choice(name: 'COMPAT_VERSION', choices: ['v1'], description: 'Compatibility Version'),
                     string(name: 'DEPLOYMENT_TAG', defaultValue: 'default', description: "Tag to distinguish things like blue, green, default, canary"),
                     string(name: 'BRANCH', defaultValue: 'main', description: "set to the dev branch you are using when testing"),
-        ]),
-        disableConcurrentBuilds()
+        ])
 ])
 timestamps {
     podTemplate(name: 'fleet-mgmt', label: 'fleet-mgmt', yaml: """
