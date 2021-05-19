@@ -3,7 +3,7 @@ locals {
 }
 
 module "infra_svcs_stack" {
-  source                                   = "../../../../../../../../modules/aws/cloudformation-20190211"
+  source                                   = "../../../../../../../../modules/aws/cloudformation"
   azs                                      = var.azs
   ami                                      = var.infra_nodegroup_ami
   vpc_id                                   = var.vpc_id
