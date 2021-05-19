@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'GameLift fleet'
+
+Parameters:
+  BuildId:
+    Type: String
+    Description: Build ID
+  EC2InstanceType:
+    Type: String
+    Description: Instance Type
+  InstanceCount:
+    Type: Number
+    Description: Number of EC2 Instances
+  FleetType:
+    Type: String
+  NewGameSessionsPerCreator:
+    Type: Number
+    Description: A policy that limits the number of game sessions that an individual player can create on instances in this fleet within a specified span of time.
+  PolicyPeriodInMinutes:
+    Type: Number
+  MaxSize:
+    Type: Number
+  MinSize:
+    Type: Number
+  Name:
+    Type: String
+  NewGameSessionProtectionPolicy:
+    Type: String
+  InstanceRoleArn:
+    Type: String
+
+
+Resources:
+  GameLiftFleet:
+    Type: AWS::GameLift::Fleet
+    Properties:
+      BuildId: !Ref BuildId
+      Description: WithMe Game Server Fleet
+      DesiredEC2Instances: !Ref InstanceCount
+      EC2InboundPermissions:
+        - FromPort: '7777'
+          ToPort: '7788'
+          IpRange: 0.0.0.0/0
+          Protocol: TCP
+        - FromPort: '7777'
+          ToPort: '7788'
+          IpRange: 0.0.0.0/0
+          Protocol: UDP
+      EC2InstanceType: !Ref EC2InstanceType
+      InstanceRoleARN: !Ref InstanceRoleArn
+      FleetType: !Ref FleetType
+      MaxSize: !Ref MaxSize
+      MetricGroups: []
+      MinSize: !Ref MinSize
+      Name: !Ref Name
+      NewGameSessionProtectionPolicy: !Ref NewGameSessionProtectionPolicy
+      ResourceCreationLimitPolicy:
+        NewGameSessionsPerCreator: !Ref NewGameSessionsPerCreator
+        PolicyPeriodInMinutes: !Ref PolicyPeriodInMinutes
+      RuntimeConfiguration:
+        ServerProcesses:
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7777 -ServerEnvironment=int1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7779 -ServerEnvironment=int1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7781 -ServerEnvironment=int1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7783 -ServerEnvironment=int1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7785 -ServerEnvironment=int1
+            ConcurrentExecutions: 1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
+            Parameters: astral -GameLift -port=7787 -ServerEnvironment=int1
+            ConcurrentExecutions: 1
+
+
+
+
+Outputs:
+  FleetId:
+    Description: The ID of the Gamelift Fleet
+    Value: !Ref GameLiftFleet
+

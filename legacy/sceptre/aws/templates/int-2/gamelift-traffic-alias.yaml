@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'GameLift Traffic Alias'
+
+Parameters:
+  Name:
+    Type: String
+  FleetId:
+    Type: String
+  Message:
+    Type: String
+  RoutingStrategyType:
+    Type: String
+
+Resources:
+  GameLiftTrafficAlias:
+    Type: AWS::GameLift::Alias
+    Properties:
+      Description: "Traffic Alias"
+      Name: !Ref Name
+      RoutingStrategy:
+        FleetId: !Ref FleetId
+        Message: !Ref Message
+        Type: !Ref RoutingStrategyType
