@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 module "cluster" {
   source             = "../../../../../../../../modules/aws/eks"
   eks_version        = 1.19

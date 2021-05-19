@@ -82,3 +82,9 @@ variable "cluster_iam_role_name" {
   type        = string
   default     = ""
 }
+
+variable "org" {
+  description = "Organization name (used for name|tag prefixes)"
+  type        = string
+  default     = "withme"
+}
