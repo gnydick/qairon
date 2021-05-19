@@ -58,7 +58,7 @@ spec:
 
                         def cmd = """
                              cd ${WORKSPACE}/legacy/sceptre/aws
-                             export GAME_VERSION=\$(aws gamelift describe-build --build-id ${GAMELIFT_BUILD_ID} --region ${AWS_REGION} | jq -r '.Build.Version' | sed 's/[^0-9]/-/g')
+                             export GAME_VERSION=\$(aws gamelift describe-build --build-id ${GAMELIFT_BUILD_ID} --region ${AWS_REGION} | jq -r '.Build.Version' | sed 's/[^0-9a-zA-Z]/-/g')
                              export GAMELIFT_BUILD_ID=${GAMELIFT_BUILD_ID}
                              sceptre --var-file varfiles/fleet-config/${AWS_REGION}/${DEPLOYMENT_TARGET}/values.yaml  ${SCEPTRE_ACTION} ${AWS_REGION}/gamelift-create-fleet"""
 
