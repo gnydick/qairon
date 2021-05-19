@@ -13,7 +13,7 @@
 # `terraform push` commands - changing this WILL affect your
 
 # terraform.tfstate file, so use caution
-environment = "sandbox"
+environment = "infra"
 config = "default"
 org = "withme"
 region = "us-west-2"
