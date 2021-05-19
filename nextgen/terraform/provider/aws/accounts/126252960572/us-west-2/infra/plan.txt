@@ -1183,7 +1183,7 @@ Terraform will perform the following actions:
 Plan: 58 to add, 0 to change, 0 to destroy.
 
 Changes to Outputs:
-  + account_id      = "296547766921"
+  + account_id      = "126252960572"
   + global_maps     = {
       + global_tags   = {
           + Config      = "default"

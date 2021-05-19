@@ -4,8 +4,8 @@ module "vpc" {
   name = var.name
   tags = var.tags
 
-  global_maps = var.global_maps
-  global_strings = var.global_strings
+//  global_maps = var.global_maps
+//  global_strings = var.global_strings
 }
 
 

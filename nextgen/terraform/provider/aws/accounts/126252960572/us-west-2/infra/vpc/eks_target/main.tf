@@ -1,5 +1,5 @@
 module "cluster" {
-  source             = "../../../../../../../../../modules/aws/eks"
+  source             = "../../../../../../../../modules/aws/eks"
   eks_version        = var.eks_version
   azs                = var.azs
   vpc_id             = var.vpc_id
@@ -9,13 +9,7 @@ module "cluster" {
   cluster_endpoint_public_access = var.cluster_endpoint_public_access
   cluster_egress_cidrs = var.cluster_egress_cidrs
   cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
-  name = var.name
   cluster_enabled_log_types = var.cluster_enabled_log_types
   cluster_endpoint_private_access = false
-  config = ""
-  environment = ""
-  region = ""
-  tags = {}
-  global_maps = var.global_maps
-  global_strings = var.global_strings
+  cluster_name = var.name
 }
