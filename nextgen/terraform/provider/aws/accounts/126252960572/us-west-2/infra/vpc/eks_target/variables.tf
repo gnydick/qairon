@@ -1,87 +1,47 @@
-variable "environment" {}
-
-variable "config" {
-  type = string
+variable "vpc_id" {}
+variable "eks_config" {
+  type = object({
+    cluster_name = string,
+    cluster_enabled_log_types = list(string),
+    eks_version = string,
+    cluster_endpoint_private_access = bool,
+    cluster_endpoint_public_access = bool,
+    cluster_endpoint_public_access_cidrs = list(string),
+    cluster_create_timeout = string,
+    cluster_delete_timeout = string,
+    cluster_log_retention_in_days = number,
+    cluster_egress_cidrs = list(string)
+  })
 }
 
-variable "region" {
-  description = "AWS region"
-  type        = string
+variable "nodegroup_configs" {
+  type = map(object({
+    bootstrap_arguments = string,
+    key_name = string,
+    ami = string,
+    name = string,
+    min_size = number,
+    max_size = number,
+    node_instance_type = string,
+    node_volume_size = number,
+    node_auto_scaling_group_desired_capacity = number,
+    associate_public_ip_address = bool
+  }))
 }
+
 
 variable "azs" {
-  description = "A list of availability zones names or ids in the region"
-  type        = list(string)
-}
-
-
-#variable "deployment_target" {
-#  default = "perf-1-us-west-2-eks"
-#}
-
-variable "vpc_id" {
-  description = "ID of the VPC"
-  type        = string
-}
-
-variable "cluster_endpoint_public_access" {
-  description = "Indicates whether or not the Amazon EKS public API server endpoint is enabled."
-  type        = bool
-}
-
-variable "cluster_endpoint_public_access_cidrs" {
-  description = "List of CIDR blocks which can access the Amazon EKS public API server endpoint."
-  type        = list(string)
-}
-
-variable "cluster_egress_cidrs" {
-  description = "List of CIDR blocks that are permitted for cluster egress traffic."
-  type        = list(string)
-}
-
-variable "cluster_log_retention_in_days" {
-  default     = 90
-  description = "Number of days to retain log events. Default retention - 90 days."
-  type        = number
-}
-
-variable "extra_tags" {
-  type = map(string)
+  type = list(string)
 }
 
 variable "public_subnets" {
-  description = "ID's of the Public subnets in the VPC"
   type = list(string)
 }
-
 variable "private_subnets" {
-  description = "ID's of the Private subnets in the VPC"
   type = list(string)
-}
-
-variable "eks_version" {
-  description = "Kubernetes version to use for the EKS cluster."
-  type        = string
-}
-
-
-
-variable "cluster_enabled_log_types" {
-  type = list
-}
-
-variable "name" {
-  type = string
-}
-
-variable "map_public_ip_on_launch" {
-  type = bool
-}
-
-variable "global_strings" {
-  type = map(string)
 }
 
 variable "global_maps" {
   type = map(map(string))
 }
+variable "global_strings" {}

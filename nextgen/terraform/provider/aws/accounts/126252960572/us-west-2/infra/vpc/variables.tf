@@ -1,89 +1,55 @@
-variable "vpc_cidr" {
-  description = "The CIDR block for the VPC."
-  type = string
+variable "vpc_config" {
+  type = object({
+    name = string,
+    enable_dns_support = bool,
+    enable_dns_hostnames = bool,
+    cidr = string
+  })
 }
 
-variable "environment" {
-  description = "Name of current environment"
-  type = string
+variable "nodegroup_configs" {
+  type = map(map(map(object({
+    bootstrap_arguments = string,
+    key_name = string,
+    ami = string,
+    name = string,
+    min_size = number,
+    max_size = number,
+    node_instance_type = string,
+    node_volume_size = number,
+    node_auto_scaling_group_desired_capacity = number,
+    associate_public_ip_address = bool
+  }))))
 }
 
-variable "region" {
-  description = "Name of current region"
-  type = string
+
+variable "eks_configs" {
+  type = map(map(object({
+    cluster_name = string,
+    cluster_enabled_log_types = list(string),
+    eks_version = string,
+    cluster_endpoint_private_access = bool,
+    cluster_endpoint_public_access = bool,
+    cluster_endpoint_public_access_cidrs = list(string),
+    cluster_create_timeout = string,
+    cluster_delete_timeout = string,
+    cluster_log_retention_in_days = number,
+    cluster_egress_cidrs = list(string)
+  })))
 }
 
-variable "azs" {
-  description = "A list of availability zones names or ids in the region"
-  type = list(string)
-}
-
-variable "map_public_ip_on_launch" {
-  description = "Should be false if you do not want to auto-assign public IP on launch"
-  type = map(bool)
-}
-
-variable "public_subnets" {
-  description = "A list of public subnets CIDR"
-  type = map(list(string))
-}
-
-variable "private_subnets" {
-  description = "A list of private subnets CIDR"
-  type = map(list(string))
-}
-
-variable "public_subnet_suffix" {
-  description = "Suffix to append to public subnets name"
-  type = string
-}
-
-variable "private_subnet_suffix" {
-  description = "Suffix to append to private subnets name"
-  type = string
-}
-
-variable "public_subnet_tags" {
-  description = "A map of tags to add to subnets"
-  type = map(string)
-}
-
-variable "private_subnet_tags" {
-  description = "A map of tags to add to subnets"
-  type = map(string)
-}
-
-variable "tags" {
-  description = "A map of tags to add to subnets"
-  type = map(string)
-}
-
-variable "name" {
-  type = string
-}
-
-variable "global_strings" {
-  type = map(string)
-}
 
 variable "global_maps" {
   type = map(map(string))
 }
+variable "global_strings" {}
 
-variable "eks_versions" {
-  type = map
+variable "azs" {
+  type = list
 }
-
-variable "cluster_endpoint_public_access" {
-  type = map(bool)
-}
-
-variable "cluster_enabled_log_types" {
+variable "public_subnets" {
   type = map(list(string))
 }
-
-variable "eks_targets" {
-  type = set(string)
+variable "private_subnets" {
+  type = map(list(string))
 }
-
-variable "config" {}

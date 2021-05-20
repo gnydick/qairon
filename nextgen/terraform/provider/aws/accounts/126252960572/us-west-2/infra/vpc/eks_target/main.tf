@@ -1,15 +1,9 @@
 module "cluster" {
   source             = "../../../../../../../../modules/aws/eks"
-  eks_version        = var.eks_version
-  azs                = var.azs
   vpc_id             = var.vpc_id
   private_subnets_ids = module.networking.private_subnets_ids
   public_subnets_ids  = module.networking.public_subnets_ids
-  cluster_log_retention_in_days = var.cluster_log_retention_in_days
-  cluster_endpoint_public_access = var.cluster_endpoint_public_access
-  cluster_egress_cidrs = var.cluster_egress_cidrs
-  cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
-  cluster_enabled_log_types = var.cluster_enabled_log_types
-  cluster_endpoint_private_access = false
-  cluster_name = var.name
+  eks_config = var.eks_config
+  global_maps = var.global_maps
+  global_strings = var.global_strings
 }

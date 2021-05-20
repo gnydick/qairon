@@ -1,21 +1,21 @@
 resource "aws_eks_cluster" "cluster" {
-  name                      = var.cluster_name
-  enabled_cluster_log_types = var.cluster_enabled_log_types
+  name                      = var.eks_config.cluster_name
+  enabled_cluster_log_types = var.eks_config.cluster_enabled_log_types
   role_arn                  = aws_iam_role.eks_service_role.arn
-  version                   = var.eks_version
-  tags                      = var.tags
+  version                   = var.eks_config.eks_version
+  tags = var.global_maps.regional_tags
 
   vpc_config {
     security_group_ids      = compact([aws_security_group.cluster.id])
     subnet_ids              = concat(var.private_subnets_ids, var.public_subnets_ids)
-    endpoint_private_access = var.cluster_endpoint_private_access
-    endpoint_public_access  = var.cluster_endpoint_public_access
-    public_access_cidrs     = var.cluster_endpoint_public_access_cidrs
+    endpoint_private_access = var.eks_config.cluster_endpoint_private_access
+    endpoint_public_access  = var.eks_config.cluster_endpoint_public_access
+    public_access_cidrs     = var.eks_config.cluster_endpoint_public_access_cidrs
   }
 
   timeouts {
-    create = var.cluster_create_timeout
-    delete = var.cluster_delete_timeout
+    create = var.eks_config.cluster_create_timeout
+    delete = var.eks_config.cluster_delete_timeout
   }
 
   depends_on = [
@@ -29,10 +29,10 @@ resource "aws_eks_cluster" "cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "cluster" {
-  count             = length(var.cluster_enabled_log_types) > 0 ? 1 : 0
-  name              = "/aws/eks/${var.cluster_name}/cluster"
-  retention_in_days = var.cluster_log_retention_in_days
-  tags              = var.tags
+  count             = length(var.eks_config.cluster_enabled_log_types) > 0 ? 1 : 0
+  name              = "/aws/eks/${var.eks_config.cluster_name}/cluster"
+  retention_in_days = var.eks_config.cluster_log_retention_in_days
+//  tags              = var.eks_config.tags
 }
 
 ################################
@@ -40,7 +40,7 @@ resource "aws_cloudwatch_log_group" "cluster" {
 ################################
 
 resource "aws_iam_role" "eks_service_role" {
-  name               = "${var.cluster_name}.eksServiceRole"
+  name               = "${var.eks_config.cluster_name}.eksServiceRole"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -127,29 +127,23 @@ resource "aws_iam_role" "example" {
 ################################
 
 resource "aws_security_group" "cluster" {
-  name_prefix = var.cluster_name
+  name_prefix = var.eks_config.cluster_name
   description = "EKS cluster control plane security group."
   vpc_id      = var.vpc_id
-  tags = merge(
-  var.tags,
-  {
-    "Name" = "${var.cluster_name}-eks_cluster_sg"
-  },
-  )
+  tags = {
+    "Name" = "${var.eks_config.cluster_name}-eks_cluster_sg"
+  }
+
 }
 
 resource "aws_security_group" "nodes" {
-  name_prefix = var.cluster_name
+  name_prefix = var.eks_config.cluster_name
   description = "Security group for all nodes in the cluster"
-  vpc_id      = var.vpc_id
-  tags = merge(
-  var.tags,
-  {
-    "Name" = "${var.cluster_name}-eks_cluster_nodes_sg"
-  },
-  )
+  vpc_id = var.vpc_id
+  tags = {
+    "Name" = "${var.eks_config.cluster_name}-eks_cluster_nodes_sg"
+  }
 }
-
 ################################
 #   EKS Control Panel SG Rules
 ################################
@@ -158,7 +152,7 @@ resource "aws_security_group_rule" "cluster_egress_internet" {
   description       = "Allow cluster egress access to the Internet."
   protocol          = "-1"
   security_group_id = aws_security_group.cluster.id
-  cidr_blocks       = var.cluster_egress_cidrs
+  cidr_blocks       = var.eks_config.cluster_egress_cidrs
   from_port         = 0
   to_port           = 0
   type              = "egress"

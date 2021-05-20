@@ -94,3 +94,7 @@ variable "tags" {
   default     = {}
 }
 
+variable "global_maps" {
+  type = map(map(string))
+}
+variable "global_strings" {}

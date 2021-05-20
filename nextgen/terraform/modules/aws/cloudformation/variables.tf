@@ -1,29 +1,24 @@
-variable "key_name" {}
-variable "ami" {}
+variable "name" {}
+variable "nodegroup_config" {
+  type = object({
+    bootstrap_arguments = string,
+    key_name = string,
+    ami = string,
+    name = string,
+    min_size = number,
+    max_size = number,
+    node_instance_type = string,
+    node_volume_size = number,
+    node_auto_scaling_group_desired_capacity = number,
+    associate_public_ip_address = bool
+  })
+}
+variable "proxy_security_group" {}
+variable "cp_sg_id" {}
 variable "vpc_id" {}
 variable "subnets" {}
-variable "cp_sg_id" {}
-variable "min_size" {}
-variable "max_size" {}
-variable "region" {}
-variable "environment" {}
-variable "group_number" {}
-variable "config_name" {}
-variable "azs" {}
-variable "role" {}
-variable "extra_tags" {
-  type = "map"
-}
-variable "node_instance_type" {}
-variable "node_volume_size" {}
-variable "node_auto_scaling_group_desired_capacity" {}
-variable "associate_public_ip_address" {
-  default = "false"
-}
-variable "bootstrap_arguments" {
-  default = ""
-}
-variable "deployment_target" {}
 variable "cluster_name" {}
-variable "nodegroup_number" {}
-variable "proxy_security_group" {}
+variable "global_maps" {
+  type = map(map(string))
+}
+variable "global_strings" {}

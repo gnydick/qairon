@@ -11,17 +11,12 @@ resource "aws_subnet" "public" {
   availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
   map_public_ip_on_launch         = var.map_public_ip_on_launch
 
-  tags = merge(
-  {
-    "Name" = format(
-    "%s-${var.public_subnet_suffix}-%s",
-    var.environment,
-    element(var.azs, count.index),
-    )
-  },
-  var.tags,
-  var.public_subnet_tags,
-  )
+  tags = {
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Az" = var.azs[count.index]
+  }
+
+
 }
 
 #################
@@ -36,17 +31,10 @@ resource "aws_subnet" "private" {
   availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
   availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
 
-  tags = merge(
-  {
-    "Name" = format(
-    "%s-${var.private_subnet_suffix}-%s",
-    var.environment,
-    element(var.azs, count.index),
-    )
-  },
-  var.tags,
-  var.private_subnet_tags,
-  )
+  tags = {
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Az" = var.azs[count.index]
+  }
 }
 
 ###################
@@ -55,12 +43,10 @@ resource "aws_subnet" "private" {
 resource "aws_internet_gateway" "igw" {
   count =  length(var.public_subnets) > 0 ? 1 : 0
   vpc_id = var.vpc_id
-  tags = merge(
-  {
-    "Name" = format("%s", var.environment)
-  },
-  var.tags,
-  )
+  tags = {
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Az" = var.azs[count.index]
+  }
 }
 
 ################
@@ -69,12 +55,10 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_route_table" "public_rt" {
   count = length(var.public_subnets) > 0 ? 1 : 0
   vpc_id = var.vpc_id
-  tags = merge(
-  {
-    "Name" = format("%s-${var.public_subnet_suffix}", var.environment)
-  },
-  var.tags,
-  )
+  tags = {
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Az" = var.azs[count.index]
+  }
 }
 
 resource "aws_route" "public_internet_gateway" {
@@ -101,16 +85,10 @@ resource "aws_eip" "nat" {
   count = var.enable_nat_gateway ? local.nat_gateway_count : 0
 
   vpc = true
-  tags = merge(
-  {
-    "Name" = format(
-    "%s-%s",
-    var.environment,
-    element(var.azs, count.index),
-    )
-  },
-  var.tags,
-  )
+  tags = {
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Az" = var.azs[count.index]
+  }
 }
 
 resource "aws_nat_gateway" "nat_gtw" {
@@ -118,17 +96,10 @@ resource "aws_nat_gateway" "nat_gtw" {
 
   allocation_id = element(local.nat_gateway_ips, count.index)
   subnet_id = element(aws_subnet.public.*.id, count.index)
-  tags = merge(
-  {
-    "Name" = format(
-    "%s-%s",
-    var.environment,
-    element(var.azs, count.index),
-    )
-  },
-  var.tags,
-  var.nat_gateway_tags,
-  )
+  tags = {
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Az" = var.azs[count.index]
+  }
 
   depends_on = [aws_internet_gateway.igw]
 }
@@ -141,17 +112,10 @@ resource "aws_route_table" "private_rt" {
   count = local.max_subnet_length > 0 ? local.nat_gateway_count : 0
 
   vpc_id = var.vpc_id
-  tags = merge(
-  {
-    "Name" = format(
-    "%s-${var.private_subnet_suffix}-%s",
-    var.environment,
-    element(var.azs, count.index),
-    )
-  },
-  var.tags,
-  var.private_route_table_tags,
-  )
+  tags = {
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Az" = var.azs[count.index]
+  }
 }
 
 resource "aws_route" "private_nat_gateway" {
