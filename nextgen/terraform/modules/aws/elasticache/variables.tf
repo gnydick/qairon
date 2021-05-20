@@ -69,27 +69,9 @@ variable "instance_type" {
   description = "Elastic cache instance type"
 }
 
-variable "family" {
-  type        = string
-  description = "Redis family"
-}
-
-variable "parameter" {
-  type = list(object({
-    name  = string
-    value = string
-  }))
-  description = "A list of Redis parameters to apply. Note that parameters may differ from one Redis family to another"
-}
-
 variable "engine_version" {
   type        = string
   description = "Redis engine version"
-}
-
-variable "at_rest_encryption_enabled" {
-  type        = bool
-  description = "Enable encryption at rest"
 }
 
 variable "apply_immediately" {
@@ -112,35 +94,9 @@ variable "availability_zones" {
   description = "Availability zone IDs"
 }
 
-variable "zone_id" {
-  type        = string
-  description = "Route53 DNS Zone ID"
-}
-
-variable "dns_subdomain" {
-  type        = string
-  description = "The subdomain to use for the CNAME record. If not provided then the CNAME record will use var.name."
-}
-
-variable "kms_key_id" {
-  type        = string
-  description = "The ARN of the key that you wish to use if encrypting at rest. If not supplied, uses service managed encryption. `at_rest_encryption_enabled` must be set to `true`"
-}
-
 variable "replication_group_id" {
   type        = string
   description = "Replication group ID with the following constraints: \nA name must contain from 1 to 20 alphanumeric characters or hyphens. \n The first character must be a letter. \n A name cannot end with a hyphen or contain two consecutive hyphens."
-}
-
-variable "snapshot_arns" {
-  type        = list(string)
-  description = "A single-element string list containing an Amazon Resource Name (ARN) of a Redis RDB snapshot file stored in Amazon S3. Example: arn:aws:s3:::my_bucket/snapshot1.rdb"
-}
-
-
-variable "snapshot_name" {
-  type        = string
-  description = "The name of a snapshot from which to restore data into the new node group. Changing the snapshot_name forces a new resource."
 }
 
 variable "snapshot_window" {
