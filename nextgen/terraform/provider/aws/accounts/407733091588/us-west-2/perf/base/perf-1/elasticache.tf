@@ -1,3 +1,4 @@
+# Note about deliting Elasticache SubnetGroup: https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/SubnetGroups.Deleting.html
 module "elasticache-microservices" {
   source = "../../../../../../../../modules/aws/elasticache"
   allowed_cidr_blocks = []
