@@ -27,6 +27,7 @@ resource "aws_security_group_rule" "ingress_security_groups" {
 }
 
 resource "aws_security_group_rule" "ingress_cidr_blocks" {
+  count = var.use_existing_security_groups == false && length(var.allowed_cidr_blocks) > 0 ? 1 : 0
   description       = "Allow inbound traffic from CIDR blocks"
   from_port         = var.port
   to_port           = var.port
@@ -57,10 +58,6 @@ resource "aws_elasticache_replication_group" "default" {
   security_group_ids            = var.use_existing_security_groups ? var.existing_security_groups : [join("", aws_security_group.default.*.id)]
   maintenance_window            = var.maintenance_window
   engine_version                = var.engine_version
-  at_rest_encryption_enabled    = var.at_rest_encryption_enabled
-  kms_key_id                    = var.at_rest_encryption_enabled ? var.kms_key_id : null
-  snapshot_name                 = var.snapshot_name
-  snapshot_arns                 = var.snapshot_arns
   snapshot_window               = var.snapshot_window
   snapshot_retention_limit      = var.snapshot_retention_limit
   apply_immediately             = var.apply_immediately
