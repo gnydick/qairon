@@ -10,3 +10,9 @@ output "eks_node_sg_ids" {
   })
 }
 
+output "eks_private_subnet_ids" {
+  value = tomap({
+  for k, vpc in module.vpcs : k => vpc.private_subnet_ids
+  })
+}
+

@@ -9,6 +9,12 @@ output "eks_node_sg_ids" {
   })
 }
 
+output "private_subnet_ids" {
+  value = tomap({
+    for k, cluster in module.eks_targets : k => cluster.private_subnet_ids
+  })
+}
+
 
 //
 //output "vpc_arn" {
