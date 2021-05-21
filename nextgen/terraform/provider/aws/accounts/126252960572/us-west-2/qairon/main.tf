@@ -1,18 +1,21 @@
+locals {
+  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_ids["vpc1"]
+}
+
 module "db" {
+  depends_on = [module.networking]
   source  = "terraform-aws-modules/rds-aurora/aws"
   version = "~> 3.0"
-
-  name           = "test-aurora-db-postgres96"
+  allowed_security_groups = [data.terraform_remote_state.vpc.outputs.eks_node_sg_ids["vpc1"]["infra1"]]
+  name           = "qairon"
   engine         = "aurora-postgresql"
   engine_version = "11.9"
   instance_type  = "db.r5.large"
 
-  vpc_id  = data.terraform_remote_state.vpc.outputs.vpc_ids["vpc1"]
-  subnets = ["subnet-12345678", "subnet-87654321"]
+  vpc_id  = local.vpc_id
+  subnets = data.terraform_remote_state.vpc.outputs.eks_node_sg_ids["vpc1"]["infra1"]
 
-  replica_count           = 1
-  allowed_security_groups = ["sg-12345678"]
-  allowed_cidr_blocks     = ["10.20.0.0/20"]
+  replica_count           = 4
 
   storage_encrypted   = true
   apply_immediately   = true
@@ -23,6 +26,7 @@ module "db" {
 
   enabled_cloudwatch_logs_exports = ["postgresql"]
 
-
 }
+
+
 
