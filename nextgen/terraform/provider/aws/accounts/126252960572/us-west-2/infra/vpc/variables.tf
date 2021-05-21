@@ -38,7 +38,6 @@ variable "eks_configs" {
   })))
 }
 
-
 variable "global_maps" {
   type = map(map(string))
 }

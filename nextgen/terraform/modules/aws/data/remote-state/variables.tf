@@ -7,3 +7,4 @@ variable "tf_remote_state_s3_bucket_prefix" {}
 variable "tf_remote_state_s3_bucket_current_environment_region" {}
 
 variable "fqk" {}
+
