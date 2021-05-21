@@ -13,7 +13,7 @@ module "db" {
   instance_type = "db.t3.large"
 
   vpc_id = local.vpc_id
-  subnets = data.terraform_remote_state.vpc.outputs.eks_private_subnet_ids["vpc1"]["infra1"]
+  subnets = data.terraform_remote_state.vpc.outputs.private_subnet_ids["vpc1"]
 
   replica_count = 4
 
