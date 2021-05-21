@@ -3,7 +3,6 @@ provider "aws" {
   default_tags {
     tags = local.global_tags
   }
-//  version = "3.37.0"
 }
 
 module "vpcs" {
