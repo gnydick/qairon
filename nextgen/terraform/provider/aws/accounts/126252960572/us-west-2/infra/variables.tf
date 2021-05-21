@@ -45,8 +45,8 @@ variable "eks_configs" {
 }
 
 variable "public_subnets" {
-  type = map(map(list(string)))
+  type = map(list(string))
 }
 variable "private_subnets" {
-  type = map(map(list(string)))
+  type = map(list(string))
 }

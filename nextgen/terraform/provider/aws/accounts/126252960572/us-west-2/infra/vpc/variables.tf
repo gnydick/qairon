@@ -48,8 +48,8 @@ variable "azs" {
   type = list
 }
 variable "public_subnets" {
-  type = map(list(string))
+  type = list(string)
 }
 variable "private_subnets" {
-  type = map(list(string))
+  type = list(string)
 }

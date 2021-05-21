@@ -13,7 +13,7 @@ module "stack" {
   source                                   = "../../../../../../../../modules/aws/cloudformation"
   vpc_id                                   = var.vpc_id
   cp_sg_id                                 = module.cluster.cluster_security_group_id
-  subnets                                  = join(",", module.networking.private_subnets_ids)
+  subnets                                  = join(",", var.private_subnets)
   name = each.key
   cluster_name = var.eks_config.cluster_name
   nodegroup_config = var.nodegroup_configs[each.key]
