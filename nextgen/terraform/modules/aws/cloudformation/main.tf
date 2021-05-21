@@ -28,7 +28,6 @@ resource "aws_cloudformation_stack" "stack" {
     NodeVolumeSize = var.nodegroup_config.node_volume_size
     NodeAutoScalingGroupDesiredCapacity = var.nodegroup_config.node_auto_scaling_group_desired_capacity
     AssociatePublicIpAddress = var.nodegroup_config.associate_public_ip_address
-    ProxySecurityGroup = var.proxy_security_group
 
   }
 

@@ -33,14 +33,14 @@ eks_configs = {
       azs = [],
       cluster_create_timeout = "90m",
       cluster_delete_timeout = "90m",
-      cluster_egress_cidrs = [],
+      cluster_egress_cidrs = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24", "10.0.7.0/24", "10.0.8.0/24"],
       cluster_enabled_log_types = [],
       cluster_endpoint_private_access = true,
       cluster_endpoint_public_access = true,
       cluster_endpoint_public_access_cidrs = [],
       cluster_log_retention_in_days = 90,
       cluster_name = "infra1",
-      eks_version = "1.19"
+      eks_version = "1.20"
     }
   }
 }
@@ -68,15 +68,15 @@ nodegroup_configs = {
       "nodegroup1" = {
         name = "nodegroup1"
         bootstrap_arguments = "",
-        key_name = "ng1",
-        ami = "",
+        key_name = "infra1",
+        ami = "ami-0010b93bf152621e5",
         subnets = [],
         node_group_name = "nodegroup1",
         min_size = 1,
-        max_size = 6,
+        max_size = 16,
         node_instance_type = "m5.large",
         node_volume_size = 1000,
-        node_auto_scaling_group_desired_capacity = 3,
+        node_auto_scaling_group_desired_capacity = 8,
         associate_public_ip_address = false,
       }
     }

@@ -12,8 +12,9 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch         = var.map_public_ip_on_launch
 
   tags = {
-    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, var.azs[count.index]),
     "Az" = var.azs[count.index]
+    "Tier" = "public"
   }
 
 
@@ -32,8 +33,9 @@ resource "aws_subnet" "private" {
   availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
 
   tags = {
-    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, var.azs[count.index]),
     "Az" = var.azs[count.index]
+    "Tier" = "private"
   }
 }
 
@@ -44,7 +46,7 @@ resource "aws_internet_gateway" "igw" {
   count =  length(var.public_subnets) > 0 ? 1 : 0
   vpc_id = var.vpc_id
   tags = {
-    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, var.azs[count.index]),
     "Az" = var.azs[count.index]
   }
 }
@@ -56,7 +58,7 @@ resource "aws_route_table" "public_rt" {
   count = length(var.public_subnets) > 0 ? 1 : 0
   vpc_id = var.vpc_id
   tags = {
-    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, var.azs[count.index]),
     "Az" = var.azs[count.index]
   }
 }
@@ -86,7 +88,7 @@ resource "aws_eip" "nat" {
 
   vpc = true
   tags = {
-    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, var.azs[count.index]),
     "Az" = var.azs[count.index]
   }
 }
@@ -97,7 +99,7 @@ resource "aws_nat_gateway" "nat_gtw" {
   allocation_id = element(local.nat_gateway_ips, count.index)
   subnet_id = element(aws_subnet.public.*.id, count.index)
   tags = {
-    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, var.azs[count.index]),
     "Az" = var.azs[count.index]
   }
 
@@ -113,7 +115,7 @@ resource "aws_route_table" "private_rt" {
 
   vpc_id = var.vpc_id
   tags = {
-    "Name" = format("%s-%s", var.global_strings.regional_prefix, count.index),
+    "Name" = format("%s-%s", var.global_strings.regional_prefix, var.azs[count.index]),
     "Az" = var.azs[count.index]
   }
 }

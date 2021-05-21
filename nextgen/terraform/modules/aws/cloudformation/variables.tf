@@ -13,7 +13,6 @@ variable "nodegroup_config" {
     associate_public_ip_address = bool
   })
 }
-variable "proxy_security_group" {}
 variable "cp_sg_id" {}
 variable "vpc_id" {}
 variable "subnets" {}

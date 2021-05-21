@@ -1,10 +1,11 @@
-module "proxy_sg" {
-  source = "../../../../../../../../modules/aws/eks-security-group"
-  vpc_id = "${var.vpc_id}"
-  proxy_sg_name_override = "dev.us-west-2.vpc-08ae4961b35a0ca43-stacks-proxy.sg"
-
-  name = "foo"
-}
+//module "proxy_sg" {
+//  source = "../../../../../../../../modules/aws/eks-security-group"
+//  vpc_id = var.vpc_id
+//
+//  name = format("proxy-%s-%s.sg", var.global_strings.regional_prefix, var.eks_config.cluster_name)
+//  global_maps = var.global_maps
+//  global_strings = var.global_strings
+//}
 
 
 module "stack" {
@@ -13,9 +14,8 @@ module "stack" {
   vpc_id                                   = var.vpc_id
   cp_sg_id                                 = module.cluster.cluster_security_group_id
   subnets                                  = join(",", module.networking.private_subnets_ids)
-  proxy_security_group                     = module.proxy_sg.sg_id
   name = each.key
-  cluster_name = ""
+  cluster_name = var.eks_config.cluster_name
   nodegroup_config = var.nodegroup_configs[each.key]
   global_maps = var.global_maps
   global_strings = var.global_strings

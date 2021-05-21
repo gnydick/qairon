@@ -1,11 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Amazon EKS - Node Group
 Parameters:
-  ProxySecurityGroup:
-    Description: >-
-      Proxy group so deleting stacks doesn't require deleting the security
-      group.
-    Type: 'AWS::EC2::SecurityGroup::Id'
   AssociatePublicIpAddress:
     Description: Whether or not to give instance a public IP
     Type: String
@@ -369,7 +364,6 @@ Resources:
       KeyName: !Ref KeyName
       SecurityGroups:
         - !Ref NodeSecurityGroup
-        - !Ref ProxySecurityGroup
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:

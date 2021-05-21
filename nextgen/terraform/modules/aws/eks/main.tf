@@ -6,7 +6,7 @@ resource "aws_eks_cluster" "cluster" {
   tags = var.global_maps.regional_tags
 
   vpc_config {
-    security_group_ids      = compact([aws_security_group.cluster.id])
+    security_group_ids      = compact([aws_security_group.cluster.id, aws_security_group.nodes.id])
     subnet_ids              = concat(var.private_subnets_ids, var.public_subnets_ids)
     endpoint_private_access = var.eks_config.cluster_endpoint_private_access
     endpoint_public_access  = var.eks_config.cluster_endpoint_public_access
@@ -56,6 +56,10 @@ resource "aws_iam_role" "eks_service_role" {
 }
 
 EOF
+
+  tags = {
+    "Name" = "${var.eks_config.cluster_name}-${var.global_strings.regional_prefix}.eksServiceRole"
+  }
 
 }
 
@@ -137,7 +141,7 @@ resource "aws_security_group" "cluster" {
 }
 
 resource "aws_security_group" "nodes" {
-  name_prefix = var.eks_config.cluster_name
+  name = "${var.eks_config.cluster_name}-eks_cluster_nodes_sg"
   description = "Security group for all nodes in the cluster"
   vpc_id = var.vpc_id
   tags = {
