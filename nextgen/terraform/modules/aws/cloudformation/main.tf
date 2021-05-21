@@ -7,7 +7,7 @@ data "template_file" "amazon-eks-nodegroup_yaml" {
 
 resource "aws_cloudformation_stack" "stack" {
   tags = var.global_maps.regional_tags
-  name = var.name
+  name = format("%s-%s", var.global_strings.regional_prefix, var.name)
   capabilities = [
     "CAPABILITY_IAM"]
   template_body = data.template_file.amazon-eks-nodegroup_yaml.rendered

@@ -103,28 +103,28 @@ resource "aws_iam_openid_connect_provider" "cluster" {
   url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
 
-data "aws_iam_policy_document" "example_assume_role_policy" {
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
+//data "aws_iam_policy_document" "example_assume_role_policy" {
+//  statement {
+//    actions = ["sts:AssumeRoleWithWebIdentity"]
+//    effect  = "Allow"
+//
+//    condition {
+//      test     = "StringEquals"
+//      variable = "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:sub"
+//      values   = ["system:serviceaccount:kube-system:aws-node"]
+//    }
+//
+//    principals {
+//      identifiers = [aws_iam_openid_connect_provider.cluster.arn]
+//      type        = "Federated"
+//    }
+//  }
+//}
 
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:sub"
-      values   = ["system:serviceaccount:kube-system:aws-node"]
-    }
-
-    principals {
-      identifiers = [aws_iam_openid_connect_provider.cluster.arn]
-      type        = "Federated"
-    }
-  }
-}
-
-resource "aws_iam_role" "example" {
-  assume_role_policy = data.aws_iam_policy_document.example_assume_role_policy.json
-  name               = "example"
-}
+//resource "aws_iam_role" "example" {
+//  assume_role_policy = data.aws_iam_policy_document.example_assume_role_policy.json
+//  name               = "example"
+//}
 
 ################################
 #   EKS and Worker Nodes SG
