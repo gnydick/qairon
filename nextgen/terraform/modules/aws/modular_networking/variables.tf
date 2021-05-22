@@ -10,7 +10,7 @@ variable "azs" {
 
 variable "public_subnet_cidrs" {
   description = "A list of public subnets inside the VPC"
-  type        = list(string)
+  type        = map(list(string))
 }
 
 variable "private_subnet_cidrs" {

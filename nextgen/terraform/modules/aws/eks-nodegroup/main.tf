@@ -114,12 +114,12 @@ module "autoscale_group" {
   iam_instance_profile_name = var.use_existing_aws_iam_instance_profile == false ? join("", aws_iam_instance_profile.default.*.name) : var.aws_iam_instance_profile_name
 
   security_group_ids = compact(
-  concat(
-  [
-    var.use_existing_security_group == false ? join("", aws_security_group.default.*.id) : var.workers_security_group_id
-  ],
-  var.additional_security_group_ids
-  )
+    concat(
+      [
+        var.use_existing_security_group == false ? join("", aws_security_group.default.*.id) : var.workers_security_group_id
+      ],
+      var.additional_security_group_ids
+    )
   )
 
   user_data_base64 = base64encode(join("", data.template_file.userdata.*.rendered))

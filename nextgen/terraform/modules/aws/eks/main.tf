@@ -4,11 +4,11 @@ resource "aws_eks_cluster" "cluster" {
   enabled_cluster_log_types = var.eks_config.cluster_enabled_log_types
   role_arn                  = aws_iam_role.eks_service_role.arn
   version                   = var.eks_config.eks_version
-  tags = var.global_maps.regional_tags
+  tags                      = var.global_maps.regional_tags
 
   vpc_config {
     security_group_ids      = compact([aws_security_group.cluster.id, aws_security_group.nodes.id])
-    subnet_ids              = concat(var.private_subnets_ids, var.public_subnets_ids)
+    subnet_ids              = concat(var.private_subnets_ids)
     endpoint_private_access = var.eks_config.cluster_endpoint_private_access
     endpoint_public_access  = var.eks_config.cluster_endpoint_public_access
     public_access_cidrs     = var.eks_config.cluster_endpoint_public_access_cidrs
@@ -31,7 +31,7 @@ resource "aws_eks_cluster" "cluster" {
 
 resource "aws_eks_addon" "cni" {
   cluster_name = var.eks_config.cluster_name
-  addon_name = "vpc-cni"
+  addon_name   = "vpc-cni"
 }
 
 
@@ -40,7 +40,7 @@ resource "aws_cloudwatch_log_group" "cluster" {
   count             = length(var.eks_config.cluster_enabled_log_types) > 0 ? 1 : 0
   name              = "/aws/eks/${var.eks_config.cluster_name}/cluster"
   retention_in_days = var.eks_config.cluster_log_retention_in_days
-//  tags              = var.eks_config.tags
+  //  tags              = var.eks_config.tags
 }
 
 ################################
@@ -131,7 +131,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
 
 resource "aws_iam_role" "oidc_role" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
-  name               = format("%s-%s.oidc_role", var.vpc_id,var.eks_config.cluster_name)
+  name               = format("%s-%s.oidc_role", var.vpc_id, var.eks_config.cluster_name)
 }
 
 
@@ -150,9 +150,9 @@ resource "aws_security_group" "cluster" {
 }
 
 resource "aws_security_group" "nodes" {
-  name = "${var.eks_config.cluster_name}-eks_cluster_nodes_sg"
+  name        = "${var.eks_config.cluster_name}-eks_cluster_nodes_sg"
   description = "Security group for all nodes in the cluster"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
   tags = {
     "Name" = "${var.eks_config.cluster_name}-eks_cluster_nodes_sg"
   }

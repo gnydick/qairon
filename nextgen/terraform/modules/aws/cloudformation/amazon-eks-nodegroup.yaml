@@ -348,9 +348,11 @@ Resources:
           PropagateAtLaunch: true
     UpdatePolicy:
       AutoScalingRollingUpdate:
-        MaxBatchSize: 6
-        MinInstancesInService: !Ref NodeAutoScalingGroupDesiredCapacity
-        PauseTime: PT5M
+#        MaxBatchSize: 6
+        MaxBatchSize: !Ref NodeAutoScalingGroupMaxSize
+#        MinInstancesInService: !Ref NodeAutoScalingGroupDesiredCapacity
+        MinInstancesInService: 0
+        PauseTime: PT3M
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 2a22b6ba-cf7e-4881-b028-ee9fe8670c1c

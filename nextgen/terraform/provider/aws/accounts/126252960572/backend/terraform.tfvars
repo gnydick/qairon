@@ -13,15 +13,15 @@
 # `terraform push` commands - changing this WILL affect your
 
 # terraform.tfstate file, so use caution
-environment = "infra"
-config = "default"
-org = "withme"
-region = "us-west-2"
+environment     = "infra"
+config          = "default"
+org             = "withme"
+region          = "us-west-2"
 provider_region = "us-west-2"
-dept = "engineering"
+dept            = "engineering"
 
 #dynamodb_table
-stream_enabled = true
+stream_enabled   = true
 stream_view_type = "NEW_AND_OLD_IMAGES"
-billing_mode = "PAY_PER_REQUEST"
-role = "tfstate"
+billing_mode     = "PAY_PER_REQUEST"
+role             = "tfstate"

@@ -15,28 +15,28 @@ variable "provider_region" {}
 
 
 locals {
-  global_prefix = "${var.org}-${var.dept}-${var.environment}-${var.role}-${var.config}"
+  global_prefix   = "${var.org}-${var.dept}-${var.environment}-${var.role}-${var.config}"
   regional_prefix = "${var.org}-${var.dept}-${var.environment}-${var.region}-${var.role}-${var.config}"
   global_tags = {
-    Org = var.org,
-    Dept = var.dept,
+    Org         = var.org,
+    Dept        = var.dept,
     Environment = var.environment,
-    Role = var.role,
-    Config = var.config,
+    Role        = var.role,
+    Config      = var.config,
     GeneratedBy = "terraform"
   }
   regional_tags = merge(
-  local.global_tags,
-  {
-    "Region" = var.region
-  }
+    local.global_tags,
+    {
+      "Region" = var.region
+    }
   )
   global_strings = {
-    global_prefix = local.global_prefix,
+    global_prefix   = local.global_prefix,
     regional_prefix = local.regional_prefix
   }
   global_maps = {
-    global_tags = local.global_tags,
+    global_tags   = local.global_tags,
     regional_tags = local.regional_tags
   }
 }
