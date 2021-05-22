@@ -7,6 +7,14 @@ module "private" {
   subnet_type = each.key
 }
 
+
+output "private_subnet_ids" {
+  value = tomap({
+  for k, ids in module.private : k => ids
+  })
+}
+
+
 module "public" {
   source = "./public_subnet"
   azs = var.azs
@@ -184,9 +192,3 @@ output "public_route_table_ids" {
 //    "kubernetes.io/role/internal-elb" = ""
 //  }
 //}
-
-output "private_subnet_ids" {
-  value = tomap({
-  for type, ids in module.private[*] : type => ids
-  })
-}

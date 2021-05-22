@@ -43,8 +43,3 @@ variable "private_subnet_cidrs" {
 output "private_subnet_ids" {
   value = aws_subnet.private.*.id
 }
-
-output "subnet_type" {
-  value = var.subnet_type
-}
-
