@@ -3,17 +3,16 @@ locals {
 }
 
 module "db" {
-  depends_on = [module.networking]
   source = "terraform-aws-modules/rds-aurora/aws"
   version = "~> 3.0"
-  allowed_security_groups = [data.terraform_remote_state.vpc.outputs.eks_node_sg_ids["vpc1"]["infra1"]]
+  allowed_security_groups = [data.terraform_remote_state.vpc.outputs.eks_node_sg_ids["vpc0"][""]]
   name = "qairon"
   engine = "aurora-postgresql"
   engine_version = "10.14"
   instance_type = "db.t3.large"
 
   vpc_id = local.vpc_id
-  subnets = data.terraform_remote_state.vpc.outputs.private_subnet_ids["vpc1"]
+  subnets = data.terraform_remote_state.vpc.outputs.private_subnet_ids["vpc0"]["rds"]
 
   replica_count = 4
 
