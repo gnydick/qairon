@@ -3,15 +3,12 @@ output "vpc_id" {
   value       = module.vpc.vpc_id
 }
 
-//output "eks_node_sg_ids" {
-//  value = tomap({
-//  for k, cluster in module.eks_targets : k => cluster.eks_node_sg
-//  })
-//}
+output "eks_node_sg_ids" {
+  value = tomap({
+  for k, cluster in module.eks_targets : k => cluster.eks_node_sg
+  })
+}
 
-//output "foo_ids" {
-//  value = module.debug.foo_ids
-//}
 
 
 output "private_subnet_ids" {
