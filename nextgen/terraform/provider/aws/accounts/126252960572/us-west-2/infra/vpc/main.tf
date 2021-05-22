@@ -14,8 +14,8 @@ module "eks_targets" {
   eks_config = var.eks_configs[var.vpc_config.name][each.key]
   azs = var.azs
   vpc_id = module.vpc.vpc_id
-  public_subnets = module.networking.public_subnets_ids
-  private_subnets = module.networking.private_subnets_ids
+  public_subnets = module.networking.public_subnet_ids
+  private_subnets = module.networking.private_subnet_ids
   nodegroup_configs = var.nodegroup_configs[var.vpc_config.name][each.key]
   global_maps = var.global_maps
   global_strings = var.global_strings

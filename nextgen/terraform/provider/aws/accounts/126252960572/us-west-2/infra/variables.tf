@@ -48,5 +48,5 @@ variable "public_subnets" {
   type = map(list(string))
 }
 variable "private_subnets" {
-  type = map(list(string))
+  type = map(map(list(string)))
 }

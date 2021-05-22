@@ -6,7 +6,7 @@ variable "environment" {}
 variable "deployment_target" {}
 variable "config_name" {}
 variable "req-sgs" {
-  type = "list"
+  type = list(string)
 }
 variable "status" {}
 variable "allow_dns_in" {}
