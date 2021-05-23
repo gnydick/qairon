@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+DOCKER_REGISTRY=${_account}.dkr.ecr.${_region}.amazonaws.com
 IMG=$1
 VER=$2
 DFILE="Dockerfile" && [[ "$3" != "" ]] && DFILE=$3
