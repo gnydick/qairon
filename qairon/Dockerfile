@@ -18,6 +18,10 @@ RUN useradd -m -d /opt/qairon qairon_user
 
 
 WORKDIR /opt/qairon
+ADD requirements.txt /
+
+RUN pip install -r /requirements.txt
+
 ADD controllers /opt/qairon/controllers
 ADD converters /opt/qairon/converters
 ADD migrations /opt/qairon/migrations
@@ -27,9 +31,7 @@ ADD app.py /opt/qairon/
 ADD base.py /opt/qairon/
 ADD db.py /opt/qairon/
 ADD qcli /opt/qairon/
-ADD requirements.txt /
 
-RUN pip install -r /requirements.txt
 
 ADD templates /opt/qairon/templates
 

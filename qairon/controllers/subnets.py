@@ -8,7 +8,6 @@ class SubnetController:
     def __init__(self, network_id):
         self.network_id = network_id
 
-
     def allocate_subnet(self, additional_mask_bits, name):
         from .rest_controller import RestController
         rest = RestController()
@@ -28,4 +27,3 @@ class SubnetController:
             subnet_cidr = str(psns[0].compressed)
 
             return subnet_cidr
-

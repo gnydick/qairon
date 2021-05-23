@@ -4,6 +4,7 @@ import re
 
 import requests
 
+from base import app
 from .schema import QaironSchema
 
 

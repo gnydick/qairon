@@ -4,6 +4,7 @@ from flask_admin.menu import BaseMenu
 from flask_migrate import Migrate
 
 from base import app
+from controllers import RestController
 from controllers.subnets import SubnetController
 from db import db
 from models import *
@@ -137,6 +138,7 @@ from flask import Response
 
 from models import  Deployment, Environment, Pop, Region
 
+rest = RestController()
 
 @app.route('/api/health')
 def health():
@@ -145,8 +147,8 @@ def health():
 
 @app.route('/api/rest/v1/network/<network_id>/allocate_subnet/<mask>/<name>', methods=['POST'])
 def allocate_subnet(network_id, mask, name):
-    subnet_controller = SubnetController(network_id)
-    return subnet_controller.allocate_subnet(mask, name) + "\n"
+    result = rest.allocate_subnet(network_id, mask, name)
+    return Response(result, mimetype='text/plain')
 
 
 @app.route('/api/tf/v1/deployment/gen/<dep_id>')
