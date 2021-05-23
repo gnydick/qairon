@@ -1,12 +1,12 @@
 locals {
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_ids["vpc1"]
+  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_ids["vpc0"]
 }
 
 module "db" {
   source = "terraform-aws-modules/rds-aurora/aws"
   version = "~> 3.0"
-  allowed_security_groups = [data.terraform_remote_state.vpc.outputs.eks_node_sg_ids["vpc0"][""]]
-  name = "qairon"
+  allowed_security_groups = [data.terraform_remote_state.vpc.outputs.eks_node_sg_ids["vpc0"]["infra0"]]
+  name = "qairon-infra0"
   engine = "aurora-postgresql"
   engine_version = "10.14"
   instance_type = "db.t3.large"
@@ -32,7 +32,7 @@ module "db" {
 resource "aws_security_group_rule" "eks_out_to_rds" {
   from_port = 5432
   protocol = "tcp"
-  security_group_id = data.terraform_remote_state.vpc.outputs.eks_node_sg_ids["vpc1"]["infra1"]
+  security_group_id = data.terraform_remote_state.vpc.outputs.eks_node_sg_ids["vpc0"]["infra0"]
   to_port = 5432
   type = "egress"
   source_security_group_id = module.db.this_security_group_id

@@ -6,3 +6,4 @@ config = "default"
 region = "us-west-2"
 provider_region = "us-west-2"
 tfstate_region = "us-west-2"
+azs = ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
