@@ -8,5 +8,6 @@ provider_region = "us-west-2"
 
 repos = [
   "jenkins",
-  "qairon"
+  "qairon",
+  "ghost-proxy"
 ]
