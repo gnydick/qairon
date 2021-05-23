@@ -19,7 +19,7 @@ service:
 env:
   user: qairon
   passwd: qairon
-  db: 192.168.99.1
+  db: qairon-infra0.cluster-cnyml3tlkmcj.us-west-2.rds.amazonaws.com
 
 
 environment: infra
