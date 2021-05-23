@@ -20,6 +20,7 @@ resource "aws_cloudformation_stack" "stack" {
     VpcId                               = var.vpc_id
     Subnets                             = var.subnets
     NodeGroupName                       = var.nodegroup_config.name
+    SharedNodeSecurityGroup             = var.shared_node_sg
     ClusterControlPlaneSecurityGroup    = var.cp_sg_id
     ClusterName                         = var.cluster_name
     NodeAutoScalingGroupMinSize         = var.nodegroup_config.min_size

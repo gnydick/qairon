@@ -129,6 +129,9 @@ Parameters:
   NodeGroupName:
     Description: Unique identifier for the Node Group.
     Type: String
+  SharedNodeSecurityGroup:
+    Description: The security group of the cluster control plane.
+    Type: 'AWS::EC2::SecurityGroup::Id'
   ClusterControlPlaneSecurityGroup:
     Description: The security group of the cluster control plane.
     Type: 'AWS::EC2::SecurityGroup::Id'
@@ -149,6 +152,7 @@ Metadata:
       - Label:
           default: Worker Node Configuration
         Parameters:
+          - SharedNodeSecurityGroup
           - NodeGroupName
           - NodeAutoScalingGroupMinSize
           - NodeAutoScalingGroupDesiredCapacity
@@ -366,6 +370,7 @@ Resources:
       KeyName: !Ref KeyName
       SecurityGroups:
         - !Ref NodeSecurityGroup
+        - !Ref SharedNodeSecurityGroup
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:

@@ -1,4 +1,5 @@
 variable "name" {}
+variable "shared_node_sg" {}
 variable "nodegroup_config" {
   type = object({
     bootstrap_arguments                      = string,
