@@ -43,6 +43,7 @@ resource "aws_subnet" "private" {
   tags = {
     "Tier" : "private"
     "Use" : var.subnet_type
+    "Name": format("%s%s", var.subnet_type, count.index)
   }
 
   lifecycle {

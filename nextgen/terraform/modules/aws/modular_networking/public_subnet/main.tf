@@ -25,6 +25,9 @@ resource "aws_subnet" "public" {
 
   tags = {
     "Tier" : "public"
+    "Use" : var.subnet_type
+    "Name": format("%s%s", var.subnet_type, count.index)
+
   }
 
 
