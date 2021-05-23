@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: qairon
-  tag: latest
+  tag: 0.2
   pullPolicy: Never
 
 nameOverride: ""
@@ -22,7 +22,7 @@ env:
   db: 192.168.99.1
 
 
-environment: dev
+environment: infra
 
 ingress:
 #  acm_arn: "arn:aws:acm:us-east-1:707026380822:certificate/666bff45-376c-4cf0-ba3c-21a421c7d81b"
