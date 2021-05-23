@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-build_ids = groovy.json.JsonOutput.toJson(BUILD_ID.split(","))
+build_ids = groovy.json.JsonOutput.toJson(BUILDS.split(","))
 
 
 try {

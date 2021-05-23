@@ -3,7 +3,7 @@ package jenkins
 
 def jobs = [:]
 
-dep_ids = DEPLOYMENT_ID.split(",")
+dep_ids = DEPLOYMENTS.split(",")
 
 println(dep_ids)
 for (int i = 0; i < dep_ids.size(); i++) {
@@ -11,7 +11,7 @@ for (int i = 0; i < dep_ids.size(); i++) {
     def dep_id = dep_ids[index]
     println(dep_ids[index])
     jobs[dep_id] = {
-        node('jenkins-agent') {
+        node('helm-installer') {
             container(name: 'helm') {
                 stage(name: 'parallelize helm installations') {
 
