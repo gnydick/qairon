@@ -23,3 +23,20 @@ output "public_subnet_ids" {
   })
 }
 
+output "cluster_oidc_provider_arns" {
+  value = tomap({
+  for k, vpc in module.vpcs: k => vpc.cluster_oidc_provider_arns
+  })
+}
+
+output "cluster_oidc_issuer_urls" {
+  value = tomap({
+  for k, vpc in module.vpcs: k => vpc.cluster_oidc_issuer_urls
+  })
+}
+
+output "cluster_oidc_providers" {
+  value = tomap({
+  for k, cluster in module.vpcs: k => cluster.cluster_oidc_providers
+  })
+}

@@ -44,3 +44,21 @@ output "public_subnet_ids" {
 //  description = "The ID of the default route table"
 //  value       = module.vpc.default_route_table_id
 //}
+
+output "cluster_oidc_provider_arns" {
+  value = tomap({
+    for k, cluster in module.eks_targets: k => cluster.cluster_oidc_provider_arn
+  })
+}
+
+output "cluster_oidc_issuer_urls" {
+  value = tomap({
+  for k, cluster in module.eks_targets: k => cluster.cluster_oidc_issuer_url
+  })
+}
+
+output "cluster_oidc_providers" {
+  value = tomap({
+  for k, cluster in module.eks_targets: k => cluster.cluster_oidc_providers
+  })
+}
