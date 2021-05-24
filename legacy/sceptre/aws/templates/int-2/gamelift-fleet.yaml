@@ -60,22 +60,22 @@ Resources:
       RuntimeConfiguration:
         ServerProcesses:
           - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
-            Parameters: astral -GameLift -port=7777 -ServerEnvironment=int2
+            Parameters: "astral -GameLift -port=7777  -ServerEnvironment=int2"
             ConcurrentExecutions: 1
           - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
-            Parameters: astral -GameLift -port=7779 -ServerEnvironment=int2
+            Parameters: "astral -GameLift -port=7779  -ServerEnvironment=int2"
             ConcurrentExecutions: 1
           - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
-            Parameters: astral -GameLift -port=7781 -ServerEnvironment=int2
+            Parameters: "astral -GameLift -port=7781  -ServerEnvironment=int2"
             ConcurrentExecutions: 1
           - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
-            Parameters: astral -GameLift -port=7783 -ServerEnvironment=int2
+            Parameters: "astral -GameLift -port=7783  -ServerEnvironment=int2"
             ConcurrentExecutions: 1
           - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
-            Parameters: astral -GameLift -port=7785 -ServerEnvironment=int2
+            Parameters: "astral -GameLift -port=7785  -ServerEnvironment=int2"
             ConcurrentExecutions: 1
           - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
-            Parameters: astral -GameLift -port=7787 -ServerEnvironment=int2
+            Parameters: "astral -GameLift -port=7787  -ServerEnvironment=int2"
             ConcurrentExecutions: 1
 
 
