@@ -7,9 +7,6 @@ region          = "us-west-2"
 provider_region = "us-west-2"
 
 
-
-
-
 public_subnets = {
   "vpc0" = {
     "eks_nodes" = [],
@@ -19,7 +16,7 @@ public_subnets = {
 
 private_subnets = {
   "vpc0" = {
-    "eks_nodes" = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24", "10.0.7.0/24"],
+    "eks_nodes" = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/s", "10.0.7.0/24"],
     "eks_cp" = ["10.0.0.0/28", "10.0.0.16/28", "10.0.0.32/28", "10.0.0.48/28"]
     "rds" = [ "10.0.8.64/26", "10.0.8.128/26", "10.0.8.192/26", "10.0.9.0/26"]
   }
@@ -44,9 +41,6 @@ eks_configs = {
 }
 
 azs = ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
-
-
-
 vpc_configs = {
   "vpc0" = {
 
@@ -56,9 +50,6 @@ vpc_configs = {
     cidr                 = "10.0.0.0/16"
   }
 }
-
-
-
 
 nodegroup_configs = {
   "vpc0" = {
