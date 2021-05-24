@@ -10,7 +10,7 @@ resource "aws_dynamodb_table" "dynamodb_table" {
   billing_mode     = var.billing_mode
   stream_enabled   = var.stream_enabled
   stream_view_type = var.stream_view_type
-  write_capacity = var.write_capacity
+  write_capacity   = var.write_capacity
   point_in_time_recovery {
     enabled = var.pit_recovery
   }
@@ -29,9 +29,9 @@ resource "aws_dynamodb_table" "dynamodb_table" {
   }
 
   tags = merge(
-  var.tags,
-  {
-    "Name" = local.name
-  }
+    var.tags,
+    {
+      "Name" = local.name
+    }
   )
 }

@@ -1,7 +1,23 @@
 output "vpc_id" {
-  value = module.vpc.vpc_id
+  description = "The ID of the VPC"
+  value       = module.vpc.vpc_id
 }
 
+output "eks_node_sg_ids" {
+  value = tomap({
+  for k, cluster in module.eks_targets : k => cluster.eks_node_sg
+  })
+}
+
+
+
+output "private_subnet_ids" {
+  value = module.networking.private_subnet_ids
+}
+
+output "public_subnet_ids" {
+  value = module.networking.public_subnet_ids
+}
 //
 //output "vpc_arn" {
 //  description = "The ARN of the VPC"
