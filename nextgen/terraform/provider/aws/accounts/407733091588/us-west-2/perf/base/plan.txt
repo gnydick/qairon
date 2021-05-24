@@ -1,0 +1,1467 @@
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # module.vpcs[0].module.vpc.aws_vpc.vpc will be created
+  + resource "aws_vpc" "vpc" {
+      + arn                              = (known after apply)
+      + assign_generated_ipv6_cidr_block = false
+      + cidr_block                       = "20.10.0.0/16"
+      + default_network_acl_id           = (known after apply)
+      + default_route_table_id           = (known after apply)
+      + default_security_group_id        = (known after apply)
+      + dhcp_options_id                  = (known after apply)
+      + enable_classiclink               = (known after apply)
+      + enable_classiclink_dns_support   = (known after apply)
+      + enable_dns_hostnames             = true
+      + enable_dns_support               = true
+      + id                               = (known after apply)
+      + instance_tenancy                 = "default"
+      + ipv6_association_id              = (known after apply)
+      + ipv6_cidr_block                  = (known after apply)
+      + main_route_table_id              = (known after apply)
+      + owner_id                         = (known after apply)
+      + tags                             = {
+          + "Config"      = "default"
+          + "Dept"        = "services"
+          + "Environment" = "perf"
+          + "GeneratedBy" = "terraform"
+          + "Name"        = "withme-services-perf-us-west-2-dev-default-0-vpc"
+          + "Org"         = "withme"
+          + "Role"        = "dev"
+        }
+      + tags_all                         = {
+          + "Config"      = "default"
+          + "Dept"        = "services"
+          + "Environment" = "perf"
+          + "GeneratedBy" = "terraform"
+          + "Name"        = "withme-services-perf-us-west-2-dev-default-0-vpc"
+          + "Org"         = "withme"
+          + "Role"        = "dev"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.data.aws_iam_policy.AmazonEKSClusterPolicy will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy" "AmazonEKSClusterPolicy"  {
+      + arn         = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+      + description = (known after apply)
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + path        = (known after apply)
+      + policy      = (known after apply)
+      + policy_id   = (known after apply)
+      + tags        = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.data.aws_iam_policy.AmazonEKSServicePolicy will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy" "AmazonEKSServicePolicy"  {
+      + arn         = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+      + description = (known after apply)
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + path        = (known after apply)
+      + policy      = (known after apply)
+      + policy_id   = (known after apply)
+      + tags        = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.data.aws_iam_policy.AmazonEKSVPCResourceController will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy" "AmazonEKSVPCResourceController"  {
+      + arn         = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+      + description = (known after apply)
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + path        = (known after apply)
+      + policy      = (known after apply)
+      + policy_id   = (known after apply)
+      + tags        = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_eks_cluster.cluster will be created
+  + resource "aws_eks_cluster" "cluster" {
+      + arn                   = (known after apply)
+      + certificate_authority = (known after apply)
+      + created_at            = (known after apply)
+      + endpoint              = (known after apply)
+      + id                    = (known after apply)
+      + identity              = (known after apply)
+      + name                  = "perf-1"
+      + platform_version      = (known after apply)
+      + role_arn              = (known after apply)
+      + status                = (known after apply)
+      + tags                  = {
+          + "Name" = "withme-services-perf-us-west-2-dev-default-perf-1"
+        }
+      + tags_all              = {
+          + "Name" = "withme-services-perf-us-west-2-dev-default-perf-1"
+        }
+      + version               = "1.19"
+
+      + kubernetes_network_config {
+          + service_ipv4_cidr = (known after apply)
+        }
+
+      + timeouts {
+          + create = "35m"
+          + delete = "20m"
+        }
+
+      + vpc_config {
+          + cluster_security_group_id = (known after apply)
+          + endpoint_private_access   = false
+          + endpoint_public_access    = true
+          + public_access_cidrs       = (known after apply)
+          + security_group_ids        = (known after apply)
+          + subnet_ids                = (known after apply)
+          + vpc_id                    = (known after apply)
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_iam_role.eks_service_role will be created
+  + resource "aws_iam_role" "eks_service_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "eks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "perf-1-eksServiceRole"
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy {
+          + name   = (known after apply)
+          + policy = (known after apply)
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+      + role       = "perf-1-eksServiceRole"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_iam_role_policy_attachment.cluster_AmazonEKSServicePolicy will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSServicePolicy" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+      + role       = "perf-1-eksServiceRole"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_iam_role_policy_attachment.cluster_AmazonEKSVPCResourceControllerPolicy will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSVPCResourceControllerPolicy" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+      + role       = "perf-1-eksServiceRole"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group.cluster will be created
+  + resource "aws_security_group" "cluster" {
+      + arn                    = (known after apply)
+      + description            = "EKS cluster control plane security group."
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "perf-1"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "perf-1-eks_cluster_sg"
+        }
+      + tags_all               = {
+          + "Name" = "perf-1-eks_cluster_sg"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group.nodes will be created
+  + resource "aws_security_group" "nodes" {
+      + arn                    = (known after apply)
+      + description            = "Security group for all nodes in the cluster"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "perf-1"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "perf-1-eks_cluster_nodes_sg"
+        }
+      + tags_all               = {
+          + "Name" = "perf-1-eks_cluster_nodes_sg"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group_rule.cluster_egress_internet will be created
+  + resource "aws_security_group_rule" "cluster_egress_internet" {
+      + cidr_blocks              = []
+      + description              = "Allow cluster egress access to the Internet."
+      + from_port                = 0
+      + id                       = (known after apply)
+      + protocol                 = "-1"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 0
+      + type                     = "egress"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group_rule.cluster_https_to_worker_egress will be created
+  + resource "aws_security_group_rule" "cluster_https_to_worker_egress" {
+      + description              = "Allow the cluster control plane to communicate with pods running extension API servers on port 443."
+      + from_port                = 443
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 443
+      + type                     = "egress"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group_rule.cluster_to_workers_kubelet_ingress will be created
+  + resource "aws_security_group_rule" "cluster_to_workers_kubelet_ingress" {
+      + description              = "Allow worker Kubelets and pods to receive communication from the cluster control plane."
+      + from_port                = 1025
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 65535
+      + type                     = "ingress"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group_rule.worker_https_cluster_ingress will be created
+  + resource "aws_security_group_rule" "worker_https_cluster_ingress" {
+      + description              = "Allow pods running extension API servers on port 443 to receive communication from cluster control plane."
+      + from_port                = 443
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 443
+      + type                     = "ingress"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group_rule.worker_https_to_cluster_ingress will be created
+  + resource "aws_security_group_rule" "worker_https_to_cluster_ingress" {
+      + description              = "Allow pods to communicate with the cluster API Server."
+      + from_port                = 443
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 443
+      + type                     = "ingress"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group_rule.workers_to_cluster_kubelet_egress will be created
+  + resource "aws_security_group_rule" "workers_to_cluster_kubelet_egress" {
+      + description              = "Allow the cluster control plane to communicate with worker Kubelet and pods."
+      + from_port                = 1025
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 65535
+      + type                     = "egress"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.cluster.aws_security_group_rule.workers_to_workers_ingress will be created
+  + resource "aws_security_group_rule" "workers_to_workers_ingress" {
+      + description              = "Allow nodes to communicate with each other."
+      + from_port                = 0
+      + id                       = (known after apply)
+      + protocol                 = "-1"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 65535
+      + type                     = "ingress"
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_eip.nat[0] will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = (known after apply)
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2a"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2a"
+        }
+      + vpc                  = true
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_eip.nat[1] will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = (known after apply)
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2b"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2b"
+        }
+      + vpc                  = true
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_eip.nat[2] will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = (known after apply)
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2c"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2c"
+        }
+      + vpc                  = true
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_internet_gateway.igw[0] will be created
+  + resource "aws_internet_gateway" "igw" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + tags     = {
+          + "Name" = "perf"
+        }
+      + tags_all = {
+          + "Name" = "perf"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_nat_gateway.nat_gtw[0] will be created
+  + resource "aws_nat_gateway" "nat_gtw" {
+      + allocation_id        = (known after apply)
+      + id                   = (known after apply)
+      + network_interface_id = (known after apply)
+      + private_ip           = (known after apply)
+      + public_ip            = (known after apply)
+      + subnet_id            = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2a"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2a"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_nat_gateway.nat_gtw[1] will be created
+  + resource "aws_nat_gateway" "nat_gtw" {
+      + allocation_id        = (known after apply)
+      + id                   = (known after apply)
+      + network_interface_id = (known after apply)
+      + private_ip           = (known after apply)
+      + public_ip            = (known after apply)
+      + subnet_id            = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2b"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2b"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_nat_gateway.nat_gtw[2] will be created
+  + resource "aws_nat_gateway" "nat_gtw" {
+      + allocation_id        = (known after apply)
+      + id                   = (known after apply)
+      + network_interface_id = (known after apply)
+      + private_ip           = (known after apply)
+      + public_ip            = (known after apply)
+      + subnet_id            = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2c"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2c"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route.private_nat_gateway[0] will be created
+  + resource "aws_route" "private_nat_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route.private_nat_gateway[1] will be created
+  + resource "aws_route" "private_nat_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route.private_nat_gateway[2] will be created
+  + resource "aws_route" "private_nat_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route.public_internet_gateway[0] will be created
+  + resource "aws_route" "public_internet_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + gateway_id             = (known after apply)
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table.private_rt[0] will be created
+  + resource "aws_route_table" "private_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "perf-private-us-west-2a"
+        }
+      + tags_all         = {
+          + "Name" = "perf-private-us-west-2a"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table.private_rt[1] will be created
+  + resource "aws_route_table" "private_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "perf-private-us-west-2b"
+        }
+      + tags_all         = {
+          + "Name" = "perf-private-us-west-2b"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table.private_rt[2] will be created
+  + resource "aws_route_table" "private_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "perf-private-us-west-2c"
+        }
+      + tags_all         = {
+          + "Name" = "perf-private-us-west-2c"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table.public_rt[0] will be created
+  + resource "aws_route_table" "public_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "perf-public"
+        }
+      + tags_all         = {
+          + "Name" = "perf-public"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table_association.private[0] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table_association.private[1] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table_association.private[2] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table_association.public[0] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table_association.public[1] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_route_table_association.public[2] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_subnet.private[0] will be created
+  + resource "aws_subnet" "private" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2a"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.10.1.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = false
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-private-us-west-2a"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-private-us-west-2a"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_subnet.private[1] will be created
+  + resource "aws_subnet" "private" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2b"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.10.2.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = false
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-private-us-west-2b"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-private-us-west-2b"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_subnet.private[2] will be created
+  + resource "aws_subnet" "private" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2c"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.10.3.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = false
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-private-us-west-2c"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-private-us-west-2c"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_subnet.public[0] will be created
+  + resource "aws_subnet" "public" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2a"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.10.11.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = true
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-public-us-west-2a"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-public-us-west-2a"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_subnet.public[1] will be created
+  + resource "aws_subnet" "public" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2b"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.10.12.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = true
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-public-us-west-2b"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-public-us-west-2b"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[0].module.networking.aws_subnet.public[2] will be created
+  + resource "aws_subnet" "public" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2c"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.10.13.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = true
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-public-us-west-2c"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-public-us-west-2c"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.data.aws_iam_policy.AmazonEKSClusterPolicy will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy" "AmazonEKSClusterPolicy"  {
+      + arn         = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+      + description = (known after apply)
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + path        = (known after apply)
+      + policy      = (known after apply)
+      + policy_id   = (known after apply)
+      + tags        = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.data.aws_iam_policy.AmazonEKSServicePolicy will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy" "AmazonEKSServicePolicy"  {
+      + arn         = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+      + description = (known after apply)
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + path        = (known after apply)
+      + policy      = (known after apply)
+      + policy_id   = (known after apply)
+      + tags        = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.data.aws_iam_policy.AmazonEKSVPCResourceController will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy" "AmazonEKSVPCResourceController"  {
+      + arn         = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+      + description = (known after apply)
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + path        = (known after apply)
+      + policy      = (known after apply)
+      + policy_id   = (known after apply)
+      + tags        = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_eks_cluster.cluster will be created
+  + resource "aws_eks_cluster" "cluster" {
+      + arn                   = (known after apply)
+      + certificate_authority = (known after apply)
+      + created_at            = (known after apply)
+      + endpoint              = (known after apply)
+      + id                    = (known after apply)
+      + identity              = (known after apply)
+      + name                  = "perf-2"
+      + platform_version      = (known after apply)
+      + role_arn              = (known after apply)
+      + status                = (known after apply)
+      + tags                  = {
+          + "Name" = "withme-services-perf-us-west-2-dev-default-perf-2"
+        }
+      + tags_all              = {
+          + "Name" = "withme-services-perf-us-west-2-dev-default-perf-2"
+        }
+      + version               = "1.19"
+
+      + kubernetes_network_config {
+          + service_ipv4_cidr = (known after apply)
+        }
+
+      + timeouts {
+          + create = "35m"
+          + delete = "20m"
+        }
+
+      + vpc_config {
+          + cluster_security_group_id = (known after apply)
+          + endpoint_private_access   = false
+          + endpoint_public_access    = true
+          + public_access_cidrs       = (known after apply)
+          + security_group_ids        = (known after apply)
+          + subnet_ids                = (known after apply)
+          + vpc_id                    = (known after apply)
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_iam_role.eks_service_role will be created
+  + resource "aws_iam_role" "eks_service_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "eks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "perf-2-eksServiceRole"
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy {
+          + name   = (known after apply)
+          + policy = (known after apply)
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+      + role       = "perf-2-eksServiceRole"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_iam_role_policy_attachment.cluster_AmazonEKSServicePolicy will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSServicePolicy" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+      + role       = "perf-2-eksServiceRole"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_iam_role_policy_attachment.cluster_AmazonEKSVPCResourceControllerPolicy will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSVPCResourceControllerPolicy" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+      + role       = "perf-2-eksServiceRole"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group.cluster will be created
+  + resource "aws_security_group" "cluster" {
+      + arn                    = (known after apply)
+      + description            = "EKS cluster control plane security group."
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "perf-2"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "perf-2-eks_cluster_sg"
+        }
+      + tags_all               = {
+          + "Name" = "perf-2-eks_cluster_sg"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group.nodes will be created
+  + resource "aws_security_group" "nodes" {
+      + arn                    = (known after apply)
+      + description            = "Security group for all nodes in the cluster"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "perf-2"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "perf-2-eks_cluster_nodes_sg"
+        }
+      + tags_all               = {
+          + "Name" = "perf-2-eks_cluster_nodes_sg"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group_rule.cluster_egress_internet will be created
+  + resource "aws_security_group_rule" "cluster_egress_internet" {
+      + cidr_blocks              = []
+      + description              = "Allow cluster egress access to the Internet."
+      + from_port                = 0
+      + id                       = (known after apply)
+      + protocol                 = "-1"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 0
+      + type                     = "egress"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group_rule.cluster_https_to_worker_egress will be created
+  + resource "aws_security_group_rule" "cluster_https_to_worker_egress" {
+      + description              = "Allow the cluster control plane to communicate with pods running extension API servers on port 443."
+      + from_port                = 443
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 443
+      + type                     = "egress"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group_rule.cluster_to_workers_kubelet_ingress will be created
+  + resource "aws_security_group_rule" "cluster_to_workers_kubelet_ingress" {
+      + description              = "Allow worker Kubelets and pods to receive communication from the cluster control plane."
+      + from_port                = 1025
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 65535
+      + type                     = "ingress"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group_rule.worker_https_cluster_ingress will be created
+  + resource "aws_security_group_rule" "worker_https_cluster_ingress" {
+      + description              = "Allow pods running extension API servers on port 443 to receive communication from cluster control plane."
+      + from_port                = 443
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 443
+      + type                     = "ingress"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group_rule.worker_https_to_cluster_ingress will be created
+  + resource "aws_security_group_rule" "worker_https_to_cluster_ingress" {
+      + description              = "Allow pods to communicate with the cluster API Server."
+      + from_port                = 443
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 443
+      + type                     = "ingress"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group_rule.workers_to_cluster_kubelet_egress will be created
+  + resource "aws_security_group_rule" "workers_to_cluster_kubelet_egress" {
+      + description              = "Allow the cluster control plane to communicate with worker Kubelet and pods."
+      + from_port                = 1025
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 65535
+      + type                     = "egress"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.cluster.aws_security_group_rule.workers_to_workers_ingress will be created
+  + resource "aws_security_group_rule" "workers_to_workers_ingress" {
+      + description              = "Allow nodes to communicate with each other."
+      + from_port                = 0
+      + id                       = (known after apply)
+      + protocol                 = "-1"
+      + security_group_id        = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 65535
+      + type                     = "ingress"
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_eip.nat[0] will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = (known after apply)
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2a"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2a"
+        }
+      + vpc                  = true
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_eip.nat[1] will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = (known after apply)
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2b"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2b"
+        }
+      + vpc                  = true
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_eip.nat[2] will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = (known after apply)
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2c"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2c"
+        }
+      + vpc                  = true
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_internet_gateway.igw[0] will be created
+  + resource "aws_internet_gateway" "igw" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + tags     = {
+          + "Name" = "perf"
+        }
+      + tags_all = {
+          + "Name" = "perf"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_nat_gateway.nat_gtw[0] will be created
+  + resource "aws_nat_gateway" "nat_gtw" {
+      + allocation_id        = (known after apply)
+      + id                   = (known after apply)
+      + network_interface_id = (known after apply)
+      + private_ip           = (known after apply)
+      + public_ip            = (known after apply)
+      + subnet_id            = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2a"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2a"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_nat_gateway.nat_gtw[1] will be created
+  + resource "aws_nat_gateway" "nat_gtw" {
+      + allocation_id        = (known after apply)
+      + id                   = (known after apply)
+      + network_interface_id = (known after apply)
+      + private_ip           = (known after apply)
+      + public_ip            = (known after apply)
+      + subnet_id            = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2b"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2b"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_nat_gateway.nat_gtw[2] will be created
+  + resource "aws_nat_gateway" "nat_gtw" {
+      + allocation_id        = (known after apply)
+      + id                   = (known after apply)
+      + network_interface_id = (known after apply)
+      + private_ip           = (known after apply)
+      + public_ip            = (known after apply)
+      + subnet_id            = (known after apply)
+      + tags                 = {
+          + "Name" = "perf-us-west-2c"
+        }
+      + tags_all             = {
+          + "Name" = "perf-us-west-2c"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route.private_nat_gateway[0] will be created
+  + resource "aws_route" "private_nat_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route.private_nat_gateway[1] will be created
+  + resource "aws_route" "private_nat_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route.private_nat_gateway[2] will be created
+  + resource "aws_route" "private_nat_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route.public_internet_gateway[0] will be created
+  + resource "aws_route" "public_internet_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + gateway_id             = (known after apply)
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table.private_rt[0] will be created
+  + resource "aws_route_table" "private_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "perf-private-us-west-2a"
+        }
+      + tags_all         = {
+          + "Name" = "perf-private-us-west-2a"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table.private_rt[1] will be created
+  + resource "aws_route_table" "private_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "perf-private-us-west-2b"
+        }
+      + tags_all         = {
+          + "Name" = "perf-private-us-west-2b"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table.private_rt[2] will be created
+  + resource "aws_route_table" "private_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "perf-private-us-west-2c"
+        }
+      + tags_all         = {
+          + "Name" = "perf-private-us-west-2c"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table.public_rt[0] will be created
+  + resource "aws_route_table" "public_rt" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "perf-public"
+        }
+      + tags_all         = {
+          + "Name" = "perf-public"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table_association.private[0] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table_association.private[1] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table_association.private[2] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table_association.public[0] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table_association.public[1] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_route_table_association.public[2] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_subnet.private[0] will be created
+  + resource "aws_subnet" "private" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2a"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.100.10.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = false
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-private-us-west-2a"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-private-us-west-2a"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_subnet.private[1] will be created
+  + resource "aws_subnet" "private" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2b"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.100.2.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = false
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-private-us-west-2b"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-private-us-west-2b"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_subnet.private[2] will be created
+  + resource "aws_subnet" "private" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2c"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.100.3.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = false
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-private-us-west-2c"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-private-us-west-2c"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_subnet.public[0] will be created
+  + resource "aws_subnet" "public" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2a"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.100.11.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = true
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-public-us-west-2a"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-public-us-west-2a"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_subnet.public[1] will be created
+  + resource "aws_subnet" "public" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2b"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.100.12.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = true
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-public-us-west-2b"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-public-us-west-2b"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+  # module.vpcs[0].module.eks_targets[1].module.networking.aws_subnet.public[2] will be created
+  + resource "aws_subnet" "public" {
+      + arn                             = (known after apply)
+      + assign_ipv6_address_on_creation = false
+      + availability_zone               = "us-west-2c"
+      + availability_zone_id            = (known after apply)
+      + cidr_block                      = "20.100.13.0/24"
+      + id                              = (known after apply)
+      + ipv6_cidr_block_association_id  = (known after apply)
+      + map_public_ip_on_launch         = true
+      + owner_id                        = (known after apply)
+      + tags                            = {
+          + "Name" = "perf-public-us-west-2c"
+        }
+      + tags_all                        = {
+          + "Name" = "perf-public-us-west-2c"
+        }
+      + vpc_id                          = (known after apply)
+    }
+
+Plan: 83 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + account_id      = "407733091588"
+  + global_prefix   = "withme-services-perf-dev-default"
+  + global_tags     = {
+      + Config      = "default"
+      + Dept        = "services"
+      + Environment = "perf"
+      + GeneratedBy = "terraform"
+      + Org         = "withme"
+      + Role        = "dev"
+    }
+  + regional_prefix = "withme-services-perf-us-west-2-dev-default"
+  + regional_tags   = {
+      + Config      = "default"
+      + Dept        = "services"
+      + Environment = "perf"
+      + GeneratedBy = "terraform"
+      + Org         = "withme"
+      + Region      = "us-west-2"
+      + Role        = "dev"
+    }
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

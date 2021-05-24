@@ -1,77 +1,94 @@
 variable "vpc_cidr" {
-  description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by AWS and should be overridden"
-  type        = string
-  default     = "20.10.0.0/16"
+  description = "The CIDR block for the VPC."
+  type = string
 }
 
 variable "environment" {
   description = "Name of current environment"
-  type        = string
-  default     = ""
+  type = string
 }
 
 variable "region" {
   description = "Name of current region"
-  type        = string
-  default     = ""
+  type = string
 }
 
 variable "azs" {
   description = "A list of availability zones names or ids in the region"
-  type        = list(string)
-  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
+  type = list(string)
 }
 
 variable "map_public_ip_on_launch" {
   description = "Should be false if you do not want to auto-assign public IP on launch"
-  type        = bool
-  default     = true
+  type = map(bool)
 }
 
 variable "public_subnets" {
   description = "A list of public subnets CIDR"
-  type        = list(string)
-  default     = ["20.10.11.0/24", "20.10.12.0/24", "20.10.13.0/24"]
+  type = map(list(string))
 }
 
 variable "private_subnets" {
   description = "A list of private subnets CIDR"
-  type        = list(string)
-  default     = ["20.10.1.0/24", "20.10.2.0/24", "20.10.3.0/24"]
+  type = map(list(string))
 }
 
 variable "public_subnet_suffix" {
   description = "Suffix to append to public subnets name"
-  type        = string
-  default     = "public"
+  type = string
 }
 
 variable "private_subnet_suffix" {
   description = "Suffix to append to private subnets name"
-  type        = string
-  default     = "private"
+  type = string
 }
 
 variable "public_subnet_tags" {
   description = "A map of tags to add to subnets"
-  type        = map(string)
-  default     = {
-    "kubernetes.io/cluster/perf-1-us-west-2-eks" = "shared"
-    "kubernetes.io/role/elb" = ""
-  }
+  type = map(string)
 }
 
 variable "private_subnet_tags" {
   description = "A map of tags to add to subnets"
-  type        = map(string)
-  default     = {
-    "kubernetes.io/cluster/perf-1-us-west-2-eks" = "shared"
-    "kubernetes.io/role/internal-elb" = ""
-  }
+  type = map(string)
 }
 
 variable "tags" {
   description = "A map of tags to add to subnets"
-  type        = map(string)
-  default     = {}
+  type = map(string)
 }
+
+variable "name" {
+  type = string
+}
+
+
+
+variable "number" {
+}
+variable "config" {
+}
+variable "eks_versions" {
+  type = map
+}
+
+variable "cluster_endpoint_public_access" {
+  type = map(bool)
+}
+
+variable "global_prefix" {
+  type = string
+}
+
+variable "regional_prefix" {
+  type = string
+}
+
+variable "cluster_enabled_log_types" {
+  type = map(list(string))
+}
+
+variable "eks_targets" {
+  type = list(string)
+}
+

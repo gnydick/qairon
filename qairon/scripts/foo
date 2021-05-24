@@ -1,0 +1,11 @@
+deployment=testpop_type:661959915760:us-west-2:rshaham_web_server:dev:gamelift:astral:withme:gameserver:unreal:default
+
+./qcli deployment get testpop_type:661959915760:us-west-2:rshaham_web_server:dev:gamelift:astral:withme:gameserver:unreal:default
+
+./qcli deployment get_field testpop_type:661959915760:us-west-2:rshaham_web_server:dev:gamelift:astral:withme:gameserver:unreal:default deployment_target_id
+
+./qcli deployment query deployment_target_id eq testpop_type:661959915760:us-west-2:rshaham_web_server:dev:gamelift:astral
+
+./qcli deployment query service_id eq withme:gameserver:unreal
+
+./qcli deployment clone testpop_type:661959915760:us-west-2:rshaham_web_server:dev:gamelift:astral:withme:gameserver:unreal:default testpop_type:661959915760:us-west-2:rshaham_web_server:dev:gamelift:astral2

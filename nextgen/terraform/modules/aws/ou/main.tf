@@ -1,5 +1,5 @@
 resource "aws_organizations_organizational_unit" "ou" {
-  name = var.name
+  name      = var.name
   parent_id = var.parent
-  tags = var.tags
+  tags      = var.tags
 }

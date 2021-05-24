@@ -1,0 +1,61 @@
+# Default values for qairon.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: qairon
+  tag: 0.2
+  pullPolicy: Never
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 5001
+
+env:
+  user: qairon
+  passwd: qairon
+  db: qairon-infra0.cluster-cnyml3tlkmcj.us-west-2.rds.amazonaws.com
+
+
+environment: infra
+
+ingress:
+#  acm_arn: "arn:aws:acm:us-east-1:707026380822:certificate/666bff45-376c-4cf0-ba3c-21a421c7d81b"
+  enabled: false
+#  server_name: qairon.dev.automationanywhere.digital
+#  public_subnets: "subnet-05b53f161207229b3,subnet-09f9575888538eee9,subnet-04caed2cb971f31b6"
+#  ingress_security_group: "sg-05f77505acbca46f6"
+#  annotations: {}
+#    # kubernetes.io/ingress.class: nginx
+#    # kubernetes.io/tls-acme: "true"
+#  hosts:
+#    - host: qairon.dev.automationanywhere.digital
+#      paths: ['/*']
+#
+#  tls: []
+#  #  - secretName: chart-example-tls
+#  #    hosts:
+#  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

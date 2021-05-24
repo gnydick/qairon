@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# PYTHON_ARGCOMPLETE_OK
+
+from controllers import CLIArgs
+from controllers import CLIController
+from controllers import RestController
+
+
+def _main():
+    rest = RestController()
+    cli = CLIController()
+    qaironargs = CLIArgs(rest)
+
+    (args, qairon_args) = qaironargs.parse_args(rest)
+    commands = ['delete', 'get', 'get_version', 'list', 'promote', 'query', 'get_field', 'set_field']
+    command = args.command
+    if args.command in commands:
+        getattr(cli, command)(**vars(args))
+
+    elif args.command == 'setver':
+        args_dict = vars(args)
+        cli.set_version(**args_dict)
+    elif args.command == 'create':
+        cli.create(vars(args))
+    elif args.command == 'allocate_subnet':
+        if args.resource == 'network':
+            cli.allocate_subnet(**vars(args))
+    elif args.command == 'clone':
+        if args.resource == 'deployment':
+            cli.clone_deployment(**vars(args))
+        elif args.resource == 'config':
+            cli.clone_config()
+        elif args.resource == 'nodegroup':
+            cli.clone_nodegroup(**vars(args))
+    elif args.resource == 'deployment' and args.command == 'addzone':
+        args_dict = vars(args)
+        args_dict['items'] = 'zones'
+        cli.add_to_collection(**args_dict)
+    elif args.resource == 'deployment' and args.command == 'delzone':
+        args_dict = vars(args)
+        args_dict['items'] = 'zones'
+        cli.del_from_collection(**args_dict)
+    elif args.resource == 'test':
+        cli.test(args)
+
+
+if __name__ == '__main__':
+    _main()
