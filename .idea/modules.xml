@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/legacy/jenkins/jenkins.iml" filepath="$PROJECT_DIR$/legacy/jenkins/jenkins.iml" />
       <module fileurl="file://$PROJECT_DIR$/nextgen/nextgen.iml" filepath="$PROJECT_DIR$/nextgen/nextgen.iml" />
       <module fileurl="file://$PROJECT_DIR$/example/code/python_artifact/python_artifact.iml" filepath="$PROJECT_DIR$/example/code/python_artifact/python_artifact.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qairon/qairon.iml" filepath="$PROJECT_DIR$/qairon/qairon.iml" />
       <module fileurl="file://$PROJECT_DIR$/withme-ops.iml" filepath="$PROJECT_DIR$/withme-ops.iml" />
     </modules>
   </component>
