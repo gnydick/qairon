@@ -43,4 +43,5 @@ module "jenkins" {
   source = "./jenkins-sa"
   cluster_oidc_provider = data.terraform_remote_state.vpc.outputs.cluster_oidc_providers["vpc0"]["infra0"]
   cluster_oidc_provider_arn = data.terraform_remote_state.vpc.outputs.cluster_oidc_provider_arns["vpc0"]["infra0"]
+
 }

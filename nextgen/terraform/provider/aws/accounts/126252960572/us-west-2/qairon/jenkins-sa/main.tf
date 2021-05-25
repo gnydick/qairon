@@ -1,35 +1,29 @@
-resource "aws_iam_role" "jenks-sa" {
-  name = "Vpc0Infra0JenkinsSA"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Federated": "${var.cluster_oidc_provider_arn}"
-      },
-      "Action": "sts:AssumeRoleWithWebIdentity",
-      "Condition": {
-        "StringEquals": {
-          "${var.cluster_oidc_provider}:sub": "system:serviceaccount:default:jenkins"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "sts.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
+data "aws_iam_policy_document" "jenkins-sa-assume-role-policy" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+
+    condition {
+      test     = "StringEquals"
+      variable = "${var.cluster_oidc_provider}:sub"
+      values   = ["system:serviceaccount:default:jenkins"]
     }
-  ]
+
+    principals {
+      identifiers = [var.cluster_oidc_provider_arn]
+      type        = "Federated"
+    }
+  }
 }
-EOF
+
+resource "aws_iam_role" "jenkins-sa" {
+  assume_role_policy = data.aws_iam_policy_document.jenkins-sa-assume-role-policy.json
+  name               = "Vpc0Infra0JenkinsSA"
+
 }
 
 resource "aws_iam_policy" "jenkins-sa-s3" {
-
+  name = "Vpc0Infra0JenkinsSAPolicy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -43,14 +37,18 @@ resource "aws_iam_policy" "jenkins-sa-s3" {
         "s3:PutObject"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::helm-repo-126252960572.s3-bucket"
+      "Resource": [
+        "arn:aws:s3:::helm-repo-126252960572.s3-bucket",
+        "arn:aws:s3:::helm-repo-126252960572.s3-bucket/stable/*"
+      ]
     }
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy_attachment" "jenkins-sa-policy-attachment" {
   policy_arn = aws_iam_policy.jenkins-sa-s3.arn
-  role = aws_iam_role.jenks-sa.name
+  role = aws_iam_role.jenkins-sa.name
 }
