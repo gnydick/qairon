@@ -59,23 +59,23 @@ Resources:
         PolicyPeriodInMinutes: !Ref PolicyPeriodInMinutes
       RuntimeConfiguration:
         ServerProcesses:
-          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
-            Parameters: astral -GameLift -port=7777 -ServerEnvironment=int1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
+            Parameters: "astral -GameLift -port=7777  -ServerEnvironment=int1"
             ConcurrentExecutions: 1
-          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
-            Parameters: astral -GameLift -port=7779 -ServerEnvironment=int1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
+            Parameters: "astral -GameLift -port=7779  -ServerEnvironment=int1"
             ConcurrentExecutions: 1
-          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
-            Parameters: astral -GameLift -port=7781 -ServerEnvironment=int1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
+            Parameters: "astral -GameLift -port=7781  -ServerEnvironment=int1"
             ConcurrentExecutions: 1
-          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
-            Parameters: astral -GameLift -port=7783 -ServerEnvironment=int1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
+            Parameters: "astral -GameLift -port=7783  -ServerEnvironment=int1"
             ConcurrentExecutions: 1
-          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
-            Parameters: astral -GameLift -port=7785 -ServerEnvironment=int1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
+            Parameters: "astral -GameLift -port=7785  -ServerEnvironment=int1"
             ConcurrentExecutions: 1
-          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServe"
-            Parameters: astral -GameLift -port=7787 -ServerEnvironment=int1
+          - LaunchPath: "/local/game/astral/Binaries/Linux/astralServer"
+            Parameters: "astral -GameLift -port=7787  -ServerEnvironment=int1"
             ConcurrentExecutions: 1
 
 
