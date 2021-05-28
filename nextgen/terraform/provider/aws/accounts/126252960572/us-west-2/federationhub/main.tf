@@ -19,7 +19,7 @@ resource "aws_iam_role" "xaccount-eks-ci" {
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringEquals": {
-          "${data.terraform_remote_state.vpc.outputs.cluster_oidc_providers["vpc0"]["infra0"]}:sub": "system:serviceaccount:ci-namespace:ci-serviceaccount"
+          "${data.terraform_remote_state.vpc.outputs.cluster_oidc_providers["vpc0"]["infra0"]}:sub": "system:serviceaccount:default:jenkins"
         }
       }
     }
@@ -52,5 +52,36 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "assume-prod-spoke" {
   policy_arn = aws_iam_policy.assume-prod-spoke.arn
+  role = aws_iam_role.xaccount-eks-ci.name
+}
+
+
+resource "aws_iam_policy" "jenkins-agent-sa-s3" {
+  name = format("%s.S3Policy", aws_iam_role.xaccount-eks-ci.name)
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:DeleteObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:s3:::helm-repo-126252960572.s3-bucket",
+        "arn:aws:s3:::helm-repo-126252960572.s3-bucket/stable/*"
+      ]
+    }
+  ]
+}
+EOF
+
+}
+
+resource "aws_iam_role_policy_attachment" "jenkins-sa-policy-attachment" {
+  policy_arn = aws_iam_policy.jenkins-agent-sa-s3.arn
   role = aws_iam_role.xaccount-eks-ci.name
 }

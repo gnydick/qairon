@@ -10,5 +10,6 @@ repos = [
   "jenkins",
   "qairon",
   "ghost-proxy",
-  "helm"
+  "helm",
+  "aws"
 ]
