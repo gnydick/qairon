@@ -1,7 +1,7 @@
 {
   "version": 4,
   "terraform_version": "0.15.0",
-  "serial": 39,
+  "serial": 37,
   "lineage": "11cc72d6-c8a2-a00c-5b96-c00b7f2543c8",
   "outputs": {
     "account_id": {
@@ -310,12 +310,15 @@
             "website_endpoint": null
           },
           "sensitive_attributes": [],
-          "private": "bnVsbA=="
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.tfstate_s3_bucket_new.aws_s3_bucket.logging"
+          ]
         }
       ]
     },
     {
-      "module": "module.tfstate_s3_bucket",
+      "module": "module.tfstate_s3_bucket_new",
       "mode": "managed",
       "type": "aws_s3_bucket",
       "name": "logging",
@@ -372,7 +375,7 @@
       ]
     },
     {
-      "module": "module.tfstate_s3_bucket",
+      "module": "module.tfstate_s3_bucket_new",
       "mode": "managed",
       "type": "aws_s3_bucket_public_access_block",
       "name": "bucket",

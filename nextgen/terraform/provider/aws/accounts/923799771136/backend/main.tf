@@ -8,9 +8,10 @@ provider "aws" {
 module "tfstate_s3_bucket" {
   source        = "../../../../../modules/aws/s3_bucket"
   s3_acl        = "private"
-  bucket_prefix = "terraform-state-backend-prod-923799771136"
+  bucket_prefix = "terraform-state-backend-923799771136"
   tags          = local.global_tags
 }
+
 
 
 module "tfstate_dyndb_lock" {
