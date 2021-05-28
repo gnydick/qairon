@@ -1,26 +1,12 @@
-data "aws_iam_policy_document" "jenkins-sa-assume-role-policy" {
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
-
-    condition {
-      test     = "StringEquals"
-      variable = "${var.cluster_oidc_provider}:sub"
-      values   = ["system:serviceaccount:default:jenkins"]
-    }
-
-    principals {
-      identifiers = [var.cluster_oidc_provider_arn]
-      type        = "Federated"
-    }
-  }
+module "sa-iam-role" {
+  source = "../../../../../../../modules/aws/sa-iam-role"
+  cluster_oidc_provider = var.cluster_oidc_provider
+  cluster_oidc_provider_arn = var.cluster_oidc_provider_arn
+  role_name = "Vpc0Infra0JenkinsSA"
+  sa = "system:serviceaccount:default:jenkins"
 }
 
-resource "aws_iam_role" "jenkins-sa" {
-  assume_role_policy = data.aws_iam_policy_document.jenkins-sa-assume-role-policy.json
-  name               = "Vpc0Infra0JenkinsSA"
 
-}
 
 resource "aws_iam_policy" "jenkins-sa-s3" {
   name = "Vpc0Infra0JenkinsSAPolicy"
@@ -50,5 +36,5 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "jenkins-sa-policy-attachment" {
   policy_arn = aws_iam_policy.jenkins-sa-s3.arn
-  role = aws_iam_role.jenkins-sa.name
+  role = "Vpc0Infra0JenkinsSA"
 }
