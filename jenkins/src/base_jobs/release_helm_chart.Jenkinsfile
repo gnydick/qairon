@@ -148,8 +148,8 @@ try {
         ])
 ])
 
-node {
-    stage {
+node('leader') {
+    stage('setup') {
         def dep_ids = DEPLOYMENTS.split(",")
 
 
