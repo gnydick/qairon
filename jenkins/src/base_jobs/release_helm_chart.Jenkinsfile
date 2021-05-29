@@ -1,6 +1,3 @@
-package base_jobs
-
-
 properties([
         parameters([
                 [
@@ -148,25 +145,23 @@ try {
         ])
 ])
 
-node('leader') {
-    stage('setup') {
-        def dep_ids = DEPLOYMENTS.split(",")
+def dep_ids = DEPLOYMENTS.split(",")
 
 
-        def jobs = [:]
-        for (int i = 0; i < dep_ids.size(); i++) {
-            def index = i
-            def dep_id = dep_ids[index]
-            println(dep_ids[index])
+def jobs = [:]
+for (int i = 0; i < dep_ids.size(); i++) {
+    def index = i
+    def dep_id = dep_ids[index]
+    println(dep_ids[index])
 
-            jobs[dep_id] = {
+    jobs[dep_id] = {
 
-                node('helm-installer') {
-                    container(name: 'helm') {
-                        stage(name: 'parallelize chart releases') {
-                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'CROSS-ACCOUNT-JENKINS']], extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'nextgen/helm/charts'], [path: 'nextgen/ops']]], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'bitbucket']], userRemoteConfigs: [[credentialsId: 'jenkins-infra0-bitbucket', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
+        node('helm-installer') {
+            container(name: 'helm') {
+                stage(name: 'parallelize chart releases') {
+                    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'CROSS-ACCOUNT-JENKINS']], extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'nextgen/helm/charts'], [path: 'nextgen/ops']]], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'bitbucket']], userRemoteConfigs: [[credentialsId: 'jenkins-infra0-bitbucket', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
 
-                            def command = $/
+                    def command = $/
                 set -x
                 DEP_DESCRIPTOR=$$(curl -s qairon:5001/api/rest/v1/deployment$/${dep_id})
                 SERVICE_ID=$$(echo $$DEP_DESCRIPTOR | jq -r .service.id)
@@ -191,13 +186,11 @@ node('leader') {
                 
                 ##helm upgrade --install $$ARTIFACT $$REPO$/$$ARTIFACT
             /$
-
-                        }
-                    }
+                sh script: command
                 }
             }
         }
-
-        parallel(jobs)
     }
 }
+
+parallel(jobs)
