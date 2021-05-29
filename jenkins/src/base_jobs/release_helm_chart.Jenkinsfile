@@ -35,32 +35,25 @@ try {
         connection.disconnect()
 
         return resultArray
-
-
     } else {
         print connection.responseCode + ": " + connection.inputStream.text
-
     }
-
-
-
 } catch (e) {
     print(e)
 }
-
 /$
                                 ]
                         ]
                 ],
                 [
-                        $class: 'CascadeChoiceParameter',
+                        $class              : 'CascadeChoiceParameter',
                         referencedParameters: 'SERVICES',
-                        choiceType  : 'PT_SINGLE_SELECT',
-                        description : 'Select the Builds from the Dropdown List',
-                        filterLength: 3,
-                        filterable  : true,
-                        name        : 'BUILDS',
-                        script      : [
+                        choiceType          : 'PT_SINGLE_SELECT',
+                        description         : 'Select the Builds from the Dropdown List',
+                        filterLength        : 3,
+                        filterable          : true,
+                        name                : 'BUILDS',
+                        script              : [
                                 $class: 'GroovyScript',
                                 script: [
                                         classpath: [],
@@ -88,16 +81,10 @@ try {
         builds.objects
         builds.each { build -> resultArray.add(build.id) }
         connection.disconnect()
-
         return resultArray
-
-
     } else {
         print connection.responseCode + ": " + connection.inputStream.text
-
     }
-
-
 } catch (e) {
     print(e)
 }
@@ -108,14 +95,14 @@ try {
                         ]
                 ],
                 [
-                        $class: 'CascadeChoiceParameter',
+                        $class              : 'CascadeChoiceParameter',
                         referencedParameters: 'SERVICES',
-                        choiceType  : 'PT_MULTI_SELECT',
-                        description : 'Select the Builds from the Dropdown List',
-                        filterLength: 3,
-                        filterable  : true,
-                        name        : 'DEPLOYMENTS',
-                        script      : [
+                        choiceType          : 'PT_MULTI_SELECT',
+                        description         : 'Select the Builds from the Dropdown List',
+                        filterLength        : 3,
+                        filterable          : true,
+                        name                : 'DEPLOYMENTS',
+                        script              : [
                                 $class: 'GroovyScript',
                                 script: [
                                         classpath: [],
@@ -143,16 +130,11 @@ try {
         builds.objects
         builds.each { build -> resultArray.add(build.id) }
         connection.disconnect()
-
         return resultArray
-
-
     } else {
         print connection.responseCode + ": " + connection.inputStream.text
 
     }
-
-
 } catch (e) {
     print(e)
 }
@@ -166,21 +148,56 @@ try {
         ])
 ])
 
-
-node('helm-installer') {
-    container(name: 'helm') {
-        stage(name: 'parallelize chart releases') {
-            def deployment = params.DEPLOYMENT_ID
-            def build = params.BUILD_ID
-            def qairon = load("lib/qairon/main.groovy")
-
-            def env_script = load("lib/qairon/environment_lookup.groovy")
-            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'main']], extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'nextgen/ops']]], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'bitbucket']], userRemoteConfigs: [[credentialsId: 'jenkins-infra0-bitbucket', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
-
-            build = qairon.get_builds(params.SERVICE_ID)
-            print(build)
+node {
+    stage {
+        def dep_ids = DEPLOYMENTS.split(",")
 
 
+        def jobs = [:]
+        for (int i = 0; i < dep_ids.size(); i++) {
+            def index = i
+            def dep_id = dep_ids[index]
+            println(dep_ids[index])
+
+            jobs[dep_id] = {
+
+                node('helm-installer') {
+                    container(name: 'helm') {
+                        stage(name: 'parallelize chart releases') {
+                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'CROSS-ACCOUNT-JENKINS']], extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'nextgen/helm/charts'], [path: 'nextgen/ops']]], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'bitbucket']], userRemoteConfigs: [[credentialsId: 'jenkins-infra0-bitbucket', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
+
+                            def command = $/
+                set -x
+                DEP_DESCRIPTOR=$$(curl -s qairon:5001/api/rest/v1/deployment$/${dep_id})
+                SERVICE_ID=$$(echo $$DEP_DESCRIPTOR | jq -r .service.id)
+                DEP_TARGET=$$(echo $$DEP_DESCRIPTOR | jq -r .deployment_target)
+                DEP_TGT_NAME=$$(echo $$DEP_TARGET | jq -r .name)
+                HELM_CHART=$$(curl -s qairon:5001/api/rest/v1/service$/$$SERVICE_ID |  jq '.defaults|fromjson|.releases.helm')
+                REPO=$$(echo $$HELM_CHART | jq -r .repo)
+                URL=$$(curl -s qairon:5001/api/rest/v1/repo/helm:$$REPO | jq -r .url)
+                ARTIFACT=$$(echo $$HELM_CHART | jq -r .artifact)
+                
+                export AWS_PROFILE=$$(echo $$DEP_TARGET | jq -r '.defaults|fromjson|.spoke_profile')
+                aws eks update-kubeconfig --name $$DEP_TGT_NAME
+                
+                
+                helm repo add $$REPO $$URL
+                helm repo update
+                
+                mkdir tmp
+                rsync -var bitbucket/withme-ops/nextgen/helm/charts$/$$ARTIFACT$/tmp$/$$ARTIFACT
+                    
+                sleep 3600000
+                
+                ##helm upgrade --install $$ARTIFACT $$REPO$/$$ARTIFACT
+            /$
+
+                        }
+                    }
+                }
+            }
         }
+
+        parallel(jobs)
     }
 }
