@@ -13,3 +13,11 @@ repos = [
   "helm",
   "aws"
 ]
+
+repo_prefix= "arn:aws:ecr:us-west-2:126252960572:repository"
+
+principal_identifiers = [
+ "arn:aws:iam::417738154227:root", #"int":
+  "arn:aws:iam::702861675511:root", # "dev"
+  "arn:aws:iam::923799771136:root" #"prod"
+]

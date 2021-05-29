@@ -8,4 +8,7 @@ provider "aws" {
 module "ecr" {
   source = "../../../../../../modules/aws/ecr"
   repos  = var.repos
+  principal_identifiers = var.principal_identifiers
+  account_id = data.aws_caller_identity.core-lib.account_id
+  region = var.region
 }

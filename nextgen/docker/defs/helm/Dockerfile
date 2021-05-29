@@ -2,6 +2,8 @@ FROM alpine:3.13.5
 
 ENV HELM_VERSION="v3.5.4"
 ENV KUBE_VERSION="v1.21.0"
+ARG EXE_FILENAME=awscli-exe-linux-x86_64.zip
+
 
 RUN apk add --no-cache ca-certificates
 RUN apk add --no-cache jq
@@ -17,14 +19,20 @@ RUN curl -s -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_
 RUN chmod +x /usr/local/bin/kubectl
 RUN helm plugin install https://github.com/hypnoglow/helm-s3.git
 
-RUN addgroup --gid 1000 -S helm && adduser -s /bin/false -G helm -S helm --uid 1000
-
-USER helm
-WORKDIR /home/helm
-RUN helm plugin install https://github.com/hypnoglow/helm-s3.git
-
-RUN helm repo add bitnami https://charts.bitnami.com/bitnami
-RUN helm repo update
-
-RUN mkdir /home/helm/.aws
-ADD aws_config /home/helm/.aws/config
+WORKDIR /
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o $EXE_FILENAME
+RUN unzip $EXE_FILENAME
+#
+#RUN ./aws/install
+#
+#RUN addgroup --gid 1000 -S helm && adduser -s /bin/false -G helm -S helm --uid 1000
+#
+#USER helm
+#WORKDIR /home/helm
+#RUN helm plugin install https://github.com/hypnoglow/helm-s3.git
+#
+#RUN helm repo add bitnami https://charts.bitnami.com/bitnami
+#RUN helm repo update
+#
+#RUN mkdir /home/helm/.aws
+#ADD aws_config /home/helm/.aws/config
