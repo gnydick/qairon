@@ -179,19 +179,12 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 REPO=$$(echo $$HELM_CHART | jq -r .repo)
                 URL=$$(curl -s qairon:5001/api/rest/v1/repo/helm:$$REPO | jq -r .url)
                 ARTIFACT=$$(echo $$HELM_CHART | jq -r .artifact)
-                
-               
-                
-                
-                helm repo add $$REPO $$URL
-                helm repo update
-                
+     
                 mkdir tmp
                 rsync -var bitbucket/nextgen/helm/charts$/$$ARTIFACT/ tmp$/$$ARTIFACT/
                 cp bitbucket/nextgen/ops$/$$PROVIDER$/$$ACCOUNT$/$$REGION$/$$DEP_TGT_NAME/helm$/$${ARTIFACT}.yaml \
                     tmp$/$$ARTIFACT/values.yaml
-                    
-                
+    
                 cd tmp
                 helm package --version $$BUILD_NUMBER $$ARTIFACT
                 aws s3 cp $$ARTIFACT-$$BUILD_NUMBER.tgz $$URL$/${dep_id}$/$$ARTIFACT-$$BUILD_NUMBER.tgz
