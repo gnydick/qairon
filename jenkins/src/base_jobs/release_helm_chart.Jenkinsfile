@@ -167,6 +167,13 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 SERVICE_ID=$$(echo $$DEP_DESCRIPTOR | jq -r .service.id)
                 DEP_TARGET=$$(echo $$DEP_DESCRIPTOR | jq -r .deployment_target)
                 DEP_TGT_NAME=$$(echo $$DEP_TARGET | jq -r .name)
+                PARTITION_ID=$$(echo $$DEP_TARGET | jq -r .partition_id)
+                PARITION=$$(curl -s qairon:5001/api/rest/v1/partition$/$$PARTITION_ID)
+                REGION=$$(echo $$PARTITION | jq -r .region.name)
+                POP_ID=$$(echo $$PARTITION | jq -r .region.pop_id)
+                POP=$$(curl -s qairon:5001/api/rest/v1/pop$/$$POP_ID)
+                ACCOUNT=$$(echo $$POP | jq -r .native)
+                PROVIDER=$$(echo $$POP | jq -r .pop_type_id)
                 HELM_CHART=$$(curl -s qairon:5001/api/rest/v1/service$/$$SERVICE_ID |  jq '.defaults|fromjson|.releases.helm')
                 REPO=$$(echo $$HELM_CHART | jq -r .repo)
                 URL=$$(curl -s qairon:5001/api/rest/v1/repo/helm:$$REPO | jq -r .url)
@@ -180,11 +187,13 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 helm repo update
                 
                 mkdir tmp
-                rsync -var bitbucket/withme-ops/nextgen/helm/charts$/$$ARTIFACT$/tmp$/$$ARTIFACT
+                rsync -var bitbucket/nextgen/helm/charts$/$$ARTIFACT/ tmp$/$$ARTIFACT
+                cp bitbucket/nextgen/ops$/$$PROVIDER$/$$ACCOUNT$/$$REGION$/$$DEP_TGT_NAME/helm$/$${ARTIFACT}.yaml \
+                    tmp$/$$ARTIFACT/values.yaml
                     
-                sleep 3600000
                 
-                ##helm upgrade --install $$ARTIFACT $$REPO$/$$ARTIFACT
+                
+               
             /$
                 sh script: command
                 }
