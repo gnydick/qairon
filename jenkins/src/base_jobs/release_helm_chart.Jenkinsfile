@@ -180,8 +180,7 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 URL=$$(curl -s qairon:5001/api/rest/v1/repo/helm:$$REPO | jq -r .url)
                 ARTIFACT=$$(echo $$HELM_CHART | jq -r .artifact)
                 
-                export AWS_PROFILE=$$(echo $$DEP_TARGET | jq -r '.defaults|fromjson|.spoke_profile')
-                aws eks update-kubeconfig --name $$DEP_TGT_NAME
+               
                 
                 
                 helm repo add $$REPO $$URL
