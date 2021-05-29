@@ -56,7 +56,7 @@ resource "aws_iam_role_policy_attachment" "assume-prod-spoke" {
 }
 
 
-resource "aws_iam_policy" "jenkins-agent-sa-s3" {
+resource "aws_iam_policy" "jenkins-sa-s3" {
   name = format("%s.S3Policy", aws_iam_role.xaccount-eks-ci.name)
   policy = <<EOF
 {
@@ -82,6 +82,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "jenkins-sa-policy-attachment" {
-  policy_arn = aws_iam_policy.jenkins-agent-sa-s3.arn
+  policy_arn = aws_iam_policy.jenkins-sa-s3.arn
   role = aws_iam_role.xaccount-eks-ci.name
 }
