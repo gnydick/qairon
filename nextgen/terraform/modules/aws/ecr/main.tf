@@ -1,6 +1,6 @@
 resource "aws_ecr_repository" "aws_docker_repo" {
   for_each = var.repos
-  name = each.value
+  name = each.key
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -9,8 +9,8 @@ resource "aws_ecr_repository" "aws_docker_repo" {
 
 resource "aws_ecr_repository_policy" "ro_ecr_access" {
   for_each = var.repos
-  policy = data.aws_iam_policy_document.ro_ecr_access[each.key].json
-  repository = each.value
+  policy = data.aws_iam_policy_document.ro_ecr_access [each.key].json
+  repository = aws_ecr_repository.aws_docker_repo[each.key].name
 }
 
 
@@ -34,8 +34,6 @@ data "aws_iam_policy_document" "ro_ecr_access" {
     ]
     effect = "Allow"
 
-    resources = [ format("%s.dkr.ecr.%s.amazonaws.com/%s", var.account_id, var.region, each.value) ]
-
     principals {
       identifiers = var.principal_identifiers
       type = "AWS"
@@ -44,5 +42,4 @@ data "aws_iam_policy_document" "ro_ecr_access" {
 
 
 }
-
 
