@@ -168,9 +168,10 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 DEP_TARGET=$$(echo $$DEP_DESCRIPTOR | jq -r .deployment_target)
                 DEP_TGT_NAME=$$(echo $$DEP_TARGET | jq -r .name)
                 PARTITION_ID=$$(echo $$DEP_TARGET | jq -r .partition_id)
-                PARITION=$$(curl -s qairon:5001/api/rest/v1/partition$/$$PARTITION_ID)
-                REGION=$$(echo $$PARTITION | jq -r .region.name)
-                POP_ID=$$(echo $$PARTITION | jq -r .region.pop_id)
+                PARTITION=$$(curl -s qairon:5001/api/rest/v1/partition$/$$PARTITION_ID)
+                REGION_OBJ=$$(echo $$PARTITION | jq -r .region)
+                REGION=$$(echo $$REGION_OBJ | jq -r .name)
+                POP_ID=$$(echo $$REGION_OBJ | jq -r .pop_id)
                 POP=$$(curl -s qairon:5001/api/rest/v1/pop$/$$POP_ID)
                 ACCOUNT=$$(echo $$POP | jq -r .native)
                 PROVIDER=$$(echo $$POP | jq -r .pop_type_id)
@@ -192,7 +193,9 @@ for (int i = 0; i < dep_ids.size(); i++) {
                     tmp$/$$ARTIFACT/values.yaml
                     
                 
-                
+                cd tmp
+                helm package --version $$BUILD_NUMBER $$ARTIFACT
+                aws s3 cp $$ARTIFACT-$$BUILD_NUMBER.tgz $$URL$/$$ARTIFACT-$$BUILD_NUMBER.tgz
                
             /$
                 sh script: command
