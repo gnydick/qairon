@@ -188,14 +188,14 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 helm repo update
                 
                 mkdir tmp
-                rsync -var bitbucket/nextgen/helm/charts$/$$ARTIFACT/ tmp$/$$ARTIFACT
+                rsync -var bitbucket/nextgen/helm/charts$/$$ARTIFACT/ tmp$/$$ARTIFACT/
                 cp bitbucket/nextgen/ops$/$$PROVIDER$/$$ACCOUNT$/$$REGION$/$$DEP_TGT_NAME/helm$/$${ARTIFACT}.yaml \
                     tmp$/$$ARTIFACT/values.yaml
                     
                 
                 cd tmp
                 helm package --version $$BUILD_NUMBER $$ARTIFACT
-                aws s3 cp $$ARTIFACT-$$BUILD_NUMBER.tgz $$URL$/$$ARTIFACT-$$BUILD_NUMBER.tgz
+                aws s3 cp $$ARTIFACT-$$BUILD_NUMBER.tgz $$URL$/${dep_id}$/$$ARTIFACT-$$BUILD_NUMBER.tgz
                
             /$
                 sh script: command
