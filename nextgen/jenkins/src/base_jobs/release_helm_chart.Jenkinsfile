@@ -1,3 +1,5 @@
+package base_jobs
+
 properties([
         parameters([
                 [
@@ -95,7 +97,7 @@ try {
                         $class              : 'CascadeChoiceParameter',
                         referencedParameters: 'SERVICES',
                         choiceType          : 'PT_MULTI_SELECT',
-                        description         : 'Select the Builds from the Dropdown List',
+                        description         : 'Select the Deployments from the Dropdown List',
                         filterLength        : 3,
                         filterable          : true,
                         name                : 'DEPLOYMENTS',
@@ -191,6 +193,20 @@ for (int i = 0; i < dep_ids.size(); i++) {
                
             /$
                 sh script: command
+                }
+                stage('record release') {
+                    def data = $/
+{
+    "build_id": "${build_id}",
+    "build_num": "${env.BUILD_NUMBER}",
+    "deployment_id": "${dep_id}"
+}
+/$
+                    def command = $/
+curl -X POST -d '${data}' -H "Content-Type: application/json" http://qairon:5001/api/rest/v1/release
+                    /$
+
+                    sh script: command
                 }
             }
         }

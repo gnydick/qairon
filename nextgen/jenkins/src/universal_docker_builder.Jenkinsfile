@@ -47,6 +47,7 @@ try {
                 string(name: 'DOCKERFILE_PATH', defaultValue: '', description: 'Where to find the Dockerfile in the repo and the filename itself', trim: true),
                 string(name: 'REGISTRY', defaultValue: '', description: '', trim: true),
                 string(name: 'BRANCH', defaultValue: '', description: '', trim: true),
+                string(name: 'IMMUTABLE_VCS_TAG', defaultValue: '', trim: true),
                 credentials(credentialType: 'com.cloudbees.plugins.credentials.common.StandardCredentials', defaultValue: '', description: '', name: 'GIT_CREDS', required: true)
 
 
@@ -65,8 +66,7 @@ for (int i = 0; i < svc_ids.size(); i++) {
     jobs[svc_id] = {
         node('docker-builder') {
             container(name: 'docker-builder') {
-                stage(name: 'parallelize docker builds') {
-                    def fields = svc_id.split(':')
+                stage(name: 'checkout') {
                     def scmVars = checkout changelog: false, poll: false,
                             scm: [$class                           : 'GitSCM', branches: [[name: params.BRANCH]],
                                   doGenerateSubmoduleConfigurations: false,
@@ -74,8 +74,9 @@ for (int i = 0; i < svc_ids.size(); i++) {
                                   userRemoteConfigs                : [
                                           [credentialsId: params.GIT_CREDS, url: params.REPO]]]
 
-                    // def builtImage = docker.image("${params.REGISTRY}/${fields[-1]}:${env.BUILD_NUMBER}", params.DOCKERFILE_PATH).withRun("--network=host")
-
+                }
+                stage('build and push'){
+                    def fields = svc_id.split(':')
                     def image = params.REGISTRY + "/" + fields[-1] + ":" + env.BUILD_NUMBER
                     def command = $/
                     docker build -t $image --network=host ${params.DOCKERFILE_PATH}
@@ -83,7 +84,20 @@ for (int i = 0; i < svc_ids.size(); i++) {
                     docker push $image
                     /$
                     sh script: command
+                }
+                stage('record build') {
+                    def data = $/
+{
+    "service_id": "${svc_id}",
+    "build_num": "${env.BUILD_NUMBER}",
+    "git_tag": "${params.IMMUTABLE_VCS_TAG}"
+}
+/$
+                    def command = $/
+curl -X POST -d '${data}' -H "Content-Type: application/json" http://qairon:5001/api/rest/v1/build
+                    /$
 
+                    sh script: command
                 }
             }
         }
