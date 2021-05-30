@@ -125,9 +125,9 @@ try {
         def jsonSlurper = new JsonSlurper()
         // get the JSON response
         def inStream = connection.inputStream
-        def builds = jsonSlurper.parse(inStream).objects
-        builds.objects
-        builds.each { build -> resultArray.add(build.id) }
+        def deployments = jsonSlurper.parse(inStream).objects
+        deployments.objects
+        deployments.each { deployment -> resultArray.add(deployment.id) }
         connection.disconnect()
         return resultArray
     } else {
@@ -197,7 +197,7 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 stage('record release') {
                     def data = $/
 {
-    "build_id": "${build_id}",
+    "build_id": "${params.BUILDS}",
     "build_num": "${env.BUILD_NUMBER}",
     "deployment_id": "${dep_id}"
 }
