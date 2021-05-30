@@ -94,7 +94,9 @@ for (int i = 0; i < svc_ids.size(); i++) {
 }
 /$
                     def command = $/
-curl -X POST -d '${data}' -H "Content-Type: application/json" http://qairon:5001/api/rest/v1/build
+curl -s -X POST -d '${data}' \
+-H "Content-Type: application/json" \
+http://qairon:5001/api/rest/v1/build
                     /$
 
                     sh script: command
