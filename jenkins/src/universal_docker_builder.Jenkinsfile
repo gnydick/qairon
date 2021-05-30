@@ -13,7 +13,8 @@ properties([
                                         classpath: [],
                                         sandbox  : false,
                                         script   :
-                                                $/package lib.qairon
+                                                $/
+package lib.qairon
 
 import groovy.json.JsonSlurper
 
@@ -41,13 +42,16 @@ try {
 /$
                                 ]
                         ]
-                ]
+                ],
+                string(name: 'REPO', defaultValue: '', description: 'Git Repo', trim: true),
+                string(name: 'DOCKERFILE_PATH', defaultValue: '', description: 'Where to find the Dockerfile in the repo and the filename itself', trim: true),
+                string(name: 'REGISTRY', defaultValue: '', description: '', trim: true),
+                string(name: 'BRANCH', defaultValue: '', description: '', trim: true),
+                credentials(credentialType: 'com.cloudbees.plugins.credentials.common.StandardCredentials', defaultValue: '', description: '', name: 'GIT_CREDS', required: true)
+
 
         ])
 ])
-
-
-
 
 
 def jobs = [:]
@@ -63,13 +67,16 @@ for (int i = 0; i < svc_ids.size(); i++) {
             container(name: 'docker-builder') {
                 stage(name: 'parallelize docker builds') {
 
-                    def command = $/
-                        set -x
-                        SERVICE_ID=$$(curl -s qairon:5001/api/rest/v1/service$/${svc_id})
-                        echo $$SERVICE_ID
-                    /$
+                    def scmVars = checkout changelog: false, poll: false,
+                            scm: [$class                           : 'GitSCM', branches: [[name: params.BRANCH]],
+                                  doGenerateSubmoduleConfigurations: false,
+                                  submoduleCfg                     : [],
+                                  userRemoteConfigs                : [
+                                          [credentialsId: params.GIT_CREDS, url: params.REPO]]]
 
-                    sh script: command
+                    def builtImage = docker.build("${params.REGISTRY}/${params.REPO}:${env.BUILD_ID}", params.DOCKERFILE_PATH)
+
+
                 }
             }
         }
