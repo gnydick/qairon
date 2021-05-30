@@ -56,7 +56,8 @@ data "aws_iam_policy_document" "ecr_access" {
         "ecr:PutImage",
         "ecr:TagResource",
         "ecr:UntagResource",
-        "ecr:UploadLayerPart"
+        "ecr:UploadLayerPart",
+        "ecr:GetAuthorizationToken"
     ]
     effect = "Allow"
 
