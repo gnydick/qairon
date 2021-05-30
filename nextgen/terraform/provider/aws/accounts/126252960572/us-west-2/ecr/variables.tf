@@ -3,8 +3,10 @@ variable "repos" {
 }
 
 
-variable "principal_identifiers" {
+variable "ro_principal_identifiers" {
   type = list(string)
 }
+
+
 
 variable "repo_prefix" {}

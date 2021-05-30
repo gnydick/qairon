@@ -273,7 +273,7 @@ controller:
   # become the content of the configuration yaml file.  The first line after this is a JCasC root element, eg jenkins, credentials,
   # etc.  Best reference is https://<jenkins_url>/configuration-as-code/reference.  The example below creates a welcome message:
   JCasC:
-    defaultConfig: true
+    defaultConfig: false
     configScripts: {}
     #  welcome-message: |
     #    jenkins:

@@ -85,3 +85,34 @@ resource "aws_iam_role_policy_attachment" "jenkins-sa-policy-attachment" {
   policy_arn = aws_iam_policy.jenkins-sa-s3.arn
   role = aws_iam_role.xaccount-eks-ci.name
 }
+
+
+
+resource "aws_iam_policy" "jenkins-sa-ecr" {
+  name = format("%s.S3Policy", aws_iam_role.xaccount-eks-ci.name)
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ecr:*"
+
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:s3:::helm-repo-126252960572.s3-bucket",
+        "arn:aws:s3:::helm-repo-126252960572.s3-bucket/stable/*"
+      ]
+    }
+  ]
+}
+EOF
+
+}
+
+resource "aws_iam_role_policy_attachment" "jenkins-sa-ecr-policy-attachment" {
+  policy_arn = aws_iam_policy.jenkins-sa-s3.arn
+  role = aws_iam_role.xaccount-eks-ci.name
+}
+
