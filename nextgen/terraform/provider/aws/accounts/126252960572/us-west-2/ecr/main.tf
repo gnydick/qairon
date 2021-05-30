@@ -69,3 +69,27 @@ data "aws_iam_policy_document" "ecr_access" {
 
 
 }
+
+data "aws_iam_policy_document" "ecr_login" {
+  statement {
+    actions = [
+      "ecr:GetAuthorizationToken"
+    ]
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "xaccount-ecr-login" {
+  name = "xaccount-ecr-login"
+  policy = data.aws_iam_policy_document.ecr_login.json
+}
+
+resource "aws_iam_role_policy_attachment" "xaccount-ecr-login" {
+  policy_arn = aws_iam_policy.xaccount-ecr-login.arn
+  role = "xaccount-eks-ci"
+}
+
