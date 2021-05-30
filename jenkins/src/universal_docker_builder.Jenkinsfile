@@ -66,7 +66,7 @@ for (int i = 0; i < svc_ids.size(); i++) {
         node('docker-builder') {
             container(name: 'docker-builder') {
                 stage(name: 'parallelize docker builds') {
-
+                    def fields = svc_id.split(':')
                     def scmVars = checkout changelog: false, poll: false,
                             scm: [$class                           : 'GitSCM', branches: [[name: params.BRANCH]],
                                   doGenerateSubmoduleConfigurations: false,
@@ -74,7 +74,7 @@ for (int i = 0; i < svc_ids.size(); i++) {
                                   userRemoteConfigs                : [
                                           [credentialsId: params.GIT_CREDS, url: params.REPO]]]
 
-                    def builtImage = docker.build("${params.REGISTRY}/${params.REPO}:${env.BUILD_ID}", params.DOCKERFILE_PATH)
+                    def builtImage = docker.build("${params.REGISTRY}/${fields[-1]}:${env.BUILD_NUMBER}", params.DOCKERFILE_PATH)
 
 
                 }
