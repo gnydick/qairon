@@ -74,8 +74,15 @@ for (int i = 0; i < svc_ids.size(); i++) {
                                   userRemoteConfigs                : [
                                           [credentialsId: params.GIT_CREDS, url: params.REPO]]]
 
-                    def builtImage = docker.build("${params.REGISTRY}/${fields[-1]}:${env.BUILD_NUMBER}", params.DOCKERFILE_PATH)
+                    // def builtImage = docker.image("${params.REGISTRY}/${fields[-1]}:${env.BUILD_NUMBER}", params.DOCKERFILE_PATH).withRun("--network=host")
 
+                    def image = params.REGISTRY + "/" + fields[-1] + ":" + env.BUILD_NUMBER
+                    def command = $/
+                    docker build -t $image --network=host ${params.DOCKERFILE_PATH}
+                    aws ecr get-login-password  | docker login --username AWS --password-stdin $params.REGISTRY
+                    docker push $image
+                    /$
+                    sh script: command
 
                 }
             }
