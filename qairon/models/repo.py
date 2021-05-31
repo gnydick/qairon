@@ -15,6 +15,8 @@ class Repo(db.Model):
     defaults = Column(Text)
 
     type = relationship("RepoType", back_populates="repos")
+    services = relationship("Service", secondary='svcs_to_repos', back_populates="repos")
+
 
     def __repr__(self):
         return self.id
