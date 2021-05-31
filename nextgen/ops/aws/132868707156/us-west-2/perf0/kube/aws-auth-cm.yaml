@@ -10,3 +10,7 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+    - rolearn: arn:aws:iam::132868707156:role/xaccount-eks-ci
+      username: hub-jenkins-infra0
+      groups:
+        - system:masters

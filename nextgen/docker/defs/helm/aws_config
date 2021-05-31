@@ -16,3 +16,8 @@ role_session_name = hub-dev-spoke
 role_arn = arn:aws:iam::417738154227:role/xaccount-eks-ci
 source_profile = hub
 role_session_name = hub-int-spoke
+
+[profile perf-spoke]
+role_arn = arn:aws:iam::132868707156:role/xaccount-eks-ci
+source_profile = hub
+role_session_name = hub-perf-spoke

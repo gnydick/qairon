@@ -29,7 +29,7 @@ resource "aws_iam_role" "xaccount-eks-ci" {
 EOF
 }
 
-resource "aws_iam_policy" "assume-prod-spoke" {
+resource "aws_iam_policy" "assume-spoke" {
   policy =<<EOF
 {
     "Version": "2012-10-17",
@@ -40,7 +40,8 @@ resource "aws_iam_policy" "assume-prod-spoke" {
             "Resource": [
               "arn:aws:iam::923799771136:role/xaccount-eks-ci",
               "arn:aws:iam::702861675511:role/xaccount-eks-ci",
-              "arn:aws:iam::417738154227:role/xaccount-eks-ci"
+              "arn:aws:iam::417738154227:role/xaccount-eks-ci",
+              "arn:aws:iam::132868707156:role/xaccount-eks-ci"
             ]
 
 
@@ -50,8 +51,8 @@ resource "aws_iam_policy" "assume-prod-spoke" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "assume-prod-spoke" {
-  policy_arn = aws_iam_policy.assume-prod-spoke.arn
+resource "aws_iam_role_policy_attachment" "assume-spoke" {
+  policy_arn = aws_iam_policy.assume-spoke.arn
   role = aws_iam_role.xaccount-eks-ci.name
 }
 
@@ -85,34 +86,3 @@ resource "aws_iam_role_policy_attachment" "jenkins-sa-policy-attachment" {
   policy_arn = aws_iam_policy.jenkins-sa-s3.arn
   role = aws_iam_role.xaccount-eks-ci.name
 }
-
-
-
-resource "aws_iam_policy" "jenkins-sa-ecr" {
-  name = format("%s.S3Policy", aws_iam_role.xaccount-eks-ci.name)
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "ecr:*"
-
-      ],
-      "Effect": "Allow",
-      "Resource": [
-        "arn:aws:s3:::helm-repo-126252960572.s3-bucket",
-        "arn:aws:s3:::helm-repo-126252960572.s3-bucket/stable/*"
-      ]
-    }
-  ]
-}
-EOF
-
-}
-
-resource "aws_iam_role_policy_attachment" "jenkins-sa-ecr-policy-attachment" {
-  policy_arn = aws_iam_policy.jenkins-sa-s3.arn
-  role = aws_iam_role.xaccount-eks-ci.name
-}
-
