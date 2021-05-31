@@ -89,17 +89,12 @@ class CLIArgs:
             __populate_args__(self.rest, _model_com_create_parser, self.schema.CREATE_FIELDS[model])
             _model_com_delete_parser = parsers_for_model_parser.add_parser('delete')
             _model_com_delete_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
-            # _model_com_clone_parser = parsers_for_model_parser.add_parser('clone')
-            # _model_com_clone_parser.add_argument('id', help='%s_id' % model).completer = getattr(self.rest,
-            #                                                                                      '%s_completer' % model)
-            # _model_com_clone_parser.add_argument('name',
-            #                                      help='NOT IMPLEMENTED')
 
         deployment_sub_parsers = self.model_subparsers['deployment']
         clone_dep_parser = deployment_sub_parsers.add_parser('clone')
         clone_dep_parser.add_argument('id').completer = getattr(self.rest, 'deployment_completer')
         clone_dep_parser.add_argument('deployment_target_id',
-                                             help='destination deployment target')
+                                      help='destination deployment target')
 
         network_sub_parsers = self.model_subparsers['network']
         subnet_allocator_parser = network_sub_parsers.add_parser('allocate_subnet')

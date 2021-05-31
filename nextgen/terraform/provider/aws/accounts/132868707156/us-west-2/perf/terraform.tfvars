@@ -1,6 +1,6 @@
 org             = "withme"
 dept            = "services"
-environment     = "infra"
+environment     = "perf"
 role            = "automation"
 config          = "default"
 region          = "us-west-2"
@@ -24,7 +24,7 @@ private_subnets = {
 
 eks_configs = {
   "vpc0" = {
-    "infra0" = {
+    "perf0" = {
       azs                                  = [],
       cluster_create_timeout               = "90m",
       cluster_delete_timeout               = "90m",
@@ -34,7 +34,7 @@ eks_configs = {
       cluster_endpoint_public_access       = true,
       cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"],
       cluster_log_retention_in_days        = 90,
-      cluster_name                         = "infra0",
+      cluster_name                         = "perf0",
       eks_version                          = "1.20"
     }
   }
@@ -53,11 +53,11 @@ vpc_configs = {
 
 nodegroup_configs = {
   "vpc0" = {
-    "infra0" = {
+    "perf0" = {
       "nodegroup0" = {
         name                                     = "nodegroup0"
         bootstrap_arguments                      = "",
-        key_name                                 = "infra-vpc0-infra0",
+        key_name                                 = "perf-vpc0-perf0",
         ami                                      = "ami-0010b93bf152621e5",
         subnets                                  = [],
         node_group_name                          = "nodegroup0",
