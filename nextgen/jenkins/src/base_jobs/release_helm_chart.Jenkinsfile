@@ -167,6 +167,7 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 set -x
                 DEP_DESCRIPTOR=$$(curl -s qairon:5001/api/rest/v1/deployment$/${dep_id})
                 SERVICE_ID=$$(echo $$DEP_DESCRIPTOR | jq -r .service.id)
+                SERVICE_NAME=$$(echo $$DEP_DESCRIPTOR | jq -r .service.name)
                 DEP_TARGET=$$(echo $$DEP_DESCRIPTOR | jq -r .deployment_target)
                 DEP_TGT_NAME=$$(echo $$DEP_TARGET | jq -r .name)
                 PARTITION_ID=$$(echo $$DEP_TARGET | jq -r .partition_id)
@@ -177,19 +178,19 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 POP=$$(curl -s qairon:5001/api/rest/v1/pop$/$$POP_ID)
                 ACCOUNT=$$(echo $$POP | jq -r .native)
                 PROVIDER=$$(echo $$POP | jq -r .pop_type_id)
-                HELM_CHART=$$(curl -s qairon:5001/api/rest/v1/service$/$$SERVICE_ID |  jq '.defaults|fromjson|.releases.helm')
-                REPO=$$(echo $$HELM_CHART | jq -r .repo)
+                
+                REPO_URL=$(curl -s qairon:5001/api/rest/v1/service$/$$SERVICE_ID/repos | jq -r '.objects[]|select(.repo_type_id == "helm")|.url')
+
                 URL=$$(curl -s qairon:5001/api/rest/v1/repo/helm:$$REPO | jq -r .url)
-                ARTIFACT=$$(echo $$HELM_CHART | jq -r .artifact)
      
                 mkdir tmp
-                rsync -var bitbucket/nextgen/helm/charts$/$$ARTIFACT/ tmp$/$$ARTIFACT/
-                cp bitbucket/nextgen/ops$/$$PROVIDER$/$$ACCOUNT$/$$REGION$/$$DEP_TGT_NAME/helm$/$${ARTIFACT}.yaml \
-                    tmp$/$$ARTIFACT/values.yaml
+                rsync -var bitbucket/nextgen/helm/charts$/$$SERVICE_NAME/ tmp$/$$SERVICE_NAME/
+                cp bitbucket/nextgen/ops$/$$PROVIDER$/$$ACCOUNT$/$$REGION$/$$DEP_TGT_NAME/helm$/$${SERVICE_NAME}.yaml \
+                    tmp$/$$SERVICE_NAME/values.yaml
     
                 cd tmp
-                helm package --version $$BUILD_NUMBER $$ARTIFACT
-                aws s3 cp $$ARTIFACT-$$BUILD_NUMBER.tgz $$URL$/${dep_id}$/$$ARTIFACT-$$BUILD_NUMBER.tgz
+                helm package --version $$BUILD_NUMBER $$SERVICE_NAME
+                aws s3 cp $$SERVICE_NAME-$$BUILD_NUMBER.tgz $$URL$/${dep_id}$/$$SERVICE_NAME-$$BUILD_NUMBER.tgz
                
             /$
                 sh script: command
