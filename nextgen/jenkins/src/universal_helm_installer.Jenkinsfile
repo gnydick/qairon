@@ -17,19 +17,20 @@ for (int i = 0; i < dep_ids.size(); i++) {
                         DEP_DESCRIPTOR=$$(curl -s qairon:5001/api/rest/v1/deployment$/${dep_id})
                         REL_BUILD_NUM=$$(echo $$DEP_DESCRIPTOR | jq -r .current_release.build_num)
                         SERVICE_ID=$$(echo $$DEP_DESCRIPTOR | jq -r .service.id)
+                        SERVICE_NAME=$$(echo $$DEP_DESCRIPTOR | jq -r .service.name)
                         DEP_TARGET=$$(echo $$DEP_DESCRIPTOR | jq -r .deployment_target)
                         DEP_TGT_NAME=$$(echo $$DEP_TARGET | jq -r .name)
                         HELM_CHART=$$(curl -s qairon:5001/api/rest/v1/service$/$$SERVICE_ID |  jq '.defaults|fromjson|.releases.helm')
                         REPO=$$(echo $$HELM_CHART | jq -r .repo)
                         URL=$$(curl -s qairon:5001/api/rest/v1/repo/helm:$$REPO | jq -r .url)
-                        ARTIFACT=$$(echo $$HELM_CHART | jq -r .artifact)
                         
-                        aws s3 cp $$URL$/${dep_id}$/$$ARTIFACT-$$REL_BUILD_NUM.tgz $$ARTIFACT-$$REL_BUILD_NUM.tgz 
+                        
+                        aws s3 cp $$URL$/${dep_id}$/$$SERVICE_NAME-$$REL_BUILD_NUM.tgz $$SERVICE_NAME-$$REL_BUILD_NUM.tgz 
 
                         export AWS_PROFILE=$$(echo $$DEP_TARGET | jq -r '.defaults|fromjson|.spoke_profile')
                         aws eks update-kubeconfig --name $$DEP_TGT_NAME
                   
-                        helm upgrade --install $$ARTIFACT .$/$$ARTIFACT-$$REL_BUILD_NUM.tgz
+                        helm upgrade --install $$SERVICE_NAME .$/$$SERVICE_NAME-$$REL_BUILD_NUM.tgz
                     /$
 
                     sh script: command
