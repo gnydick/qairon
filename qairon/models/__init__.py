@@ -10,6 +10,7 @@ from .config_template import ConfigTemplate
 from .config_template_type import ConfigTemplateType
 from .language import Language
 from .associations import deps_to_zones
+from .associations import svcs_to_repos
 from .application import Application
 from .deployment_target import DeploymentTarget
 from .repo import Repo
