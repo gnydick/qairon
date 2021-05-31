@@ -15,7 +15,6 @@ class Repo(db.Model):
     defaults = Column(Text)
 
     type = relationship("RepoType", back_populates="repos")
-    services = relationship("Service", back_populates="repo")
 
     def __repr__(self):
         return self.id

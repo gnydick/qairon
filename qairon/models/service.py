@@ -8,14 +8,11 @@ class Service(db.Model):
     __tablename__ = "service"
     id = Column(String, primary_key=True)
     stack_id = Column(String, ForeignKey('stack.id'), nullable=False)
-    repo_id = Column(String, ForeignKey('repo.id'))
     name = Column(String, nullable=False)
 
-    scm_url = Column(String)
     artifact_name = Column(String)
     defaults = Column(Text)
 
-    repo = relationship("Repo", back_populates="services")
     stack = relationship("Stack", back_populates="services")
     builds = relationship("Build", back_populates="service")
     deployments = relationship("Deployment", back_populates="service")

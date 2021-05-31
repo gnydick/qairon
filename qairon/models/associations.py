@@ -17,3 +17,8 @@ current_dep_release = Table('current_dep_release', db.metadata,
                             Column('release_id', String, ForeignKey('release.id')),
                             UniqueConstraint('deployment_id')
                             )
+
+svcs_to_repos = Table('services_repos', db.metadata,
+                      Column('service_id', String, ForeignKey('service.id')),
+                      Column('repo_id', String, ForeignKey('repo.id'))
+                      )
