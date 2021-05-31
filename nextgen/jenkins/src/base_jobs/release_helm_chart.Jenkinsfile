@@ -181,7 +181,6 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 
                 REPO_URL=$(curl -s qairon:5001/api/rest/v1/service$/$$SERVICE_ID/repos | jq -r '.objects[]|select(.repo_type_id == "helm")|.url')
 
-                URL=$$(curl -s qairon:5001/api/rest/v1/repo/helm:$$REPO | jq -r .url)
      
                 mkdir tmp
                 rsync -var bitbucket/nextgen/helm/charts$/$$SERVICE_NAME/ tmp$/$$SERVICE_NAME/
@@ -190,7 +189,7 @@ for (int i = 0; i < dep_ids.size(); i++) {
     
                 cd tmp
                 helm package --version $$BUILD_NUMBER $$SERVICE_NAME
-                aws s3 cp $$SERVICE_NAME-$$BUILD_NUMBER.tgz $$URL$/${dep_id}$/$$SERVICE_NAME-$$BUILD_NUMBER.tgz
+                aws s3 cp $$SERVICE_NAME-$$BUILD_NUMBER.tgz $$REPO_URL$/${dep_id}$/$$SERVICE_NAME-$$BUILD_NUMBER.tgz
                
             /$
                 sh script: command
