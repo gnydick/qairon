@@ -43,6 +43,7 @@ try {
                                 ]
                         ]
                 ],
+//                TODO change this to get the repo url from the "repo" object
                 string(name: 'REPO', defaultValue: '', description: 'Git Repo', trim: true),
                 string(name: 'DOCKERFILE_PATH', defaultValue: '', description: 'Where to find the Dockerfile in the repo and the filename itself', trim: true),
                 string(name: 'REGISTRY', defaultValue: '', description: '', trim: true),
