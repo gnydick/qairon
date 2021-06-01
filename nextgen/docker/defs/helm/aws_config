@@ -21,3 +21,7 @@ role_session_name = hub-int-spoke
 role_arn = arn:aws:iam::132868707156:role/xaccount-eks-ci
 source_profile = hub
 role_session_name = hub-perf-spoke
+
+[profile jenkins-automation-client]
+role_arn = arn:aws:iam::126252960572:role/JenkinsAutomationClient
+web_identity_token_file = /var/run/secrets/eks.amazonaws.com/serviceaccount/token

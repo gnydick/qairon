@@ -34,9 +34,6 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o $EXE_FILE
 RUN groupadd -r --gid 1000  helm \
     && useradd -r -m -s /bin/false -g helm helm --uid 1000
 
-USER helm
-WORKDIR /home/helm
-
 RUN helm plugin install https://github.com/hypnoglow/helm-s3.git
 
 RUN helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -44,3 +41,8 @@ RUN helm repo update
 
 RUN mkdir /home/helm/.aws
 ADD aws_config /home/helm/.aws/config
+
+RUN chown -R helm:helm /home/helm
+
+USER helm
+WORKDIR /home/helm
