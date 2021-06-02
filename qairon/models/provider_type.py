@@ -4,13 +4,13 @@ from sqlalchemy.orm import relationship, validates
 from db import db
 
 
-class PopType(db.Model):
-    __tablename__ = "pop_type"
+class ProviderType(db.Model):
+    __tablename__ = "provider_type"
     id = Column(String, primary_key=True)
     defaults = Column(Text)
 
-    pops = relationship("Pop", back_populates="type")
-    fleet_types = relationship("FleetType", back_populates="pop_type")
+    providers = relationship("Provider", back_populates="type")
+    fleet_types = relationship("FleetType", back_populates="provider_type")
 
     def __repr__(self):
         return self.id

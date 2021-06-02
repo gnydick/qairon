@@ -9,10 +9,10 @@ def step_impl(context, resource, res_id):
     assert data['id'] == res_id
 
 
-@then('create pop of type "{pop_type_id}" with native_id "{native_id}" via rest')
+@then('create provider of type "{pop_type_id}" with native_id "{native_id}" via rest')
 def step_impl(context, pop_type_id, native_id):
     res = context.rest.create_resource(
-        {'pop_type_id': pop_type_id, 'resource': 'pop',
+        {'pop_type_id': pop_type_id, 'resource': 'provider',
          'native': native_id}
     )
     data = res.json()
@@ -39,20 +39,20 @@ def step_impl(context, resource, res_name, version, parent_fk_field, parent_id, 
 
 
 # use_step_matcher("re")
-@given('pop "{pop}" can be created via rest')
-def step_impl(context, pop):
+@given('provider "{provider}" can be created via rest')
+def step_impl(context, provider):
     prov = context.rest.create_resource(
-        {'id': pop, 'resource': 'pop'})
+        {'id': provider, 'resource': 'provider'})
     data = prov.json()
-    assert data['id'] == pop
+    assert data['id'] == provider
 
 
-@given('region "{region}" can be created for pop "{pop}" via rest')
-def step_impl(context, region, pop):
+@given('region "{region}" can be created for provider "{provider}" via rest')
+def step_impl(context, region, provider):
     new_region = context.rest.create_resource(
-        {'name': region, 'provider_id': pop, 'resource': 'region'})
+        {'name': region, 'provider_id': provider, 'resource': 'region'})
     data = new_region.json()
-    assert data['id'] == '%s:%s' % (pop, region)
+    assert data['id'] == '%s:%s' % (provider, region)
 
 
 @given('zone "{zone}" can be created for region "{region}" via rest')

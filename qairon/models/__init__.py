@@ -1,7 +1,7 @@
 from .deployment import Deployment
 from .environment import Environment
 from .config import ServiceConfig, DeploymentConfig
-from .pop import Pop
+from .provider import Provider
 from .region import Region
 from .service import Service
 from .stack import Stack
@@ -28,4 +28,5 @@ from .repo_type import RepoType
 from .fleet_type import FleetType
 from .deployment_target_type import DeploymentTargetType
 from .capacity import Capacity
-from .pop_type import PopType
+from .provider_type import ProviderType
+from .provider import Provider
