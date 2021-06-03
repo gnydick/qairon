@@ -47,8 +47,7 @@ try {
                 string(name: 'REPO', defaultValue: '', description: 'Git Repo', trim: true),
                 string(name: 'DOCKERFILE_PATH', defaultValue: '', description: 'Where to find the Dockerfile in the repo and the filename itself', trim: true),
                 string(name: 'REGISTRY', defaultValue: '', description: '', trim: true),
-                string(name: 'BRANCH', defaultValue: '', description: '', trim: true),
-                string(name: 'IMMUTABLE_VCS_TAG', defaultValue: '', trim: true),
+                string(name: 'RELEASE_BRANCH', defaultValue: '', description: 'use "tags/vX.Y.Z" for releases. branches that are not tags do not get published to the automation framework', trim: true),
                 credentials(credentialType: 'com.cloudbees.plugins.credentials.common.StandardCredentials', defaultValue: '', description: '', name: 'GIT_CREDS', required: true)
 
 
@@ -69,14 +68,14 @@ for (int i = 0; i < svc_ids.size(); i++) {
             container(name: 'docker-builder') {
                 stage(name: 'checkout') {
                     def scmVars = checkout changelog: false, poll: false,
-                            scm: [$class                           : 'GitSCM', branches: [[name: params.BRANCH]],
+                            scm: [$class                           : 'GitSCM', branches: [[name: params.RELEASE_BRANCH]],
                                   doGenerateSubmoduleConfigurations: false,
                                   submoduleCfg                     : [],
                                   userRemoteConfigs                : [
                                           [credentialsId: params.GIT_CREDS, url: params.REPO]]]
 
                 }
-                stage('build and push'){
+                stage('build and push') {
                     def fields = svc_id.split(':')
                     def image = params.REGISTRY + "/" + fields[-1] + ":" + env.BUILD_NUMBER
                     def command = $/
@@ -87,20 +86,26 @@ for (int i = 0; i < svc_ids.size(); i++) {
                     sh script: command
                 }
                 stage('record build') {
-                    def data = $/
+                    def pattern = ~$/^tags/v\d+\.\d+\.\d+/$
+                    if (pattern.matcher(params.RELEASE_BRANCH).matches()) {
+                        def data = $/
 {
     "service_id": "${svc_id}",
     "build_num": "${env.BUILD_NUMBER}",
-    "git_tag": "${params.IMMUTABLE_VCS_TAG}"
+    "git_tag": "${params.RELEASE_BRANCH}"
 }
 /$
-                    def command = $/
+                        def command = $/
 curl -s -X POST -d '${data}' \
 -H "Content-Type: application/json" \
 http://qairon:5001/api/rest/v1/build
                     /$
 
-                    sh script: command
+                        sh script: command
+                    }
+                    else {
+                        print("Not an immutable version: $params.RELEASE_BRANCH, not submitting to framework.")
+                    }
                 }
             }
         }
