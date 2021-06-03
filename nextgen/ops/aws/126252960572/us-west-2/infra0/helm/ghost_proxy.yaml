@@ -86,5 +86,5 @@ proxy:
   name: postgres
   port: 5432
   destination:
-    host: "qairon-snapshot.cluster-cnyml3tlkmcj.us-west-2.rds.amazonaws.com"
+    host: "qairon-infra0.cluster-cnyml3tlkmcj.us-west-2.rds.amazonaws.com"
     port: 5432
