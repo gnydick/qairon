@@ -22,14 +22,28 @@ def __populate_args__(rest, parser, fields):
         if type(field) == str:
             parser.add_argument(field)
         elif type(field) == dict:
-            for key in field.keys():
-                for k, v in field[key].items():
-                    if k == 'args':
-                        parser.add_argument(key, **v)
-                    elif k == 'dotters':
-                        for d, m in v.items():
-                            arg = parser.add_argument(key)
-                            setattr(arg, d, getattr(rest, m))
+            for flag in field.keys():
+                config = field[flag]
+                arg = None
+                if 'dotters' in config:
+                    if 'args' in config:
+                        settings = config['args']
+                        arg = parser.add_argument(flag, **settings)
+                    else:
+                        arg = parser.add_argument(flag)
+                    for d, m in config['dotters'].items():
+                        setattr(arg, d, getattr(rest, m))
+
+                elif 'args' in config:
+                    settings = config['args']
+                    parser.add_argument(flag, **settings)
+
+
+
+
+
+
+
 
 
 def __add_list_parser__(parsers):

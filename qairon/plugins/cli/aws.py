@@ -1,7 +1,6 @@
 import importlib
 import os
 
-
 from plugins.controller.aws import AwsController
 
 aws = AwsController()
@@ -10,7 +9,17 @@ COMMANDS = dict(
     create_secret=[
         'secret_name',
         'secret_value',
-        {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
+        {
+            '-d': {
+                'args': {
+                    'dest': 'deployment_id'
+                },
+                'dotters': {
+                    'completer': 'deployment_completer'
+                }
+            }
+        },
+
         {'-k': {'args': {'dest': 'kms_key_alias'}}}
     ],
     get_secret_string=[
