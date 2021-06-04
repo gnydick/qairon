@@ -8,12 +8,12 @@ class Region(db.Model):
     __tablename__ = "region"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
-    pop_id = Column(String, ForeignKey('pop.id'), nullable=False)
+    provider_id = Column(String, ForeignKey('provider.id'), nullable=True)
     defaults = Column(Text)
     native = Column(Text)
 
     partitions = relationship("Partition", back_populates="region")
-    pop = relationship("Pop", back_populates="regions")
+    provider = relationship("Provider", back_populates="regions")
     zones = relationship("Zone", back_populates="region")
 
     def __repr__(self):

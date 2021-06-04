@@ -42,7 +42,9 @@ data "aws_iam_policy_document" "ecr_access" {
       "ecr:GetRegistryPolicy",
       "ecr:GetRepositoryPolicy",
       "ecr:ListImages",
-      "ecr:ListTagsForResource"
+      "ecr:ListTagsForResource",
+      "ecr:InitiateLayerUpload",
+      "ecr:CompleteLayerUpload"
     ]
     effect = "Allow"
 

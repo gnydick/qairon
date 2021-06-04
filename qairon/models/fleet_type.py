@@ -8,11 +8,11 @@ class FleetType(db.Model):
     __tablename__ = "fleet_type"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
-    pop_type_id = Column(String, ForeignKey('pop_type.id'))
+    provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=True)
 
     defaults = Column(Text)
 
-    pop_type = relationship("PopType", back_populates="fleet_types")
+    provider_type = relationship("ProviderType", back_populates="fleet_types")
     fleets = relationship("Fleet", back_populates="type")
 
     def __repr__(self):

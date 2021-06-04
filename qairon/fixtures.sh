@@ -1,15 +1,15 @@
 export SQLALCHEMY_DATABASE_URI=postgresql://qairon:qairon@localhost:5433/qairon
-# pop type is like cloud vendor
-./qcli pop_type create aws
+# provider type is like cloud vendor
+./qcli provider_type create aws
 
-# dev as a pop type means somewhere in our dev env, could be laptop
-./qcli pop_type create dev
+# dev as a provider type means somewhere in our dev env, could be laptop
+./qcli provider_type create dev
 
 # creates aws account
-./qcli pop create aws 126252960572
+./qcli provider create aws 126252960572
 
-# creates a dev pop to represent laptop
-./qcli pop create dev laptop
+# creates a dev provider to represent laptop
+./qcli provider create dev laptop
 
 # self explanatory
 ./qcli region create aws:126252960572 us-west-2

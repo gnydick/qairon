@@ -6,7 +6,7 @@ direnv hook bash >$DE
 rm $DE
 
 for DIR in $@; do
-  pop=$(echo $DIR | awk -F "/" '{print $NF}')
+  provider=$(echo $DIR | awk -F "/" '{print $NF}')
 
   for REG in $(find $DIR -maxdepth 1 -mindepth 1 -type d); do
     region=$(echo $REG | awk -F "/" '{print $NF}')
