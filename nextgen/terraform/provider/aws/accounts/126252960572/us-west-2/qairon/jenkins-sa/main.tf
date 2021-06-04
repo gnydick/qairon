@@ -27,6 +27,23 @@ resource "aws_iam_policy" "jenkins-sa-s3" {
         "arn:aws:s3:::helm-repo-126252960572.s3-bucket",
         "arn:aws:s3:::helm-repo-126252960572.s3-bucket/stable/*"
       ]
+    },
+    {
+      "Sid": "Stmt1621879441488",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:CreateTags",
+        "ec2:DescribeSpotFleetRequests",
+        "ec2:DescribeSpotFleetInstances",
+        "ec2:ModifySpotFleetRequest",
+        "ec2:DescribeAutoScalingGroups",
+        "ec2:TerminateInstances",
+        "ec2:UpdateAutoScalingGroup"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:ec2:::*"
+      ]
     }
   ]
 }
