@@ -5,29 +5,15 @@ provider "aws" {
   }
 }
 
-resource "aws_iam_role" "xaccount-eks-ci" {
-  name = "xaccount-eks-ci"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Federated": "arn:aws:iam::${data.aws_caller_identity.core-lib.account_id}:oidc-provider/${data.terraform_remote_state.vpc.outputs.cluster_oidc_providers["vpc0"]["infra0"]}"
-      },
-      "Action": "sts:AssumeRoleWithWebIdentity",
-      "Condition": {
-        "StringEquals": {
-          "${data.terraform_remote_state.vpc.outputs.cluster_oidc_providers["vpc0"]["infra0"]}:sub": "system:serviceaccount:default:jenkins"
-        }
-      }
-    }
-  ]
+
+module "xaccount-eks-ci" {
+  source = "../../../../../../modules/aws/sa-iam-role"
+  cluster_oidc_provider = data.terraform_remote_state.vpc.outputs.cluster_oidc_providers["vpc0"]["infra0"]
+  cluster_oidc_provider_arn = data.terraform_remote_state.vpc.outputs.cluster_oidc_provider_arns["vpc0"]["infra0"]
+  role_name = "xaccount-eks-ci"
+  sa = "system:serviceaccount:default:jenkins"
 }
 
-EOF
-}
 
 resource "aws_iam_policy" "assume-spoke" {
   policy =<<EOF
@@ -53,12 +39,12 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "assume-spoke" {
   policy_arn = aws_iam_policy.assume-spoke.arn
-  role = aws_iam_role.xaccount-eks-ci.name
+  role = module.xaccount-eks-ci.role_name
 }
 
 
 resource "aws_iam_policy" "jenkins-sa-s3" {
-  name = format("%s.S3Policy", aws_iam_role.xaccount-eks-ci.name)
+  name = format("%s.S3Policy", module.xaccount-eks-ci.role_name)
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -84,5 +70,5 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "jenkins-sa-policy-attachment" {
   policy_arn = aws_iam_policy.jenkins-sa-s3.arn
-  role = aws_iam_role.xaccount-eks-ci.name
+  role = module.xaccount-eks-ci.role_name
 }
