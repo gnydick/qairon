@@ -1,10 +1,7 @@
 import importlib
 import os
 
-import boto3
-from boto3 import session
-from botocore.docs import paginator
-from botocore.exceptions import ClientError
+
 from plugins.controller.aws import AwsController
 
 aws = AwsController()

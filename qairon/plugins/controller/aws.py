@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 class AwsController:
 
     @staticmethod
-    def create_secret(secret_name, secret_value, kms_key_alias=None, deployment_id=None, q=False):
+    def create_secret(secret_name, secret_value, kms_key_alias=None, deployment_id=None, short_name=None):
         """
         Creates a new secret. The secret value can be a string or bytes.
         """
@@ -27,8 +27,9 @@ class AwsController:
 
         response = secrets_client.create_secret(**kwargs)
 
-        # create a new config object and attach it to the deployment
-        if deployment_id:
+        # create a new config object and attach it to the deployment for
+        # the short-name:long-name mapping
+        if deployment_id and short_name:
             pass
 
         return response
