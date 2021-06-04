@@ -14,9 +14,9 @@ module "xaccount-eks-ci" {
   sa = "system:serviceaccount:default:jenkins"
 }
 
-
 resource "aws_iam_policy" "assume-spoke" {
-  policy =<<EOF
+  name = "federationhub"
+  policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -43,13 +43,14 @@ resource "aws_iam_role_policy_attachment" "assume-spoke" {
 }
 
 
-resource "aws_iam_policy" "jenkins-sa-s3" {
-  name = format("%s.S3Policy", module.xaccount-eks-ci.role_name)
-  policy = <<EOF
+resource "aws_iam_policy" "jenkins-sa" {
+  name = format("%s.Policy", module.xaccount-eks-ci.role_name)
+  policy =<<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "Stmt1621879441487",
       "Action": [
         "s3:DeleteObject",
         "s3:GetObject",
@@ -61,6 +62,37 @@ resource "aws_iam_policy" "jenkins-sa-s3" {
         "arn:aws:s3:::helm-repo-126252960572.s3-bucket",
         "arn:aws:s3:::helm-repo-126252960572.s3-bucket/stable/*"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeSpotFleetInstances",
+        "ec2:ModifySpotFleetRequest",
+        "ec2:CreateTags",
+        "ec2:DescribeRegions",
+        "ec2:DescribeInstances",
+        "ec2:TerminateInstances",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeSpotFleetRequests"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "autoscaling:DescribeAutoScalingGroups",
+        "autoscaling:UpdateAutoScalingGroup"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListInstanceProfiles",
+        "iam:ListRoles",
+        "iam:PassRole"
+      ],
+      "Resource": "*"
     }
   ]
 }
@@ -69,6 +101,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "jenkins-sa-policy-attachment" {
-  policy_arn = aws_iam_policy.jenkins-sa-s3.arn
+  policy_arn = aws_iam_policy.jenkins-sa.arn
   role = module.xaccount-eks-ci.role_name
 }
