@@ -5,14 +5,29 @@ import boto3
 from boto3 import session
 from botocore.exceptions import ClientError
 
+from controllers import RestController
+
+rest = RestController()
+
 
 class AwsController:
 
     @staticmethod
-    def create_secret(secret_name, secret_value, kms_key_alias=None, deployment_id=None, short_name=None):
+    def __creat_if_not_exists_config_type__(config_type):
+        results = rest.query('config_template_type', 'id', 'eq', config_type, 'id')
+        if len(results) == 0:
+            new_config_template_type = rest.create_resource({'id': config_type, 'resource': 'config_template_type'})
+            print(new_config_template_type)
+        print(results)
+
+    @staticmethod
+    def create_secret(secret_name, secret_value, kms_key_alias=None, deployment_id=None):
         """
         Creates a new secret. The secret value can be a string or bytes.
         """
+        import pydevd_pycharm
+        pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
+
         boto_sess = session.Session()
         secrets_client = boto_sess.client("secretsmanager")
         kwargs = {"Name": secret_name}
@@ -26,11 +41,21 @@ class AwsController:
             kwargs["KmsKeyId"] = kms_key_alias
 
         response = secrets_client.create_secret(**kwargs)
-
         # create a new config object and attach it to the deployment for
         # the short-name:long-name mapping
-        if deployment_id and short_name:
-            pass
+        if deployment_id:
+            template = rest.get_instance('config_template', 'secret_name_map_item:1')
+
+            doc = template['doc']
+            doc = str(doc).replace("%--key--%", secret_name).replace("%--value--%", response['ARN'])
+
+            payload = {'resource': 'deployment_config',
+                       'config_template_id': 'secret_name_map_item:1',
+                       'name': secret_name, 'deployment_id': deployment_id,
+                       'config': doc, 'tag': 'default'
+                       }
+
+            new_config = rest.create_resource(payload)
 
         return response
 

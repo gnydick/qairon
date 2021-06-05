@@ -9,17 +9,7 @@ COMMANDS = dict(
     create_secret=[
         'secret_name',
         'secret_value',
-        {
-            '-d': {
-                'args': {
-                    'dest': 'deployment_id'
-                },
-                'dotters': {
-                    'completer': 'deployment_completer'
-                }
-            }
-        },
-
+        {'-d': {'args': {'dest': 'deployment_id'}, 'dotters': {'completer': 'deployment_completer'}}},
         {'-k': {'args': {'dest': 'kms_key_alias'}}}
     ],
     get_secret_string=[
