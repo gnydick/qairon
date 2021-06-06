@@ -21,16 +21,14 @@ class AwsController:
         print(results)
 
     @staticmethod
-    def create_secret(secret_name, secret_value, kms_key_alias=None, deployment_id=None):
+    def create_secret(secret_name, secret_value, deployment_id, kms_key_alias=None):
         """
         Creates a new secret. The secret value can be a string or bytes.
         """
-        import pydevd_pycharm
-        pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
-
+        fqsn = format("%s.%s" % (secret_name, str(deployment_id).replace(':', '-')))
         boto_sess = session.Session()
         secrets_client = boto_sess.client("secretsmanager")
-        kwargs = {"Name": secret_name}
+        kwargs = {"Name": fqsn}
 
         if isinstance(secret_value, str):
             kwargs["SecretString"] = secret_value
@@ -43,24 +41,24 @@ class AwsController:
         response = secrets_client.create_secret(**kwargs)
         # create a new config object and attach it to the deployment for
         # the short-name:long-name mapping
-        if deployment_id:
-            template = rest.get_instance('config_template', 'secret_name_map_item:1')
+        template = rest.get_instance('config_template', 'secret_name_map_item:1')
 
-            doc = template['doc']
-            doc = str(doc).replace("%--key--%", secret_name).replace("%--value--%", response['ARN'])
+        doc = template['doc']
+        doc = str(doc).replace("%--key--%", secret_name).replace("%--value--%", response['ARN'])
 
-            payload = {'resource': 'deployment_config',
-                       'config_template_id': 'secret_name_map_item:1',
-                       'name': secret_name, 'deployment_id': deployment_id,
-                       'config': doc, 'tag': 'default'
-                       }
+        payload = {'resource': 'deployment_config',
+                   'config_template_id': 'secret_name_map_item:1',
+                   'name': secret_name, 'deployment_id': deployment_id,
+                   'config': doc, 'tag': 'default'
+                   }
 
-            new_config = rest.create_resource(payload)
+        new_config = rest.create_resource(payload)
 
         return response
 
     @staticmethod
-    def get_secret_string(secret_name):
+    def get_secret_string_for_deployment(secret_name, deployment_id):
+        fqsn =  format("%s.%s" % (secret_name, str(deployment_id).replace(':', '-')))
         boto_sess = session.Session()
         client = boto_sess.client(
             service_name='secretsmanager'
@@ -72,20 +70,23 @@ class AwsController:
                     {
                         'Key': 'name',
                         'Values': [
-                            secret_name
+                           fqsn
                         ]
                     }
                 ]
             )
 
             if 'SecretList' in secrets_list:
-                if len(secrets_list['SecretList']) == 1:
+                ln = len(secrets_list['SecretList'])
+                if ln == 1:
                     response = secrets_list['SecretList'][0]
                     id = response['ARN']
                     get_secret_value_response = client.get_secret_value(SecretId=id)
                     return [get_secret_value_response, None]
-                else:
+                elif ln > 1:
                     return [None, "Too many results!"]
+                elif ln == 0:
+                    return [None, "No results"]
             else:
                 return [None, "Not found!"]
         except ClientError as e:

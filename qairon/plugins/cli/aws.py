@@ -2,18 +2,18 @@ import importlib
 import os
 
 from plugins.controller.aws import AwsController
-
 aws = AwsController()
 
 COMMANDS = dict(
     create_secret=[
         'secret_name',
         'secret_value',
-        {'-d': {'args': {'dest': 'deployment_id'}, 'dotters': {'completer': 'deployment_completer'}}},
+        {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
         {'-k': {'args': {'dest': 'kms_key_alias'}}}
     ],
     get_secret_string=[
-        'secret_name'
+        'secret_name',
+        {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}}
     ]
 )
 
@@ -28,8 +28,10 @@ def create_secret(secret_name=None, secret_value=None, kms_key_alias=None,
         print(result)
 
 
-def get_secret_string(resource, command, secret_name=None, q=False):
-    result = aws.get_secret_string(secret_name)
+def get_secret_string(resource, command, secret_name, deployment_id, q=False):
+
+
+    result = aws.get_secret_string_for_deployment(secret_name, deployment_id)
     if result[0]:
         if not q:
             print(result[0]['SecretString'])
