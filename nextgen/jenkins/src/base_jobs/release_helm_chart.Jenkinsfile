@@ -174,17 +174,17 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 PARTITION=$$(curl -s qairon:5001/api/rest/v1/partition$/$$PARTITION_ID)
                 REGION_OBJ=$$(echo $$PARTITION | jq -r .region)
                 REGION=$$(echo $$REGION_OBJ | jq -r .name)
-                POP_ID=$$(echo $$REGION_OBJ | jq -r .pop_id)
-                POP=$$(curl -s qairon:5001/api/rest/v1/pop$/$$POP_ID)
-                ACCOUNT=$$(echo $$POP | jq -r .native)
-                PROVIDER=$$(echo $$POP | jq -r .pop_type_id)
+                PROVIDER_ID=$$(echo $$REGION_OBJ | jq -r .provider_id)
+                PROVIDER=$$(curl -s qairon:5001/api/rest/v1/provider$/$$PROVIDER_ID)
+                ACCOUNT=$$(echo $$PROVIDER | jq -r .native)
+                PROVIDER_TYPE=$$(echo $$PROVIDER | jq -r .provider_type_id)
                 
                 REPO_URL=$(curl -s qairon:5001/api/rest/v1/service$/$$SERVICE_ID/repos | jq -r '.objects[]|select(.repo_type_id == "helm")|.url')
 
      
                 mkdir tmp
                 rsync -var bitbucket/nextgen/helm/charts$/$$SERVICE_NAME/ tmp$/$$SERVICE_NAME/
-                cp bitbucket/nextgen/ops$/$$PROVIDER$/$$ACCOUNT$/$$REGION$/$$DEP_TGT_NAME/helm$/$${SERVICE_NAME}.yaml \
+                cp bitbucket/nextgen/ops$/$$PROVIDER_TYPE$/$$ACCOUNT$/$$REGION$/$$DEP_TGT_NAME/helm$/$${SERVICE_NAME}.yaml \
                     tmp$/$$SERVICE_NAME/values.yaml
     
                 cd tmp
