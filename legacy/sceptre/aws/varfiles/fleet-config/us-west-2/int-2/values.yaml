@@ -25,7 +25,7 @@ deployment_target: "int-2"
 # GameLift fleet configuration
 ####
 fleet_type: "ON_DEMAND"
-new_game_sessions_per_creator: "10"
+new_game_sessions_per_creator: "1000"
 policy_period_in_minutes: "60"
 max_size: "1"
 min_size: "0"
