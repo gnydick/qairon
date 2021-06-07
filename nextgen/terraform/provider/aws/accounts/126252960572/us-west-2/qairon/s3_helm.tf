@@ -5,6 +5,7 @@ module "helm-bucket" {
   tags = local.global_tags
 }
 
+
 resource "aws_s3_bucket_object" "helm-stable" {
   bucket = module.helm-bucket.bucket_name
   key = "stable/"

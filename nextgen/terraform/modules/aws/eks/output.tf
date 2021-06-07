@@ -46,3 +46,11 @@ output "cluster_oidc_issuer_url" {
   description = "The URL on the EKS cluster OIDC Issuer"
   value       = flatten(concat(aws_eks_cluster.cluster[*].identity[*].oidc.0.issuer, [""]))[0]
 }
+
+output "cluster_oidc_provider_arn" {
+  value = aws_iam_openid_connect_provider.cluster.arn
+}
+
+output "cluster_oidc_provider" {
+  value = aws_iam_openid_connect_provider.cluster.url
+}

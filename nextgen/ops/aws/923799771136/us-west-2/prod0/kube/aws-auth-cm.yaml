@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::923799771136:role/withme-services-prod-us-west-2-au-NodeInstanceRole-1PW0PR7W9C7WN
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+    - rolearn: arn:aws:iam::923799771136:role/xaccount-eks-ci
+      username: hub-jenkins-infra0
+      groups:
+        - system:masters

@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-dt_ids = groovy.json.JsonOutput.toJson(DEPLOYMENT_TARGET_ID.split(","))
+dt_ids = groovy.json.JsonOutput.toJson(DEPLOYMENT_TARGETS.split(","))
 
 
 try {

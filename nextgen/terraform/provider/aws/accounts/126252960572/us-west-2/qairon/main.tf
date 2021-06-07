@@ -37,3 +37,4 @@ resource "aws_security_group_rule" "eks_out_to_rds" {
   type = "egress"
   source_security_group_id = module.db.this_security_group_id
 }
+

@@ -1,8 +1,8 @@
 Feature: full test
 
-  Scenario: pop hierarchy
-    Given create "pop_type" "testpop_type" via rest
-    Then create pop of type "testpop_type" with native_id "testpop" via rest
+  Scenario: provider hierarchy
+    Given create "provider_type" "testpop_type" via rest
+    Then create provider of type "testpop_type" with native_id "testpop" via rest
     Then create "region" "testregion" under "pop_id" "testpop_type:testpop" via rest
     Then create "zone" "testzone" under "region_id" "testpop_type:testpop:testregion" via rest
     Then create "zone" "testzone2" under "region_id" "testpop_type:testpop:testregion" via rest
@@ -44,7 +44,7 @@ Feature: full test
     Then delete "zone" "testpop_type:testpop:testregion:testzone2" via rest
     Then delete "partition" "testpop_type:testpop:testregion:testpartition" via rest
     Then delete "region" "testpop_type:testpop:testregion" via rest
-    Then delete "pop" "testpop_type:testpop" via rest
+    Then delete "provider" "testpop_type:testpop" via rest
     And delete "build" "testapp:teststack:testservice:v1.0:123" via rest
     And delete "service" "testapp:teststack:testservice" via rest
     And delete "stack" "testapp:teststack" via rest

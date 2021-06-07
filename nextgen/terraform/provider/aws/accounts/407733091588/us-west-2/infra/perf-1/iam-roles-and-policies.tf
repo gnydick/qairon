@@ -1,5 +1,5 @@
 module "iam_role_content_manager" {
-  source = "../../../../../../../../modules/aws/iam-assumable-role-with-oidc"
+  source = "../../../../../../../modules/aws/iam-assumable-role-with-oidc"
   role_name_prefix              = "${var.environment}-content-manager"
   aws_account_id                = data.aws_caller_identity.current.account_id
   create_role                   = true
@@ -23,11 +23,11 @@ module "iam_role_content_manager" {
 }
 
 module "iam_policy_content_manager" {
-  source = "../../../../../../../../modules/aws/iam-policy"
+  source = "../../../../../../../modules/aws/iam-policy"
   description = "IAM Policy for content-manager IAM Role"
   iam_policy_document_actions = ["s3:ListBucket", "s3:GetBucketLocation", "s3:GetBucketAcl", "s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:PutObjectAcl"]
   iam_policy_document_effect = "Allow"
-  iam_policy_document_resource_arn = ["${module.s3-content-manager.bucket_arn}", "${module.s3-content-manager.bucket_arn}/*"]
+  iam_policy_document_resource_arn = [module.s3-content-manager.bucket_arn, "${module.s3-content-manager.bucket_arn}/*"]
   iam_policy_document_sid = "1"
   iam_role_name = module.iam_role_content_manager.iam_role_name
   name = "content_manager_s3_rw"

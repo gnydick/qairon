@@ -8,6 +8,7 @@ resource "aws_route_table" "public" {
     "Az" = element(var.azs, count.index)
   }
 
+
   lifecycle {
     create_before_destroy = true
   }
@@ -24,6 +25,7 @@ resource "aws_route_table" "private" {
   vpc_id = var.vpc_id
 
 
+
   lifecycle {
     create_before_destroy = true
   }
@@ -38,6 +40,7 @@ module "private" {
   vpc_id = var.vpc_id
   subnet_type = each.key
   route_table_ids = aws_route_table.private.*.id
+  depends_on = [aws_route_table.private, aws_route_table.public]
 }
 
 
@@ -49,6 +52,7 @@ module "public" {
   subnet_type = each.key
   public_subnet_cidrs = each.value
   route_table_ids = aws_route_table.public.*.id
+  depends_on = [aws_route_table.private, aws_route_table.public]
 }
 
 
@@ -58,6 +62,8 @@ resource "aws_route" "private_def_nat_gw" {
   route_table_id = element(aws_route_table.private.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id = element(aws_nat_gateway.inet_access.*.id, count.index)
+  depends_on = [aws_nat_gateway.inet_access, module.public, module.private, aws_route_table.private, aws_route_table.public]
+
 }
 
 
@@ -76,6 +82,7 @@ resource "aws_network_acl" "allow_all" {
   subnet_ids = flatten([ [for k, subnets in module.public : subnets
   .public_subnet_ids], [for k, subnets in module.private : subnets
   .private_subnet_ids]])
+  depends_on = [module.public, module.private]
 
 
   lifecycle {
@@ -107,6 +114,8 @@ resource "aws_route" "public_def_gw" {
   route_table_id = element(aws_route_table.public.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
   gateway_id = aws_internet_gateway.public.id
+  depends_on = [module.public, module.private, aws_route_table.private, aws_route_table.public]
+
 }
 
 resource "aws_internet_gateway" "public" {
@@ -114,28 +123,20 @@ resource "aws_internet_gateway" "public" {
   tags = {
     "Name" = format("%s.igw", var.global_strings.regional_prefix),
   }
+  depends_on = [module.public, module.private, aws_route_table.public, aws_route_table.private]
+
 }
 
-
-
-
-// duplicate
-//resource "aws_route_table_association" "priv_to_nat" {
-//  count = "${length(var.private_subnet_cidrs)}"
-//  subnet_id = "${element(module.private.private_subnet_ids, count.index)}"
-//  route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
-//}
 
 resource "aws_nat_gateway" "inet_access" {
   count = length(var.azs)
   allocation_id = element(aws_eip.nat.*.id, count.index)
   subnet_id = element(module.public["nat_gw"].public_subnet_ids, count.index)
+  depends_on = [module.public, module.private]
 
   lifecycle {
-    create_before_destroy = true
-
+    create_before_destroy = false
     ignore_changes = [tags]
-
   }
 
 }
@@ -144,6 +145,8 @@ resource "aws_nat_gateway" "inet_access" {
 resource "aws_eip" "nat" {
   count = length(var.azs)
   vpc = true
+  depends_on = [module.public, module.private]
+
   lifecycle {
     create_before_destroy = true
     ignore_changes = [tags]

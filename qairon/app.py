@@ -55,9 +55,9 @@ restmanager.create_api(Partition, primary_key='id', methods=['GET', 'POST', 'DEL
                        max_results_per_page=-1)
 restmanager.create_api(Proc, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
-restmanager.create_api(Pop, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
+restmanager.create_api(Provider, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
-restmanager.create_api(PopType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
+restmanager.create_api(ProviderType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
 restmanager.create_api(Region, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
@@ -99,8 +99,8 @@ admin.add_view(DefaultView(ServiceConfig, db.session, category='Services'))
 admin.add_view(DefaultView(Build, db.session, category='CICD'))
 admin.add_view(DefaultView(Release, db.session, category='CICD'))
 
-admin.add_view(WithIdView(PopType, db.session, category='Types'))
-admin.add_view(DefaultView(Pop, db.session, category='Platform'))
+admin.add_view(WithIdView(ProviderType, db.session, category='Types'))
+admin.add_view(DefaultView(Provider, db.session, category='Platform'))
 admin.add_view(DefaultView(Region, db.session, category='Platform'))
 admin.add_view(DefaultView(Zone, db.session, category='Platform'))
 
@@ -136,7 +136,7 @@ from socket import gethostname
 
 from flask import Response
 
-from models import  Deployment, Environment, Pop, Region
+from models import  Deployment, Environment, Provider, Region
 
 rest = RestController()
 
@@ -203,12 +203,12 @@ def _gen_tf(dep_id, config_type, name, tag=None):
     dep = s.query(Deployment).get(dep_id)
     env = s.query(Environment).get(dep.environment.id)
     # inheritance order
-    # pop
+    # provider
     # region
     # zone
     # appvars
 
-    provvars = ast.literal_eval(s.query(Pop).get('aws').defaults)
+    provvars = ast.literal_eval(s.query(Provider).get('aws').defaults)
     regvars = __clean_outputs_reader__(s.query(Region).get('us-east-1'))
 
     depcfg = ast.literal_eval(

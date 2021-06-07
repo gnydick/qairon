@@ -8,7 +8,7 @@ for ENV in prod stg dev ; do
   ./qaironcli environment create $ENV
 done
 
-./qaironcli pop_type create aws
+./qaironcli provider_type create aws
 for FLEET_TYPE in asg nodegroup ; do
   ./qaironcli fleet_type create aws $FLEET_TYPE
 done
@@ -26,9 +26,9 @@ done
 ./qaironcli deployment_target_type create eks
 
 for DIR in "$@"; do
-  pop=$(echo $DIR | awk -F "/" '{print $NF}')
+  provider=$(echo $DIR | awk -F "/" '{print $NF}')
   ACCT_ID=$(aws sts get-caller-identity | jq -r .Account)
-  ./qaironcli pop create aws $provider -n '{"account_id": "'"$ACCT_ID"'"}'
+  ./qaironcli provider create aws $provider -n '{"account_id": "'"$ACCT_ID"'"}'
   for REG in $(find $DIR -maxdepth 1 -mindepth 1 -type d); do
     region=$(echo $REG | awk -F "/" '{print $NF}')
     REGION_ID=$(./qaironcli region create $provider $region)

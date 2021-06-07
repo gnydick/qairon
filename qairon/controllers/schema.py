@@ -86,7 +86,7 @@ class QaironSchema:
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
         fleet_type=[
-            {'pop_type_id': {'dotters': {'completer': 'pop_type_completer'}}},
+            {'provider_type_id': {'dotters': {'completer': 'provider_type_completer'}}},
             'name',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
@@ -107,17 +107,17 @@ class QaironSchema:
             'name',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
-        pop=[
-            {'pop_type_id': {'dotters': {'completer': 'pop_type_completer'}}},
+        provider=[
+            {'provider_type_id': {'dotters': {'completer': 'provider_type_completer'}}},
             'native',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
-        pop_type=[
+        provider_type=[
             'id',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
         region=[
-            {'pop_id': {'dotters': {'completer': 'pop_completer'}}},
+            {'provider_id': {'dotters': {'completer': 'provider_completer'}}},
             'name',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],

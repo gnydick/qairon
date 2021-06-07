@@ -43,8 +43,8 @@ def my_before_write_listener(mapper, connection, deployment):
 #     svc = db.session.query(Service).filter(Service.id == kwargs['service_id']).first()
 #     for sc in svc.service_config_templates:
 #         cfg = sc.__dict__
-#         cfg.pop('service_id')
-#         cfg.pop('_sa_instance_state')
+#         cfg.provider('service_id')
+#         cfg.provider('_sa_instance_state')
 #         deployment.configs.append(Config(**cfg))
 #     # DO NOT DELETE THIS SAMPLE CODE EITHER
 #     # for rel in inspect(deployment.__class__).relationships:

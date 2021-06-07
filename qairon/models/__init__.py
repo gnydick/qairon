@@ -1,7 +1,7 @@
 from .deployment import Deployment
 from .environment import Environment
 from .config import ServiceConfig, DeploymentConfig
-from .pop import Pop
+from .provider import Provider
 from .region import Region
 from .service import Service
 from .stack import Stack
@@ -10,6 +10,7 @@ from .config_template import ConfigTemplate
 from .config_template_type import ConfigTemplateType
 from .language import Language
 from .associations import deps_to_zones
+from .associations import svcs_to_repos
 from .application import Application
 from .deployment_target import DeploymentTarget
 from .repo import Repo
@@ -27,4 +28,5 @@ from .repo_type import RepoType
 from .fleet_type import FleetType
 from .deployment_target_type import DeploymentTargetType
 from .capacity import Capacity
-from .pop_type import PopType
+from .provider_type import ProviderType
+from .provider import Provider
