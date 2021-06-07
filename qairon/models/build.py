@@ -38,4 +38,4 @@ def my_before_update_listener(mapper, connection, build):
 
 
 def __update_id__(build):
-    build.id = '%s:%s:%s' % (build.service_id, build.git_tag, build.build_num)
+    build.id = '%s:%s' % (build.service_id, build.build_num)
