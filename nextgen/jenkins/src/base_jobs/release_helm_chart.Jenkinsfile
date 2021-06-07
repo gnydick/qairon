@@ -188,6 +188,8 @@ for (int i = 0; i < dep_ids.size(); i++) {
                     tmp$/$$SERVICE_NAME/values.yaml
     
                 cd tmp
+                sed -i "s/%--tag--%$/$$BUILD_NUMBER/g" $$SERVICE_NAME/values.yaml
+                echo -e"\nversion: $$BUILD_NUMBER" >> $$SERVICE_NAME/Chart.yaml
                 helm package --version $$BUILD_NUMBER $$SERVICE_NAME
                 aws s3 cp $$SERVICE_NAME-$$BUILD_NUMBER.tgz $$REPO_URL$/${dep_id}$/$$SERVICE_NAME-$$BUILD_NUMBER.tgz
                
