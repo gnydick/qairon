@@ -15,7 +15,7 @@ for (int i = 0; i < dep_ids.size(); i++) {
                     def command = $/
                         set -x
                         DEP_DESCRIPTOR=$$(curl -s qairon:5001/api/rest/v1/deployment$/${dep_id})
-                        REL_BUILD_NUM=$$(echo $$DEP_DESCRIPTOR | jq -r .current_release.build_num)
+                        #REL_BUILD_NUM=$$(echo $$DEP_DESCRIPTOR | jq -r .current_release.build_num)
                         SERVICE_ID=$$(echo $$DEP_DESCRIPTOR | jq -r .service.id)
                         SERVICE_NAME=$$(echo $$DEP_DESCRIPTOR | jq -r .service.name)
                         DEP_TARGET=$$(echo $$DEP_DESCRIPTOR | jq -r .deployment_target)
