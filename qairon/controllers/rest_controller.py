@@ -4,7 +4,6 @@ import re
 
 import requests
 
-from base import app
 from .schema import QaironSchema
 
 
@@ -12,7 +11,7 @@ class RestController:
     global schema
     schema = QaironSchema()
     global endpoint
-    endpoint = os.getenv("QAIRON_ENDPOINT", "http://localhost:5000")
+    endpoint = os.getenv("QAIRON_ENDPOINT")
 
     def __init__(self):
         pass

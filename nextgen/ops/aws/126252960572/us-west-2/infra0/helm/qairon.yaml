@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: 126252960572.dkr.ecr.us-west-2.amazonaws.com/qairon
-  tag: 77
+  tag: %--tag--%
   pullPolicy: Always
 
 nameOverride: ""

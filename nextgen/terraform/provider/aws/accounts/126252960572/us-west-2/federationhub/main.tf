@@ -31,6 +31,16 @@ resource "aws_iam_policy" "assume-spoke" {
             ]
 
 
+        },
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAllMyBuckets",
+                "eks:DescribeCluster",
+                "eks:ListClusters"
+            ],
+            "Resource": "*"
         }
     ]
 }

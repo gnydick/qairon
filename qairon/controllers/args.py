@@ -22,14 +22,28 @@ def __populate_args__(rest, parser, fields):
         if type(field) == str:
             parser.add_argument(field)
         elif type(field) == dict:
-            for key in field.keys():
-                for k, v in field[key].items():
-                    if k == 'args':
-                        parser.add_argument(key, **v)
-                    elif k == 'dotters':
-                        for d, m in v.items():
-                            arg = parser.add_argument(key)
-                            setattr(arg, d, getattr(rest, m))
+            for flag in field.keys():
+                config = field[flag]
+                arg = None
+                if 'dotters' in config:
+                    if 'args' in config:
+                        settings = config['args']
+                        arg = parser.add_argument(flag, **settings)
+                    else:
+                        arg = parser.add_argument(flag)
+                    for d, m in config['dotters'].items():
+                        setattr(arg, d, getattr(rest, m))
+
+                elif 'args' in config:
+                    settings = config['args']
+                    parser.add_argument(flag, **settings)
+
+
+
+
+
+
+
 
 
 def __add_list_parser__(parsers):
@@ -74,6 +88,31 @@ class CLIArgs:
         return ['additional_mask_bits']
 
     def __gen_parsers__(self, context_parsers):
+        import importlib
+        import pkgutil
+        import plugins.cli
+
+        def iter_namespace(ns_pkg):
+            # Specifying the second argument (prefix) to iter_modules makes the
+            # returned name an absolute name instead of a relative one. This allows
+            # import_module to work without having to do additional modification to
+            # the name.
+            return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
+
+        self.discovered_plugins = dict()
+        for finder, name, ispkg in iter_namespace(plugins.cli):
+            cli_plugin_name = name[12:]
+            plugin = importlib.import_module(name)
+            self.discovered_plugins[cli_plugin_name] = plugin
+            plugin_parser = context_parsers.add_parser(cli_plugin_name)
+            new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
+            new_subparsers.required=True
+            for command in plugin.COMMANDS.keys():
+                fields = plugin.COMMANDS[command]
+                parser = new_subparsers.add_parser(command)
+                __populate_args__(self.rest, parser, plugin.COMMANDS[command])
+
+
         for model in self.schema.MODELS:
             model_parser = context_parsers.add_parser(model)
             parsers_for_model_parser = model_parser.add_subparsers(help='command', dest='command')

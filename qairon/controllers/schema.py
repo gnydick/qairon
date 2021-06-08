@@ -110,6 +110,7 @@ class QaironSchema:
         provider=[
             {'provider_type_id': {'dotters': {'completer': 'provider_type_completer'}}},
             'native',
+            'name',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
         provider_type=[
