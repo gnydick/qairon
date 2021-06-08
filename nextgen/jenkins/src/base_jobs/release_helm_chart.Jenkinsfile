@@ -176,7 +176,7 @@ for (int i = 0; i < dep_ids.size(); i++) {
                 REGION=$$(echo $$REGION_OBJ | jq -r .name)
                 PROVIDER_ID=$$(echo $$REGION_OBJ | jq -r .provider_id)
                 PROVIDER=$$(curl -s qairon:5001/api/rest/v1/provider$/$$PROVIDER_ID)
-                ACCOUNT=$$(echo $$PROVIDER | jq -r .native)
+                ACCOUNT=$$(echo $$PROVIDER | jq -r .native_id)
                 PROVIDER_TYPE=$$(echo $$PROVIDER | jq -r .provider_type_id)
                 
                 REPO_URL=$(curl -s qairon:5001/api/rest/v1/service$/$$SERVICE_ID/repos | jq -r '.objects[]|select(.repo_type_id == "helm")|.url')
