@@ -13,7 +13,6 @@ def __gen_completers__(rest):
             return rest.resource_get_search(prefix, resource, **kwargs)
 
         completer.__name__ = "%s_completer" % res
-
         setattr(RestController, ("%s_completer" % res), completer)
 
 
@@ -91,7 +90,7 @@ class CLIArgs:
         __gen_attr_completers__(rest, 'deployment', 'zones')
         __gen_attr_completers__(rest, 'service', 'service_configs')
         __gen_attr_completers__(rest, 'deployment', 'releases')
-
+        __gen_attr_completers__(rest, 'deployment', 'deployment_procs')
 
     def subnet_allocator_bits_completer(self, prefix, **kwargs):
         return ['additional_mask_bits']
@@ -139,12 +138,12 @@ class CLIArgs:
 
         service_subparsers = self.model_subparsers['service']
         assign_repo_parser = service_subparsers.add_parser('assign_repo')
-        assign_repo_parser.add_argument('owner_id').completer = getattr(self.rest, 'service_completer')
-        assign_repo_parser.add_argument('item_id').completer = getattr(self.rest, 'repo_completer')
+        assign_repo_parser.add_argument(metavar='service_id', dest='owner_id').completer = getattr(self.rest, 'service_completer')
+        assign_repo_parser.add_argument(metavar='repo_id', dest='item_id').completer = getattr(self.rest, 'repo_completer')
 
         unassign_repo_parser = service_subparsers.add_parser('unassign_repo')
-        unassign_repo_parser.add_argument('owner_id').completer = getattr(self.rest, 'service_completer')
-        unassign_repo_parser.add_argument('item_id').completer = getattr(self.rest, 'service_repos_completer')
+        unassign_repo_parser.add_argument(metavar='service_id', dest='owner_id').completer = getattr(self.rest, 'service_completer')
+        unassign_repo_parser.add_argument(metavar='repo_id', dest='item_id').completer = getattr(self.rest, 'service_repos_completer')
 
         deployment_sub_parsers = self.model_subparsers['deployment']
         clone_dep_parser = deployment_sub_parsers.add_parser('clone')
@@ -153,13 +152,12 @@ class CLIArgs:
                                       help='destination deployment target')
 
         assign_zone_parser = deployment_sub_parsers.add_parser('assign_zone')
-        assign_zone_parser.add_argument('owner_id').completer = getattr(self.rest, 'deployment_completer')
-        assign_zone_parser.add_argument('item_id').completer = getattr(self.rest, 'zone_completer')
-
+        assign_zone_parser.add_argument(metavar='deployment_id', dest='owner_id').completer = getattr(self.rest, 'deployment_completer')
+        assign_zone_parser.add_argument(metavar='zone_id', dest='item_id').completer = getattr(self.rest, 'zone_completer')
 
         unassign_zone_parser = deployment_sub_parsers.add_parser('unassign_zone')
-        unassign_zone_parser.add_argument('owner_id').completer = getattr(self.rest, 'deployment_completer')
-        unassign_zone_parser.add_argument('item_id').completer = getattr(self.rest, 'deployment_zones_completer')
+        unassign_zone_parser.add_argument(metavar='deployment_id', dest='owner_id').completer = getattr(self.rest, 'deployment_completer')
+        unassign_zone_parser.add_argument(metavar='zone_id', dest='item_id').completer = getattr(self.rest, 'deployment_zones_completer')
 
         network_sub_parsers = self.model_subparsers['network']
         subnet_allocator_parser = network_sub_parsers.add_parser('allocate_subnet')
