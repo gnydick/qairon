@@ -35,12 +35,16 @@ class RestController:
     def resource_get_search(self, prefix, resource, **kwargs):
         return self._get_search_(prefix, resource=resource, **kwargs)
 
+    def resource_get_attr_search(self, prefix, parsed_args, resource, attribute, **kwargs):
+        return self._get_attr_search_(prefix, parsed_args, resource=resource, attribute=attribute, **kwargs)
+
     def __collection_for_resource_completer__(self, prefix, parsed_args, plural):
         results = self._get_members_of_collection_(prefix, parsed_args, plural)
         return results
 
     def add_service_config_for_service_completer(self, prefix, parsed_args, **kwargs):
-        current_service_config_templates = self.__collection_for_resource_completer__(prefix, parsed_args, 'service_config_templates')
+        current_service_config_templates = self.__collection_for_resource_completer__(prefix, parsed_args,
+                                                                                      'service_config_templates')
         filters = [dict(name='id', op='not_in', val=current_service_config_templates)]
         filtered_service_config_templates = [x[0] for x in self._complex_list_('service_config_template', filters)]
         return filtered_service_config_templates
@@ -85,6 +89,18 @@ class RestController:
 
     def _get_search_(self, prefix, resource=None, **kwargs):
         url = self.URL + "{resource}".format(resource=resource)
+        headers = {'Content-Type': 'application/json'}
+        filters = [dict(name='id', op='like', val=str(prefix) + '%')]
+        params = dict(q=json.dumps(dict(filters=filters)))
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code == 200
+        results = requests.get(url, headers=headers).json()
+        objs = results['objects']
+        ids = [x['id'] for x in objs]
+        return ids
+
+    def _get_attr_search_(self, prefix, parsed_args, resource=None, attribute=None,  **kwargs):
+        url = self.URL + "{resource}/{id}/{attr}".format(resource=resource, id=parsed_args.owner_id, attr=attribute)
         headers = {'Content-Type': 'application/json'}
         filters = [dict(name='id', op='like', val=str(prefix) + '%')]
         params = dict(q=json.dumps(dict(filters=filters)))
@@ -170,7 +186,8 @@ class RestController:
         response = self._get_rest_(resource, resource_id, kwargs)
         return response.json()[field]
 
-    def query(self, resource, search_field, op, value=None, output_fields=None, resperpage=None, page=None, format="text",
+    def query(self, resource, search_field, op, value=None, output_fields=None, resperpage=None, page=None,
+              format="text",
               **kwargs):
         return self._list_(resource, search_field, op, value, output_fields, resperpage, page, format, **kwargs)
 
