@@ -142,6 +142,7 @@ class QaironSchema:
         service=[
             {'stack_id': {'dotters': {'completer': 'stack_completer'}}},
             'name',
+            {'repo_id': {'dotters': {'completer': 'repo_completer'}}},
             {'-d': {'args': {'dest': 'defaults'}}},
             {'-s': {'args': {'dest': 'scm_url', 'help': 'source control URL'}}}
         ],
