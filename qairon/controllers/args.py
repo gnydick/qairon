@@ -18,12 +18,13 @@ def __gen_completers__(rest):
 
 
 def __gen_attr_completers__(rest, res, attr):
-        def completer(self, prefix, parsed_args, resource=res, attribute=attr, **kwargs):
-            return rest.resource_get_attr_search(prefix, parsed_args, resource, attribute, **kwargs)
-        name = "%s_%s_completer" % (res, attr)
-        completer.__name__ = "%s_completer" % res
+    def completer(self, prefix, parsed_args, resource=res, attribute=attr, **kwargs):
+        return rest.resource_get_attr_search(prefix, parsed_args, resource, attribute, **kwargs)
 
-        setattr(RestController, name, completer)
+    name = "%s_%s_completer" % (res, attr)
+    completer.__name__ = "%s_completer" % res
+
+    setattr(RestController, name, completer)
 
 
 def __populate_args__(rest, parser, fields):
@@ -46,13 +47,6 @@ def __populate_args__(rest, parser, fields):
                 elif 'args' in config:
                     settings = config['args']
                     parser.add_argument(flag, **settings)
-
-
-
-
-
-
-
 
 
 def __add_list_parser__(parsers):
@@ -94,6 +88,9 @@ class CLIArgs:
         self.model_subparsers = dict()
 
         __gen_attr_completers__(rest, 'service', 'repos')
+        __gen_attr_completers__(rest, 'deployment', 'zones')
+        __gen_attr_completers__(rest, 'service', 'service_configs')
+        __gen_attr_completers__(rest, 'deployment', 'releases')
 
 
     def subnet_allocator_bits_completer(self, prefix, **kwargs):
@@ -118,12 +115,11 @@ class CLIArgs:
             self.discovered_plugins[cli_plugin_name] = plugin
             plugin_parser = context_parsers.add_parser(cli_plugin_name)
             new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
-            new_subparsers.required=True
+            new_subparsers.required = True
             for command in plugin.COMMANDS.keys():
                 fields = plugin.COMMANDS[command]
                 parser = new_subparsers.add_parser(command)
                 __populate_args__(self.rest, parser, plugin.COMMANDS[command])
-
 
         for model in self.schema.MODELS:
             model_parser = context_parsers.add_parser(model)
@@ -155,6 +151,15 @@ class CLIArgs:
         clone_dep_parser.add_argument('id').completer = getattr(self.rest, 'deployment_completer')
         clone_dep_parser.add_argument('deployment_target_id',
                                       help='destination deployment target')
+
+        assign_zone_parser = deployment_sub_parsers.add_parser('assign_zone')
+        assign_zone_parser.add_argument('owner_id').completer = getattr(self.rest, 'deployment_completer')
+        assign_zone_parser.add_argument('item_id').completer = getattr(self.rest, 'zone_completer')
+
+
+        unassign_zone_parser = deployment_sub_parsers.add_parser('unassign_zone')
+        unassign_zone_parser.add_argument('owner_id').completer = getattr(self.rest, 'deployment_completer')
+        unassign_zone_parser.add_argument('item_id').completer = getattr(self.rest, 'deployment_zones_completer')
 
         network_sub_parsers = self.model_subparsers['network']
         subnet_allocator_parser = network_sub_parsers.add_parser('allocate_subnet')
