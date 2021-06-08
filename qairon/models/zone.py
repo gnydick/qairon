@@ -10,7 +10,7 @@ class Zone(db.Model):
     name = Column(String, nullable=False)
     region_id = Column(String, ForeignKey('region.id'), nullable=False)
     defaults = Column(Text)
-    native = Column(Text)
+    native_id = Column(String)
 
     region = relationship("Region", back_populates="zones")
     deployments = relationship("Deployment", secondary='deployments_zones', back_populates="zones")

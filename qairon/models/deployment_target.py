@@ -15,7 +15,7 @@ class DeploymentTarget(db.Model):
     name = Column(String(255), nullable=False)
 
     defaults = Column(Text)
-    native = Column(Text)
+    native_id = Column(String)
 
     partition = relationship("Partition", back_populates="deployment_targets")
     environment = relationship("Environment", back_populates="deployment_targets")

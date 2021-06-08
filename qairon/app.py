@@ -1,15 +1,12 @@
 import flask_restless
 from flask_admin import Admin
-from flask_admin.menu import BaseMenu
-from flask_migrate import Migrate
+from flask_migrate import Migrate, Config
 
 from base import app
 from controllers import RestController
-from controllers.subnets import SubnetController
 from db import db
 from models import *
 from views import *
-
 # if app.debug:
 #     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 from views.menus.divider import DividerMenu
@@ -57,7 +54,8 @@ restmanager.create_api(Proc, primary_key='id', methods=['GET', 'POST', 'DELETE',
                        max_results_per_page=-1)
 restmanager.create_api(Provider, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
-restmanager.create_api(ProviderType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
+restmanager.create_api(ProviderType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
+                       url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
 restmanager.create_api(Region, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
@@ -94,7 +92,6 @@ admin.add_view(WithIdView(Application, db.session, category='Services'))
 admin.add_view(DefaultView(Stack, db.session, category='Services'))
 admin.add_view(ServiceView(Service, db.session, category='Services'))
 admin.add_view(DefaultView(ServiceConfig, db.session, category='Services'))
-
 
 admin.add_view(DefaultView(Build, db.session, category='CICD'))
 admin.add_view(DefaultView(Release, db.session, category='CICD'))
@@ -136,9 +133,10 @@ from socket import gethostname
 
 from flask import Response
 
-from models import  Deployment, Environment, Provider, Region
+from models import Deployment, Environment, Provider, Region
 
 rest = RestController()
+
 
 @app.route('/api/health')
 def health():

@@ -18,7 +18,7 @@ class Network(db.Model):
     name = Column(String, nullable=False)
     cidr = Column(CIDR, nullable=False, )
     defaults = Column(Text)
-    native = Column(Text)
+    native_id = Column(String)
 
     partition = relationship("Partition", back_populates="networks")
     subnets = relationship("Subnet", back_populates='network')

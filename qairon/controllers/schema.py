@@ -99,7 +99,7 @@ class QaironSchema:
         partition=[
             {'region_id': {'dotters': {'completer': 'region_completer'}}},
             'name',
-            {'-n': {'args': {'dest': 'native'}}},
+            {'-n': {'args': {'dest': 'native_id'}}},
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
         proc=[
@@ -109,7 +109,7 @@ class QaironSchema:
         ],
         provider=[
             {'provider_type_id': {'dotters': {'completer': 'provider_type_completer'}}},
-            'native',
+            'native_id',
             'name',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
@@ -141,7 +141,6 @@ class QaironSchema:
 
         service=[
             {'stack_id': {'dotters': {'completer': 'stack_completer'}}},
-            {'repo_id': {'dotters': {'completer': 'repo_completer'}}},
             'name',
             {'-d': {'args': {'dest': 'defaults'}}},
             {'-s': {'args': {'dest': 'scm_url', 'help': 'source control URL'}}}
@@ -153,14 +152,14 @@ class QaironSchema:
         ],
         subnet=[
             {'network_id': {'dotters': {'completer': 'network_completer'}}},
-            {'-n': {'args': {'dest': 'native'}}},
+            {'-n': {'args': {'dest': 'native_id'}}},
             'name',
             'cidr'
         ],
         zone=[
             {'region_id': {'dotters': {'completer': 'region_completer'}}},
             'name',
-            {'-n': {'args': {'dest': 'native'}}},
+            {'-n': {'args': {'dest': 'native_id'}}},
             {'-d': {'args': {'dest': 'defaults'}}}
         ]
     )
