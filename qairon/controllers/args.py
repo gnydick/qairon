@@ -88,9 +88,6 @@ class CLIArgs:
 
         __gen_attr_completers__(rest, 'service', 'repos')
         __gen_attr_completers__(rest, 'deployment', 'zones')
-        __gen_attr_completers__(rest, 'service', 'service_configs')
-        __gen_attr_completers__(rest, 'deployment', 'releases')
-        __gen_attr_completers__(rest, 'deployment', 'deployment_procs')
 
     def subnet_allocator_bits_completer(self, prefix, **kwargs):
         return ['additional_mask_bits']
