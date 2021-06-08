@@ -162,9 +162,11 @@ for (int i = 0; i < dep_ids.size(); i++) {
             container(name: 'helm') {
                 stage(name: 'parallelize chart releases') {
                     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'main']], extensions: [[$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [[path: 'nextgen/helm/charts'], [path: 'nextgen/ops']]], [$class: 'RelativeTargetDirectory', relativeTargetDir: 'bitbucket']], userRemoteConfigs: [[credentialsId: 'jenkins-infra0-bitbucket', url: 'git@bitbucket.org:imvu/withme-ops.git']]]
-
+                    def docker_build = params.BUILDS
                     def command = $/
                 set -x
+                IMAGE_TAG=$$(curl -s qairon:5001/api/rest/v1/build$/${docker_build} | jq -r .build_num)
+
                 DEP_DESCRIPTOR=$$(curl -s qairon:5001/api/rest/v1/deployment$/${dep_id})
                 SERVICE_ID=$$(echo $$DEP_DESCRIPTOR | jq -r .service.id)
                 SERVICE_NAME=$$(echo $$DEP_DESCRIPTOR | jq -r .service.name)
@@ -188,7 +190,7 @@ for (int i = 0; i < dep_ids.size(); i++) {
                     tmp$/$$SERVICE_NAME/values.yaml
     
                 cd tmp
-                sed -i "s/%--tag--%$/$$BUILD_NUMBER/g" $$SERVICE_NAME/values.yaml
+                sed -i "s/%--tag--%$/$$IMAGE_TAG/g" $$SERVICE_NAME/values.yaml
                 echo "" >> $$SERVICE_NAME/Chart.yaml
                 echo "version: $$BUILD_NUMBER" >> $$SERVICE_NAME/Chart.yaml
                 helm package --version $$BUILD_NUMBER $$SERVICE_NAME
