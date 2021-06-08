@@ -1,7 +1,7 @@
 from alembic import command
-from flask_migrate import Config
+from flask_migrate import Config, Migrate
 
-import db
+from app import migrate
 from controllers import RestController, CLIArgs
 
 
@@ -12,6 +12,6 @@ def before_all(context):
     config.set_main_option("script_location", "migrations")
     # command.downgrade(config, "base")
     # command.upgrade(config, "head")
-    db.db.drop_all()
-    db.db.create_all()
+    migrate.db.drop_all()
+    migrate.db.create_all()
     print("hello")

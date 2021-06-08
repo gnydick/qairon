@@ -9,14 +9,14 @@ def step_impl(context, resource, res_id):
     assert data['id'] == res_id
 
 
-@then('create provider of type "{pop_type_id}" with native_id "{native_id}" via rest')
-def step_impl(context, pop_type_id, native_id):
+@then('create provider of type "{provider_type_id}" with native_id "{native_id}" named "{name}" via rest')
+def step_impl(context, provider_type_id, native_id, name):
     res = context.rest.create_resource(
-        {'pop_type_id': pop_type_id, 'resource': 'provider',
-         'native_id': native_id}
+        {'provider_type_id': provider_type_id, 'resource': 'provider',
+         'name': name, 'native_id': native_id}
     )
     data = res.json()
-    assert data['id'] == '%s:%s' % (pop_type_id, native_id)
+    assert data['id'] == '%s:%s' % (provider_type_id, native_id)
 
 
 @then('create "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" via rest')
@@ -118,7 +118,7 @@ def step_impl(context, service_id, job_number, tag):
     response = context.rest.create_resource(
         {'resource': 'build', 'service_id': service_id, 'build_num': job_number, 'git_tag': tag})
     data = response.json()
-    assert data['id'] == '%s:%s:%s' % (service_id, tag, job_number)
+    assert data['id'] == '%s:%s' % (service_id, job_number)
 
 @given(
     'create deployment at "{dep_target_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" at version "{version}" via rest')
