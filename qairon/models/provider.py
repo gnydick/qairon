@@ -9,7 +9,7 @@ class Provider(db.Model):
     id = Column(String, primary_key=True)
     provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=False)
     name = Column(String, nullable=False)
-    native = Column(Text)
+    native_id = Column(String)
     defaults = Column(Text)
 
     type = relationship("ProviderType", back_populates="providers")
@@ -31,4 +31,4 @@ def my_before_insert_listener(mapper, connection, provider):
 
 
 def __update_id__(provider):
-    provider.id = provider.provider_type_id + ':' + provider.native
+    provider.id = provider.provider_type_id + ':' + provider.native_id

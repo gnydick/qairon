@@ -13,7 +13,7 @@ def step_impl(context, resource, res_id):
 def step_impl(context, pop_type_id, native_id):
     res = context.rest.create_resource(
         {'pop_type_id': pop_type_id, 'resource': 'provider',
-         'native': native_id}
+         'native_id': native_id}
     )
     data = res.json()
     assert data['id'] == '%s:%s' % (pop_type_id, native_id)

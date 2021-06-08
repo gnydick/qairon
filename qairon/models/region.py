@@ -10,7 +10,7 @@ class Region(db.Model):
     name = Column(String, nullable=False)
     provider_id = Column(String, ForeignKey('provider.id'), nullable=True)
     defaults = Column(Text)
-    native = Column(Text)
+    native_id = Column(String)
 
     partitions = relationship("Partition", back_populates="region")
     provider = relationship("Provider", back_populates="regions")
@@ -27,4 +27,4 @@ def my_before_insert_listener(mapper, connection, region):
 
 
 def __update_id__(region):
-    region.id = region.pop_id + ':' + region.name
+    region.id = region.provider_id + ':' + region.name

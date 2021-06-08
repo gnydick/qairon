@@ -10,7 +10,7 @@ class Partition(db.Model):
     id = Column(String, primary_key=True)
     region_id = Column(String, ForeignKey('region.id'), nullable=False)
 
-    native = Column(Text)
+    native_id = Column(String)
     name = Column(String, nullable=False)
     defaults = Column(Text)
 

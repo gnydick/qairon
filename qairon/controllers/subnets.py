@@ -12,7 +12,7 @@ class SubnetController:
         from .rest_controller import RestController
         rest = RestController()
         import ipaddress as ip
-        net = rest.get_instance(resource='network', resource_id=self.network_id)
+        net = rest.get_instance('network', resource_id=self.network_id)
         network = Network(**net)
         if type(net) is None:
             pass

@@ -13,7 +13,7 @@ class Fleet(db.Model):
     name = Column(String(256))
 
     defaults = Column(Text)
-    native = Column(Text)
+    native_id = Column(String)
 
     deployment_target = relationship("DeploymentTarget", back_populates="fleets")
     subnets = relationship("Subnet", secondary='subnets_fleets', back_populates="fleets")

@@ -3,7 +3,7 @@ Feature: full test
   Scenario: provider hierarchy
     Given create "provider_type" "testpop_type" via rest
     Then create provider of type "testpop_type" with native_id "testpop" via rest
-    Then create "region" "testregion" under "pop_id" "testpop_type:testpop" via rest
+    Then create "region" "testregion" under "provider_id" "testpop_type:testpop" via rest
     Then create "zone" "testzone" under "region_id" "testpop_type:testpop:testregion" via rest
     Then create "zone" "testzone2" under "region_id" "testpop_type:testpop:testregion" via rest
     Then create "partition" "testpartition" under "region_id" "testpop_type:testpop:testregion" via rest

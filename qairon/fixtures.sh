@@ -1,21 +1,20 @@
-export SQLALCHEMY_DATABASE_URI=postgresql://qairon:qairon@localhost:5433/qairon
-# provider type is like cloud vendor
-./qcli provider_type create aws
-
-# dev as a provider type means somewhere in our dev env, could be laptop
-./qcli provider_type create dev
-
-# creates aws account
-./qcli provider create aws 126252960572
+## provider type is like cloud vendor
+#./qcli provider_type create aws
+#
+## dev as a provider type means somewhere in our dev env, could be laptop
+#./qcli provider_type create dev
+#
+## creates aws account
+#./qcli provider create aws 126252960572 infra
 
 # creates a dev provider to represent laptop
-./qcli provider create dev laptop
+#./qcli provider create dev 0000000000000 laptop
 
 # self explanatory
 ./qcli region create aws:126252960572 us-west-2
 
 # just need a place holder region for local development
-./qcli region create dev:laptop here
+./qcli region create dev:0000000000000 here
 
 # availability zones
 ./qcli zone create aws:126252960572:us-west-2 usw2-az1
@@ -27,7 +26,7 @@ export SQLALCHEMY_DATABASE_URI=postgresql://qairon:qairon@localhost:5433/qairon
 ./qcli partition create aws:126252960572:us-west-2 vpc0 -n vpc-074b080f312234a06
 
 # again, placeholder for local development
-./qcli partition create dev:laptop:here default
+./qcli partition create dev:0000000000000:here default
 
 # records the cidr for our vpc
 ./qcli network create aws:126252960572:us-west-2:vpc0 default 10.0.0.0/16
@@ -52,20 +51,6 @@ export SQLALCHEMY_DATABASE_URI=postgresql://qairon:qairon@localhost:5433/qairon
 ./qcli subnet create aws:126252960572:us-west-2:vpc0:default nat_gw2 "10.0.0.96/28" -n "subnet-051316a1151cbc29d"
 
 
-# Application -> Stack -> Service hierarchy
-./qcli application create withme
-./qcli stack create withme cicd
-./qcli stack create withme automation
-./qcli service create withme:automation ecr:qairon.image qairon
-./qcli service create withme:cicd ecr:jenkins.image jenkins -d '{
-   "releases":{
-      "helm":{
-         "repo":"jenkins",
-         "artifact":"jenkins"
-      }
-   }
-}'
-
 # Artifact tracking
 ./qcli repo_type create ecr
 ./qcli repo_type create helm
@@ -73,6 +58,21 @@ export SQLALCHEMY_DATABASE_URI=postgresql://qairon:qairon@localhost:5433/qairon
 ./qcli repo create ecr 'jenkins' '126252960572.ecr.us-west2.aws.com/jenkins'
 ./qcli repo create helm bitnami https://charts.bitnami.com/bitnami
 
+
+
+# Application -> Stack -> Service hierarchy
+./qcli application create withme
+./qcli stack create withme cicd
+./qcli stack create withme automation
+./qcli service create withme:automation qairon
+./qcli service create withme:cicd  jenkins -d '{
+   "releases":{
+      "helm":{
+         "repo":"jenkins",
+         "artifact":"jenkins"
+      }
+   }
+}'
 
 # environments
 for ENV in  infra prod dev stg int local ; do  ./qcli environment create $ENV ; done
@@ -126,12 +126,12 @@ EOF
 
 
 # the deployment targets themselves
-./qcli deployment_target create minikube dev:laptop:here:default local vbox
+./qcli deployment_target create minikube dev:0000000000000:here:default local vbox
 ./qcli deployment_target create eks aws:126252960572:us-west-2:vpc0 infra infra0
 
 
 # then the actual deployments linking deployment target and service
-./qcli deployment create withme:cicd:jenkins dev:laptop:here:default:local:minikube:vbox
+./qcli deployment create withme:cicd:jenkins dev:0000000000000:here:default:local:minikube:vbox
 ./qcli deployment create withme:automation:qairon aws:126252960572:us-west-2:vpc0:infra:eks:infra0
 
 # CICD data
@@ -144,6 +144,6 @@ EOF
 
 # releases -- installation instructions bundled with any appropriate config for that deployment
 # e.g. -- helm chart tar ball with additional configuration that is deployment target specific bundled in
-./qcli release create withme:cicd:jenkins:v1.0:456 dev:laptop:here:default:local:minikube:vbox:withme:cicd:jenkins:default 789
-./qcli release create withme:automation:qairon:v0.1:422 aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default 1023
-./qcli release create withme:automation:qairon:v0.2:564 aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default 1104
+./qcli release create withme:cicd:jenkins:456 dev:laptop:here:default:local:minikube:vbox:withme:cicd:jenkins:default 789
+./qcli release create withme:automation:qairon:422 aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default 1023
+./qcli release create withme:automation:qairon:564 aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default 1104

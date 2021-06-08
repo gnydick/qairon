@@ -12,12 +12,12 @@ class Subnet(db.Model):
     __tablename__ = "subnet"
     id = Column(String, primary_key=True)
     network_id = Column(String, ForeignKey('network.id'), nullable=False)
-    native = Column(String)
+    native_id = Column(String)
     name = Column(String, nullable=False)
     cidr = Column(CIDR, nullable=False, )
 
     defaults = Column(Text)
-    native = Column(Text)
+    native_id = Column(String)
 
     network = relationship("Network", back_populates="subnets")
     fleets = relationship("Fleet", secondary='subnets_fleets', back_populates="subnets")
@@ -51,6 +51,7 @@ def my_before_insert_listener(mapper, connection, subnet):
 
     if newsubnet in [ip.IPv4Network(net['cidr']) for net in network['subnets']]:
         error = SubnetUnavailableError("Already Used", null)
+        return error
     __update_id__(subnet)
 
 
