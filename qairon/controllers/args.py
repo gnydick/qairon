@@ -13,8 +13,17 @@ def __gen_completers__(rest):
             return rest.resource_get_search(prefix, resource, **kwargs)
 
         completer.__name__ = "%s_completer" % res
-
         setattr(RestController, ("%s_completer" % res), completer)
+
+
+def __gen_attr_completers__(rest, res, attr):
+    def completer(self, prefix, parsed_args, resource=res, attribute=attr, **kwargs):
+        return rest.resource_get_attr_search(prefix, parsed_args, resource, attribute, **kwargs)
+
+    name = "%s_%s_completer" % (res, attr)
+    completer.__name__ = "%s_completer" % res
+
+    setattr(RestController, name, completer)
 
 
 def __populate_args__(rest, parser, fields):
@@ -37,13 +46,6 @@ def __populate_args__(rest, parser, fields):
                 elif 'args' in config:
                     settings = config['args']
                     parser.add_argument(flag, **settings)
-
-
-
-
-
-
-
 
 
 def __add_list_parser__(parsers):
@@ -84,6 +86,9 @@ class CLIArgs:
         self.schema = QaironSchema()
         self.model_subparsers = dict()
 
+        __gen_attr_completers__(rest, 'service', 'repos')
+        __gen_attr_completers__(rest, 'deployment', 'zones')
+
     def subnet_allocator_bits_completer(self, prefix, **kwargs):
         return ['additional_mask_bits']
 
@@ -106,12 +111,11 @@ class CLIArgs:
             self.discovered_plugins[cli_plugin_name] = plugin
             plugin_parser = context_parsers.add_parser(cli_plugin_name)
             new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
-            new_subparsers.required=True
+            new_subparsers.required = True
             for command in plugin.COMMANDS.keys():
                 fields = plugin.COMMANDS[command]
                 parser = new_subparsers.add_parser(command)
                 __populate_args__(self.rest, parser, plugin.COMMANDS[command])
-
 
         for model in self.schema.MODELS:
             model_parser = context_parsers.add_parser(model)
@@ -129,11 +133,28 @@ class CLIArgs:
             _model_com_delete_parser = parsers_for_model_parser.add_parser('delete')
             _model_com_delete_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
 
+        service_subparsers = self.model_subparsers['service']
+        assign_repo_parser = service_subparsers.add_parser('assign_repo')
+        assign_repo_parser.add_argument(metavar='service_id', dest='owner_id').completer = getattr(self.rest, 'service_completer')
+        assign_repo_parser.add_argument(metavar='repo_id', dest='item_id').completer = getattr(self.rest, 'repo_completer')
+
+        unassign_repo_parser = service_subparsers.add_parser('unassign_repo')
+        unassign_repo_parser.add_argument(metavar='service_id', dest='owner_id').completer = getattr(self.rest, 'service_completer')
+        unassign_repo_parser.add_argument(metavar='repo_id', dest='item_id').completer = getattr(self.rest, 'service_repos_completer')
+
         deployment_sub_parsers = self.model_subparsers['deployment']
         clone_dep_parser = deployment_sub_parsers.add_parser('clone')
         clone_dep_parser.add_argument('id').completer = getattr(self.rest, 'deployment_completer')
         clone_dep_parser.add_argument('deployment_target_id',
                                       help='destination deployment target')
+
+        assign_zone_parser = deployment_sub_parsers.add_parser('assign_zone')
+        assign_zone_parser.add_argument(metavar='deployment_id', dest='owner_id').completer = getattr(self.rest, 'deployment_completer')
+        assign_zone_parser.add_argument(metavar='zone_id', dest='item_id').completer = getattr(self.rest, 'zone_completer')
+
+        unassign_zone_parser = deployment_sub_parsers.add_parser('unassign_zone')
+        unassign_zone_parser.add_argument(metavar='deployment_id', dest='owner_id').completer = getattr(self.rest, 'deployment_completer')
+        unassign_zone_parser.add_argument(metavar='zone_id', dest='item_id').completer = getattr(self.rest, 'deployment_zones_completer')
 
         network_sub_parsers = self.model_subparsers['network']
         subnet_allocator_parser = network_sub_parsers.add_parser('allocate_subnet')

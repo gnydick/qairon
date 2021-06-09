@@ -36,13 +36,21 @@ def _main_():
                         cli.clone_config()
                     elif args.resource == 'nodegroup':
                         cli.clone_nodegroup(**vars(args))
-                elif args.resource == 'deployment' and args.command == 'addzone':
+                elif args.resource == 'deployment' and args.command == 'assign_zone':
                     args_dict = vars(args)
                     args_dict['items'] = 'zones'
                     cli.add_to_collection(**args_dict)
-                elif args.resource == 'deployment' and args.command == 'delzone':
+                elif args.resource == 'service' and args.command == 'assign_repo':
+                    args_dict = vars(args)
+                    args_dict['items'] = 'repos'
+                    cli.add_to_collection(**args_dict)
+                elif args.resource == 'deployment' and args.command == 'unassign_zone':
                     args_dict = vars(args)
                     args_dict['items'] = 'zones'
+                    cli.del_from_collection(**args_dict)
+                elif args.resource == 'service' and args.command == 'unassign_repo':
+                    args_dict = vars(args)
+                    args_dict['items'] = 'repos'
                     cli.del_from_collection(**args_dict)
                 elif args.resource == 'test':
                     cli.test(args)
