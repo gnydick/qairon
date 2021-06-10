@@ -1,2 +1,0 @@
-
-variable "tfstate_region" {}

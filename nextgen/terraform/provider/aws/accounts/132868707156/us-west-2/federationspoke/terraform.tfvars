@@ -1,8 +1,0 @@
-org             = "withme"
-dept            = "services"
-environment     = "perf"
-role            = "automation"
-config          = "default"
-region          = "us-west-2"
-provider_region = "us-west-2"
-tfstate_region = "us-west-2"

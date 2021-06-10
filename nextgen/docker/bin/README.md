@@ -1,1 +1,0 @@
-make sure `DOCKER_REGISTRY` is set as an env var

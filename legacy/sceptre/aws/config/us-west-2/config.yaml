@@ -1,4 +1,0 @@
-project_code: {{ var.project_code }}
-region: {{ environment_variable.AWS_REGION }}
-fleet_name_pattern: {{ var.project_code }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.GAME_VERSION}}-{{ environment_variable.DEPLOYMENT_TAG }}
-traffic_alias_pattern: {{ var.project_code }}-{{ environment_variable.ORG_ID }}-{{ var.environment }}-{{ environment_variable.AWS_REGION }}-{{ var.deployment_target }}-{{ var.game_server_name }}-{{ environment_variable.DEPLOYMENT_TAG }}

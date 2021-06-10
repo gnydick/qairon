@@ -1,9 +1,0 @@
-template_path: {{ var.deployment_target }}/gamelift-traffic-alias.yaml
-stack_name: traffic-alias-{{ traffic_alias_pattern }}
-
-
-parameters:
-  Name: {{ environment_variable.ORG_ID }}-{{ environment_variable.COMPAT_VERSION }}
-  FleetId: !stack_output_external fleet-{{ fleet_name_pattern }}::FleetId
-  Message: {{ var.message }}
-  RoutingStrategyType: {{ var.routing_strategy_type }}
