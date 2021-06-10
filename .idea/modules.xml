@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/nextgen/jenkins/jenkins.iml" filepath="$PROJECT_DIR$/nextgen/jenkins/jenkins.iml" />
-      <module fileurl="file://$PROJECT_DIR$/legacy/jenkins/legacy-jenkins.iml" filepath="$PROJECT_DIR$/legacy/jenkins/legacy-jenkins.iml" />
-      <module fileurl="file://$PROJECT_DIR$/nextgen/nextgen.iml" filepath="$PROJECT_DIR$/nextgen/nextgen.iml" />
-      <module fileurl="file://$PROJECT_DIR$/example/code/python_artifact/python_artifact.iml" filepath="$PROJECT_DIR$/example/code/python_artifact/python_artifact.iml" />
-      <module fileurl="file://$PROJECT_DIR$/qairon/qairon.iml" filepath="$PROJECT_DIR$/qairon/qairon.iml" />
-      <module fileurl="file://$PROJECT_DIR$/withme-ops.iml" filepath="$PROJECT_DIR$/withme-ops.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qairon.iml" filepath="$PROJECT_DIR$/qairon.iml" />
     </modules>
   </component>
 </project>
