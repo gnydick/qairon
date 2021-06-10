@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="qairon unit tests" type="PyBehaveRunConfigurationType" factoryName="Behave">
+    <module name="qairon" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="QAIRON_ENDPOINT" value="http://localhost:5002" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://ut:ut@localhost/unit_test_qairon" />
+    </envs>
+    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/qairon" />
+    <option name="IS_MODULE_SDK" value="true" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <WHAT_TO_RUN WHAT_TO_RUN="$PROJECT_DIR$/qairon/features" />
+    <option name="ADDITIONAL_ARGS" value="" />
+    <method v="2" />
+  </configuration>
+</component>
