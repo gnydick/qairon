@@ -214,7 +214,7 @@ class CLIController:
         pass
 
     def jenkins(self, args):  # dir, git_url, recursive=False):
-        rest.list('service', 0, 'scm_url', 'equal', args.git_url)
+        rest.list('service', 0, 'equal', args.git_url)
         recurse_flag = "-r" if args.recursive else ""
         command_line = "qairon jenkins %s %s %s " % (recurse_flag, args.dir, args.git_url)
         command = command_line.split()
