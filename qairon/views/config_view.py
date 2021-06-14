@@ -1,7 +1,7 @@
 from flask_admin.contrib.sqla import ModelView
 from qairon.models import Deployment
 
-from db import db
+from qairon.db import db
 
 
 class ConfigView(ModelView):

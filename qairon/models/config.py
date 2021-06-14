@@ -2,7 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.ext.declarative import ConcreteBase
 from sqlalchemy.orm import relationship
 
-from db import db
+from qairon.db import db
 
 
 # class Config(ConcreteBase, db.Model):

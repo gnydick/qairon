@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import validates, relationship
 
-from db import db
+from qairon.db import db
 
 
 class Capacity(db.Model):

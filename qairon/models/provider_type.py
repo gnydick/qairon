@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
-from db import db
+from qairon.db import db
 
 
 class ProviderType(db.Model):

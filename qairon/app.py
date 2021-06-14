@@ -2,9 +2,9 @@ import flask_restless
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 
-from base import app
+from qairon.base import app
 from qairon.controllers import RestController
-from db import db
+from qairon.db import db
 from qairon.models import *
 from qairon.views import *
 # if app.debug:
@@ -152,7 +152,7 @@ def allocate_subnet(network_id, mask, name):
 @app.route('/api/tf/v1/deployment/gen/<dep_id>')
 @app.route('/api/tf/v1/deployment/gen/<dep_id>/<config_tag>')
 def gen_config(dep_id, config_tag=None):
-    from db import db
+    from qairon.db import db
     s = db.session
     config_tag = 'default' if config_tag == None else config_tag
     tfs = s.query(Config).filter(Config.deployment_id == dep_id, Config.config_type_id == 'tf',
@@ -194,7 +194,7 @@ def __clean_outputs_reader__(query):
 def _gen_tf(dep_id, config_type, name, tag=None):
     import ast
     from string import Template
-    from db import db
+    from qairon.db import db
     s = db.session
     app_result = s.query(Config).filter(Config.deployment_id == dep_id, Config.config_type_id == 'vars').first()
     appvars = __clean_config_reader__(app_result)

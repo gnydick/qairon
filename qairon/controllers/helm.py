@@ -4,7 +4,7 @@
 #
 # from flask import Response, send_file
 #
-# from db import db
+# from qairon.db import db
 # from qairon.models import Deployment, DeploymentConfig
 #
 #

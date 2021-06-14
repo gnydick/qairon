@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
-from db import db
+from qairon.db import db
 
 
 class Release(db.Model):

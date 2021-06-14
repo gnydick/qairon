@@ -1,6 +1,6 @@
 from sqlalchemy import *
 
-from db import db
+from qairon.db import db
 
 deps_to_zones = Table('deployments_zones', db.metadata,
                       Column('deployment_id', String, ForeignKey('deployment.id')),

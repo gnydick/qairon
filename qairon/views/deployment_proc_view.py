@@ -1,7 +1,7 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.sqla.ajax import QueryAjaxModelLoader
 
-from db import db
+from qairon.db import db
 from qairon.models import *
 
 

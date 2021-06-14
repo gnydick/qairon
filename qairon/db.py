@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.pool import QueuePool
 
-from base import app
+from qairon.base import app
 
 
 SQLALCHEMY_ENGINE_OPTIONS = {

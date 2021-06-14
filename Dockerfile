@@ -22,15 +22,15 @@ ADD requirements.txt /
 
 RUN pip install -r /requirements.txt
 
-ADD controllers /opt/qairon/controllers
-ADD converters /opt/qairon/converters
-ADD migrations /opt/qairon/migrations
-ADD models /opt/qairon/models
-ADD views /opt/qairon/views
-ADD app.py /opt/qairon/
-ADD base.py /opt/qairon/
-ADD db.py /opt/qairon/
-ADD qcli /opt/qairon/
+ADD qairon/controllers /opt/qairon/controllers
+ADD qairon/converters /opt/qairon/converters
+ADD qairon/migrations /opt/qairon/migrations
+ADD qairon/models /opt/qairon/models
+ADD qairon/views /opt/qairon/views
+ADD qairon/app.py /opt/qairon/
+ADD qairon/base.py /opt/qairon/
+ADD qairon/db.py /opt/qairon/
+ADD qcli /opt/
 
 
 ADD templates /opt/qairon/templates

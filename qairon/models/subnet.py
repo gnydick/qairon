@@ -3,7 +3,7 @@ from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import CIDR
 from sqlalchemy.orm import relationship
 
-from db import db
+from qairon.db import db
 
 import ipaddress as ip
 

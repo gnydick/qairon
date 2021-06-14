@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
-from db import db
+from qairon.db import db
 
 from sqlalchemy.dialects.postgresql.base import CIDR
 
