@@ -45,7 +45,7 @@ def my_before_update_listener(mapper, connection, subnet):
 @db.event.listens_for(Subnet, 'before_insert')
 def my_before_insert_listener(mapper, connection, subnet):
     newsubnet = ip.IPv4Network(address=subnet.cidr)
-    from controllers import RestController
+    from qairon.controllers import RestController
     rest = RestController()
     network = rest.get_instance('network', subnet.network_id)
 

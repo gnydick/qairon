@@ -1,6 +1,6 @@
 import json
 
-from models import Network, Subnet
+from qairon.models import Network, Subnet
 
 
 class SubnetController:

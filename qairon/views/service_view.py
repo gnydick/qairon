@@ -1,6 +1,6 @@
-from models import Service, Stack
+from qairon.models import Service, Stack
 
-from views import DefaultView
+from qairon.views import DefaultView
 
 
 class ServiceView(DefaultView):

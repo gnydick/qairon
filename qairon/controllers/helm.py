@@ -5,7 +5,7 @@
 # from flask import Response, send_file
 #
 # from db import db
-# from models import Deployment, DeploymentConfig
+# from qairon.models import Deployment, DeploymentConfig
 #
 #
 # class HelmController:

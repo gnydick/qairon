@@ -1,6 +1,6 @@
 from flask_admin.contrib.sqla import ModelView
-from models import Partition, Network
-from converters import NetworkModelConverter
+from qairon.models import Partition, Network
+from qairon.converters import NetworkModelConverter
 
 
 class NetworkView(ModelView):

@@ -1,7 +1,7 @@
 import importlib
 import os
 
-from plugins.controller.aws import AwsController
+from qairon.plugins.controller.aws import AwsController
 aws = AwsController()
 
 COMMANDS = dict(

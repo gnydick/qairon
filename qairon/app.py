@@ -3,13 +3,13 @@ from flask_admin import Admin
 from flask_migrate import Migrate, Config
 
 from base import app
-from controllers import RestController
+from qairon.controllers import RestController
 from db import db
-from models import *
-from views import *
+from qairon.models import *
+from qairon.views import *
 # if app.debug:
 #     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
-from views.menus.divider import DividerMenu
+from qairon.views.menus.divider import DividerMenu
 
 migrate = Migrate(app, db)
 restmanager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
@@ -133,7 +133,7 @@ from socket import gethostname
 
 from flask import Response
 
-from models import Deployment, Environment, Provider, Region
+from qairon.models import Deployment, Environment, Provider, Region
 
 rest = RestController()
 

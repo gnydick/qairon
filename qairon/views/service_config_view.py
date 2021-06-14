@@ -1,5 +1,5 @@
 from flask_admin.contrib.sqla import ModelView
-from models import Service
+from qairon.models import Service
 
 
 

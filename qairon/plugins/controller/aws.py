@@ -5,7 +5,7 @@ import boto3
 from boto3 import session
 from botocore.exceptions import ClientError
 
-from controllers import RestController
+from qairon.controllers import RestController
 
 rest = RestController()
 

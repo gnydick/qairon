@@ -1,5 +1,5 @@
 from flask_admin.contrib.sqla import ModelView
-from models import Environment, Deployment
+from qairon.models import Environment, Deployment
 
 
 class DeploymentView(ModelView):

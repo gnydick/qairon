@@ -2,7 +2,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.sqla.ajax import QueryAjaxModelLoader
 
 from db import db
-from models import *
+from qairon.models import *
 
 
 class DeploymentProcView(ModelView):
