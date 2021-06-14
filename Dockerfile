@@ -27,13 +27,14 @@ ADD qairon/converters /opt/qairon/converters
 ADD qairon/migrations /opt/qairon/migrations
 ADD qairon/models /opt/qairon/models
 ADD qairon/views /opt/qairon/views
+ADD qairon/templates /opt/qairon/templates
 ADD qairon/app.py /opt/qairon/
 ADD qairon/base.py /opt/qairon/
 ADD qairon/db.py /opt/qairon/
 ADD qcli /opt/
 
 
-ADD templates /opt/qairon/templates
+
 
 RUN chown -R qairon_user:qairon_user /opt/qairon
 
