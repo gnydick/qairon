@@ -1,50 +1,60 @@
-import importlib
-import os
+import json
 
-import boto3
 from boto3 import session
-from botocore.exceptions import ClientError
 
 from qairon.controllers import RestController
 
 rest = RestController()
 
 
+def __update_secret__(secret_id, secret_value, secret_tag, kms_key_alias):
+    """
+    update a secret for a deployment
+    """
+
+
+    boto_sess = session.Session()
+    secrets_client = boto_sess.client("secretsmanager")
+    kwargs = {"SecretId": secret_id}
+
+    if isinstance(secret_value, str):
+        kwargs["SecretString"] = secret_value
+    elif isinstance(secret_value, bytes):
+        kwargs["SecretBinary"] = secret_value
+
+    if kms_key_alias is not None:
+        kwargs["KmsKeyId"] = kms_key_alias
+
+    response = secrets_client.update_secret(**kwargs)
+    # create a new config object and attach it to the deployment for
+    # the short-name:long-name mapping
+    return response
+
+
+def __fqsn__(deployment_id, secret_name):
+    fqsn = format("%s.%s" % (secret_name, str(deployment_id).replace(':', '-')))
+
+
+def __get_secret_id__(deployment_id, secret_name) -> object:
+    config_templs = rest.query("config_template", "config_template_type_id", "eq", "secret_name_map_item")
+    possible_configs = rest.get_field("deployment", deployment_id, 'configs')
+    configs = [c for c in possible_configs if c['name'] == secret_name and c['config_template_id'] in config_templs[0]]
+
+    if len(configs) != 1:
+        exit(255)
+
+    secret_id = json.loads(configs[0]['config'])[secret_name]
+    return secret_id
+
+
 class AwsController:
 
     @staticmethod
-    def __creat_if_not_exists_config_type__(config_type):
-        results = rest.query('config_template_type', 'id', 'eq', config_type, 'id')
-        if len(results) == 0:
-            new_config_template_type = rest.create_resource({'id': config_type, 'resource': 'config_template_type'})
-            print(new_config_template_type)
-        print(results)
-
-    @staticmethod
-    def create_secret(secret_name, secret_value, deployment_id, kms_key_alias=None):
-        """
-        Creates a new secret. The secret value can be a string or bytes.
-        """
-        fqsn = format("%s.%s" % (secret_name, str(deployment_id).replace(':', '-')))
-        boto_sess = session.Session()
-        secrets_client = boto_sess.client("secretsmanager")
-        kwargs = {"Name": fqsn}
-
-        if isinstance(secret_value, str):
-            kwargs["SecretString"] = secret_value
-        elif isinstance(secret_value, bytes):
-            kwargs["SecretBinary"] = secret_value
-
-        if kms_key_alias is not None:
-            kwargs["KmsKeyId"] = kms_key_alias
-
-        response = secrets_client.create_secret(**kwargs)
-        # create a new config object and attach it to the deployment for
-        # the short-name:long-name mapping
+    def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag, kms_key_alias=None):
         template = rest.get_instance('config_template', 'secret_name_map_item:1')
 
         doc = template['doc']
-        doc = str(doc).replace("%--key--%", secret_name).replace("%--value--%", response['ARN'])
+        doc = str(doc).replace("%--key--%", secret_name).replace("%--value--%", secret_id)
 
         payload = {'resource': 'deployment_config',
                    'config_template_id': 'secret_name_map_item:1',
@@ -53,50 +63,22 @@ class AwsController:
                    }
 
         new_config = rest.create_resource(payload)
+        response = __update_secret__(secret_id, secret_value, secret_tag, kms_key_alias=None)
 
-        return response
+        return json.loads(new_config.content)
 
     @staticmethod
-    def get_secret_string_for_deployment(secret_name, deployment_id):
-        fqsn =  format("%s.%s" % (secret_name, str(deployment_id).replace(':', '-')))
+    def update_secret(deployment_id, secret_name, secret_value, secret_tag, kms_key_alias=None):
+        secret_id = __get_secret_id__(deployment_id, secret_name)
+        return __update_secret__(secret_id, secret_value, secret_tag, kms_key_alias)
+
+    @staticmethod
+    def get_secret_string_for_deployment(deployment_id, secret_name):
+        secret_id = __get_secret_id__(deployment_id, secret_name)
+
         boto_sess = session.Session()
         client = boto_sess.client(
             service_name='secretsmanager'
         )
-
-        try:
-            secrets_list = client.list_secrets(
-                Filters=[
-                    {
-                        'Key': 'name',
-                        'Values': [
-                           fqsn
-                        ]
-                    }
-                ]
-            )
-
-            if 'SecretList' in secrets_list:
-                ln = len(secrets_list['SecretList'])
-                if ln == 1:
-                    response = secrets_list['SecretList'][0]
-                    id = response['ARN']
-                    get_secret_value_response = client.get_secret_value(SecretId=id)
-                    return [get_secret_value_response, None]
-                elif ln > 1:
-                    return [None, "Too many results!"]
-                elif ln == 0:
-                    return [None, "No results"]
-            else:
-                return [None, "Not found!"]
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                print("The requested secret " + secret_name + " was not found")
-            elif e.response['Error']['Code'] == 'InvalidRequestException':
-                print("The request was invalid due to:", e)
-            elif e.response['Error']['Code'] == 'InvalidParameterException':
-                print("The request had invalid params:", e)
-            elif e.response['Error']['Code'] == 'DecryptionFailure':
-                print("The requested secret can't be decrypted using the provided KMS key:", e)
-            elif e.response['Error']['Code'] == 'InternalServiceError':
-                print("An error occurred on service side:", e)
+        get_secret_value_response = client.get_secret_value(SecretId=secret_id)
+        return get_secret_value_response

@@ -1,40 +1,51 @@
-import importlib
-import os
-
 from qairon.plugins.controller.aws import AwsController
+
 aws = AwsController()
 
 COMMANDS = dict(
-    create_secret=[
+    register_secret=[
+        {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
+        'secret_id',
         'secret_name',
         'secret_value',
+        {'-k': {'args': {'dest': 'kms_key_alias'}}}
+    ],
+    update_secret=[
         {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
+        'secret_name',
+        'secret_value',
         {'-k': {'args': {'dest': 'kms_key_alias'}}}
     ],
     get_secret_string=[
-        'secret_name',
-        {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}}
+        {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
+        'secret_name'
+
     ]
 )
 
 
-def create_secret(secret_name=None, secret_value=None, kms_key_alias=None,
-                  deployment_id=None, resource=None, command=None, q=False):
+def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
+                    resource=None, command=None, q=False):
+    result = aws.register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag=secret_tag,
+                                 kms_key_alias=kms_key_alias)
+    if not q:
+        print(result)
+
+def update_secret(deployment_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
+                  resource=None, command=None, q=False):
     """
     Creates a new secret. The secret value can be a string or bytes.
     """
-    result = aws.create_secret(secret_name, secret_value, kms_key_alias=kms_key_alias, deployment_id=deployment_id)
+    result = aws.update_secret(deployment_id, secret_name, secret_value, secret_tag, kms_key_alias=kms_key_alias)
     if not q:
         print(result)
 
 
-def get_secret_string(resource, command, secret_name, deployment_id, q=False):
-
-
-    result = aws.get_secret_string_for_deployment(secret_name, deployment_id)
-    if result[0]:
+def get_secret_string(resource, command, deployment_id, secret_name, q=False):
+    result = aws.get_secret_string_for_deployment(deployment_id, secret_name)
+    if result is not None:
         if not q:
-            print(result[0]['SecretString'])
+            print(result['SecretString'])
     else:
-        print(result[1])
+        print(result)
         exit(255)

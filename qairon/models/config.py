@@ -36,7 +36,6 @@ class DeploymentConfig(db.Model):
 
     template = relationship("ConfigTemplate", back_populates="deployment_configs")
 
-
     deployment = relationship("Deployment", back_populates="configs")
 
     # __mapper_args__ = {
@@ -68,6 +67,9 @@ class ServiceConfig(db.Model):
     #     'concrete': True
     # }
 
+    def config_template_type(self):
+        return self.template.config_template_type
+
     def __repr__(self):
         return self.service.id + ':' + self.config_template_id + ':' + self.name + ':' + self.tag
 
@@ -89,7 +91,7 @@ def my_before_insert_listener(mapper, connection, config):
 
 
 def __update_deployment_id__(config):
-    config.id =  config.deployment_id + ':' + config.config_template_id + ':' + config.name + ':' + config.tag
+    config.id = config.deployment_id + ':' + config.config_template_id + ':' + config.name + ':' + config.tag
 
 
 @db.event.listens_for(ServiceConfig, 'before_update')
@@ -99,5 +101,4 @@ def my_before_insert_listener(mapper, connection, config):
 
 
 def __update_service_id__(config):
-    config.id =  config.service_id + ':' + config.config_template_id + ':' + config.name + ':' + config.tag
-
+    config.id = config.service_id + ':' + config.config_template_id + ':' + config.name + ':' + config.tag
