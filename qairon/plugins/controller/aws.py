@@ -12,7 +12,6 @@ def __update_secret__(secret_id, secret_value, secret_tag, kms_key_alias):
     update a secret for a deployment
     """
 
-
     boto_sess = session.Session()
     secrets_client = boto_sess.client("secretsmanager")
     kwargs = {"SecretId": secret_id}
