@@ -17,21 +17,21 @@ RUN useradd -m -d /opt/qairon qairon_user
 
 
 
-WORKDIR /opt/qairon
+WORKDIR /opt/qairon/qairon
 ADD requirements.txt /
 
 RUN pip install -r /requirements.txt
 
-ADD qairon/controllers /opt/qairon/controllers
-ADD qairon/converters /opt/qairon/converters
-ADD qairon/migrations /opt/qairon/migrations
-ADD qairon/models /opt/qairon/models
-ADD qairon/views /opt/qairon/views
-ADD qairon/templates /opt/qairon/templates
-ADD qairon/app.py /opt/qairon/
-ADD qairon/base.py /opt/qairon/
-ADD qairon/db.py /opt/qairon/
-ADD qcli /opt/
+ADD qairon/controllers /opt/qairon/qairon/controllers
+ADD qairon/converters /opt/qairon/qairon/converters
+ADD qairon/migrations /opt/qairon/qairon/migrations
+ADD qairon/models /opt/qairon/qairon/models
+ADD qairon/views /opt/qairon/qairon/views
+ADD qairon/templates /opt/qairon/qairon/templates
+ADD qairon/app.py /opt/qairon/qairon
+ADD qairon/base.py /opt/qairon/qairon
+ADD qairon/db.py /opt/qairon/qairon
+ADD qcli /opt/qairon
 
 
 
@@ -43,4 +43,5 @@ USER qairon_user
 RUN export SECRET_KEY=$SECRET_KEY
 RUN export LC_ALL=$LC_ALL
 RUN export LANG=$LANG
-CMD gunicorn app:app -b 0.0.0.0:5001 --keep-alive 86400 --preload --workers=16 -k gevent
+WORKDIR /opt/qairon
+CMD gunicorn qairon.app:app -b 0.0.0.0:5001 --keep-alive 86400 --preload --workers=16 -k gevent
