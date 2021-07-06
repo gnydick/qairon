@@ -112,9 +112,6 @@ EOF
 # language label for a configuration
 ./qcli language create json
 
-# creating template type
-./qcli config_template_type create cfn-gamelift-fleet
-
 # creating a template marked as json with the contents from above
 ./qcli config_template create cfn-gamelift-fleet json  1 -c "$doc"
 

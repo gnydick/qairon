@@ -7,7 +7,6 @@ from .service import Service
 from .stack import Stack
 from .zone import Zone
 from .config_template import ConfigTemplate
-from .config_template_type import ConfigTemplateType
 from .language import Language
 from .associations import deps_to_zones
 from .associations import svcs_to_repos

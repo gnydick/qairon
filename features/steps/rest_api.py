@@ -136,11 +136,10 @@ def step_impl(context, dep_target_id, service, tag, defaults, version):
 
 
 @then(
-    'service_config_template "{service_config_template}" can be created for service "{service}" of type "{config_template_type_id}" via rest')
-def step_impl(context, service_config_template, service, config_template_type_id):
+    'service_config_template "{service_config_template}" can be created for service "{service}" via rest')
+def step_impl(context, service_config_template, service):
     response = context.rest.create_resource(
-        {'resource': 'service_config_template', 'name': service_config_template, 'service_id': service, 'template': '',
-         'config_template_type_id': config_template_type_id}
+        {'resource': 'service_config_template', 'name': service_config_template, 'service_id': service, 'template': ''}
     )
     new_svc_config = response.json()
     assert new_svc_config['id'] == '%s:%s' % (service, service_config_template)
@@ -176,15 +175,6 @@ def step_impl(context, plural_resource, item_id, dest_resource, dest_id):
     new_plural = response.json()[plural_resource]
     assert item_id not in [x['id'] for x in new_plural]
     assert len(new_plural) == 1
-
-
-@given('config_template_type "{config_template_type}" can be created via rest')
-def step_impl(context, config_template_type):
-    cfgtype = context.rest.create_resource(
-        {'id': config_template_type, 'resource': 'config_template_type'})
-    data = cfgtype.json()
-    assert data['id'] == config_template_type
-
 
 @then(
     'create config for resource "{resource}" named "{name}" from template version "{config_template}" can be created for "{resource_id}" tagged "{tag}" via rest')

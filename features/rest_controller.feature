@@ -9,8 +9,7 @@ Feature: full test
     Then create "partition" "testpartition" under "region_id" "testprovider_type:testprovider:testregion" via rest
   Scenario: application hierarchy
     Given create "application" "testapp" via rest
-    And config_template_type "testcfgtype" can be created via rest
-    Then create versioned "config_template" "testcfgtmpl" version "1" under "config_template_type_id" "testcfgtype" doc "{}" via rest
+    Then create versioned "config_template" "testcfgtmpl"  doc "{}" via rest
     Then create "stack" "teststack" under "application_id" "testapp" via rest
     Then create "service" "testservice" under "stack_id" "testapp:teststack" via rest
     Then create config for resource "service" named "testsvccfg" from template version "testcfgtype:1" can be created for "testapp:teststack:testservice" tagged "tag" via rest
@@ -35,7 +34,6 @@ Feature: full test
     When delete "deployment_config" "testprovider_type:testprovider:testregion:testpartition:testenv:k8s:testdt:testapp:teststack:testservice:default:testcfgtype:1:testdepcfg:tag" via rest
     When delete "service_config" "testapp:teststack:testservice:testcfgtype:1:testsvccfg:tag" via rest
     When delete "config_template" "testcfgtype:1" via rest
-    Then delete "config_template_type" "testcfgtype" via rest
 
     Then delete "deployment" "testprovider_type:testprovider:testregion:testpartition:testenv:k8s:testdt:testapp:teststack:testservice:default" via rest
     Then delete "deployment_target" "testprovider_type:testprovider:testregion:testpartition:testenv:k8s:testdt" via rest

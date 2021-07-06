@@ -40,9 +40,8 @@ class QaironSchema:
             {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
         ],
         config_template=[
-            {'config_template_type_id': {'dotters': {'completer': 'config_template_type_completer'}}},
             {'language_id': {'dotters': {'completer': 'language_completer'}}},
-            'version',
+            'name',
             {'-c': {'args': {'dest': 'doc'}}},
         ],
         language=[

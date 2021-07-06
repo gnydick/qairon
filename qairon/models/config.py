@@ -67,8 +67,6 @@ class ServiceConfig(db.Model):
     #     'concrete': True
     # }
 
-    def config_template_type(self):
-        return self.template.config_template_type
 
     def __repr__(self):
         return self.service.id + ':' + self.config_template_id + ':' + self.name + ':' + self.tag
