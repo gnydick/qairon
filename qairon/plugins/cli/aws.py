@@ -24,14 +24,6 @@ COMMANDS = dict(
 )
 
 
-def update_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
-                  resource=None, command=None, q=False):
-    result = aws.update_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag=secret_tag,
-                               kms_key_alias=kms_key_alias)
-    if not q:
-        print(result)
-
-
 def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
                     resource=None, command=None, q=False):
     result = aws.register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag=secret_tag,
