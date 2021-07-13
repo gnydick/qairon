@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
+import os
 
 from controllers import CLIArgs
 from controllers import CLIController
