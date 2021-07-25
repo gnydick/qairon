@@ -33,10 +33,10 @@ class CLIController:
         if not q:
             print(value)
 
-    def get_field(selfs, resource, field, command=None, id=None, q=False):
+    def get_field(self, resource, field, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field=field)
         if not q:
-            print(value)
+            print(json.dumps(value))
 
     def set_field(self, resource, id, field, value, command=None, q=False):
         response = self._set_field_(resource, id, field, value)
