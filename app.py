@@ -2,13 +2,16 @@ import flask_restless
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 
+
 from base import app
 from controllers import RestController
 from db import db
 from models import *
 from views import *
-# if app.debug:
-#     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
+
+if app.debug:
+    from werkzeug.debug import DebuggedApplication
+    app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 from views.menus.divider import DividerMenu
 
 migrate = Migrate(app, db)

@@ -41,15 +41,11 @@ class QaironSchema:
         ],
         config_template=[
             {'language_id': {'dotters': {'completer': 'language_completer'}}},
-            'name',
+            'id',
             {'-c': {'args': {'dest': 'doc'}}},
         ],
         language=[
             'id'
-        ],
-        config_template_type=[
-            'id',
-            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         deployment=[
             {'service_id': {'dotters': {'completer': 'service_completer'}}},
