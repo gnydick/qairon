@@ -26,7 +26,7 @@ importlib_backport_requires = ["importlib-metadata >= 0.23, < 5"]
 
 setup(
     name='qairon-qcli',
-    version='0.0.4',
+    version='0.0.5',
     url='https://github.com/gnydick/qairon',
     project_urls={},
     license='MIT',
@@ -36,7 +36,7 @@ setup(
     long_description=open('README.md').read(),
     install_requires=install_requires,
     extras_require={
-        ':python_version == "3.9"': importlib_backport_requires
+        ':python_version == "3.9.2"': importlib_backport_requires
     },
     packages=find_packages(exclude=("features", "features.*", "models", "views", "views.*")),
     scripts=['qcli'],
