@@ -29,6 +29,10 @@ dist/
 # JetBrains IDE
 .idea/
 
+# JetBrains Sharable
+!.idea/dataSources.xml
+!.idea/dataSources.local.xml
+
 # Unit test reports
 TEST*.xml
 
