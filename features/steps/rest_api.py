@@ -29,13 +29,13 @@ def step_impl(context, resource, res_name, parent_fk_field, parent_id):
 
 
 @then(
-    'create versioned "{resource}" "{res_name}" version "{version}" under "{parent_fk_field}" "{parent_id}" doc "{doc}" via rest')
-def step_impl(context, resource, res_name, version, parent_fk_field, parent_id, doc):
+    'create textresource "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" with doc "{doc}" via rest')
+def step_impl(context, resource, res_name,  parent_fk_field, parent_id, doc):
     res = context.rest.create_resource(
-        {'name': res_name, parent_fk_field: parent_id, 'resource': resource, 'version': version, 'doc': doc}
+        {'id': res_name, parent_fk_field: parent_id, 'resource': resource, 'doc': doc}
     )
     data = res.json()
-    assert data['id'] == '%s:%s' % (parent_id, version)
+    assert data['id'] == res_name
 
 
 # use_step_matcher("re")
