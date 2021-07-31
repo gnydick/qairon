@@ -9,7 +9,7 @@ Feature: full test
     Then create "partition" "testpartition" under "region_id" "testprovider_type:testprovider:testregion" via rest
   Scenario: application hierarchy
     Given create "application" "testapp" via rest
-    Then create versioned "config_template" "testcfgtmpl"  doc "{}" via rest
+    Given create "config_template" "testcfgtmpl" via rest
     Then create "stack" "teststack" under "application_id" "testapp" via rest
     Then create "service" "testservice" under "stack_id" "testapp:teststack" via rest
     Then create config for resource "service" named "testsvccfg" from template version "testcfgtype:1" can be created for "testapp:teststack:testservice" tagged "tag" via rest
