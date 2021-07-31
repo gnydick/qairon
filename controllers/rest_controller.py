@@ -212,11 +212,14 @@ class RestController:
         elif output_fields is None:
             output_fields = ['id']
         for obj in response.json()['objects']:
-            row = []
-            for field in output_fields:
-                row.append(obj[field])
-
-            results.append(row)
+            if len(output_fields) > 1:
+                row = []
+                for field in output_fields:
+                    row.append(obj[field])
+                results.append(row)
+            elif len(output_fields) == 1:
+                for field in output_fields:
+                    results.append(obj[field])
             if fmt == "json":
                 results = json.dumps(results)
         return results

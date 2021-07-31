@@ -146,6 +146,8 @@ class CLIArgs:
                                                                                                  'service_repos_completer')
 
         deployment_sub_parsers = self.model_subparsers['deployment']
+        bake_dep_parser = deployment_sub_parsers.add_parser('bake')
+        bake_dep_parser.add_argument('id').completer = getattr(self.rest, 'deployment_completer')
         clone_dep_parser = deployment_sub_parsers.add_parser('clone')
         clone_dep_parser.add_argument('id').completer = getattr(self.rest, 'deployment_completer')
         clone_dep_parser.add_argument('deployment_target_id',

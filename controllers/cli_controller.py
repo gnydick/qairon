@@ -2,7 +2,9 @@ import json
 import os
 from subprocess import call
 
+
 from .rest_controller import RestController
+from .baking_controller import BakingController
 
 rest = RestController()
 
@@ -105,6 +107,10 @@ class CLIController:
         if status_code == 201:
             if not q:
                 print(new_dep_id)
+
+    def bake_deployment(self, resource, id, command=None, q=False):
+        baker = BakingController(id)
+        baker.bake()
 
     def clone_deployment(self, id, deployment_target_id, resource, command=None, version=None, q=False):
         dep = rest.get_instance('deployment', id)
