@@ -10,24 +10,29 @@ rest = RestController()
 
 class CLIController:
 
-    def get(self, resource, command=None, id=None, q=False):
-        print(json.dumps(rest.get_instance(resource, id)))
-
-    def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, format=None, q=False):
-        rows = rest.query(resource, None, None, output_fields=output_fields, resperpage=resperpage, page=page)
+    def __output__(self, rows, format):
         if format == 'json':
             objects = {"objects": rows}
 
             print(json.dumps(objects))
         else:
             for row in rows:
-                print(row)
+                if type(row) == list:
+                    print(' '.join(row))
+                else:
+                    print(row)
+    def get(self, resource, command=None, id=None, q=False):
+        print(json.dumps(rest.get_instance(resource, id)))
+
+    def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, format=None, q=False):
+        rows = rest.query(resource, None, None, output_fields=output_fields, resperpage=resperpage, page=page)
+        self.__output__(rows,format)
 
     def query(self, resource, command=None, search_field=None, op=None, value=None, output_fields=None, resperpage=None,
-              page=None, q=False):
-        results = rest.query(resource, search_field, op, value, output_fields, resperpage=resperpage, page=page)
-        for row in results:
-            print(" ".join(map(lambda x: str(x), row)))
+              page=None, format=None, q=False):
+        rows = rest.query(resource, search_field, op, value, output_fields, resperpage=resperpage, page=page)
+        self.__output__(rows, format)
+
 
     def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')
