@@ -187,15 +187,14 @@ class RestController:
         return response.json()[field]
 
     def query(self, resource, search_field, op, value=None, output_fields=None, resperpage=None, page=None,
-              format="text",
               **kwargs):
-        return self._list_(resource, search_field, op, value, output_fields, resperpage, page, format, **kwargs)
+        return self._list_(resource, search_field, op, value, output_fields, resperpage, page, **kwargs)
 
     def list(self, resource):
         return self._list_(resource)
 
     def _list_(self, resource, search_field=None, op=None, value=None, output_fields=None, resperpage=None, page=None,
-               fmt="text", **kwargs):
+               **kwargs):
         params = dict(results_per_page=resperpage, page=page)
 
         if search_field is not None and op is not None:
@@ -220,8 +219,6 @@ class RestController:
             elif len(output_fields) == 1:
                 for field in output_fields:
                     results.append(obj[field])
-            if fmt == "json":
-                results = json.dumps(results)
         return results
 
     def _complex_list_(self, resource, filters, output_fields=None, resperpage=100):

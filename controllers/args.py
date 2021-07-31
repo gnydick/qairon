@@ -54,6 +54,7 @@ def __add_list_parser__(parsers):
     list_parser.add_argument('-p', help='page', dest='page')
     list_parser.add_argument('-r', help='results per page', dest='resperpage')
     list_parser.add_argument('-o', help='output fields', dest='output_fields', action='append')
+    list_parser.add_argument('-f', help='format', dest='format')
 
     query_parser = parsers.add_parser('query')
     query_parser.required = False

@@ -2,10 +2,8 @@ import json
 import os
 from subprocess import call
 
-
 from .baker_controller import BakerController
 from .rest_controller import RestController
-
 
 rest = RestController()
 
@@ -15,15 +13,15 @@ class CLIController:
     def get(self, resource, command=None, id=None, q=False):
         print(json.dumps(rest.get_instance(resource, id)))
 
-    def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, q=False):
-        for row in rest.query(resource, None, None, output_fields, resperpage=resperpage, page=page):
-            newrow = []
-            for field in row:
-                if field is None:
-                    newrow.append('')
-                else:
-                    newrow.append(field)
-            print(" ".join(newrow))
+    def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, format=None, q=False):
+        rows = rest.query(resource, None, None, output_fields=output_fields, resperpage=resperpage, page=page)
+        if format == 'json':
+            objects = {"objects": rows}
+
+            print(json.dumps(objects))
+        else:
+            for row in rows:
+                print(row)
 
     def query(self, resource, command=None, search_field=None, op=None, value=None, output_fields=None, resperpage=None,
               page=None, q=False):
