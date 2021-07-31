@@ -2,9 +2,9 @@ import json
 import os
 from subprocess import call
 
-
+from .bakers import HelmBakerController
 from .rest_controller import RestController
-from .baking_controller import BakingController
+
 
 rest = RestController()
 
@@ -108,8 +108,8 @@ class CLIController:
             if not q:
                 print(new_dep_id)
 
-    def bake_deployment(self, resource, id, command=None, q=False):
-        baker = BakingController(id)
+    def bake_release(self, resource, id, command=None, q=False):
+        baker = HelmBakerController(id)
         baker.bake()
 
     def clone_deployment(self, id, deployment_target_id, resource, command=None, version=None, q=False):

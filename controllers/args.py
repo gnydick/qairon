@@ -146,8 +146,6 @@ class CLIArgs:
                                                                                                  'service_repos_completer')
 
         deployment_sub_parsers = self.model_subparsers['deployment']
-        bake_dep_parser = deployment_sub_parsers.add_parser('bake')
-        bake_dep_parser.add_argument('id').completer = getattr(self.rest, 'deployment_completer')
         clone_dep_parser = deployment_sub_parsers.add_parser('clone')
         clone_dep_parser.add_argument('id').completer = getattr(self.rest, 'deployment_completer')
         clone_dep_parser.add_argument('deployment_target_id',
@@ -172,6 +170,12 @@ class CLIArgs:
         subnet_allocator_parser.add_argument('additional_mask_bits',
                                              help='Subnet bits').completer = self.subnet_allocator_bits_completer
         subnet_allocator_parser.add_argument('name', help='Name of subnet')
+
+
+        release_sub_parsers = self.model_subparsers['release']
+        bake_rel_parser = release_sub_parsers.add_parser('bake')
+        bake_rel_parser.add_argument('id').completer = getattr(self.rest, 'release_completer')
+
 
     def assign_args(self):
         parser = argparse.ArgumentParser(description='qaironRegistry CLI')
