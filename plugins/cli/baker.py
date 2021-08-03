@@ -1,6 +1,6 @@
 from plugins.controller import BakerBuilder
 
-baker_builder = BakerBuilder()
+
 
 COMMANDS = dict(
     bake=[
@@ -12,7 +12,8 @@ COMMANDS = dict(
 
 
 def bake(deployment_id, build_id, release_job_number, resource=None, command=None, q=False):
-    baker = baker_builder.build(deployment_id, build_id, release_job_number)
+    baker_builder = BakerBuilder(deployment_id, build_id, release_job_number)
+    baker = baker_builder.build()
     result = baker.bake()
     if not q:
         if result is not None:
