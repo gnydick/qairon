@@ -7,8 +7,9 @@ class AbstractBakerController(ABC):
 
     def __init__(self, metadata):
         self.rest = metadata.rest
-        self.release_id = metadata.release_id
-        self.release = metadata.release
+        self.deployment_id = metadata.deployment_id
+        self.build_id = metadata.build_id
+        self.release_job_number = metadata.release_job_number
         self.build = metadata.build
         self.deployment = metadata.deployment
         self.deployment_target = metadata.deployment_target

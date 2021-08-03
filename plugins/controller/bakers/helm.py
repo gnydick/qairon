@@ -1,15 +1,20 @@
 import json
+
+# from controllers.bakers.baker import BakerInterface
 import os
 
-from controllers import RestController
-# from controllers.bakers.baker import BakerInterface
-from controllers.bakers.baker import AbstractBakerController
+from plugins.controller.bakers import AbstractBakerController
 
 
 class HelmBakerController(AbstractBakerController):
 
     def __init__(self, metadata):
         super().__init__(metadata)
+        self.local_data = {
+            'release_job_number': metadata.release_job_number,
+            'deployment_id': metadata.deployment_id,
+            'build_id': metadata.build_id
+        }
         blob_repo_type = 'ecr'
         candidate_repos = [repo for repo in self.rest.get_field('service', self.deployment['service_id'], 'repos') if
                            repo['repo_type_id'] == blob_repo_type]
@@ -48,6 +53,11 @@ class HelmBakerController(AbstractBakerController):
     def substition(self, subs_list):
         for instruction in subs_list:
             output = ''
+            filename = ''
+            if os.getenv('LOCAL_DEV'):
+                filename = instruction['filename'] + '.tmpl'
+            else:
+                filename = instruction['filename']
             with open(instruction['filename'] + '.tmpl', 'r') as file:
                 output = file.read()
 
@@ -58,6 +68,8 @@ class HelmBakerController(AbstractBakerController):
                     field_name = field['value']['field']
                     obj = getattr(self, object_type)
                     value = str(obj[field_name])
+                elif field['type'] == 'local':
+                    value = self.local_data[field['value']]
 
                 pattern = '%%--%s--%%' % field['name']
                 output = output.replace(pattern, value)

@@ -46,10 +46,6 @@ def _main_():
                         args_dict = vars(args)
                         args_dict['items'] = 'zones'
                         cli.del_from_collection(**args_dict)
-                elif args.resource == 'release':
-                    if args.command == 'bake':
-                        args_dict = vars(args)
-                        cli.bake_release(**args_dict)
                 elif args.resource == 'service':
                     if args.command == 'assign_repo':
                         args_dict = vars(args)

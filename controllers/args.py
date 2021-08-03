@@ -173,12 +173,6 @@ class CLIArgs:
                                              help='Subnet bits').completer = self.subnet_allocator_bits_completer
         subnet_allocator_parser.add_argument('name', help='Name of subnet')
 
-
-        release_sub_parsers = self.model_subparsers['release']
-        bake_rel_parser = release_sub_parsers.add_parser('bake')
-        bake_rel_parser.add_argument('id').completer = getattr(self.rest, 'release_completer')
-
-
     def assign_args(self):
         parser = argparse.ArgumentParser(description='qaironRegistry CLI')
         parser.add_argument('-q', help='Quiet', required=False, action='store_true')
