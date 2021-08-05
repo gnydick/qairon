@@ -1,28 +1,29 @@
-## provider type is like cloud vendor
+#!/bin/sh -x
+### provider type is like cloud vendor
 ./qcli provider_type create aws
-
-## dev as a provider type means somewhere in our dev env, could be laptop
+#
+### dev as a provider type means somewhere in our dev env, could be laptop
 ./qcli provider_type create dev
-
-## creates aws account
+#
+### creates aws account
 ./qcli provider create aws 126252960572 infra
-
-# creates a dev provider to represent laptop
+#
+## creates a dev provider to represent laptop
 ./qcli provider create dev 0000000000000 laptop
-
-# self explanatory
+#
+## self explanatory
 ./qcli region create aws:126252960572 us-west-2
-
-# just need a place holder region for local development
+#
+## just need a place holder region for local development
 ./qcli region create dev:0000000000000 here
-
-# availability zones
+#
+## availability zones
 ./qcli zone create aws:126252960572:us-west-2 usw2-az1
 ./qcli zone create aws:126252960572:us-west-2 usw2-az2
 ./qcli zone create aws:126252960572:us-west-2 usw2-az3
 ./qcli zone create aws:126252960572:us-west-2 usw2-az4
-
-# partition is a VPC or the like in other vendors
+#
+## partition is a VPC or the like in other vendors
 ./qcli partition create aws:126252960572:us-west-2 vpc0 -n vpc-074b080f312234a06
 
 # again, placeholder for local development
@@ -113,7 +114,7 @@ EOF
 ./qcli language create json
 
 # creating a template marked as json with the contents from above
-./qcli config_template create cfn-gamelift-fleet json  1 -c "$doc"
+./qcli config_template create json cfn-gamelift-fleet   1 -c "$doc"
 
 # first, creating deployment target types
 ./qcli deployment_target_type create eks
@@ -141,6 +142,6 @@ EOF
 
 # releases -- installation instructions bundled with any appropriate config for that deployment
 # e.g. -- helm chart tar ball with additional configuration that is deployment target specific bundled in
-./qcli release create withme:cicd:jenkins:456 dev:laptop:here:default:local:minikube:vbox:withme:cicd:jenkins:default 789
+./qcli release create withme:cicd:jenkins:456 dev:0000000000000:here:default:local:minikube:vbox:withme:cicd:jenkins:default 789
 ./qcli release create withme:automation:qairon:422 aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default 1023
 ./qcli release create withme:automation:qairon:564 aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default 1104

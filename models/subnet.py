@@ -1,8 +1,8 @@
 import sqlalchemy
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import CIDR
-from sqlalchemy.orm import relationship
-
+from sqlalchemy.orm import relationship, Session
+from models import Network
 from db import db
 
 import ipaddress as ip
@@ -45,11 +45,12 @@ def my_before_update_listener(mapper, connection, subnet):
 @db.event.listens_for(Subnet, 'before_insert')
 def my_before_insert_listener(mapper, connection, subnet):
     newsubnet = ip.IPv4Network(address=subnet.cidr)
-    from controllers import RestController
-    rest = RestController()
-    network = rest.get_instance('network', subnet.network_id)
+    session = db.session
+    network = session.query(Network).filter_by(id=subnet.network_id).first()
 
-    if newsubnet in [ip.IPv4Network(net['cidr']) for net in network['subnets']]:
+
+
+    if newsubnet in [ip.IPv4Network(net.cidr) for net in network.subnets]:
         error = SubnetUnavailableError("Already Used", null)
         return error
     __update_id__(subnet)
