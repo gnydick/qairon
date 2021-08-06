@@ -19,7 +19,8 @@ class Release(db.Model):
     last_updated_at = Column(DateTime, nullable=False)
 
     build = relationship('Build', back_populates='releases')
-    deployment = relationship('Deployment', back_populates='releases')
+    deployment = relationship('Deployment', back_populates='releases', foreign_keys='[Release.deployment_id]')
+
 
     def __repr__(self):
         return self.id

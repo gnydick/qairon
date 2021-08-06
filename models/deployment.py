@@ -9,6 +9,7 @@ class Deployment(db.Model):
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
     service_id = Column(String, ForeignKey('service.id'))
+    current_release_id = Column(String, ForeignKey('release.id'))
     tag = Column(String, nullable=False, default='default')
 
     defaults = Column(Text)
@@ -16,10 +17,10 @@ class Deployment(db.Model):
     deployment_target = relationship("DeploymentTarget", back_populates="deployments")
     service = relationship("Service", back_populates="deployments")
     configs = relationship("DeploymentConfig", back_populates="deployment")
-    releases = relationship("Release", back_populates="deployment")
+    releases = relationship("Release", back_populates="deployment", foreign_keys='[Release.deployment_id]')
     zones = relationship("Zone", secondary='deployments_zones', back_populates="deployments")
     deployment_procs = relationship("DeploymentProc", back_populates="deployment")
-    current_release = relationship("Release", secondary='current_dep_release', uselist=False)
+    current_release = relationship("Release", foreign_keys='[Deployment.current_release_id]', innerjoin=False)
 
     def __repr__(self):
         return self.id
@@ -28,9 +29,9 @@ class Deployment(db.Model):
 @db.event.listens_for(Deployment, 'before_update')
 @db.event.listens_for(Deployment, 'before_insert')
 def my_before_write_listener(mapper, connection, deployment):
-    if deployment.current_release:
-        if deployment.current_release.build.service_id != deployment.service_id:
-            raise ValueError("Release must be for the same service as deployed in this deployment.")
+    # if deployment.current_release:
+    #     if deployment.current_release.build.service_id != deployment.service_id:
+    #         raise ValueError("Release must be for the same service as deployed in this deployment.")
 
 
     __update_id__(deployment)
