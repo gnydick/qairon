@@ -24,12 +24,12 @@ class CLIController:
         print(json.dumps(rest.get_instance(resource, id)))
 
     def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, format=None, q=False):
-        rows = rest.query(resource, None, None, output_fields=output_fields, resperpage=resperpage, page=page)
+        rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
         self.__output__(rows,format)
 
-    def query(self, resource, command=None, search_field=None, op=None, value=None, output_fields=None, resperpage=None,
+    def query(self, resource, command=None, query=None, output_fields=None, resperpage=None,
               page=None, format=None, q=False):
-        rows = rest.query(resource, search_field, op, value, output_fields, resperpage=resperpage, page=page)
+        rows = rest.query(resource, query, output_fields, resperpage=resperpage, page=page)
         self.__output__(rows, format)
 
 

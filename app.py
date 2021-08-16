@@ -156,7 +156,7 @@ def gen_config(dep_id, config_tag=None):
     s = db.session
     config_tag = 'default' if config_tag == None else config_tag
     tfs = s.query(Config).filter(Config.deployment_id == dep_id, Config.config_type_id == 'tf',
-                                 Config.tag == config_tag).all()
+                                    Config.tag == config_tag).all()
     tf_files = list(map(lambda x: x.name, tfs))
 
     result = ''

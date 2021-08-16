@@ -58,7 +58,7 @@ class HelmBakerController(AbstractBakerController):
                 filename = instruction['filename'] + '.tmpl'
             else:
                 filename = instruction['filename']
-            with open(instruction['filename'] + '.tmpl', 'r') as file:
+            with open(filename, 'r') as file:
                 output = file.read()
 
             for field in instruction['fields']:

@@ -99,7 +99,7 @@ class RestController:
         ids = [x['id'] for x in objs]
         return ids
 
-    def _get_attr_search_(self, prefix, parsed_args, resource=None, attribute=None,  **kwargs):
+    def _get_attr_search_(self, prefix, parsed_args, resource=None, attribute=None, **kwargs):
         url = self.URL + "{resource}/{id}/{attr}".format(resource=resource, id=parsed_args.owner_id, attr=attribute)
         headers = {'Content-Type': 'application/json'}
         filters = [dict(name='id', op='like', val=str(prefix) + '%')]
@@ -186,23 +186,21 @@ class RestController:
         response = self._get_rest_(resource, resource_id, kwargs)
         return response.json()[field]
 
-    def query(self, resource, search_field, op, value=None, output_fields=None, resperpage=None, page=None,
+    def query(self, resource, query, output_fields=None, resperpage=None, page=None,
               **kwargs):
-        return self._list_(resource, search_field, op, value, output_fields, resperpage, page, **kwargs)
+        return self._list_(resource, query, output_fields, resperpage, page, **kwargs)
 
     def list(self, resource):
         return self._list_(resource)
 
-    def _list_(self, resource, search_field=None, op=None, value=None, output_fields=None, resperpage=None, page=None,
+    def _list_(self, resource, query=None, output_fields=None, resperpage=None, page=None,
                **kwargs):
         params = dict(results_per_page=resperpage, page=page)
-
-        if search_field is not None and op is not None:
-            if value is not None:
-                filters = [dict(name=search_field, op=op, val=value)]
-                params['q'] = json.dumps(dict(filters=filters))
-            else:
-                filters = [dict(name=search_field, op=op)]
+        if query is not None:
+            filters = json.loads(query)
+            if type(filters) == dict:
+                params['q'] = json.dumps(dict(filters=[filters]))
+            elif type(filters) == list:
                 params['q'] = json.dumps(dict(filters=filters))
         response = self._get_rest_(resource, params=params)
         results = []
