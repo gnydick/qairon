@@ -68,6 +68,20 @@ class HelmBakerController(AbstractBakerController):
                     field_name = field['value']['field']
                     obj = getattr(self, object_type)
                     value = str(obj[field_name])
+                if field['type'] == 'config_kv_list':
+                    object_type = field['value']['object']
+                    field_name = field['value']['field']
+                    filter_value = field['value']['filter']
+                    objs = [cfg for cfg in getattr(self, object_type) if cfg[field_name] == filter_value]
+                    value = ""
+                    x = 0
+                    for cfg_obj in objs:
+                        for k, v in json.loads(cfg_obj['config']).items():
+                            # assume all config kv's get indented
+                            if x > 0:
+                                value += "\n"
+                            value += format("  %s=%s" % (k, v))
+                            x=x+1
                 elif field['type'] == 'local':
                     value = self.local_data[field['value']]
 

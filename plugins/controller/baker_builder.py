@@ -11,6 +11,7 @@ class BakerBuilder:
         self.release_job_number = release_job_number
         self.__build__ = self.rest.get_instance('build', build_id)
         self.__deployment__ = self.rest.get_instance('deployment', deployment_id)
+        self.__configs__ = self.rest.get_field('deployment', deployment_id, 'configs')
         self.__deployment_target__ = self.rest.get_instance('deployment_target',
                                                         self.__deployment__['deployment_target_id'])
 

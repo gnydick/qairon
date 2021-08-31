@@ -13,6 +13,7 @@ class AbstractBakerController(ABC):
         self.build = metadata.__build__
         self.deployment = metadata.__deployment__
         self.deployment_target = metadata.__deployment_target__
+        self.configs = metadata.__configs__
 
     @abstractmethod
     def bake(self):
