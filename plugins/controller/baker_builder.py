@@ -18,3 +18,5 @@ class BakerBuilder:
     def build(self):
         if self.__deployment_target__['deployment_target_type_id'] in ['eks', 'k8s', 'minikube']:
             return HelmBakerController(self)
+        elif self.__deployment_target__['deployment_target_type_id'] in ['glbuild']:
+            return GlBuildBaker(self)
