@@ -76,10 +76,9 @@ class RestController:
         return ids
 
     def allocate_subnet(self, network_id, additional_mask_bits, name):
-        from models import Subnet
         from .subnets import SubnetController
-        s = Subnet()
-        subnet = s.__dict__
+        # s = Subnet()
+        subnet = dict()
         subc = SubnetController(network_id)
         subnet['resource'] = 'subnet'
         subnet['network_id'] = network_id
