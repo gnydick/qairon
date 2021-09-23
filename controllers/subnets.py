@@ -1,6 +1,6 @@
 import json
 
-from models import Network, Subnet
+
 
 
 class SubnetController:
@@ -12,13 +12,13 @@ class SubnetController:
         from .rest_controller import RestController
         rest = RestController()
         import ipaddress as ip
-        net = rest.get_instance('network', resource_id=self.network_id)
-        network = Network(**net)
-        if type(net) is None:
+        network = rest.get_instance('network', resource_id=self.network_id)
+
+        if type(network) is None:
             pass
         else:
-            used_sbns = list(map(lambda x: ip.IPv4Network(x['cidr']), network.subnets))
-            n = ip.IPv4Network(network.cidr)
+            used_sbns = list(map(lambda x: ip.IPv4Network(x['cidr']), network['subnets']))
+            n = ip.IPv4Network(network['cidr'])
             psns = list(n.subnets(int(additional_mask_bits)))
 
             for sbn in used_sbns:
