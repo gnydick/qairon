@@ -5,3 +5,6 @@
 5. Enjoy!
 
 ./qcli ....
+
+[comment]: <> (pip build)
+python setup.py clean build sdist upload -r local
