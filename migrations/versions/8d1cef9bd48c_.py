@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: 2b28d97ccb94
+Revision ID: 8d1cef9bd48c
 Revises: None
-Create Date: 2021-06-02 13:31:45.066138
+Create Date: 2021-09-14 13:56:53.486668
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '2b28d97ccb94'
+revision = '8d1cef9bd48c'
 down_revision = None
 
 from alembic import op
@@ -48,11 +48,6 @@ def schema_upgrades():
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('config_template_type',
-    sa.Column('id', sa.String(), nullable=False),
-    sa.Column('defaults', sa.Text(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('deployment_target_type',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
@@ -72,6 +67,8 @@ def schema_upgrades():
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+
+
     op.create_table('repo_type',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
@@ -79,11 +76,8 @@ def schema_upgrades():
     )
     op.create_table('config_template',
     sa.Column('id', sa.String(), nullable=False),
-    sa.Column('version', sa.String(), nullable=False),
-    sa.Column('config_template_type_id', sa.String(), nullable=True),
     sa.Column('doc', sa.Text(), nullable=False),
     sa.Column('language_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['config_template_type_id'], ['config_template_type.id'], ),
     sa.ForeignKeyConstraint(['language_id'], ['language.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -99,7 +93,7 @@ def schema_upgrades():
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('provider_type_id', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('native', sa.Text(), nullable=True),
+    sa.Column('native_id', sa.String(), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.ForeignKeyConstraint(['provider_type_id'], ['provider_type.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -121,12 +115,13 @@ def schema_upgrades():
     sa.ForeignKeyConstraint(['application_id'], ['application.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+
     op.create_table('region',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('provider_id', sa.String(), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.Column('native', sa.Text(), nullable=True),
+    sa.Column('native_id', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['provider_id'], ['provider.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -139,6 +134,7 @@ def schema_upgrades():
     sa.ForeignKeyConstraint(['stack_id'], ['stack.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+
     op.create_table('build',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('build_num', sa.Integer(), nullable=False),
@@ -149,10 +145,12 @@ def schema_upgrades():
     sa.ForeignKeyConstraint(['service_id'], ['service.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+
+
     op.create_table('partition',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('region_id', sa.String(), nullable=False),
-    sa.Column('native', sa.Text(), nullable=True),
+    sa.Column('native_id', sa.String(), nullable=True),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.ForeignKeyConstraint(['region_id'], ['region.id'], ),
@@ -187,10 +185,11 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('region_id', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.Column('native', sa.Text(), nullable=True),
+    sa.Column('native_id', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['region_id'], ['region.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+
     op.create_table('deployment_target',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('deployment_target_type_id', sa.String(), nullable=True),
@@ -198,19 +197,9 @@ def schema_upgrades():
     sa.Column('environment_id', sa.String(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.Column('native', sa.Text(), nullable=True),
+    sa.Column('native_id', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['deployment_target_type_id'], ['deployment_target_type.id'], ),
     sa.ForeignKeyConstraint(['environment_id'], ['environment.id'], ),
-    sa.ForeignKeyConstraint(['partition_id'], ['partition.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('network',
-    sa.Column('id', sa.String(), nullable=False),
-    sa.Column('partition_id', sa.String(), nullable=False),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('cidr', postgresql.CIDR(), nullable=False),
-    sa.Column('defaults', sa.Text(), nullable=True),
-    sa.Column('native', sa.Text(), nullable=True),
     sa.ForeignKeyConstraint(['partition_id'], ['partition.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -218,10 +207,74 @@ def schema_upgrades():
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('deployment_target_id', sa.String(), nullable=True),
     sa.Column('service_id', sa.String(), nullable=True),
+    sa.Column('current_release_id', sa.String(), nullable=True),
     sa.Column('tag', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.ForeignKeyConstraint(['deployment_target_id'], ['deployment_target.id'], ),
     sa.ForeignKeyConstraint(['service_id'], ['service.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_table('deployment_proc',
+    sa.Column('id', sa.String(), nullable=False),
+    sa.Column('deployment_id', sa.String(), nullable=True),
+    sa.Column('proc_id', sa.String(), nullable=True),
+    sa.Column('defaults', sa.Text(), nullable=True),
+    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
+    sa.ForeignKeyConstraint(['proc_id'], ['proc.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_table('release',
+    sa.Column('id', sa.String(), nullable=False),
+    sa.Column('build_id', sa.String(), nullable=False),
+    sa.Column('deployment_id', sa.String(), nullable=False),
+    sa.Column('build_num', sa.Integer(), nullable=False),
+    sa.Column('tag', sa.String(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('last_updated_at', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['build_id'], ['build.id'], ),
+    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_table('deployment_config',
+    sa.Column('id', sa.String(), nullable=False),
+    sa.Column('config_template_id', sa.String(), nullable=True),
+    sa.Column('deployment_id', sa.String(), nullable=True),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('tag', sa.String(), nullable=False),
+    sa.Column('config', sa.Text(), nullable=True),
+    sa.ForeignKeyConstraint(['config_template_id'], ['config_template.id'], ),
+    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+
+    op.create_table('deployments_zones',
+    sa.Column('deployment_id', sa.String(), nullable=True),
+    sa.Column('zone_id', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
+    sa.ForeignKeyConstraint(['zone_id'], ['zone.id'], )
+    )
+    op.create_table('network',
+    sa.Column('id', sa.String(), nullable=False),
+    sa.Column('partition_id', sa.String(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('cidr', postgresql.CIDR(), nullable=False),
+    sa.Column('defaults', sa.Text(), nullable=True),
+    sa.Column('native_id', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['partition_id'], ['partition.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('allocation',
+    sa.Column('id', sa.String(), nullable=False),
+    sa.Column('value', sa.Float(), nullable=False),
+    sa.Column('allocation_type_id', sa.String(), nullable=True),
+    sa.Column('deployment_proc_id', sa.String(), nullable=True),
+    sa.Column('watermark', sa.Enum('HIGH', 'LOW', name='watermark'), nullable=True),
+    sa.Column('defaults', sa.Text(), nullable=True),
+    sa.ForeignKeyConstraint(['allocation_type_id'], ['allocation_type.id'], ),
+    sa.ForeignKeyConstraint(['deployment_proc_id'], ['deployment_proc.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('fleet',
@@ -230,7 +283,7 @@ def schema_upgrades():
     sa.Column('fleet_type_id', sa.String(), nullable=True),
     sa.Column('name', sa.String(length=256), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.Column('native', sa.Text(), nullable=True),
+    sa.Column('native_id', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['deployment_target_id'], ['deployment_target.id'], ),
     sa.ForeignKeyConstraint(['fleet_type_id'], ['fleet_type.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -241,7 +294,7 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('cidr', postgresql.CIDR(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.Column('native', sa.Text(), nullable=True),
+    sa.Column('native_id', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['network_id'], ['network.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -255,68 +308,15 @@ def schema_upgrades():
     sa.ForeignKeyConstraint(['fleet_id'], ['fleet.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('deployment_config',
-    sa.Column('id', sa.String(), nullable=False),
-    sa.Column('config_template_id', sa.String(), nullable=True),
-    sa.Column('deployment_id', sa.String(), nullable=True),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('tag', sa.String(), nullable=False),
-    sa.Column('config', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['config_template_id'], ['config_template.id'], ),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('deployment_proc',
-    sa.Column('id', sa.String(), nullable=False),
-    sa.Column('deployment_id', sa.String(), nullable=True),
-    sa.Column('proc_id', sa.String(), nullable=True),
-    sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
-    sa.ForeignKeyConstraint(['proc_id'], ['proc.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('deployments_zones',
-    sa.Column('deployment_id', sa.String(), nullable=True),
-    sa.Column('zone_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
-    sa.ForeignKeyConstraint(['zone_id'], ['zone.id'], )
-    )
-    op.create_table('release',
-    sa.Column('id', sa.String(), nullable=False),
-    sa.Column('build_id', sa.String(), nullable=False),
-    sa.Column('deployment_id', sa.String(), nullable=False),
-    sa.Column('build_num', sa.Integer(), nullable=False),
-    sa.Column('tag', sa.String(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('last_updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['build_id'], ['build.id'], ),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('subnets_fleets',
     sa.Column('subnet_id', sa.String(), nullable=True),
     sa.Column('fleet_id', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['fleet_id'], ['fleet.id'], ),
     sa.ForeignKeyConstraint(['subnet_id'], ['subnet.id'], )
     )
-    op.create_table('allocation',
-    sa.Column('id', sa.String(), nullable=False),
-    sa.Column('value', sa.Float(), nullable=False),
-    sa.Column('allocation_type_id', sa.String(), nullable=True),
-    sa.Column('deployment_proc_id', sa.String(), nullable=True),
-    sa.Column('watermark', sa.Enum('HIGH', 'LOW', name='watermark'), nullable=True),
-    sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['allocation_type_id'], ['allocation_type.id'], ),
-    sa.ForeignKeyConstraint(['deployment_proc_id'], ['deployment_proc.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('current_dep_release',
-    sa.Column('deployment_id', sa.String(), nullable=True),
-    sa.Column('release_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
-    sa.ForeignKeyConstraint(['release_id'], ['release.id'], ),
-    sa.UniqueConstraint('deployment_id')
-    )
+    # sa.ForeignKeyConstraint(['current_release_id'], ['release.id'], ),
+
+
     # ### end Alembic commands ###
 
 
@@ -333,19 +333,15 @@ def downgrades_pre():
 def schema_downgrades():
     """schema downgrade migrations go here."""
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('current_dep_release')
-    op.drop_table('allocation')
     op.drop_table('subnets_fleets')
-    op.drop_table('release')
-    op.drop_table('deployments_zones')
-    op.drop_table('deployment_proc')
-    op.drop_table('deployment_config')
     op.drop_table('capacity')
     op.drop_table('subnet')
     op.drop_table('fleet')
-    op.drop_table('deployment')
+    op.drop_table('allocation')
     op.drop_table('network')
+    op.drop_table('deployments_zones')
     op.drop_table('deployment_target')
+    op.drop_table('deployment_proc')
     op.drop_table('zone')
     op.drop_table('services_repos')
     op.drop_table('service_config')
@@ -354,17 +350,19 @@ def schema_downgrades():
     op.drop_table('build')
     op.drop_table('service')
     op.drop_table('region')
+    op.drop_table('deployment_config')
     op.drop_table('stack')
     op.drop_table('repo')
     op.drop_table('provider')
     op.drop_table('fleet_type')
     op.drop_table('config_template')
     op.drop_table('repo_type')
+    op.drop_table('release')
     op.drop_table('provider_type')
     op.drop_table('language')
     op.drop_table('environment')
     op.drop_table('deployment_target_type')
-    op.drop_table('config_template_type')
+    op.drop_table('deployment')
     op.drop_table('application')
     op.drop_table('allocation_type')
     # ### end Alembic commands ###

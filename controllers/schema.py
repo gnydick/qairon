@@ -18,8 +18,10 @@ class QaironSchema:
         ],
         build=[
             {'service_id': {'dotters': {'completer': 'service_completer'}}},
-            'build_num',
-            'git_tag'
+            'ver',
+            'vcs_ref',
+            'build_num'
+
         ],
         capacity=[
             {'fleet_id': {'dotters': {'completer': 'fleet_completer'}}},
@@ -50,7 +52,6 @@ class QaironSchema:
         deployment=[
             {'service_id': {'dotters': {'completer': 'service_completer'}}},
             {'deployment_target_id': {'dotters': {'completer': 'deployment_target_completer'}}},
-            {'-r': {'args': {'dest': 'current_release_id'}}},
             {'-d': {'args': {'dest': 'defaults'}}},
             {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}}
         ],
@@ -121,7 +122,8 @@ class QaironSchema:
             {'build_id': {'dotters': {'completer': 'build_completer'}}},
             {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
             'build_num',
-            {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}}
+            {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
+            {'-c': {'args': {'dest': 'current', 'help': 'current release', 'default': 'False'}}}
         ],
         repo=[
             {'repo_type_id': {'dotters': {'completer': 'repo_type_completer'}}},

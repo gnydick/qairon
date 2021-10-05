@@ -14,7 +14,8 @@ class Build(db.Model):
     created_at = Column(DateTime, nullable=False)
     last_updated_at = Column(DateTime, nullable=False)
     service_id = Column(String, ForeignKey('service.id'), nullable=False)
-    git_tag = Column(String, nullable=False)
+    ver = Column(String, nullable=False)
+    vcs_ref = Column(String, nullable=False)
     service = relationship('Service', back_populates='builds')
     releases = relationship('Release', back_populates='build')
 
