@@ -39,9 +39,6 @@ class Deployment(db.Model):
         return value
 
 
-
-
-
 @db.event.listens_for(Deployment, 'before_update')
 @db.event.listens_for(Deployment, 'before_insert')
 def my_before_write_listener(mapper, connection, deployment):
