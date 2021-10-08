@@ -44,8 +44,7 @@ def schema_upgrades():
 
 
 def upgrades_post():
-    """Add any optional data prep post migrations here!"""
-    pass
+    op.execute("update build set ver=regexp_replace(build.vcs_ref, '[^a-zA-Z0-9.-]', '-')")
 
 
 def downgrades_pre():

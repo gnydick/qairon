@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="local qairon local db" type="Python.FlaskServer">
-    <option name="additionalOptions" value="-p 5002" />
+    <option name="additionalOptions" value="-p 5003" />
+    <option name="flaskDebug" value="true" />
     <module name="qairon" />
     <option name="target" value="$PROJECT_DIR$/app.py" />
     <option name="targetType" value="PATH" />
