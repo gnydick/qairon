@@ -8,7 +8,7 @@ Create Date: 2021-10-05 14:02:28.470631
 
 # revision identifiers, used by Alembic.
 revision = 'build_vcs_ref'
-down_revision = 'golden'
+down_revision = 'deployment_current_release_fk'
 
 from alembic import op
 import sqlalchemy as sa
