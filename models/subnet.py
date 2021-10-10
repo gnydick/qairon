@@ -50,7 +50,7 @@ def my_before_insert_listener(mapper, connection, subnet):
 
 
 
-    if newsubnet in [ip.IPv4Network(net.cidr) for net in network.subnets]:
+    if newsubnet in [ip.IPv4Network(subnet.cidr) for subnet in network.subnets if subnet.id is not None]:
         error = SubnetUnavailableError("Already Used", null)
         return error
     __update_id__(subnet)
