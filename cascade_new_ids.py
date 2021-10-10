@@ -12,7 +12,7 @@ deployment_target_classes = {
 }
 
 provider_classes = {
-    Provider: "name",
+    Provider: "environment_id",
     Region: "provider_id",
     Partition: "region_id",
     DeploymentTarget: "partition_id",
