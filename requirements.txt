@@ -25,7 +25,6 @@ mimerender==0.6.0
 parse==1.19.0
 parse-type==0.5.2
 psycopg2==2.8.6
-pydevd-pycharm==203.7148.72
 python-dateutil==2.8.1
 python-editor==1.0.4
 python-mimeparse==1.6.0
