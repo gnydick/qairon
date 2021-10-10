@@ -16,6 +16,14 @@ alter table deployment
         foreign key (deployment_target_id) references deployment_target
             on update cascade;
 
+alter table deployment drop constraint deployment_current_release_id_fkey;
+
+alter table deployment
+    add constraint deployment_current_release_id_fkey
+        foreign key (current_release_id) references release
+            on update cascade;
+
+
 -- deployment_config
 alter table deployment_config drop constraint deployment_config_deployment_id_fkey;
 

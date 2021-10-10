@@ -12,11 +12,12 @@ deployment_target_classes = {
 }
 
 provider_classes = {
-    Region: "name",
-    Partition: "name",
-    DeploymentTarget: "name",
-    Network: "cidr",
-    Zone: "name"
+    Provider: "name",
+    Region: "provider_id",
+    Partition: "region_id",
+    DeploymentTarget: "partition_id",
+    Network: "partition_id",
+    Zone: "region_id"
 }
 
 sess = db.session()
