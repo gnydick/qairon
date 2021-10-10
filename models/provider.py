@@ -10,7 +10,6 @@ class Provider(db.Model):
     provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=False)
     environment_id = Column(String, ForeignKey('environment.id'), nullable=False)
     name = Column(String, nullable=False)
-    index = Column(String, nullable=False)
     native_id = Column(String)
     defaults = Column(Text)
 
@@ -34,5 +33,4 @@ def my_before_insert_listener(mapper, connection, provider):
 
 
 def __update_id__(provider):
-    provider.index = provider.native_id[0:4]
-    provider.id = provider.provider_type_id + ':' + provider.environment_id + ':' + provider.index
+    provider.id = provider.provider_type_id + ':' + provider.native_id + ':' + provider.environment_id

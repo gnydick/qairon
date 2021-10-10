@@ -103,10 +103,10 @@ def step_impl(context, environment, deployment_url, role):
     assert data['id'] == environment
 
 
-@given('create deployment_target "{name}" of type "{dep_target_type}" in "{partition_id}" via rest')
-def step_impl(context, name, dep_target_type, partition_id):
+@given('create deployment_target "{name}" of type "{dep_target_type}" for "{environment}" in "{partition_id}" via rest')
+def step_impl(context, name, dep_target_type, environment, partition_id):
     response = context.rest.create_resource(
-        {'resource': 'deployment_target', 'deployment_target_type_id': dep_target_type,
+        {'resource': 'deployment_target', 'deployment_target_type_id': dep_target_type, 'environment_id': environment,
          'partition_id': partition_id, 'name': name}
     )
     data = response.json()
@@ -201,6 +201,16 @@ def step_impl(context, env, role_id):
     )
     environment = context.rest.get_instance('environment', expected_env_id)
     assert environment['id'] == expected_env_id
+
+
+@step('create k8s_cluster "{name}" in "{environment}" via rest')
+def step_impl(context, name, environment):
+    expected_cluster_id = '%s:%s:k8s' % (environment, name)
+    context.cli.create(
+        {'resource': 'k8s_cluster', 'environment_id': environment, 'name': name}
+    )
+    k8s_cluster = context.rest.get_instance('k8s_cluster', expected_cluster_id)
+    assert k8s_cluster['id'] == expected_cluster_id
 
 
 @step('environment "{id}" can be created via rest')

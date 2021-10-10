@@ -4,20 +4,19 @@ from app import db
 
 deployment_target_classes = {
     Fleet: "name",
-    Deployment: "deployment_target_id",
-    DeploymentProc: "deployment_id",
-    Allocation: "deployment_id",
-    Release: "deployment_id",
-    DeploymentConfig: "deployment_id"
+    Deployment: "service_id",
+    DeploymentProc: "proc_id",
+    Allocation: "value",
+    Release: "tag",
+    DeploymentConfig: "name"
 }
 
 provider_classes = {
-    Provider: "index",
-    Region: "provider_id",
-    Partition: "region_id",
-    DeploymentTarget: "partition_id",
-    Network: "partition_id",
-    Zone: "region_id"
+    Region: "name",
+    Partition: "name",
+    DeploymentTarget: "name",
+    Network: "cidr",
+    Zone: "name"
 }
 
 sess = db.session()

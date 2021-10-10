@@ -16,14 +16,6 @@ alter table deployment
         foreign key (deployment_target_id) references deployment_target
             on update cascade;
 
-alter table deployment drop constraint deployment_current_release_id_fkey;
-
-alter table deployment
-    add constraint deployment_current_release_id_fkey
-        foreign key (current_release_id) references release
-            on update cascade;
-
-
 -- deployment_config
 alter table deployment_config drop constraint deployment_config_deployment_id_fkey;
 
@@ -89,14 +81,6 @@ alter table partition
         foreign key (region_id) references region
             on update cascade;
 
-
--- provider
-alter table provider drop constraint provider_environment_id_fkey;
-
-alter table provider
-    add constraint provider_environment_id_fkey
-        foreign key (environment_id) references environment
-            on update cascade;
 
 -- region
 alter table region drop constraint region_provider_id_fkey;
