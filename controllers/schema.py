@@ -18,8 +18,8 @@ class QaironSchema:
         ],
         build=[
             {'service_id': {'dotters': {'completer': 'service_completer'}}},
-            'vcs_ref',
-            'build_num'
+            'build_num',
+            'vcs_ref'
         ],
         capacity=[
             {'fleet_id': {'dotters': {'completer': 'fleet_completer'}}},
