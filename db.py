@@ -5,7 +5,7 @@ from base import app
 
 
 SQLALCHEMY_ENGINE_OPTIONS = {
-    'pool_size': 3,
+    'pool_size': 32,
     'pool_recycle': 120,
     'pool_pre_ping': True,
     'echo': True

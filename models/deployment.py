@@ -32,10 +32,11 @@ class Deployment(db.Model):
         return self.id
 
     # makes sure the release is actually one that belongs to the deployment
-    @validates('current_release_id')
+    @validates('current_release')
     def validate_current_release_id(self, key, value):
-        assert value in self.releases
-        assert value.build.service_id == self.service_id
+        if value is not None:
+            assert value in self.releases
+            assert value.build.service_id == self.service_id
         return value
 
 

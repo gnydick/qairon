@@ -10,3 +10,4 @@ from .allocation_view import AllocationView
 from .deployment_proc_view import DeploymentProcView
 from .service_config_view import ServiceConfigView
 from .menus.divider import DividerMenu
+from .subnet_view import SubnetView

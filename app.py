@@ -120,7 +120,7 @@ admin.add_view(DefaultView(Proc, db.session, category='Services'))
 
 admin.add_view(DefaultView(Partition, db.session, category='Platform'))
 admin.add_view(NetworkView(Network, db.session, category='Platform'))
-admin.add_view(NetworkView(Subnet, db.session, category='Platform'))
+admin.add_view(SubnetView(Subnet, db.session, category='Platform'))
 
 admin.add_view(WithIdView(AllocationType, db.session, category='Types'))
 admin.add_view(DefaultView(Allocation, db.session, category='Deploying'))
