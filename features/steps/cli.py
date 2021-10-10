@@ -45,17 +45,6 @@ def step_impl(context, service_id, deployment_target):
     assert deployment['id'] == expected_dep_id
 
 
-@given('create k8s_cluster "{name}" in "{environment}" via cli')
-def step_impl(context, name, environment):
-    expected_k8s_id = '%s:%s:k8s' % (environment, name)
-    context.cli.create(
-        {'resource': 'k8s_cluster', 'environment_id': environment, 'name': name}
-    )
-    k8s_cluster = context.rest.get_instance('k8s_cluster', expected_k8s_id)
-    assert k8s_cluster['id'] == expected_k8s_id
-    assert k8s_cluster['name'] == name
-
-
 @given('create config "{config_name}" type "{config_type_id}" for deployment "{deployment_id}" tagged "{tag}" via cli')
 def step_impl(context, config_name, config_type_id, deployment_id, tag):
     expected_config_id = '%s:%s:%s:%s' % (deployment_id, config_type_id, config_name, tag)

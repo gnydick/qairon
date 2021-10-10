@@ -14,6 +14,13 @@ alter table deployment
     add constraint deployment_deployment_target_id_fkey
         foreign key (deployment_target_id) references deployment_target;
 
+alter table deployment drop constraint deployment_current_release_id_fkey;
+
+alter table deployment
+    add constraint deployment_current_release_id_fkey
+        foreign key (current_release_id) references release;
+
+
 -- deployment_config
 alter table deployment_config drop constraint deployment_config_deployment_id_fkey;
 
@@ -70,6 +77,14 @@ alter table partition drop constraint partition_region_id_fkey;
 alter table partition
     add constraint partition_region_id_fkey
         foreign key (region_id) references region;
+
+
+-- provider
+alter table provider drop constraint provider_environment_id_fkey;
+
+alter table provider
+    add constraint provider_environment_id_fkey
+        foreign key (environment_id) references environment;
 
 
 -- region
