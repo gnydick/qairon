@@ -120,8 +120,7 @@ class QaironSchema:
             {'build_id': {'dotters': {'completer': 'build_completer'}}},
             {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
             'build_num',
-            {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
-            {'-c': {'args': {'dest': 'current', 'help': 'current release', 'default': 'False'}}}
+            {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}}
         ],
         repo=[
             {'repo_type_id': {'dotters': {'completer': 'repo_type_completer'}}},

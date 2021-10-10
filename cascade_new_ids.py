@@ -3,12 +3,12 @@ from models import *
 from app import db
 
 deployment_target_classes = {
-    Fleet: "name",
-    Deployment: "service_id",
-    DeploymentProc: "proc_id",
-    Allocation: "value",
-    Release: "tag",
-    DeploymentConfig: "name"
+    Fleet: "deployment_target_id",
+    Deployment: "deployment_target_id",
+    DeploymentProc: "deployment_id",
+    Allocation: "deployment_proc_id",
+    Release: "deployment_id",
+    DeploymentConfig: "deployment_id"
 }
 
 provider_classes = {

@@ -13,7 +13,7 @@ if app.debug:
     from werkzeug.debug import DebuggedApplication
     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 from views.menus.divider import DividerMenu
-
+app.config['DEBUG'] = True
 migrate = Migrate(app, db)
 restmanager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
 restmanager.create_api(Allocation, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
