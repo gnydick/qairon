@@ -17,7 +17,12 @@ provider_classes = {
     Partition: "region_id",
     DeploymentTarget: "partition_id",
     Network: "partition_id",
-    Zone: "region_id"
+    Zone: "region_id",
+    Deployment: "deployment_target_id",
+    DeploymentProc: "deployment_id",
+    Allocation: "deployment_proc_id",
+    Release: "deployment_id",
+    DeploymentConfig: "deployment_id"
 }
 
 sess = db.session()

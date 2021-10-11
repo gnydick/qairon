@@ -14,4 +14,3 @@ def before_all(context):
     # command.upgrade(config, "head")
     migrate.db.drop_all()
     migrate.db.create_all()
-    print("hello")

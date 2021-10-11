@@ -20,6 +20,13 @@ alter table deployment
     add constraint deployment_current_release_id_fkey
         foreign key (current_release_id) references release;
 
+alter table deployment drop constraint deployment_service_id_fkey;
+
+alter table deployment
+    add constraint deployment_service_id_fkey
+        foreign key (service_id) references service;
+
+
 
 -- deployment_config
 alter table deployment_config drop constraint deployment_config_deployment_id_fkey;
@@ -34,6 +41,12 @@ alter table deployment_target drop constraint deployment_target_partition_id_fke
 alter table deployment_target
     add constraint deployment_target_partition_id_fkey
         foreign key (partition_id) references partition;
+
+alter table deployment_target drop constraint deployment_target_deployment_target_type_id_fkey;
+
+alter table deployment_target
+    add constraint deployment_target_deployment_target_type_id_fkey
+        foreign key (deployment_target_type_id) references deployment_target_type;
 
 
 -- deployment_proc
@@ -93,6 +106,13 @@ alter table release drop constraint release_deployment_id_fkey;
 alter table release
     add constraint release_deployment_id_fkey
         foreign key (deployment_id) references deployment;
+
+-- service
+alter table service drop constraint service_stack_id_fkey;
+
+alter table service
+    add constraint service_stack_id_fkey
+        foreign key (stack_id) references stack;
 
 -- subnet
 alter table subnet drop constraint subnet_network_id_fkey;
