@@ -19,7 +19,12 @@ class Release(db.Model):
     last_updated_at = Column(DateTime, nullable=False)
 
     build = relationship('Build', back_populates='releases')
-    deployment = relationship('Deployment', back_populates='releases', foreign_keys='[Release.deployment_id]')
+
+    deployment = relationship('Deployment', back_populates='releases', foreign_keys=[deployment_id])
+
+    deployment_cur = relationship("Deployment", primaryjoin='Release.deployment_id==Deployment.current_release_id',
+                        foreign_keys="Deployment.current_release_id", back_populates='current_release')
+
 
 
     def __repr__(self):

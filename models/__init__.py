@@ -1,3 +1,4 @@
+from .release import Release
 from .deployment import Deployment
 from .environment import Environment
 from .config import ServiceConfig, DeploymentConfig
@@ -22,7 +23,7 @@ from .allocation import Allocation
 from .fleet import Fleet
 from .subnet import Subnet
 from .build import Build
-from .release import Release
+
 from .repo_type import RepoType
 from .fleet_type import FleetType
 from .deployment_target_type import DeploymentTargetType

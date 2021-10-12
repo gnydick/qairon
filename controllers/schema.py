@@ -102,9 +102,10 @@ class QaironSchema:
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
         provider=[
+            {'environment_id': {'dotters': {'completer': 'environment_completer'}}},
             {'provider_type_id': {'dotters': {'completer': 'provider_type_completer'}}},
             'native_id',
-            'name',
+
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
         provider_type=[

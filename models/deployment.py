@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from models import Release
 
 
 class Deployment(db.Model):
@@ -9,7 +10,7 @@ class Deployment(db.Model):
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
     service_id = Column(String, ForeignKey('service.id'))
-    current_release_id = Column(String, ForeignKey('release.id'))
+    current_release_id = Column(String)
     tag = Column(String, nullable=False, default='default')
 
     defaults = Column(Text)
@@ -23,10 +24,12 @@ class Deployment(db.Model):
 
     # safely circular relationship
     releases = relationship("Release", primaryjoin='Deployment.id==Release.deployment_id',
-                            foreign_keys="Release.deployment_id")
+                            foreign_keys="Release.deployment_id", back_populates="deployment")
+
+    # releases = relationship('Release', back_populates='deployment')
 
     current_release = relationship("Release", primaryjoin='Deployment.current_release_id==Release.id',
-                                   foreign_keys=current_release_id, post_update=True)
+                                   foreign_keys=[Release.id], post_update=True)
 
     def __repr__(self):
         return self.id

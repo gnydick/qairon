@@ -9,14 +9,15 @@ def step_impl(context, resource, res_id):
     assert data['id'] == res_id
 
 
-@then('create provider of type "{provider_type_id}" with native_id "{native_id}" named "{name}" via rest')
-def step_impl(context, provider_type_id, native_id, name):
+@then(
+    'create provider in env "{environment_id}" of type "{provider_type_id}" with native_id "{native_id}" via rest')
+def step_impl(context, environment_id, provider_type_id, native_id):
     res = context.rest.create_resource(
-        {'provider_type_id': provider_type_id, 'resource': 'provider',
-         'name': name, 'native_id': native_id}
+        {'environment_id': environment_id, 'provider_type_id': provider_type_id, 'resource': 'provider',
+         'native_id': native_id}
     )
     data = res.json()
-    assert data['id'] == '%s:%s' % (provider_type_id, native_id)
+    assert data['id'] == ':'.join([environment_id, provider_type_id, native_id])
 
 
 @then('create "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" via rest')
@@ -30,7 +31,7 @@ def step_impl(context, resource, res_name, parent_fk_field, parent_id):
 
 @then(
     'create textresource "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" with doc "{doc}" via rest')
-def step_impl(context, resource, res_name,  parent_fk_field, parent_id, doc):
+def step_impl(context, resource, res_name, parent_fk_field, parent_id, doc):
     res = context.rest.create_resource(
         {'id': res_name, parent_fk_field: parent_id, 'resource': resource, 'doc': doc}
     )
@@ -103,10 +104,10 @@ def step_impl(context, environment, deployment_url, role):
     assert data['id'] == environment
 
 
-@given('create deployment_target "{name}" of type "{dep_target_type}" for "{environment}" in "{partition_id}" via rest')
-def step_impl(context, name, dep_target_type, environment, partition_id):
+@given('create deployment_target "{name}" of type "{dep_target_type}" in "{partition_id}" via rest')
+def step_impl(context, name, dep_target_type, partition_id):
     response = context.rest.create_resource(
-        {'resource': 'deployment_target', 'deployment_target_type_id': dep_target_type, 'environment_id': environment,
+        {'resource': 'deployment_target', 'deployment_target_type_id': dep_target_type,
          'partition_id': partition_id, 'name': name}
     )
     data = response.json()
@@ -116,23 +117,23 @@ def step_impl(context, name, dep_target_type, environment, partition_id):
 @given('create build for "{service_id}" from job "{job_number}" tagged "{tag}" via rest')
 def step_impl(context, service_id, job_number, tag):
     response = context.rest.create_resource(
-        {'resource': 'build', 'service_id': service_id, 'build_num': job_number, 'git_tag': tag})
+        {'resource': 'build', 'service_id': service_id, 'build_num': job_number, 'vcs_ref': tag})
     data = response.json()
     assert data['id'] == '%s:%s' % (service_id, job_number)
 
+
 @given(
-    'create deployment at "{dep_target_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" at version "{version}" via rest')
-def step_impl(context, dep_target_id, service, tag, defaults, version):
+    'create deployment at "{dep_target_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via rest')
+def step_impl(context, dep_target_id, service, tag, defaults):
     response = context.rest.create_resource(
         {'resource': 'deployment', 'deployment_target_id': dep_target_id, 'service_id': service,
-         'tag': tag, 'defaults': defaults, 'version': version}
+         'tag': tag, 'defaults': defaults}
     )
     data = response.json()
     assert data['id'] == '%s:%s:%s' % (dep_target_id, service, tag)
     new_dep = context.rest.get_instance('deployment', data['id'])
     assert new_dep['defaults'] == defaults
     assert new_dep['tag'] == tag
-
 
 
 @then(
@@ -176,16 +177,17 @@ def step_impl(context, plural_resource, item_id, dest_resource, dest_id):
     assert item_id not in [x['id'] for x in new_plural]
     assert len(new_plural) == 1
 
+
 @then(
-    'create config for resource "{resource}" named "{name}" from template version "{config_template}" can be created for "{resource_id}" tagged "{tag}" via rest')
+    'create config for resource "{resource}" named "{name}" from template "{config_template_id}" can be created for "{resource_id}" tagged "{tag}" via rest')
 @given(
-    'create config for resource "{resource}" named "{name}" from template version "{config_template}" can be created for "{resource_id}" tagged "{tag}" via rest')
-def step_impl(context, resource, name, config_template, resource_id, tag):
-    cfg = context.rest.create_resource(
-        {'resource': "%s_config" % resource, 'name': name, 'config_template_id': config_template,
-         '%s_id' % resource: resource_id, 'tag': tag})
+    'create config for resource "{resource}" named "{name}" from template "{config_template_id}" can be created for "{resource_id}" tagged "{tag}" via rest')
+def step_impl(context, resource, name, config_template_id, resource_id, tag):
+    payload = {'resource': "%s_config" % resource, 'name': name, 'config_template_id': config_template_id,
+               '%s_id' % resource: resource_id, 'tag': tag}
+    cfg = context.rest.create_resource(payload)
     data = cfg.json()
-    assert data['config_template_id'] == config_template
+    assert data['config_template_id'] == config_template_id
 
 
 @given('update "{field}" for "{resource}" "{resource_id}" to "{value}" via rest')
