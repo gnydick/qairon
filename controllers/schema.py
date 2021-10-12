@@ -61,7 +61,6 @@ class QaironSchema:
         deployment_target=[
             {'deployment_target_type_id': {'dotters': {'completer': 'deployment_target_type_completer'}}},
             {'partition_id': {'dotters': {'completer': 'partition_completer'}}},
-            {'environment_id': {'dotters': {'completer': 'environment_completer'}}},
             'name',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
