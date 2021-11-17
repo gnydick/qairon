@@ -68,6 +68,15 @@ class HelmBakerController(AbstractBakerController):
                     field_name = field['value']['field']
                     obj = getattr(self, object_type)
                     value = str(obj[field_name])
+                if field['type'] == 'one_from_collection':
+                    object_type = field['collection']
+                    data_field = field['data_field']
+                    filters = field['filters']
+                    objs = getattr(self, object_type)
+                    for filter in filters:
+                        objs = [cfg for cfg in objs if cfg[filter['field_name']] == filter['value']]
+                    assert len(objs) == 1
+                    value = objs[0][data_field]
                 if field['type'] == 'config_kv_list':
                     object_type = field['value']['object']
                     field_name = field['value']['field']
