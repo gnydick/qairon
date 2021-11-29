@@ -17,6 +17,7 @@ class Build(db.Model):
     created_at = Column(DateTime, nullable=False)
     last_updated_at = Column(DateTime, nullable=False)
     service_id = Column(String, ForeignKey('service.id'), nullable=False)
+    profile = Column(String, nullable=True, default="")
     ver = Column(String, nullable=False)
     vcs_ref = Column(String, nullable=False)
     service = relationship('Service', back_populates='builds')
@@ -52,5 +53,5 @@ def my_before_update_listener(mapper, connection, build):
 
 
 def __update_fields__(build):
-    build.id = '%s:%s' % (build.service_id, build.build_num)
+    build.id = '%s:%s:%s' % (build.service_id, build.profile, build.build_num)
     build.ver = re.sub(r"[^0-9a-zA-Z.-]", '-', build.vcs_ref)
