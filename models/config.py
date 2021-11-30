@@ -53,7 +53,6 @@ class ServiceConfig(db.Model):
 
     config_template_id = Column(String, ForeignKey('config_template.id'))
     service_id = Column(String, ForeignKey('service.id'))
-    profile = Column(String, nullable=True, default="")
     name = Column(String, nullable=False)
 
     tag = Column(String, nullable=False, default='default')
@@ -99,4 +98,4 @@ def my_before_insert_listener(mapper, connection, config):
 
 
 def __update_service_id__(config):
-    config.id = config.service_id + ':' + config.config_template_id + ':' + (config.profile or "") + ':' + config.name + ':' + config.tag
+    config.id = config.service_id + ':' + config.config_template_id +  ':' + config.name + ':' + config.tag
