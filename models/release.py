@@ -47,4 +47,4 @@ def my_before_update_listener(mapper, connection, release):
 
 
 def __update_id__(release):
-    release.id = '%s:%s:%s' % (release.deployment_id, release.build_num)
+    release.id = '%s:%s' % (release.deployment_id, release.build_num)
