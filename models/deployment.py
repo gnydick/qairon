@@ -10,7 +10,7 @@ class Deployment(db.Model):
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
     service_id = Column(String, ForeignKey('service.id'))
-    current_release_id = Column(String)
+    current_release_id = Column(String, ForeignKey('release.id', use_alter=True))
     tag = Column(String, nullable=False, default='default')
 
     defaults = Column(Text)
