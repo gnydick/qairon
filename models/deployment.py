@@ -29,7 +29,7 @@ class Deployment(db.Model):
     # releases = relationship('Release', back_populates='deployment')
 
     current_release = relationship("Release", primaryjoin='Deployment.current_release_id==Release.id',
-                                   foreign_keys=[Release.id], post_update=True)
+                                   foreign_keys=[current_release_id], post_update=True)
 
     def __repr__(self):
         return self.id

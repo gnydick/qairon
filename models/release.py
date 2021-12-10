@@ -14,16 +14,12 @@ class Release(db.Model):
     deployment_id = Column(String, ForeignKey('deployment.id'), nullable=False)
     build_num = Column(Integer, nullable=False)
 
-
     created_at = Column(DateTime, nullable=False)
     last_updated_at = Column(DateTime, nullable=False)
 
     build = relationship('Build', back_populates='releases')
 
     deployment = relationship('Deployment', back_populates='releases', foreign_keys=[deployment_id])
-
-    deployment_cur = relationship("Deployment", primaryjoin='Release.deployment_id==Deployment.current_release_id',
-                        foreign_keys="Deployment.current_release_id", back_populates='current_release')
 
 
 
