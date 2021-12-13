@@ -18,6 +18,7 @@ Feature: full test
 
   Scenario: deployment
     Given create build for "testapp:teststack:testservice" from job "123" tagged "v1.0" build args "default" via rest
+    Given create build for "testapp:teststack:testservice" from job "124" tagged "v1.0" via rest
     And create "deployment_target_type" "k8s" via rest
     And create deployment_target "testdt" of type "k8s" in "testenv:testprovider_type:testprovider:testregion:testpartition" via rest
 
@@ -44,6 +45,7 @@ Feature: full test
     Then delete "region" "testenv:testprovider_type:testprovider:testregion" via rest
     Then delete "provider" "testenv:testprovider_type:testprovider" via rest
     And delete "build" "testapp:teststack:testservice:123" via rest
+    And delete "build" "testapp:teststack:testservice:124" via rest
     And delete "service" "testapp:teststack:testservice" via rest
     And delete "stack" "testapp:teststack" via rest
     And delete "application" "testapp" via rest

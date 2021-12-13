@@ -122,6 +122,14 @@ def step_impl(context, service_id, job_number, tag, build_args):
     assert data['id'] == '%s:%s' % (service_id, job_number)
 
 
+@given('create build for "{service_id}" from job "{job_number}" tagged "{tag}" via rest')
+def step_impl(context, service_id, job_number, tag):
+    response = context.rest.create_resource(
+        {'resource': 'build', 'service_id': service_id, 'build_num': job_number, 'vcs_ref': tag})
+    data = response.json()
+    assert data['id'] == '%s:%s' % (service_id, job_number)
+
+
 @given(
     'create deployment at "{dep_target_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via rest')
 def step_impl(context, dep_target_id, service, tag, defaults):
