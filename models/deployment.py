@@ -10,7 +10,7 @@ class Deployment(db.Model):
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
     service_id = Column(String, ForeignKey('service.id'))
-    current_release_id = Column(String, ForeignKey('release.id'))
+    current_release_id = Column(String, ForeignKey('release.id', use_alter=True))
     tag = Column(String, nullable=False, default='default')
 
     defaults = Column(Text)
@@ -29,7 +29,7 @@ class Deployment(db.Model):
     # releases = relationship('Release', back_populates='deployment')
 
     current_release = relationship("Release", primaryjoin='Deployment.current_release_id==Release.id',
-                                   foreign_keys=[Release.id], post_update=True)
+                                   foreign_keys=[current_release_id], post_update=True)
 
     def __repr__(self):
         return self.id

@@ -5,6 +5,7 @@ from app import db
 deployment_target_classes = {
     Fleet: "deployment_target_id",
     Deployment: "deployment_target_id",
+    Deployment: "current_release_id",
     DeploymentProc: "deployment_id",
     Allocation: "deployment_proc_id",
     Release: "deployment_id",
