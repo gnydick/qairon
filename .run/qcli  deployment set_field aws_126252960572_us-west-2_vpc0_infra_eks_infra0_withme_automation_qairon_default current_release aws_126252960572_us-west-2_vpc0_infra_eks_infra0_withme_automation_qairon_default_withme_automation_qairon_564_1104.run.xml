@@ -1,0 +1,27 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="qcli  deployment set_field aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default current_release aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default:withme:automation:qairon:564:1104" type="PythonConfigurationType" factoryName="Python">
+    <module name="qairon" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://qairon:qairon@localhost/qairon" />
+      <env name="SECRET_KEY" value="12345" />
+      <env name="doc" value="{ &quot;Type&quot; : &quot;AWS::GameLift::Fleet&quot;, &quot;Properties&quot; : { &quot;BuildId&quot; : String, &quot;CertificateConfiguration&quot; : CertificateConfiguration, &quot;Description&quot; : String, &quot;DesiredEC2Instances&quot; : Integer, &quot;EC2InboundPermissions&quot; : [ IpPermission, ... ], &quot;EC2InstanceType&quot; : String, &quot;FleetType&quot; : String, &quot;InstanceRoleARN&quot; : String, &quot;LogPaths&quot; : [ String, ... ], &quot;MaxSize&quot; : Integer, &quot;MetricGroups&quot; : [ String, ... ], &quot;MinSize&quot; : Integer, &quot;Name&quot; : String, &quot;NewGameSessionProtectionPolicy&quot; : String, &quot;PeerVpcAwsAccountId&quot; : String, &quot;PeerVpcId&quot; : String, &quot;ResourceCreationLimitPolicy&quot; : ResourceCreationLimitPolicy, &quot;RuntimeConfiguration&quot; : RuntimeConfiguration, &quot;ScriptId&quot; : String, &quot;ServerLaunchParameters&quot; : String, &quot;ServerLaunchPath&quot; : String } } " />
+    </envs>
+    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="IS_MODULE_SDK" value="false" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli" />
+    <option name="PARAMETERS" value="deployment set_field aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default current_release aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default:withme:automation:qairon:564:1104" />
+    <option name="SHOW_COMMAND_LINE" value="true" />
+    <option name="EMULATE_TERMINAL" value="false" />
+    <option name="MODULE_MODE" value="false" />
+    <option name="REDIRECT_INPUT" value="false" />
+    <option name="INPUT_FILE" value="" />
+    <method v="2" />
+  </configuration>
+</component>
