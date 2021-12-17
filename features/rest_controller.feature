@@ -17,7 +17,7 @@ Feature: full test
     Then create config for resource "service" named "testsvccfg" from template "testcfgtmpl" can be created for "testapp:teststack:testservice" tagged "tag" via rest
 
   Scenario: deployment
-    Given create build for "testapp:teststack:testservice" from job "123" tagged "v1.0" build args "default" via rest
+    Given create build for "testapp:teststack:testservice" from job "123" tagged "v1.0" build args "debug" via rest
     Given create build for "testapp:teststack:testservice" from job "124" tagged "v1.0" via rest
     And create "deployment_target_type" "k8s" via rest
     And create deployment_target "testdt" of type "k8s" in "testenv:testprovider_type:testprovider:testregion:testpartition" via rest

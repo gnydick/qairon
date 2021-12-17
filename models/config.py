@@ -68,7 +68,7 @@ class ServiceConfig(db.Model):
     # }
 
     def __repr__(self):
-        return self.service.id + ':' + self.config_template_id + ':' + self.profile + ":" + self.name + ':' + self.tag
+        return self.service.id + ':' + self.config_template_id + ':'  + self.name + ':' + self.tag
 
 
 # @db.event.listens_for(Config, 'init')
@@ -98,4 +98,4 @@ def my_before_insert_listener(mapper, connection, config):
 
 
 def __update_service_id__(config):
-    config.id = config.service_id + ':' + config.config_template_id +  ':' + config.name + ':' + config.tag
+    config.id = config.service_id + ':' + config.config_template_id + ':' + config.name + ':' + config.tag
