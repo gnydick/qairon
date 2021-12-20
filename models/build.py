@@ -19,7 +19,7 @@ class Build(db.Model):
     service_id = Column(String, ForeignKey('service.id'), nullable=False)
     ver = Column(String, nullable=False)
     vcs_ref = Column(String, nullable=False)
-    build_args = Column(String, nullable=True, default="")
+    build_args = Column(String, nullable=True)
 
     service = relationship('Service', back_populates='builds')
     releases = relationship('Release', back_populates='build')

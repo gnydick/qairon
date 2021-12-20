@@ -114,7 +114,7 @@ def step_impl(context, name, dep_target_type, partition_id):
     print(data)
 
 
-@given('create build for "{service_id}" from job "{job_number}" tagged "{tag}" build args "{build_args} via rest')
+@given('create build for "{service_id}" from job "{job_number}" tagged "{tag}" with build args "{build_args} via rest')
 def step_impl(context, service_id, job_number, tag, build_args):
     response = context.rest.create_resource(
         {'resource': 'build', 'service_id': service_id, 'build_num': job_number, 'vcs_ref': tag, 'build_args': build_args})
