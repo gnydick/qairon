@@ -45,11 +45,19 @@ class ReleaseArtifact(db.Model):
 
 @db.event.listens_for(BuildArtifact, 'before_update')
 @db.event.listens_for(BuildArtifact, 'before_insert')
-@db.event.listens_for(ReleaseArtifact, 'before_update')
-@db.event.listens_for(ReleaseArtifact, 'before_insert')
 def my_before_insert_listener(mapper, connection, artifact):
     __update_artifact_id__(artifact)
 
 
 def __update_artifact_id__(artifact):
     artifact.id = artifact.build_id + ':' + artifact.name
+
+
+@db.event.listens_for(ReleaseArtifact, 'before_update')
+@db.event.listens_for(ReleaseArtifact, 'before_insert')
+def my_before_insert_listener_release(mapper, connection, artifact):
+    __update_release_artifact_id__(artifact)
+
+
+def __update_release_artifact_id__(artifact):
+    artifact.id = artifact.release_id + ':' + artifact.name

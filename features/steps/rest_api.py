@@ -9,6 +9,32 @@ def step_impl(context, resource, res_id):
     assert data['id'] == res_id
 
 
+@then('create build_artifact for "{build_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}"')
+def step_impl(context, build_id, input_repo_id, output_repo_id, name, upload_path):
+    res = context.rest.create_resource(
+        {'resource': 'build_artifact', 'build_id': build_id, 'input_repo_id': input_repo_id, 'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}
+    )
+    data = res.json()
+    assert data['id'] == ':'.join([build_id, name])
+
+
+@then('create release_artifact for "{release_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}"')
+def step_impl(context, release_id, input_repo_id, output_repo_id, name, upload_path):
+    res = context.rest.create_resource(
+        {'resource': 'release_artifact', 'release_id': release_id, 'input_repo_id': input_repo_id, 'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}
+    )
+    data = res.json()
+    assert data['id'] == ':'.join([release_id, name])
+
+@then('create "{resource}" with parent id "{parent_id}" in parent field "{parent_field}" named "{name}"')
+def step_impl(context, resource, parent_id, parent_field, name):
+    res = context.rest.create_resource(
+        {'resource': resource, parent_field: parent_id, 'name': name}
+    )
+    data = res.json()
+    assert data['id'] == ':'.join([parent_id, name])
+
+
 @then(
     'create provider in env "{environment_id}" of type "{provider_type_id}" with native_id "{native_id}" via rest')
 def step_impl(context, environment_id, provider_type_id, native_id):
@@ -114,13 +140,20 @@ def step_impl(context, name, dep_target_type, partition_id):
     print(data)
 
 
-@given('create build for "{service_id}" from job "{job_number}" tagged "{tag}" via rest')
+@then('create build for "{service_id}" from job "{job_number}" tagged "{tag}" via rest')
 def step_impl(context, service_id, job_number, tag):
     response = context.rest.create_resource(
         {'resource': 'build', 'service_id': service_id, 'build_num': job_number, 'vcs_ref': tag})
     data = response.json()
     assert data['id'] == '%s:%s' % (service_id, job_number)
 
+
+@then('create release for "{deployment_id}" from build "{build_id}" from job "{build_num}" via rest')
+def step_impl(context, deployment_id, build_id, build_num):
+    response = context.rest.create_resource(
+        {'resource': 'release', 'deployment_id': deployment_id, 'build_id': build_id, 'build_num': build_num})
+    data = response.json()
+    assert data['id'] == '%s:%s' % (deployment_id, build_num)
 
 @given(
     'create deployment at "{dep_target_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via rest')

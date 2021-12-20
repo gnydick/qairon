@@ -21,6 +21,14 @@ class QaironSchema:
             'build_num',
             'vcs_ref'
         ],
+        build_artifact=[
+            {'build_id': {'dotters': {'completer': 'build_completer'}}},
+            {'input_repo_id': {'dotters': {'completer': 'repo_completer'}}},
+            {'output_repo_id': {'dotters': {'completer': 'repo_completer'}}},
+            'name',
+            'upload_path',
+            {'-d': {'args': {'dest': 'data'}}}
+        ],
         capacity=[
             {'fleet_id': {'dotters': {'completer': 'fleet_completer'}}},
             'value'
@@ -120,6 +128,14 @@ class QaironSchema:
             {'build_id': {'dotters': {'completer': 'build_completer'}}},
             {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
             'build_num'
+        ],
+        release_artifact=[
+            {'release_id': {'dotters': {'completer': 'release_completer'}}},
+            {'input_repo_id': {'dotters': {'completer': 'repo_completer'}}},
+            {'output_repo_id': {'dotters': {'completer': 'repo_completer'}}},
+            'name',
+            'upload_path',
+            {'-d': {'args': {'dest': 'data'}}}
         ],
         repo=[
             {'repo_type_id': {'dotters': {'completer': 'repo_type_completer'}}},

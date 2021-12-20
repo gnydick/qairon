@@ -24,6 +24,8 @@ restmanager.create_api(Application, primary_key='id', methods=['GET', 'POST', 'D
                        url_prefix='/api/rest/v1', max_results_per_page=-1)
 restmanager.create_api(Build, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
+restmanager.create_api(BuildArtifact, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
+                       max_results_per_page=-1)
 restmanager.create_api(Capacity, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
 
@@ -61,6 +63,8 @@ restmanager.create_api(ProviderType, primary_key='id', methods=['GET', 'POST', '
 restmanager.create_api(Region, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
 restmanager.create_api(Release, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
+                       max_results_per_page=-1)
+restmanager.create_api(ReleaseArtifact, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
 restmanager.create_api(Repo, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
