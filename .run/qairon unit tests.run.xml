@@ -5,7 +5,7 @@
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="QAIRON_ENDPOINT" value="http://localhost:5002" />
-      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://ut_qairon:ut_qairon@localhost/ut_qairon" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://ut_qairon:ut_qairon@localhost:5432/ut_qairon" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
