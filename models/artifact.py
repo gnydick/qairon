@@ -1,5 +1,4 @@
 from sqlalchemy import *
-from sqlalchemy.ext.declarative import AbstractConcreteBase
 
 from sqlalchemy.orm import relationship
 
