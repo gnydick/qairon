@@ -22,6 +22,8 @@ class Build(db.Model):
     service = relationship('Service', back_populates='builds')
     releases = relationship('Release', back_populates='build')
 
+    build_artifacts = relationship('BuildArtifact', back_populates='build')
+
     @hybrid_property
     def git_tag(self):
         return self.vcs_ref

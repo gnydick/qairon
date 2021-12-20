@@ -16,6 +16,16 @@ class Repo(db.Model):
 
     type = relationship("RepoType", back_populates="repos")
     services = relationship("Service", secondary='services_repos', back_populates="repos")
+    input_build_artifacts = relationship("BuildArtifact", back_populates="input_repo", foreign_keys="BuildArtifact.input_repo_id",
+                                    primaryjoin='Repo.id==BuildArtifact.input_repo_id')
+    output_build_artifacts = relationship("BuildArtifact", back_populates="output_repo", foreign_keys="BuildArtifact.output_repo_id",
+                                    primaryjoin='Repo.id==BuildArtifact.output_repo_id')
+    input_release_artifacts = relationship("ReleaseArtifact", back_populates="input_repo", foreign_keys="ReleaseArtifact.input_repo_id",
+                                    primaryjoin='Repo.id==ReleaseArtifact.input_repo_id')
+    output_release_artifacts = relationship("ReleaseArtifact", back_populates="output_repo", foreign_keys="ReleaseArtifact.output_repo_id",
+                                     primaryjoin='Repo.id==ReleaseArtifact.output_repo_id')
+
+
 
     def __repr__(self):
         return self.id

@@ -30,3 +30,4 @@ from .deployment_target_type import DeploymentTargetType
 from .capacity import Capacity
 from .provider_type import ProviderType
 from .provider import Provider
+from .artifact import BuildArtifact, ReleaseArtifact
