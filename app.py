@@ -99,7 +99,9 @@ admin.add_view(ServiceView(Service, db.session, category='Services'))
 admin.add_view(DefaultView(ServiceConfig, db.session, category='Services'))
 
 admin.add_view(DefaultView(Build, db.session, category='CICD'))
+admin.add_view(DefaultView(BuildArtifact, db.session, category='CICD'))
 admin.add_view(DefaultView(Release, db.session, category='CICD'))
+admin.add_view(DefaultView(ReleaseArtifact, db.session, category='CICD'))
 
 admin.add_view(WithIdView(ProviderType, db.session, category='Types'))
 admin.add_view(DefaultView(Provider, db.session, category='Platform'))

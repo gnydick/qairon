@@ -70,3 +70,6 @@ Feature: full test
     And delete "stack" "testapp:teststack" via rest
     And delete "application" "testapp" via rest
     Then delete "environment" "testenv" via rest
+    Then delete "repo" "ecr:testsvcrepobuildartifact" via rest
+    Then delete "repo" "git:testsvcreposrc" via rest
+    Then delete "repo" "helm:testsvcreporeleaseartifact" via rest
