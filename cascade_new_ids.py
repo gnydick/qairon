@@ -23,7 +23,14 @@ provider_classes = {
     DeploymentProc: "deployment_id",
     Allocation: "deployment_proc_id",
     Release: "deployment_id",
-    DeploymentConfig: "deployment_id"
+    Build: "service_id",
+    DeploymentConfig: "deployment_id",
+    BuildArtifact: "build_id",
+    BuildArtifact: "input_repo_id",
+    BuildArtifact: "output_repo_id",
+    ReleaseArtifact: "release_id",
+    ReleaseArtifact: "input_repo_id",
+    ReleaseArtifact: "output_repo_id"
 }
 
 sess = db.session()

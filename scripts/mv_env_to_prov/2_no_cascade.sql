@@ -7,6 +7,29 @@ alter table allocation
         foreign key (deployment_proc_id) references deployment_proc;
 
 
+
+-- build
+alter table build drop constraint build_service_id_fkey;
+
+alter table build
+    add constraint build_service_id_fkey
+        foreign key (service_id) references service;
+
+-- release
+alter table release drop constraint release_build_id_fkey;
+
+alter table release
+    add constraint release_build_id_fkey
+        foreign key (build_id) references build;
+
+
+alter table release drop constraint release_deployment_id_fkey;
+
+alter table release
+    add constraint release_deployment_id_fkey
+        foreign key (deployment_id) references deployment;
+
+
 -- deployment
 alter table deployment drop constraint deployment_deployment_target_id_fkey;
 
@@ -137,3 +160,49 @@ alter table zone
         foreign key (region_id) references region;
 
 
+
+---- build_artifact
+-- build_id
+alter table build_artifact drop constraint build_artifact_build_id_fkey;
+
+alter table build_artifact
+    add constraint build_artifact_build_id_fkey
+        foreign key (build_id) references build;
+
+-- input_repo_id
+alter table build_artifact drop constraint build_artifact_input_repo_id_fkey;
+
+alter table build_artifact
+    add constraint build_artifact_input_repo_id_fkey
+        foreign key (input_repo_id) references repo;
+
+-- output_repo_id
+alter table build_artifact drop constraint build_artifact_output_repo_id_fkey;
+
+alter table build_artifact
+    add constraint build_artifact_output_repo_id_fkey
+        foreign key (output_repo_id) references repo;
+
+
+
+---- release_artifact
+-- release_id
+alter table release_artifact drop constraint release_artifact_release_id_fkey;
+
+alter table release_artifact
+    add constraint release_artifact_release_id_fkey
+        foreign key (release_id) references release;
+
+-- input_repo_id
+alter table release_artifact drop constraint release_artifact_input_repo_id_fkey;
+
+alter table release_artifact
+    add constraint release_artifact_input_repo_id_fkey
+        foreign key (input_repo_id) references repo;
+
+-- output_repo_id
+alter table release_artifact drop constraint release_artifact_output_repo_id_fkey;
+
+alter table release_artifact
+    add constraint release_artifact_output_repo_id_fkey
+        foreign key (output_repo_id) references repo;
