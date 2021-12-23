@@ -2,7 +2,6 @@ import flask_restless
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 
-
 from base import app
 from controllers import RestController
 from db import db
@@ -11,9 +10,10 @@ from views import *
 
 if app.debug:
     from werkzeug.debug import DebuggedApplication
+
     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 from views.menus.divider import DividerMenu
-app.config['DEBUG'] = True
+
 migrate = Migrate(app, db)
 restmanager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
 restmanager.create_api(Allocation, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
@@ -24,7 +24,8 @@ restmanager.create_api(Application, primary_key='id', methods=['GET', 'POST', 'D
                        url_prefix='/api/rest/v1', max_results_per_page=-1)
 restmanager.create_api(Build, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
-restmanager.create_api(BuildArtifact, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
+restmanager.create_api(BuildArtifact, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
+                       url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
 restmanager.create_api(Capacity, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
@@ -64,7 +65,8 @@ restmanager.create_api(Region, primary_key='id', methods=['GET', 'POST', 'DELETE
                        max_results_per_page=-1)
 restmanager.create_api(Release, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
-restmanager.create_api(ReleaseArtifact, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
+restmanager.create_api(ReleaseArtifact, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
+                       url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
 restmanager.create_api(Repo, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
                        max_results_per_page=-1)
@@ -162,7 +164,7 @@ def gen_config(dep_id, config_tag=None):
     s = db.session
     config_tag = 'default' if config_tag == None else config_tag
     tfs = s.query(Config).filter(Config.deployment_id == dep_id, Config.config_type_id == 'tf',
-                                    Config.tag == config_tag).all()
+                                 Config.tag == config_tag).all()
     tf_files = list(map(lambda x: x.name, tfs))
 
     result = ''

@@ -83,7 +83,7 @@ for ENV in  infra prod dev stg int local ; do  ./qcli environment create $ENV ; 
 
 
 
-# configuration sectino
+# configuration section
 # default template for gamelift fleet
 export doc=$(cat <<EOF
 {
