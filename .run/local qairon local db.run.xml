@@ -11,8 +11,6 @@
       <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://qairon:qairon@localhost:5432/qairon" />
       <env name="SECRET_KEY" value="12345" />
       <env name="PROPAGATE_EXCEPTIONS" value="True" />
-      <env name="SQLALCHEMY_RECORD_QUERIES" value="True" />
-      <env name="SQLALCHEMY_ECHO" value="true" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
