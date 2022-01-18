@@ -17,4 +17,4 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False)
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = SQLALCHEMY_ENGINE_OPTIONS
 
-app.config['DEBUG'] = True
+app.config['DEBUG'] = os.getenv('DEBUG', False)
