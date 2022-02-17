@@ -18,11 +18,18 @@ class HelmBakerController(AbstractBakerController):
         blob_repo_type = 'ecr'
         candidate_repos = [repo for repo in self.rest.get_field('service', self.deployment['service_id'], 'repos') if
                            repo['repo_type_id'] == blob_repo_type]
-        assert len(candidate_repos) == 1
-        self.repo = candidate_repos[0]
+        # this condition supports old DSL for baking of repo as a single object on the baker
+        if len(candidate_repos) == 1:
+            self.repo = candidate_repos[0]
+        # this condition supports new DSL for having mutliple output repos
+        elif len(candidate_repos) > 1:
+            self.repos = {}
+            for repo in candidate_repos:
+                self.repos[repo['id']] = repo
 
     def bake(self):
-        svc_cfg = [svc_cfg for svc_cfg in self.rest.get_field('service', self.deployment['service_id'], 'configs') if
+        svc_configs = self.rest.get_field('service', self.deployment['service_id'], 'configs')
+        svc_cfg = [svc_cfg for svc_cfg in svc_configs if
                    svc_cfg['config_template_id'] == 'helm_bake' and svc_cfg['name'] == 'default']
         assert len(svc_cfg) == 1
         cfg = svc_cfg[0]['config']
@@ -63,6 +70,12 @@ class HelmBakerController(AbstractBakerController):
 
             for field in instruction['fields']:
                 value = ''
+                if field['type'] == 'meta_hash':
+                    object_type = field['value']['object']
+                    key = field['value']['key']
+                    field_name = field['value']['field']
+                    obj = getattr(self, object_type)
+                    value = str(obj[key][field_name])
                 if field['type'] == 'meta':
                     object_type = field['value']['object']
                     field_name = field['value']['field']
