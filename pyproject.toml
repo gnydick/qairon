@@ -4,5 +4,5 @@ build-backend = "setuptools.build_meta"
 
 [metadata]
 name = "qairon-qcli"
-version = "0.0.27"
+version = "0.4.1"
 description = "CLI for single source of truth Qairon"
