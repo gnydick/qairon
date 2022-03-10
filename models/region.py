@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+import datetime
 
 
 class Region(db.Model):
@@ -9,6 +10,8 @@ class Region(db.Model):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     provider_id = Column(String, ForeignKey('provider.id'), nullable=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     defaults = Column(Text)
     native_id = Column(String)
 

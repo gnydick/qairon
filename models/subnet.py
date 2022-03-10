@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import CIDR
 from sqlalchemy.orm import relationship, Session
 from models import Network
 from db import db
+import datetime
 
 import ipaddress as ip
 
@@ -13,6 +14,8 @@ class Subnet(db.Model):
     id = Column(String, primary_key=True)
     network_id = Column(String, ForeignKey('network.id'), nullable=False)
     native_id = Column(String)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     name = Column(String, nullable=False)
     cidr = Column(CIDR, nullable=False, )
 

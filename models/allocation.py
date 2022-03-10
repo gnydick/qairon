@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import validates, relationship
 
 from db import db
+import datetime
 
 
 class Allocation(db.Model):
@@ -16,6 +17,8 @@ class Allocation(db.Model):
     deployment_proc_id = Column(String, ForeignKey('deployment_proc.id'))
     watermark = db.Column(watermarks_enum)
     UniqueConstraint('deployment_proc_id', 'type', 'watermark')
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     defaults = Column(Text)
 
     deployment_proc = relationship('DeploymentProc', back_populates='allocations')

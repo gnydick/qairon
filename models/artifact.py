@@ -3,6 +3,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+import datetime
 
 
 class BuildArtifact(db.Model):
@@ -12,9 +13,12 @@ class BuildArtifact(db.Model):
     build_id = Column(String, ForeignKey('build.id'), nullable=False)
     input_repo_id = Column(String, ForeignKey('repo.id'), nullable=False)
     output_repo_id = Column(String, ForeignKey('repo.id'), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     name = Column(String, nullable=False)
     upload_path = Column(String, nullable=False)
     data = Column(Text)
+    defaults = Column(Text)
 
     build = relationship('Build', back_populates='build_artifacts')
     input_repo = relationship("Repo", back_populates="input_build_artifacts", foreign_keys=[input_repo_id])

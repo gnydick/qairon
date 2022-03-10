@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+import datetime
 
 
 class Fleet(db.Model):
@@ -9,11 +10,13 @@ class Fleet(db.Model):
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
     fleet_type_id = Column(String, ForeignKey('fleet_type.id'))
+    native_id = Column(String)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
 
     name = Column(String(256))
 
     defaults = Column(Text)
-    native_id = Column(String)
 
     deployment_target = relationship("DeploymentTarget", back_populates="fleets")
     subnets = relationship("Subnet", secondary='subnets_fleets', back_populates="fleets")

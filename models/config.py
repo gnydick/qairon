@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import ConcreteBase
 from sqlalchemy.orm import relationship
 
 from db import db
+import datetime
 
 
 # class Config(ConcreteBase, db.Model):
@@ -28,11 +29,14 @@ class DeploymentConfig(db.Model):
 
     config_template_id = Column(String, ForeignKey('config_template.id'))
     deployment_id = Column(String, ForeignKey('deployment.id'))
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     name = Column(String, nullable=False)
 
     tag = Column(String, nullable=False, default='default')
 
     config = Column(Text)
+    defaults = Column(Text)
 
     template = relationship("ConfigTemplate", back_populates="deployment_configs")
 

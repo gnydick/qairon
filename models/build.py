@@ -7,6 +7,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, object_session, synonym
 
 from db import db
+import datetime
 
 
 class Build(db.Model):
@@ -14,11 +15,12 @@ class Build(db.Model):
 
     id = Column(String, primary_key=True)
     build_num = Column(Integer, nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    last_updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     service_id = Column(String, ForeignKey('service.id'), nullable=False)
     ver = Column(String, nullable=False)
     vcs_ref = Column(String, nullable=False)
+    defaults = Column(Text)
     service = relationship('Service', back_populates='builds')
     releases = relationship('Release', back_populates='build')
 
@@ -40,16 +42,11 @@ class Build(db.Model):
 
 @db.event.listens_for(Build, 'before_insert')
 def my_before_insert_listener(mapper, connection, build):
-    now = datetime.now()
-    build.created_at = now
-    build.last_updated_at = now
     __update_fields__(build)
 
 
 @db.event.listens_for(Build, 'before_update')
 def my_before_update_listener(mapper, connection, build):
-    now = datetime.now()
-    build.last_updated_at = now
     __update_fields__(build)
 
 

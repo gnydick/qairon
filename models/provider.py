@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+import datetime
 
 
 class Provider(db.Model):
@@ -10,6 +11,8 @@ class Provider(db.Model):
     provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=False)
     environment_id = Column(String, ForeignKey('environment.id'), nullable=False)
     native_id = Column(String)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     defaults = Column(Text)
 
     environment = relationship("Environment", back_populates="providers")

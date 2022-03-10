@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+import datetime
 
 
 class DeploymentProc(db.Model):
@@ -9,6 +10,8 @@ class DeploymentProc(db.Model):
     id = Column(String, primary_key=True)
     deployment_id = Column(String, ForeignKey('deployment.id'))
     proc_id = Column(String, ForeignKey('proc.id'))
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     defaults = Column(Text)
 
     allocations = relationship("Allocation", back_populates="deployment_proc",

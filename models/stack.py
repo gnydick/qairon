@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+import datetime
 
 
 class Stack(db.Model):
@@ -10,6 +11,8 @@ class Stack(db.Model):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     application_id = Column(String, ForeignKey('application.id'), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     defaults = Column(Text)
 
     application = relationship('Application', back_populates='stacks')

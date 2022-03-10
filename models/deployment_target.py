@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import validates, relationship
 
 from db import db
+import datetime
 
 
 class DeploymentTarget(db.Model):
@@ -10,7 +11,8 @@ class DeploymentTarget(db.Model):
     id = Column(String, primary_key=True)
     deployment_target_type_id = Column(String, ForeignKey('deployment_target_type.id'))
     partition_id = Column(String, ForeignKey('partition.id'))
-
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     name = Column(String(255), nullable=False)
 
     defaults = Column(Text)

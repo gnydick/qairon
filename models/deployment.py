@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+import datetime
 from models import Release
 
 
@@ -11,6 +12,8 @@ class Deployment(db.Model):
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
     service_id = Column(String, ForeignKey('service.id'))
     current_release_id = Column(String, ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey', link_to_name=True))
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     tag = Column(String, nullable=False, default='default')
 
     defaults = Column(Text)

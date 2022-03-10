@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+import datetime
 
 from sqlalchemy.dialects.postgresql.base import CIDR
 
@@ -15,10 +16,14 @@ class Network(db.Model):
 
     id = Column(String, primary_key=True)
     partition_id = Column(String, ForeignKey('partition.id'), nullable=False)
+    native_id = Column(String)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
+
     name = Column(String, nullable=False)
     cidr = Column(CIDR, nullable=False, )
     defaults = Column(Text)
-    native_id = Column(String)
+
 
     partition = relationship("Partition", back_populates="networks")
     subnets = relationship("Subnet", back_populates='network')

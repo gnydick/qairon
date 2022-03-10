@@ -4,6 +4,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+import datetime
 
 
 class Release(db.Model):
@@ -12,11 +13,10 @@ class Release(db.Model):
     id = Column(String, primary_key=True)
     build_id = Column(String, ForeignKey('build.id'), nullable=False)
     deployment_id = Column(String, ForeignKey('deployment.id'), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     build_num = Column(Integer, nullable=False)
-
-    created_at = Column(DateTime, nullable=False)
-    last_updated_at = Column(DateTime, nullable=False)
-
+    defaults = Column(Text)
     build = relationship('Build', back_populates='releases')
 
     deployment = relationship('Deployment', back_populates='releases', foreign_keys=[deployment_id])
@@ -29,16 +29,11 @@ class Release(db.Model):
 
 @db.event.listens_for(Release, 'before_insert')
 def my_before_insert_listener(mapper, connection, release):
-    now = datetime.now()
-    release.created_at = now
-    release.last_updated_at = now
     __update_id__(release)
 
 
 @db.event.listens_for(Release, 'before_update')
 def my_before_update_listener(mapper, connection, release):
-    now = datetime.now()
-    release.last_updated_at = now
     __update_id__(release)
 
 

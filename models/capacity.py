@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import validates, relationship
 
 from db import db
+import datetime
 
 
 class Capacity(db.Model):
@@ -9,8 +10,10 @@ class Capacity(db.Model):
 
     id = Column(String, primary_key=True)
     fleet_id = Column(String, ForeignKey('fleet.id'))
-    value = Column(Float, nullable=False)
     allocation_type_id = Column(String, ForeignKey('allocation_type.id'))
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
+    value = Column(Float, nullable=False)
     defaults = Column(Text)
 
     type = relationship('AllocationType', back_populates='capacities')
