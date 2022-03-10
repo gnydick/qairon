@@ -19,7 +19,8 @@ class QaironSchema:
         build=[
             {'service_id': {'dotters': {'completer': 'service_completer'}}},
             'build_num',
-            'vcs_ref'
+            'vcs_ref',
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         build_artifact=[
             {'build_id': {'dotters': {'completer': 'build_completer'}}},
@@ -27,11 +28,13 @@ class QaironSchema:
             {'output_repo_id': {'dotters': {'completer': 'repo_completer'}}},
             'name',
             'upload_path',
-            {'-d': {'args': {'dest': 'data'}}}
+            {'-D': {'args': {'dest': 'data'}}},
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         capacity=[
             {'fleet_id': {'dotters': {'completer': 'fleet_completer'}}},
-            'value'
+            'value',
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         deployment_config=[
             {'config_template_id': {'dotters': {'completer': 'config_template_completer'}}},
@@ -39,6 +42,7 @@ class QaironSchema:
             'name',
             {'-c': {'args': {'dest': 'config', 'default': '{}'}}},
             {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         service_config=[
             {'config_template_id': {'dotters': {'completer': 'config_template_completer'}}},
@@ -46,20 +50,24 @@ class QaironSchema:
             'name',
             {'-c': {'args': {'dest': 'config', 'default': '{}'}}},
             {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         config_template=[
             {'language_id': {'dotters': {'completer': 'language_completer'}}},
             'id',
             {'-c': {'args': {'dest': 'doc'}}},
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         language=[
-            'id'
+            'id',
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         deployment=[
             {'service_id': {'dotters': {'completer': 'service_completer'}}},
             {'deployment_target_id': {'dotters': {'completer': 'deployment_target_completer'}}},
             {'-d': {'args': {'dest': 'defaults'}}},
-            {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}}
+            {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         deployment_proc=[
             {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
@@ -112,7 +120,6 @@ class QaironSchema:
             {'environment_id': {'dotters': {'completer': 'environment_completer'}}},
             {'provider_type_id': {'dotters': {'completer': 'provider_type_completer'}}},
             'native_id',
-
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
         provider_type=[
@@ -127,7 +134,8 @@ class QaironSchema:
         release=[
             {'build_id': {'dotters': {'completer': 'build_completer'}}},
             {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
-            'build_num'
+            'build_num',
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         release_artifact=[
             {'release_id': {'dotters': {'completer': 'release_completer'}}},
@@ -135,7 +143,8 @@ class QaironSchema:
             {'output_repo_id': {'dotters': {'completer': 'repo_completer'}}},
             'name',
             'upload_path',
-            {'-d': {'args': {'dest': 'data'}}}
+            {'-D': {'args': {'dest': 'data'}}},
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         repo=[
             {'repo_type_id': {'dotters': {'completer': 'repo_type_completer'}}},
@@ -162,7 +171,8 @@ class QaironSchema:
             {'network_id': {'dotters': {'completer': 'network_completer'}}},
             {'-n': {'args': {'dest': 'native_id'}}},
             'name',
-            'cidr'
+            'cidr',
+            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         zone=[
             {'region_id': {'dotters': {'completer': 'region_completer'}}},

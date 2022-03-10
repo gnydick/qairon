@@ -57,10 +57,13 @@ class ServiceConfig(db.Model):
 
     config_template_id = Column(String, ForeignKey('config_template.id'))
     service_id = Column(String, ForeignKey('service.id'))
+    created_at = Column(DateTime, nullable=False, server_default=func.now())
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     name = Column(String, nullable=False)
 
     tag = Column(String, nullable=False, default='default')
     config = Column(Text)
+    defaults = Column(Text)
 
     template = relationship("ConfigTemplate", back_populates="service_configs")
 
