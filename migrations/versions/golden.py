@@ -138,8 +138,6 @@ def schema_upgrades():
     op.create_table('build',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('build_num', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('last_updated_at', sa.DateTime(), nullable=False),
     sa.Column('service_id', sa.String(), nullable=False),
     sa.Column('git_tag', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['service_id'], ['service.id'], ),
@@ -231,8 +229,6 @@ def schema_upgrades():
     sa.Column('deployment_id', sa.String(), nullable=False),
     sa.Column('build_num', sa.Integer(), nullable=False),
     sa.Column('tag', sa.String(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('last_updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['build_id'], ['build.id'], ),
     sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
     sa.PrimaryKeyConstraint('id')

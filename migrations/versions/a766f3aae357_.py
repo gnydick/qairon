@@ -43,10 +43,9 @@ def schema_upgrades():
     op.add_column('allocation_type', sa.Column('last_updated_at', sa.DateTime(), nullable=True))
     op.add_column('application', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False))
     op.add_column('application', sa.Column('last_updated_at', sa.DateTime(), nullable=True))
+    op.add_column('build', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False))
     op.add_column('build', sa.Column('defaults', sa.Text(), nullable=True))
-    op.alter_column('build', 'last_updated_at',
-               existing_type=postgresql.TIMESTAMP(),
-               nullable=True)
+    op.add_column('build', sa.Column('last_updated_at', sa.DateTime(), nullable=True))
     op.add_column('build_artifact', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False))
     op.add_column('build_artifact', sa.Column('defaults', sa.Text(), nullable=True))
     op.add_column('build_artifact', sa.Column('last_updated_at', sa.DateTime(), nullable=True))
@@ -88,10 +87,9 @@ def schema_upgrades():
     op.add_column('provider_type', sa.Column('last_updated_at', sa.DateTime(), nullable=True))
     op.add_column('region', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False))
     op.add_column('region', sa.Column('last_updated_at', sa.DateTime(), nullable=True))
+    op.add_column('release', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False))
     op.add_column('release', sa.Column('defaults', sa.Text(), nullable=True))
-    op.alter_column('release', 'last_updated_at',
-               existing_type=postgresql.TIMESTAMP(),
-               nullable=True)
+    op.add_column('release', sa.Column('last_updated_at', sa.DateTime(), nullable=True))
     op.add_column('repo', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False))
     op.add_column('repo', sa.Column('last_updated_at', sa.DateTime(), nullable=True))
     op.add_column('repo_type', sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False))
@@ -132,10 +130,9 @@ def schema_downgrades():
     op.drop_column('repo_type', 'created_at')
     op.drop_column('repo', 'last_updated_at')
     op.drop_column('repo', 'created_at')
-    op.alter_column('release', 'last_updated_at',
-               existing_type=postgresql.TIMESTAMP(),
-               nullable=False)
+    op.drop_column('release', 'last_updated_at')
     op.drop_column('release', 'defaults')
+    op.drop_column('release', 'created_at')
     op.drop_column('region', 'last_updated_at')
     op.drop_column('region', 'created_at')
     op.drop_column('provider_type', 'last_updated_at')
@@ -177,10 +174,9 @@ def schema_downgrades():
     op.drop_column('build_artifact', 'last_updated_at')
     op.drop_column('build_artifact', 'defaults')
     op.drop_column('build_artifact', 'created_at')
-    op.alter_column('build', 'last_updated_at',
-               existing_type=postgresql.TIMESTAMP(),
-               nullable=False)
+    op.drop_column('build', 'last_updated_at')
     op.drop_column('build', 'defaults')
+    op.drop_column('build', 'created_at')
     op.drop_column('application', 'last_updated_at')
     op.drop_column('application', 'created_at')
     op.drop_column('allocation_type', 'last_updated_at')

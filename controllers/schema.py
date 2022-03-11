@@ -67,7 +67,6 @@ class QaironSchema:
             {'deployment_target_id': {'dotters': {'completer': 'deployment_target_completer'}}},
             {'-d': {'args': {'dest': 'defaults'}}},
             {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
-            {'-d': {'args': {'dest': 'defaults'}}}
         ],
         deployment_proc=[
             {'deployment_id': {'dotters': {'completer': 'deployment_completer'}}},
