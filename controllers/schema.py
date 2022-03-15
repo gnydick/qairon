@@ -28,8 +28,7 @@ class QaironSchema:
             {'output_repo_id': {'dotters': {'completer': 'repo_completer'}}},
             'name',
             'upload_path',
-            {'-D': {'args': {'dest': 'data'}}},
-            {'-d': {'args': {'dest': 'defaults'}}}
+            {'-d': {'args': {'dest': 'data'}}}
         ],
         capacity=[
             {'fleet_id': {'dotters': {'completer': 'fleet_completer'}}},
@@ -142,8 +141,7 @@ class QaironSchema:
             {'output_repo_id': {'dotters': {'completer': 'repo_completer'}}},
             'name',
             'upload_path',
-            {'-D': {'args': {'dest': 'data'}}},
-            {'-d': {'args': {'dest': 'defaults'}}}
+            {'-d': {'args': {'dest': 'data'}}}
         ],
         repo=[
             {'repo_type_id': {'dotters': {'completer': 'repo_type_completer'}}},

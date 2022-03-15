@@ -19,3 +19,4 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = SQLALCHEMY_ENGINE_OPTIONS
 app.config['SQLALCHEMY_RECORD_QUERIES'] = 'SQLALCHEMY_RECORD_QUERIES' in os.environ
 app.config['SQLALCHEMY_ECHO'] = 'SQLALCHEMY_ECHO' in os.environ
 
+app.config['DEBUG'] = os.getenv('DEBUG', True)
