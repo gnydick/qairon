@@ -37,6 +37,7 @@ class ReleaseArtifact(db.Model):
     name = Column(String, nullable=False)
     upload_path = Column(String, nullable=False)
     data = Column(Text)
+    defaults = Column(Text)
 
     input_repo = relationship("Repo", back_populates="input_release_artifacts", foreign_keys=[input_repo_id])
     output_repo = relationship("Repo", back_populates="output_release_artifacts", foreign_keys=[output_repo_id])
