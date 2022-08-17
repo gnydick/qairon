@@ -22,7 +22,7 @@ class DeploymentTarget(db.Model):
 
     fleets = relationship("Fleet", back_populates="deployment_target")
     type = relationship("DeploymentTargetType", back_populates="targets")
-    deployments = relationship('Deployment', back_populates='deployment_target')
+    deployment_target_bins = relationship('DeploymentTargetBin', back_populates='deployment_target')
 
 
 

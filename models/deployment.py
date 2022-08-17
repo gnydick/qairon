@@ -9,7 +9,7 @@ from models import Release
 class Deployment(db.Model):
     __tablename__ = "deployment"
     id = Column(String, primary_key=True)
-    deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
+    deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id'))
     service_id = Column(String, ForeignKey('service.id'))
     current_release_id = Column(String, ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey', link_to_name=True))
     created_at = Column(DateTime, nullable=False, server_default=func.now())
@@ -18,7 +18,7 @@ class Deployment(db.Model):
 
     defaults = Column(Text)
 
-    deployment_target = relationship("DeploymentTarget", back_populates="deployments")
+    deployment_target_bin = relationship("DeploymentTargetBin", back_populates="deployments")
     service = relationship("Service", back_populates="deployments")
     configs = relationship("DeploymentConfig", back_populates="deployment")
 
@@ -75,4 +75,4 @@ def my_before_write_listener(mapper, connection, deployment):
 
 
 def __update_id__(deployment):
-    deployment.id = deployment.deployment_target_id + ':' + deployment.service_id + ':' + deployment.tag
+    deployment.id = deployment.deployment_target_bin_id + ':' + deployment.service_id + ':' + deployment.tag

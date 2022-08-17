@@ -34,6 +34,8 @@ restmanager.create_api(ConfigTemplate, primary_key='id', methods=['GET', 'POST',
                        url_prefix='/api/rest/v1', max_results_per_page=-1)
 restmanager.create_api(Deployment, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
                        url_prefix='/api/rest/v1', max_results_per_page=-1)
+restmanager.create_api(DeploymentTargetBin, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
+                       url_prefix='/api/rest/v1', max_results_per_page=-1)
 restmanager.create_api(DeploymentConfig, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
                        url_prefix='/api/rest/v1', max_results_per_page=-1)
 restmanager.create_api(DeploymentProc, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
@@ -117,6 +119,7 @@ admin.add_view(DefaultView(FleetType, db.session, category='Types'))
 admin.add_view(DefaultView(Fleet, db.session, category='Targets'))
 
 admin.add_view(DefaultView(Deployment, db.session, category='Deploying'))
+admin.add_view(DefaultView(DeploymentTargetBin, db.session, category='Deploying'))
 admin.add_view(DefaultView(DeploymentConfig, db.session, category='Deploying'))
 
 admin.add_view(DefaultView(DeploymentProc, db.session, category='Deploying'))
