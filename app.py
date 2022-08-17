@@ -1,3 +1,5 @@
+import inspect
+import models
 import flask_restless
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
@@ -16,74 +18,14 @@ from views.menus.divider import DividerMenu
 
 migrate = Migrate(app, db)
 restmanager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
-restmanager.create_api(Allocation, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(AllocationType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(Application, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(Build, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(BuildArtifact, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Capacity, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
 
-restmanager.create_api(ConfigTemplate, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(Deployment, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(DeploymentTargetBin, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(DeploymentConfig, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(DeploymentProc, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(DeploymentTarget, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(DeploymentTargetType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(Environment, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(Fleet, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(FleetType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Language, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Network, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Partition, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Proc, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Provider, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(ProviderType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Region, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Release, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(ReleaseArtifact, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Repo, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(RepoType, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Service, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(ServiceConfig, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                       url_prefix='/api/rest/v1', max_results_per_page=-1)
-restmanager.create_api(Stack, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Subnet, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
-restmanager.create_api(Zone, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'], url_prefix='/api/rest/v1',
-                       max_results_per_page=-1)
+# dynamically generate the rest endpoint for each data model
+model_classes = [getattr(models, m[0]) for m in inspect.getmembers(models, inspect.isclass) if m[1].__module__.startswith('models.')]
+for model_class in model_classes:
+    restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
+                           url_prefix='/api/rest/v1', max_results_per_page=-1)
+
+
 
 admin = Admin(app, name='QAIRON', template_mode='bootstrap3')
 admin.add_menu_item(DividerMenu(name='meta'), target_category='META')
