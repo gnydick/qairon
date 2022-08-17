@@ -13,6 +13,11 @@ subnets_to_fleets = Table('subnets_fleets', db.metadata,
                           Column('fleet_id', String, ForeignKey('fleet.id'))
                           )
 
+target_bins_to_fleets = Table('target_bins_fleets', db.metadata,
+                          Column('deployment_target_bin_id', String, ForeignKey('deployment_target_bin.id')),
+                          Column('fleet_id', String, ForeignKey('fleet.id'))
+                          )
+
 
 
 svcs_to_repos = Table('services_repos', db.metadata,
