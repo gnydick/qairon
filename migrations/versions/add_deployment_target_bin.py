@@ -4,6 +4,8 @@ Revision ID: add_deployment_target_bin
 Revises: b7c56b16a417
 Create Date: 2022-08-16 11:26:34.365049
 
+this migration will require regenerating
+
 """
 
 # revision identifiers, used by Alembic.
@@ -53,7 +55,6 @@ def schema_upgrades():
     )
     op.execute('update deployment as d' \
                ' set deployment_target_bin_id=b.db_id,' \
-               ' deployment_target_id=null' \
                ' from (select db.id as db_id,' \
                ' dt.id as dt_id' \
                ' from deployment_target_bin db,' \

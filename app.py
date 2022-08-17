@@ -20,12 +20,11 @@ migrate = Migrate(app, db)
 restmanager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
 
 # dynamically generate the rest endpoint for each data model
-model_classes = [getattr(models, m[0]) for m in inspect.getmembers(models, inspect.isclass) if m[1].__module__.startswith('models.')]
+model_classes = [getattr(models, m[0]) for m in inspect.getmembers(models, inspect.isclass) if
+                 m[1].__module__.startswith('models.')]
 for model_class in model_classes:
     restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
                            url_prefix='/api/rest/v1', max_results_per_page=-1)
-
-
 
 admin = Admin(app, name='QAIRON', template_mode='bootstrap3')
 admin.add_menu_item(DividerMenu(name='meta'), target_category='META')
