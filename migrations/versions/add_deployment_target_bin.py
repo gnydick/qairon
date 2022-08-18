@@ -4,7 +4,8 @@ Revision ID: add_deployment_target_bin
 Revises: b7c56b16a417
 Create Date: 2022-08-16 11:26:34.365049
 
-this migration will require regenerating
+this migration will require regenerating the cascading ids across the database, this cannot be done via alembic alone,
+must use the scripts/
 
 """
 
