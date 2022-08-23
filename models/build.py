@@ -22,9 +22,9 @@ class Build(db.Model):
     vcs_ref = Column(String, nullable=False)
     defaults = Column(Text)
     service = relationship('Service', back_populates='builds')
-    releases = relationship('Release', back_populates='build')
+    releases = relationship('Release', back_populates='build', lazy='joined')
 
-    build_artifacts = relationship('BuildArtifact', back_populates='build')
+    build_artifacts = relationship('BuildArtifact', back_populates='build', lazy='joined')
 
     @hybrid_property
     def git_tag(self):

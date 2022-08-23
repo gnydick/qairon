@@ -15,8 +15,8 @@ class ConfigTemplate(db.Model):
     defaults = Column(Text)
 
     
-    service_configs = relationship('ServiceConfig', back_populates='template')
-    deployment_configs = relationship('DeploymentConfig', back_populates='template')
+    service_configs = relationship('ServiceConfig', back_populates='template', lazy='joined')
+    deployment_configs = relationship('DeploymentConfig', back_populates='template', lazy='joined')
     language = relationship('Language', back_populates='config_templates')
 
     def __repr__(self):

@@ -26,7 +26,7 @@ class Network(db.Model):
 
 
     partition = relationship("Partition", back_populates="networks")
-    subnets = relationship("Subnet", back_populates='network')
+    subnets = relationship("Subnet", back_populates='network', lazy='joined')
 
     def __repr__(self):
         return self.id

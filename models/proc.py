@@ -17,7 +17,7 @@ class Proc(db.Model):
 
     service = relationship("Service", back_populates="procs")
 
-    deployment_procs = relationship("DeploymentProc", back_populates="proc")
+    deployment_procs = relationship("DeploymentProc", back_populates="proc", lazy='joined')
 
     def __repr__(self):
         return self.id

@@ -17,12 +17,12 @@ class Service(db.Model):
     defaults = Column(Text)
 
     stack = relationship("Stack", back_populates="services")
-    builds = relationship("Build", back_populates="service")
-    deployments = relationship("Deployment", back_populates="service")
-    repos = relationship("Repo", secondary='services_repos', back_populates="services")
+    builds = relationship("Build", back_populates="service", lazy='joined')
+    deployments = relationship("Deployment", back_populates="service", lazy='joined')
+    repos = relationship("Repo", secondary='services_repos', back_populates="services", lazy='joined')
 
-    configs = relationship("ServiceConfig", back_populates="service")
-    procs = relationship("Proc", back_populates="service")
+    configs = relationship("ServiceConfig", back_populates="service", lazy='joined')
+    procs = relationship("Proc", back_populates="service", lazy='joined')
 
     def __repr__(self):
         return self.id

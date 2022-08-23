@@ -18,7 +18,7 @@ class Repo(db.Model):
     defaults = Column(Text)
 
     type = relationship("RepoType", back_populates="repos")
-    services = relationship("Service", secondary='services_repos', back_populates="repos")
+    services = relationship("Service", secondary='services_repos', back_populates="repos", lazy='joined')
     input_build_artifacts = relationship("BuildArtifact", back_populates="input_repo", foreign_keys="BuildArtifact.input_repo_id",
                                     primaryjoin='Repo.id==BuildArtifact.input_repo_id')
     output_build_artifacts = relationship("BuildArtifact", back_populates="output_repo", foreign_keys="BuildArtifact.output_repo_id",

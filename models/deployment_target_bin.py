@@ -16,8 +16,8 @@ class DeploymentTargetBin(db.Model):
     defaults = Column(Text)
 
     deployment_target = relationship('DeploymentTarget', back_populates='deployment_target_bins')
-    deployments = relationship("Deployment", back_populates="deployment_target_bin")
-    fleets = relationship("Fleet", secondary='target_bins_fleets', back_populates="deployment_target_bins")
+    deployments = relationship("Deployment", back_populates="deployment_target_bin", lazy='joined')
+    fleets = relationship("Fleet", secondary='target_bins_fleets', back_populates="deployment_target_bins", lazy='joined')
 
     def __repr__(self):
         return self.id

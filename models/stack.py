@@ -16,7 +16,7 @@ class Stack(db.Model):
     defaults = Column(Text)
 
     application = relationship('Application', back_populates='stacks')
-    services = relationship("Service", back_populates="stack")
+    services = relationship("Service", back_populates="stack", lazy='joined')
 
     def __repr__(self):
         return self.id

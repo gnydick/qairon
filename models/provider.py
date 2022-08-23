@@ -17,7 +17,7 @@ class Provider(db.Model):
 
     environment = relationship("Environment", back_populates="providers")
     type = relationship("ProviderType", back_populates="providers")
-    regions = relationship("Region", back_populates="provider")
+    regions = relationship("Region", back_populates="provider", lazy='joined')
 
     def __repr__(self):
         return self.id
