@@ -55,7 +55,7 @@ def schema_upgrades():
         " select concat(dt.id, ':', 'bin0'), dt.id, 'bin0' as db_name from deployment_target dt;"
     )
     op.execute('update deployment as d' \
-               ' set deployment_target_bin_id=b.db_id,' \
+               ' set deployment_target_bin_id=b.db_id' \
                ' from (select db.id as db_id,' \
                ' dt.id as dt_id' \
                ' from deployment_target_bin db,' \
