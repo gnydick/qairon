@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: empty
-Revises: deployment_current_release_fk
+Revises: None
 Create Date: 2021-10-05 16:33:01.598088
 
 """

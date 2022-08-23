@@ -35,7 +35,7 @@
       </schema-mapping>
     </data-source>
     <data-source name="project based -- production" uuid="b8633f2f-fb24-47df-be89-9e4ef5cff52e">
-      <database-info product="PostgreSQL" version="10.14" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.2.22" dbms="POSTGRES" exact-version="10.14" exact-driver-version="42.2">
+      <database-info product="PostgreSQL" version="10.18" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.4.0" dbms="POSTGRES" exact-version="10.18" exact-driver-version="42.4">
         <identifier-quote-string>&quot;</identifier-quote-string>
       </database-info>
       <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />

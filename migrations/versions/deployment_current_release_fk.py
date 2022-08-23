@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: deployment_current_release_fk
-Revises: build_vcs_ref
+Revises: golden
 Create Date: 2021-10-05 15:59:25.486339
 
 """
