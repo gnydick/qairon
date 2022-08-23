@@ -10,11 +10,11 @@ class Deployment(db.Model):
     __tablename__ = "deployment"
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
-    service_id = Column(String, ForeignKey('service.id'))
-    current_release_id = Column(String, ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey', link_to_name=True))
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
-    tag = Column(String, nullable=False, default='default')
+    service_id = Column(String, ForeignKey('service.id'), index=true)
+    current_release_id = Column(String, ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey', link_to_name=True), index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    tag = Column(String, nullable=False, default='default', index=true)
 
     defaults = Column(Text)
 

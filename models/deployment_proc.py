@@ -8,10 +8,10 @@ import datetime
 class DeploymentProc(db.Model):
     __tablename__ = "deployment_proc"
     id = Column(String, primary_key=True)
-    deployment_id = Column(String, ForeignKey('deployment.id'))
-    proc_id = Column(String, ForeignKey('proc.id'))
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
+    deployment_id = Column(String, ForeignKey('deployment.id'), index=true)
+    proc_id = Column(String, ForeignKey('proc.id'), index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
     allocations = relationship("Allocation", back_populates="deployment_proc",
