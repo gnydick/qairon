@@ -15,13 +15,13 @@ class Network(db.Model):
         self.__dict__.update(entries)
 
     id = Column(String, primary_key=True)
-    partition_id = Column(String, ForeignKey('partition.id'), nullable=False)
-    native_id = Column(String)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
+    partition_id = Column(String, ForeignKey('partition.id'), nullable=False, index=true)
+    native_id = Column(String, index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
 
-    name = Column(String, nullable=False)
-    cidr = Column(CIDR, nullable=False, )
+    name = Column(String, nullable=False, index=true)
+    cidr = Column(CIDR, nullable=False, index=true)
     defaults = Column(Text)
 
 

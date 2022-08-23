@@ -12,15 +12,15 @@ import ipaddress as ip
 class Subnet(db.Model):
     __tablename__ = "subnet"
     id = Column(String, primary_key=True)
-    network_id = Column(String, ForeignKey('network.id'), nullable=False)
-    native_id = Column(String)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
-    name = Column(String, nullable=False)
-    cidr = Column(CIDR, nullable=False, )
+    network_id = Column(String, ForeignKey('network.id'), nullable=False, index=true)
+    native_id = Column(String, index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    name = Column(String, nullable=False, index=true)
+    cidr = Column(CIDR, nullable=False, index=true)
 
     defaults = Column(Text)
-    native_id = Column(String)
+    native_id = Column(String, index=true)
 
     network = relationship("Network", back_populates="subnets")
     fleets = relationship("Fleet", secondary='subnets_fleets', back_populates="subnets")

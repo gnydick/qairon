@@ -10,11 +10,11 @@ class BuildArtifact(db.Model):
     __tablename__ = "build_artifact"
     id = Column(String, primary_key=True)
 
-    build_id = Column(String, ForeignKey('build.id'), nullable=False)
-    input_repo_id = Column(String, ForeignKey('repo.id'), nullable=False)
-    output_repo_id = Column(String, ForeignKey('repo.id'), nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
+    build_id = Column(String, ForeignKey('build.id'), nullable=False, index=true)
+    input_repo_id = Column(String, ForeignKey('repo.id'), nullable=False, index=true)
+    output_repo_id = Column(String, ForeignKey('repo.id'), nullable=False, index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     name = Column(String, nullable=False)
     upload_path = Column(String, nullable=False)
     data = Column(Text)

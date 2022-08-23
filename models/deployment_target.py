@@ -9,11 +9,11 @@ class DeploymentTarget(db.Model):
     __tablename__ = "deployment_target"
 
     id = Column(String, primary_key=True)
-    deployment_target_type_id = Column(String, ForeignKey('deployment_target_type.id'))
-    partition_id = Column(String, ForeignKey('partition.id'))
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
-    name = Column(String(255), nullable=False)
+    deployment_target_type_id = Column(String, ForeignKey('deployment_target_type.id'), index=true)
+    partition_id = Column(String, ForeignKey('partition.id'), index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    name = Column(String(255), nullable=False, index=true)
 
     defaults = Column(Text)
     native_id = Column(String)

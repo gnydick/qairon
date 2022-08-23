@@ -11,7 +11,7 @@ must use the scripts/
 
 # revision identifiers, used by Alembic.
 revision = 'add_deployment_target_bin'
-down_revision = 'b7c56b16a417'
+down_revision = 'add_indexes'
 
 from alembic import op
 import sqlalchemy as sa

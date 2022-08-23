@@ -8,12 +8,12 @@ import datetime
 class Region(db.Model):
     __tablename__ = "region"
     id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
-    provider_id = Column(String, ForeignKey('provider.id'), nullable=True)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
+    name = Column(String, nullable=False, index=true)
+    provider_id = Column(String, ForeignKey('provider.id'), nullable=True, index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
-    native_id = Column(String)
+    native_id = Column(String, index=true)
 
     partitions = relationship("Partition", back_populates="region")
     provider = relationship("Provider", back_populates="regions")

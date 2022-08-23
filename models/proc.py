@@ -9,10 +9,10 @@ class Proc(db.Model):
     __tablename__ = "proc"
 
     id = Column(String, primary_key=True, nullable=False)
-    service_id = Column(String, ForeignKey('service.id'), nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
-    name = Column(String(64), nullable=False)
+    service_id = Column(String, ForeignKey('service.id'), nullable=False, index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    name = Column(String(64), nullable=False, index=true)
     defaults = Column(Text)
 
     service = relationship("Service", back_populates="procs")

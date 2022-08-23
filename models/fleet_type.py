@@ -8,10 +8,10 @@ import datetime
 class FleetType(db.Model):
     __tablename__ = "fleet_type"
     id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
-    provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=True)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
+    name = Column(String, nullable=False, index=true)
+    provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=True, index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
     provider_type = relationship("ProviderType", back_populates="fleet_types")

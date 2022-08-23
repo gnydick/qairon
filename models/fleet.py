@@ -8,13 +8,13 @@ import datetime
 class Fleet(db.Model):
     __tablename__ = "fleet"
     id = Column(String, primary_key=True)
-    deployment_target_id = Column(String, ForeignKey('deployment_target.id'))
-    fleet_type_id = Column(String, ForeignKey('fleet_type.id'))
-    native_id = Column(String)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
+    deployment_target_id = Column(String, ForeignKey('deployment_target.id'), index=true)
+    fleet_type_id = Column(String, ForeignKey('fleet_type.id'), index=true)
+    native_id = Column(String, index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
 
-    name = Column(String(256))
+    name = Column(String, index=true)
 
     defaults = Column(Text)
 
