@@ -21,3 +21,8 @@ svcs_to_repos = Table('services_repos', db.metadata,
                       Column('service_id', String, ForeignKey('service.id')),
                       Column('repo_id', String, ForeignKey('repo.id'))
                       )
+
+svcs_to_owners = Table('services_owners', db.metadata,
+                      Column('service_id', String, ForeignKey('service.id')),
+                      Column('owner_id', String, ForeignKey('owner.id'))
+                      )

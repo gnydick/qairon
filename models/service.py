@@ -20,6 +20,7 @@ class Service(db.Model):
     builds = relationship("Build", back_populates="service")
     deployments = relationship("Deployment", back_populates="service")
     repos = relationship("Repo", secondary='services_repos', back_populates="services")
+    owners = relationship("ServiceOwner", secondary='services_owners', back_populates="services")
 
     configs = relationship("ServiceConfig", back_populates="service")
     procs = relationship("Proc", back_populates="service")
