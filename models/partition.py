@@ -18,9 +18,9 @@ class Partition(db.Model):
 
     region = relationship("Region", uselist=False, back_populates="partitions")
 
-    deployment_targets = relationship("DeploymentTarget", back_populates="partition", lazy='joined')
+    deployment_targets = relationship("DeploymentTarget", back_populates="partition", lazy='selectin')
 
-    networks = relationship("Network", back_populates="partition", lazy='joined')
+    networks = relationship("Network", back_populates="partition", lazy='selectin')
 
     def __repr__(self):
         return self.id

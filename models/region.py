@@ -15,9 +15,9 @@ class Region(db.Model):
     defaults = Column(Text)
     native_id = Column(String, index=true)
 
-    partitions = relationship("Partition", back_populates="region", lazy='joined')
+    partitions = relationship("Partition", back_populates="region", lazy='selectin')
     provider = relationship("Provider", back_populates="regions")
-    zones = relationship("Zone", back_populates="region", lazy='joined')
+    zones = relationship("Zone", back_populates="region", lazy='selectin')
 
     def __repr__(self):
         return self.id

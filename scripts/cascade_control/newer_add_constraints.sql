@@ -1,10 +1,10 @@
 alter table allocation
-    add constraint allocation_allocation_type_id_fkey
-        FOREIGN KEY (allocation_type_id) REFERENCES allocation_type(id)
-            on update cascade;
-alter table allocation
     add constraint allocation_deployment_proc_id_fkey
         FOREIGN KEY (deployment_proc_id) REFERENCES deployment_proc(id)
+            on update cascade;
+alter table allocation
+    add constraint allocation_allocation_type_id_fkey
+        FOREIGN KEY (allocation_type_id) REFERENCES allocation_type(id)
             on update cascade;
 alter table build
     add constraint build_service_id_fkey
@@ -23,12 +23,12 @@ alter table build_artifact
         FOREIGN KEY (input_repo_id) REFERENCES repo(id)
             on update cascade;
 alter table capacity
-    add constraint capacity_allocation_type_id_fkey
-        FOREIGN KEY (allocation_type_id) REFERENCES allocation_type(id)
-            on update cascade;
-alter table capacity
     add constraint capacity_fleet_id_fkey
         FOREIGN KEY (fleet_id) REFERENCES fleet(id)
+            on update cascade;
+alter table capacity
+    add constraint capacity_allocation_type_id_fkey
+        FOREIGN KEY (allocation_type_id) REFERENCES allocation_type(id)
             on update cascade;
 alter table config_template
     add constraint config_template_language_id_fkey
@@ -83,12 +83,12 @@ alter table deployment_target_bin
         FOREIGN KEY (deployment_target_id) REFERENCES deployment_target(id)
             on update cascade;
 alter table fleet
-    add constraint fleet_deployment_target_id_fkey
-        FOREIGN KEY (deployment_target_id) REFERENCES deployment_target(id)
-            on update cascade;
-alter table fleet
     add constraint fleet_fleet_type_id_fkey
         FOREIGN KEY (fleet_type_id) REFERENCES fleet_type(id)
+            on update cascade;
+alter table fleet
+    add constraint fleet_deployment_target_id_fkey
+        FOREIGN KEY (deployment_target_id) REFERENCES deployment_target(id)
             on update cascade;
 alter table fleet_type
     add constraint fleet_type_provider_type_id_fkey
@@ -107,12 +107,12 @@ alter table proc
         FOREIGN KEY (service_id) REFERENCES service(id)
             on update cascade;
 alter table provider
-    add constraint provider_provider_type_id_fkey
-        FOREIGN KEY (provider_type_id) REFERENCES provider_type(id)
-            on update cascade;
-alter table provider
     add constraint provider_environment_id_fkey
         FOREIGN KEY (environment_id) REFERENCES environment(id)
+            on update cascade;
+alter table provider
+    add constraint provider_provider_type_id_fkey
+        FOREIGN KEY (provider_type_id) REFERENCES provider_type(id)
             on update cascade;
 alter table region
     add constraint region_provider_id_fkey
@@ -131,12 +131,12 @@ alter table release_artifact
         FOREIGN KEY (input_repo_id) REFERENCES repo(id)
             on update cascade;
 alter table release_artifact
-    add constraint release_artifact_output_repo_id_fkey
-        FOREIGN KEY (output_repo_id) REFERENCES repo(id)
-            on update cascade;
-alter table release_artifact
     add constraint release_artifact_release_id_fkey
         FOREIGN KEY (release_id) REFERENCES release(id)
+            on update cascade;
+alter table release_artifact
+    add constraint release_artifact_output_repo_id_fkey
+        FOREIGN KEY (output_repo_id) REFERENCES repo(id)
             on update cascade;
 alter table repo
     add constraint repo_repo_type_id_fkey

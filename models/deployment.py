@@ -20,16 +20,16 @@ class Deployment(db.Model):
 
     deployment_target_bin = relationship("DeploymentTargetBin", back_populates="deployments")
     service = relationship("Service", back_populates="deployments")
-    configs = relationship("DeploymentConfig", back_populates="deployment", lazy='joined')
+    configs = relationship("DeploymentConfig", back_populates="deployment", lazy='selectin')
 
-    zones = relationship("Zone", secondary='deployments_zones', back_populates="deployments", lazy='joined')
-    deployment_procs = relationship("DeploymentProc", back_populates="deployment", lazy='joined')
+    zones = relationship("Zone", secondary='deployments_zones', back_populates="deployments", lazy='selectin')
+    deployment_procs = relationship("DeploymentProc", back_populates="deployment", lazy='selectin')
 
     # safely circular relationship
     releases = relationship("Release", primaryjoin='Deployment.id==Release.deployment_id',
                             foreign_keys="Release.deployment_id", back_populates="deployment")
 
-    # releases = relationship('Release', back_populates='deployment', lazy='joined')
+    # releases = relationship('Release', back_populates='deployment', lazy='selectin')
     current_release = relationship("Release", primaryjoin='Deployment.current_release_id==Release.id',
                                    foreign_keys=[current_release_id], post_update=True)
 

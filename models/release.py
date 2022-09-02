@@ -21,7 +21,7 @@ class Release(db.Model):
 
     deployment = relationship('Deployment', back_populates='releases', foreign_keys=[deployment_id])
 
-    release_artifacts = relationship('ReleaseArtifact', back_populates='release', lazy='joined')
+    release_artifacts = relationship('ReleaseArtifact', back_populates='release', lazy='selectin')
 
     def __repr__(self):
         return self.id

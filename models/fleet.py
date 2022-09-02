@@ -19,10 +19,10 @@ class Fleet(db.Model):
     defaults = Column(Text)
 
     deployment_target = relationship("DeploymentTarget", back_populates="fleets")
-    deployment_target_bins = relationship("DeploymentTargetBin", secondary='target_bins_fleets', back_populates="fleets", lazy='joined')
-    subnets = relationship("Subnet", secondary='subnets_fleets', back_populates="fleets", lazy='joined')
+    deployment_target_bins = relationship("DeploymentTargetBin", secondary='target_bins_fleets', back_populates="fleets", lazy='selectin')
+    subnets = relationship("Subnet", secondary='subnets_fleets', back_populates="fleets", lazy='selectin')
     type = relationship("FleetType", back_populates="fleets")
-    capacities = relationship("Capacity", back_populates="fleet", lazy='joined')
+    capacities = relationship("Capacity", back_populates="fleet", lazy='selectin')
 
     def __repr__(self):
         return self.id
