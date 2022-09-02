@@ -17,7 +17,7 @@ class Zone(db.Model):
 
 
     region = relationship("Region", back_populates="zones")
-    deployments = relationship("Deployment", secondary='deployments_zones', back_populates="zones")
+    deployments = relationship("Deployment", secondary='deployments_zones', back_populates="zones", lazy='selectin')
 
     def __repr__(self):
         return self.id

@@ -15,7 +15,7 @@ class FleetType(db.Model):
     defaults = Column(Text)
 
     provider_type = relationship("ProviderType", back_populates="fleet_types")
-    fleets = relationship("Fleet", back_populates="type")
+    fleets = relationship("Fleet", back_populates="type", lazy='selectin')
 
     def __repr__(self):
         return self.id

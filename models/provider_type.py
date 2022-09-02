@@ -12,8 +12,8 @@ class ProviderType(db.Model):
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
-    providers = relationship("Provider", back_populates="type")
-    fleet_types = relationship("FleetType", back_populates="provider_type")
+    providers = relationship("Provider", back_populates="type", lazy='selectin')
+    fleet_types = relationship("FleetType", back_populates="provider_type", lazy='selectin')
 
     def __repr__(self):
         return self.id

@@ -8,10 +8,11 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
-      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://qairon:qairon@localhost:5432/qairon" />
-      <env name="SECRET_KEY" value="12345" />
-      <env name="PROPAGATE_EXCEPTIONS" value="True" />
       <env name="FLASK_DEBUG" value="True" />
+      <env name="PROPAGATE_EXCEPTIONS" value="True" />
+      <env name="SECRET_KEY" value="12345" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://qairon:qairon@localhost:5432/qairon" />
+      <env name="SQLALCHEMY_ECHO" value="True" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -19,6 +20,11 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </EXTENSION>
     <option name="launchJavascriptDebuger" value="false" />
     <method v="2" />
   </configuration>

@@ -12,7 +12,7 @@ class DeploymentTargetType(db.Model):
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
-    targets = relationship("DeploymentTarget", back_populates="type")
+    targets = relationship("DeploymentTarget", back_populates="type", lazy='selectin')
 
     def __repr__(self):
         return self.id

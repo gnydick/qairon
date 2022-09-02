@@ -155,15 +155,15 @@ def step_impl(context, deployment_id, build_id, build_num):
     data = response.json()
     assert data['id'] == '%s:%s' % (deployment_id, build_num)
 
-@given(
-    'create deployment at "{dep_target_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via rest')
-def step_impl(context, dep_target_id, service, tag, defaults):
+@then(
+    'create deployment at "{dep_target_bin_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via rest')
+def step_impl(context, dep_target_bin_id, service, tag, defaults):
     response = context.rest.create_resource(
-        {'resource': 'deployment', 'deployment_target_id': dep_target_id, 'service_id': service,
+        {'resource': 'deployment', 'deployment_target_bin_id': dep_target_bin_id, 'service_id': service,
          'tag': tag, 'defaults': defaults}
     )
     data = response.json()
-    assert data['id'] == '%s:%s:%s' % (dep_target_id, service, tag)
+    assert data['id'] == '%s:%s:%s' % (dep_target_bin_id, service, tag)
     new_dep = context.rest.get_instance('deployment', data['id'])
     assert new_dep['defaults'] == defaults
     assert new_dep['tag'] == tag

@@ -13,6 +13,7 @@ from .associations import deps_to_zones
 from .associations import svcs_to_repos
 from .application import Application
 from .deployment_target import DeploymentTarget
+from .deployment_target_bin import DeploymentTargetBin
 from .repo import Repo
 from .network import Network
 from .partition import Partition

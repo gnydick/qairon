@@ -23,7 +23,7 @@ class Subnet(db.Model):
     native_id = Column(String, index=true)
 
     network = relationship("Network", back_populates="subnets")
-    fleets = relationship("Fleet", secondary='subnets_fleets', back_populates="subnets")
+    fleets = relationship("Fleet", secondary='subnets_fleets', back_populates="subnets", lazy='selectin')
 
     def __repr__(self):
         return self.id

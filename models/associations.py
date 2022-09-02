@@ -17,6 +17,15 @@ subnets_to_fleets = Table('subnets_fleets', db.metadata,
                           Index('ix_subnets_to_fleets_fleet_id', 'fleet_id')
                           )
 
+target_bins_to_fleets = Table('target_bins_fleets', db.metadata,
+                          Column('deployment_target_bin_id', String, ForeignKey('deployment_target_bin.id')),
+                          Column('fleet_id', String, ForeignKey('fleet.id')),
+                          Index('ix_target_bins_to_fleets_deployment_target_bin_id', 'deployment_target_bin_id'),
+                          Index('ix_target_bins_to_fleets_fleet_id', 'fleet_id')
+                          )
+
+
+
 svcs_to_repos = Table('services_repos', db.metadata,
                       Column('service_id', String, ForeignKey('service.id')),
                       Column('repo_id', String, ForeignKey('repo.id'))

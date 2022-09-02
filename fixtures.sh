@@ -64,6 +64,7 @@ for ENV in  infra prod dev stg int local ; do  ./qcli environment create $ENV ; 
 ./qcli repo create ecr 'qairon' '126252960572.ecr.us-west2.aws.com/qairon'
 ./qcli repo create ecr 'jenkins' '126252960572.ecr.us-west2.aws.com/jenkins'
 ./qcli repo create helm bitnami https://charts.bitnami.com/bitnami
+./qcli repo create helm qairon 's3://126252960572-helm-repo/stable'
 
 
 
@@ -132,10 +133,14 @@ EOF
 ./qcli deployment_target create minikube local:dev:0000000000000:here:default vbox
 ./qcli deployment_target create eks infra:aws:126252960572:us-west-2:vpc0 infra0
 
+# deployment_target_bins
+./qcli deployment_target_bin create local:dev:0000000000000:here:default:minikube:vbox bin0
+./qcli deployment_target_bin create infra:aws:126252960572:us-west-2:vpc0:eks:infra0 bin0
+
 
 # then the actual deployments linking deployment target and service
-./qcli deployment create withme:cicd:jenkins local:dev:0000000000000:here:default:minikube:vbox
-./qcli deployment create withme:automation:qairon infra:aws:126252960572:us-west-2:vpc0:eks:infra0
+./qcli deployment create withme:cicd:jenkins local:dev:0000000000000:here:default:minikube:vbox:bin0
+./qcli deployment create withme:automation:qairon infra:aws:126252960572:us-west-2:vpc0:eks:infra0:bin0
 
 # CICD data
 # builds -- immutable blobs from build pipeline
@@ -148,7 +153,7 @@ EOF
 
 # releases -- installation instructions bundled with any appropriate config for that deployment
 # e.g. -- helm chart tar ball with additional configuration that is deployment target specific bundled in
-./qcli release create withme:cicd:jenkins:456 local:dev:0000000000000:here:default:minikube:vbox:withme:cicd:jenkins:default 789
-./qcli release create withme:automation:qairon:422 infra:aws:126252960572:us-west-2:vpc0:eks:infra0:withme:automation:qairon:default 1023
-./qcli release create withme:automation:qairon:564 infra:aws:126252960572:us-west-2:vpc0:eks:infra0:withme:automation:qairon:default 1104
-./qcli release_artifact create infra:aws:126252960572:us-west-2:vpc0:eks:infra0:withme:automation:qairon:default:1104 ecr:qairon helm:qairon helm_chart foobarbaz
+./qcli release create withme:cicd:jenkins:456 local:dev:0000000000000:here:default:minikube:vbox:bin0:withme:cicd:jenkins:default 789
+./qcli release create withme:automation:qairon:422 infra:aws:126252960572:us-west-2:vpc0:eks:infra0:bin0:withme:automation:qairon:default 1023
+./qcli release create withme:automation:qairon:564 infra:aws:126252960572:us-west-2:vpc0:eks:infra0:bin0:withme:automation:qairon:default 1104
+./qcli release_artifact create infra:aws:126252960572:us-west-2:vpc0:eks:infra0:bin0:withme:automation:qairon:default:1104 ecr:qairon helm:qairon helm_chart foobarbaz

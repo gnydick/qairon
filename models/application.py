@@ -13,7 +13,7 @@ class Application(db.Model):
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
-    stacks = relationship('Stack', back_populates='application')
+    stacks = relationship('Stack', back_populates='application', lazy='selectin')
 
     def __repr__(self):
         return self.id

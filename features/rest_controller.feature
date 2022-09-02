@@ -8,6 +8,7 @@ Feature: full test
     Then create "zone" "testzone" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
     Then create "zone" "testzone2" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
     Then create "partition" "testpartition" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
+
   Scenario: application hierarchy
     Given create "application" "testapp" via rest
     Given create "language" "json" via rest
@@ -17,19 +18,15 @@ Feature: full test
     Then create config for resource "service" named "testsvccfg" from template "testcfgtmpl" can be created for "testapp:teststack:testservice" tagged "tag" via rest
 
 
-
-
   Scenario: deployment
     Given create "deployment_target_type" "k8s" via rest
     And create deployment_target "testdt" of type "k8s" in "testenv:testprovider_type:testprovider:testregion:testpartition" via rest
+    Then create "deployment_target_bin" with parent id "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" in parent field "deployment_target_id" named "bin0"
+    Then create deployment at "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0" for "testapp:teststack:testservice" tagged "default" with defaults "{}" via rest
+    Then create config for resource "deployment" named "testdepcfg" from template "testcfgtmpl" can be created for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" tagged "tag" via rest
 
-    And create deployment at "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" for "testapp:teststack:testservice" tagged "default" with defaults "{}" via rest
-    Then create config for resource "deployment" named "testdepcfg" from template "testcfgtmpl" can be created for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" tagged "tag" via rest
-    
-    When add first "zones" "testenv:testprovider_type:testprovider:testregion:testzone" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" via rest
-    And add second "zones" "testenv:testprovider_type:testprovider:testregion:testzone2" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" via rest
-
-
+    When add first "zones" "testenv:testprovider_type:testprovider:testregion:testzone" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
+    And add second "zones" "testenv:testprovider_type:testprovider:testregion:testzone2" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
 
 
   Scenario: cicd
@@ -41,23 +38,24 @@ Feature: full test
     Then create "repo" with parent id "ecr" in parent field "repo_type_id" named "testsvcrepobuildartifact"
     Then create "repo" with parent id "helm" in parent field "repo_type_id" named "testsvcreporeleaseartifact"
     Then create build for "testapp:teststack:testservice" from job "123" tagged "v1.0" via rest
-    Then create release for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" from build "testapp:teststack:testservice:123" from job "456" via rest
+    Then create release for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" from build "testapp:teststack:testservice:123" from job "456" via rest
     Then create build_artifact for "testapp:teststack:testservice:123" from "git:testsvcreposrc" uploaded to "ecr:testsvcrepobuildartifact" named "test_build_artifact_ecr" in path "some_output_path"
-    Then create release_artifact for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:456" from "ecr:testsvcrepobuildartifact" uploaded to "helm:testsvcreporeleaseartifact" named "test_release_artifact_helm" in path "some_output_path"
+    Then create release_artifact for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456" from "ecr:testsvcrepobuildartifact" uploaded to "helm:testsvcreporeleaseartifact" named "test_release_artifact_helm" in path "some_output_path"
 
 
   Scenario: cleanup
-    Then remove second "zones" "testenv:testprovider_type:testprovider:testregion:testzone2" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" via rest
-    And remove first "zones" "testenv:testprovider_type:testprovider:testregion:testzone" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" via rest
+    Then remove second "zones" "testenv:testprovider_type:testprovider:testregion:testzone2" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
+    And remove first "zones" "testenv:testprovider_type:testprovider:testregion:testzone" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
 
 
-    When delete "deployment_config" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:testcfgtmpl:testdepcfg:tag" via rest
+    When delete "deployment_config" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:testcfgtmpl:testdepcfg:tag" via rest
     When delete "service_config" "testapp:teststack:testservice:testcfgtmpl:testsvccfg:tag" via rest
     When delete "config_template" "testcfgtmpl" via rest
 
-    Then delete "release_artifact" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:456:test_release_artifact_helm" via rest
-    Then delete "release" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:456" via rest
-    Then delete "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" via rest
+    Then delete "release_artifact" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456:test_release_artifact_helm" via rest
+    Then delete "release" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456" via rest
+    Then delete "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
+    Then delete "deployment_target_bin" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0" via rest
     Then delete "deployment_target" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" via rest
     Then delete "zone" "testenv:testprovider_type:testprovider:testregion:testzone" via rest
     Then delete "zone" "testenv:testprovider_type:testprovider:testregion:testzone2" via rest
