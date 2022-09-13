@@ -34,7 +34,14 @@ def downgrade():
 
 
 def upgrades_pre():
-    pass
+    op.create_table('bin_map',
+                    sa.Column('env_id', sa.String(), nullable=False),
+                    sa.Column('stack_id', sa.String(), nullable=False),
+                    sa.Column('bin', sa.String(), nullable=False),
+                    sa.ForeignKeyConstraint(['env_id'], ['environment.id']),
+                    sa.ForeignKeyConstraint(['stack_id'], ['stack.id']),
+                    sa.PrimaryKeyConstraint('env_id', 'stack_id')
+                    )
 
 
 def schema_upgrades():
@@ -96,6 +103,7 @@ def upgrades_post():
 
 
 def downgrades_pre():
+    op.drop_table('bin_map')
     op.add_column('deployment', sa.Column('old_id', sa.String(), nullable=True))
     op.add_column('release', sa.Column('old_id', sa.String(), nullable=True))
     op.execute("update deployment set old_id=id")
