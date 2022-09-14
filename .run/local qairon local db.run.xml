@@ -11,7 +11,7 @@
       <env name="FLASK_DEBUG" value="True" />
       <env name="PROPAGATE_EXCEPTIONS" value="True" />
       <env name="SECRET_KEY" value="12345" />
-      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://qairon:qairon@localhost:5432/qairon" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://qairon:qairon@127.0.0.1:5432/qairon" />
       <env name="SQLALCHEMY_ECHO" value="True" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
