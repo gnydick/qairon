@@ -12,15 +12,11 @@ for ENV in  infra prod dev stg int local ; do  ./qcli environment create $ENV ; 
 ### creates aws account
 ./qcli provider create infra aws 126252960572
 #
-## creates a dev provider to represent local
-./qcli provider create local dev 0000000000000
-#
+
 ## self explanatory
 ./qcli region create infra:aws:126252960572 us-west-2
 #
-## just need a place holder region for local development
-./qcli region create local:dev:0000000000000 here
-#
+
 ## availability zones
 ./qcli zone create infra:aws:126252960572:us-west-2 usw2-az1
 ./qcli zone create infra:aws:126252960572:us-west-2 usw2-az2
@@ -30,8 +26,6 @@ for ENV in  infra prod dev stg int local ; do  ./qcli environment create $ENV ; 
 ## partition is a VPC or the like in other vendors
 ./qcli partition create infra:aws:126252960572:us-west-2 vpc0 -n vpc-074b080f312234a06
 
-# again, placeholder for local development
-./qcli partition create local:dev:0000000000000:here default
 
 # records the cidr for our vpc
 ./qcli network create infra:aws:126252960572:us-west-2:vpc0 default 10.0.0.0/16
@@ -125,21 +119,16 @@ EOF
 # first, creating deployment target types
 ./qcli deployment_target_type create eks
 
-# minikube for local development
-./qcli deployment_target_type create minikube
 
 
 # the deployment targets themselves
-./qcli deployment_target create minikube local:dev:0000000000000:here:default vbox
 ./qcli deployment_target create eks infra:aws:126252960572:us-west-2:vpc0 infra0
 
 # deployment_target_bins
-./qcli deployment_target_bin create local:dev:0000000000000:here:default:minikube:vbox bin0
 ./qcli deployment_target_bin create infra:aws:126252960572:us-west-2:vpc0:eks:infra0 bin0
 
 
 # then the actual deployments linking deployment target and service
-./qcli deployment create withme:cicd:jenkins local:dev:0000000000000:here:default:minikube:vbox:bin0
 ./qcli deployment create withme:automation:qairon infra:aws:126252960572:us-west-2:vpc0:eks:infra0:bin0
 
 # CICD data
@@ -153,7 +142,6 @@ EOF
 
 # releases -- installation instructions bundled with any appropriate config for that deployment
 # e.g. -- helm chart tar ball with additional configuration that is deployment target specific bundled in
-./qcli release create withme:cicd:jenkins:456 local:dev:0000000000000:here:default:minikube:vbox:bin0:withme:cicd:jenkins:default 789
 ./qcli release create withme:automation:qairon:422 infra:aws:126252960572:us-west-2:vpc0:eks:infra0:bin0:withme:automation:qairon:default 1023
 ./qcli release create withme:automation:qairon:564 infra:aws:126252960572:us-west-2:vpc0:eks:infra0:bin0:withme:automation:qairon:default 1104
 ./qcli release_artifact create infra:aws:126252960572:us-west-2:vpc0:eks:infra0:bin0:withme:automation:qairon:default:1104 ecr:qairon helm:qairon helm_chart foobarbaz
