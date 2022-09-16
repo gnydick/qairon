@@ -9,7 +9,7 @@ from controllers import RestController
 from db import db
 from models import *
 from views import *
-
+app.url_map.strict_slashes = False
 if app.debug:
     from werkzeug.debug import DebuggedApplication
 
@@ -26,7 +26,7 @@ for model_class in model_classes:
     restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
                            url_prefix='/api/rest/v1', max_results_per_page=-1)
 
-admin = Admin(app, name='QAIRON', template_mode='bootstrap3')
+admin = Admin(app, name='QAIRON', template_mode='bootstrap3', base_template='admin/master.html')
 admin.add_menu_item(DividerMenu(name='meta'), target_category='META')
 admin.add_menu_item(DividerMenu(name='provider'), target_category='Platform')
 admin.add_menu_item(DividerMenu(name='software'), target_category='Services')
