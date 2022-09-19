@@ -140,9 +140,8 @@ def upgrades_post():
     op.drop_column('deployment', 'old_id')
     op.drop_column('release', 'old_id')
 
-    # op.execute("END;")
-def downgrades_pre():
     op.drop_table('bin_map')
+def downgrades_pre():
     op.add_column('deployment', sa.Column('old_id', sa.String(), nullable=True))
     op.add_column('release', sa.Column('old_id', sa.String(), nullable=True))
     op.execute("update deployment set old_id=id")
