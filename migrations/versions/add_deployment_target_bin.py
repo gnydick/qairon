@@ -18,41 +18,41 @@ from alembic import op
 
 mapping = {
     'prod': {
-        'withme:infra': 'bin1',
-        'withme:monitoring': 'bin2',
-        'withme:services': 'bin3',
+        'withme:infra': 'infra',
+        'withme:monitoring': 'mon',
+        'withme:services': 'prod',
     },
     'perf': {
-        'withme:infra': 'bin1',
-        'withme:monitoring': 'bin2'
+        'withme:infra': 'infra',
+        'withme:monitoring': 'mon'
 
     },
     'int': {
-        'withme:infra': 'bin1',
-        'withme:monitoring': 'bin2',
-        'withme:services': 'bin3'
+        'withme:infra': 'infra',
+        'withme:monitoring': 'mon',
+        'withme:services': 'withmedev'
 
     },
     'infra':
         {
-            'withme:automation': 'bin1',
-            'withme:cicd': 'bin2',
-            'withme:infra': 'bin3',
-            'withme:monitoring': 'bin4',
-            'withme:security': 'bin5'
+            'withme:automation': 'auto',
+            'withme:cicd': 'cicd',
+            'withme:infra': 'infra',
+            'withme:monitoring': 'mon',
+            'withme:security': 'sec'
 
         },
     'dev':
         {
-            'kube:system': 'bin0',
-            'withme:automation': 'bin1',
-            'withme:cicd': 'bin2',
-            'withme:devtools': 'bin3',
-            'withme:infra': 'bin4',
-            'withme:monitoring': 'bin5',
-            'withme:resources': 'bin6',
-            'withme:security': 'bin7',
-            'withme:services': 'bin8'
+            'kube:system': 'sys',
+            'withme:automation': 'auto',
+            'withme:cicd': 'cicd',
+            'withme:devtools': 'devtools',
+            'withme:infra': 'infra',
+            'withme:monitoring': 'mon',
+            'withme:resources': 'resources',
+            'withme:security': 'sec',
+            'withme:services': 'dev'
         }
 }
 
