@@ -11,50 +11,10 @@ must use the scripts/
 
 # revision identifiers, used by Alembic.
 revision = 'add_deployment_target_bin'
-down_revision = 'add_indexes'
+down_revision = 'add_bin_map'
 
 import sqlalchemy as sa
 from alembic import op
-
-mapping = {
-    'prod': {
-        'withme:infra': 'infra',
-        'withme:monitoring': 'mon',
-        'withme:services': 'prod',
-    },
-    'perf': {
-        'withme:infra': 'infra',
-        'withme:monitoring': 'mon'
-
-    },
-    'int': {
-        'withme:infra': 'infra',
-        'withme:monitoring': 'mon',
-        'withme:services': 'withmedev'
-
-    },
-    'infra':
-        {
-            'withme:automation': 'auto',
-            'withme:cicd': 'cicd',
-            'withme:infra': 'infra',
-            'withme:monitoring': 'mon',
-            'withme:security': 'sec'
-
-        },
-    'dev':
-        {
-            'kube:system': 'sys',
-            'withme:automation': 'auto',
-            'withme:cicd': 'cicd',
-            'withme:devtools': 'devtools',
-            'withme:infra': 'infra',
-            'withme:monitoring': 'mon',
-            'withme:resources': 'resources',
-            'withme:security': 'sec',
-            'withme:services': 'dev'
-        }
-}
 
 
 def upgrade():
@@ -70,16 +30,7 @@ def downgrade():
 
 
 def upgrades_pre():
-    op.create_table('bin_map',
-                    sa.Column('env_id', sa.String(), nullable=False),
-                    sa.Column('stack_id', sa.String(), nullable=False),
-                    sa.Column('bin', sa.String(), nullable=False)
-                    )
-
-
-    for env, map in mapping.items():
-        for ns, bin in map.items():
-            op.execute("insert into bin_map (env_id, stack_id, bin) values ('%s', '%s', '%s');" % (env, ns, bin))
+    pass
 
 
 def schema_upgrades():
@@ -112,11 +63,20 @@ def schema_upgrades():
     op.execute("update deployment set old_id=id")
     op.execute("update release set old_id=id")
 
-    populate_dt_bin_query = "insert into deployment_target_bin (id, deployment_target_id, name) select concat(bb.deployment_target_id, ':', bb.bin), bb.deployment_target_id, bb.bin as db_name from (select *      from service s,      stack st,      deployment d,      deployment_target dt,      bin_map b,      partition p,      region r,      provider pv      where b.stack_id = st.id      and s.stack_id = st.id      and d.service_id = s.id      and dt.id = d.deployment_target_id      and dt.partition_id = p.id      and p.region_id = r.id      and r.provider_id = pv.id      and pv.environment_id = b.env_id) as bb;"
+    populate_dt_bin_query = "insert into deployment_target_bin (id, deployment_target_id, name)" \
+                            " select concat(bb.dt_id, ':', bb.bin), bb.dt_id, bb.bin as db_name" \
+                            " from (select dt.id dt_id, bin" \
+                            " from service s" \
+                            " join stack st on s.stack_id = st.id" \
+                            " join deployment d on d.service_id=s.id" \
+                            " join deployment_target dt on dt.id=d.deployment_target_id" \
+                            " join partition p on p.id =dt.partition_id" \
+                            " join region r on r.id=p.region_id" \
+                            " join provider pv on pv.id=r.provider_id" \
+                            " left outer join bin_map b on b.env_id=pv.environment_id and b.stack_id=st.id" \
+                            " group by dt_id, bin) as bb;"
 
     op.execute(populate_dt_bin_query)
-
-
 
 
 def upgrades_post():
@@ -140,7 +100,7 @@ def upgrades_post():
     op.drop_column('deployment', 'old_id')
     op.drop_column('release', 'old_id')
 
-    op.drop_table('bin_map')
+
 def downgrades_pre():
     op.add_column('deployment', sa.Column('old_id', sa.String(), nullable=True))
     op.add_column('release', sa.Column('old_id', sa.String(), nullable=True))
@@ -153,8 +113,6 @@ def downgrades_pre():
 
 
 def schema_downgrades():
-
-
     op.execute('update deployment as d' \
                ' set deployment_target_id=b.dt_id,' \
                ' id=concat(b.dt_id, \':\', d.service_id, \':\', d.tag)'
