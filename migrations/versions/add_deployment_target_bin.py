@@ -41,7 +41,7 @@ def schema_upgrades():
 
     op.create_table('deployment_target_bin',
                     sa.Column('id', sa.String(), nullable=False),
-                    sa.Column('name', sa.String(), nullable=False, server_default='bin0'),
+                    sa.Column('name', sa.String(), nullable=False, server_default='default'),
                     sa.Column('deployment_target_id', sa.String(), nullable=False),
                     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
                     sa.Column('last_updated_at', sa.DateTime(), nullable=True),

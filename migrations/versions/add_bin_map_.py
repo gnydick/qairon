@@ -18,41 +18,41 @@ from alembic import context
 mapping = {
     'dev':
         {
-            'mwebbdev:stuff': 'mwebb',
+            'mwebbdev:stuff': 'default',
             'withme:astral': 'dev',
-            'withme:demo': 'demo',
+            'withme:demo': 'default',
             'withme:gameserver': 'dev',
             'withme:playground': 'devplay',
             'withme:testing': 'dev',
             'withme:unreal': 'dev',
             'k8s:kube-system': 'sys',
             'kube:system': 'sys',
-            'withme:automation': 'auto',
-            'withme:cicd': 'cicd',
-            'withme:devtools': 'devtools',
-            'withme:infra': 'infra',
-            'withme:monitoring': 'mon',
-            'withme:resources': 'resources',
-            'withme:security': 'sec',
+            'withme:automation': 'default',
+            'withme:cicd': 'default',
+            'withme:devtools': 'default',
+            'withme:infra': 'default',
+            'withme:monitoring': 'default',
+            'withme:resources': 'default',
+            'withme:security': 'default',
             'withme:services': 'dev'
         },
     'docs':
         {
-            'app_for_docs:stack': 'junk',
-            'mwebbdev:stuff': 'mwebb',
-            'withme:demo': 'demo'
+            'app_for_docs:stack': 'default',
+            'mwebbdev:stuff': 'default',
+            'withme:demo': 'default'
         },
     'prod':
         {
             'k8s:kube-system': 'sys',
             'kube:system': 'sys',
-            'withme:automation': 'auto',
-            'withme:cicd': 'cicd',
-            'withme:devtools': 'devtools',
-            'withme:infra': 'infra',
-            'withme:monitoring': 'mon',
-            'withme:resources': 'resources',
-            'withme:security': 'sec',
+            'withme:automation': 'default',
+            'withme:cicd': 'default',
+            'withme:devtools': 'default',
+            'withme:infra': 'default',
+            'withme:monitoring': 'default',
+            'withme:resources': 'default',
+            'withme:security': 'default',
             'withme:services': 'withmeprod',
             'withme:astral': 'withmeprod',
             'withme:gameserver': 'withmeprod',
@@ -62,13 +62,13 @@ mapping = {
         {
             'k8s:kube-system': 'sys',
             'kube:system': 'sys',
-            'withme:automation': 'auto',
-            'withme:cicd': 'cicd',
-            'withme:devtools': 'devtools',
-            'withme:infra': 'infra',
-            'withme:monitoring': 'mon',
-            'withme:resources': 'resources',
-            'withme:security': 'sec',
+            'withme:automation': 'default',
+            'withme:cicd': 'default',
+            'withme:devtools': 'default',
+            'withme:infra': 'default',
+            'withme:monitoring': 'default',
+            'withme:resources': 'default',
+            'withme:security': 'default',
             'withme:services': 'withmeperf',
             'withme:gameserver': 'withmeperf',
             'withme:testing': 'withmeperf'
@@ -80,13 +80,13 @@ mapping = {
             'withme:testing': 'withmedev',
             'k8s:kube-system': 'sys',
             'kube:system': 'sys',
-            'withme:automation': 'auto',
-            'withme:cicd': 'cicd',
-            'withme:devtools': 'devtools',
-            'withme:infra': 'infra',
-            'withme:monitoring': 'mon',
-            'withme:resources': 'resources',
-            'withme:security': 'sec',
+            'withme:automation': 'default',
+            'withme:cicd': 'default',
+            'withme:devtools': 'default',
+            'withme:infra': 'default',
+            'withme:monitoring': 'default',
+            'withme:resources': 'default',
+            'withme:security': 'default',
             'withme:services': 'withmedev'
 
         },
@@ -94,22 +94,22 @@ mapping = {
         {
             'k8s:kube-system': 'sys',
             'kube:system': 'sys',
-            'withme:automation': 'auto',
-            'withme:cicd': 'cicd',
-            'withme:devtools': 'devtools',
-            'withme:infra': 'infra',
-            'withme:monitoring': 'mon',
-            'withme:resources': 'resources',
-            'withme:security': 'sec',
+            'withme:automation': 'default',
+            'withme:cicd': 'default',
+            'withme:devtools': 'default',
+            'withme:infra': 'default',
+            'withme:monitoring': 'default',
+            'withme:resources': 'default',
+            'withme:security': 'default',
 
         },
     'legacy':
         {
-            'withme:astral': 'legacy',
-            'withme:cicd': 'legacy',
-            'withme:gameserver': 'legacy',
-            'withme:playground': 'legacy',
-            'withme:services': 'legacy'
+            'withme:astral': 'default',
+            'withme:cicd': 'default',
+            'withme:gameserver': 'default',
+            'withme:playground': 'default',
+            'withme:services': 'default'
         }
 
 }

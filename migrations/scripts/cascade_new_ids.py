@@ -33,6 +33,7 @@ provider_classes = {
 }
 
 deployment_classes = {
+    # DeploymentTargetBin: "name",
     Deployment: "deployment_target_bin_id",
     Fleet: "deployment_target_id",
     Fleet: "fleet_type_id",
