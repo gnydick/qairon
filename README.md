@@ -1,3 +1,7 @@
+# Important Notes
+## Migrations
+Some migrations require multiple steps. They are documented in the `migrations/README.md`
+
 # Local dev setup
 ## install postgres server &gt;= 10
 1. create 2 x pyenv 
