@@ -12,6 +12,7 @@ SQLALCHEMY_ENGINE_OPTIONS = {
     'pool_timeout': 2
 }
 app = Flask(__name__)
+app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'SQLALCHEMY_TRACK_MODIFICATIONS' in os.environ
