@@ -13,6 +13,7 @@
       <env name="SECRET_KEY" value="12345" />
       <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://qairon:qairon@127.0.0.1:5432/qairon" />
       <env name="SQLALCHEMY_ECHO" value="True" />
+      <env name="PREFERRED_URL_SCHEME" value="https" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />

@@ -5,5 +5,3 @@ FROM   pg_constraint
 WHERE  contype = 'f'
   AND    connamespace = 'public'::regnamespace
 ORDER  BY conrelid::regclass::text, contype DESC;
-
-

@@ -8,7 +8,6 @@ alter table capacity add constraint capacity_fleet_id_fkey FOREIGN KEY (fleet_id
 alter table capacity add constraint capacity_allocation_type_id_fkey FOREIGN KEY (allocation_type_id) REFERENCES allocation_type(id)  on update cascade;
 alter table config_template add constraint config_template_language_id_fkey FOREIGN KEY (language_id) REFERENCES language(id)  on update cascade;
 alter table deployment add constraint deployment_current_release_id_fkey FOREIGN KEY (current_release_id) REFERENCES release(id)  on update cascade;
-alter table deployment add constraint deployment_deployment_target_id_fkey FOREIGN KEY (deployment_target_id) REFERENCES deployment_target(id)  on update cascade;
 alter table deployment add constraint deployment_service_id_fkey FOREIGN KEY (service_id) REFERENCES service(id)  on update cascade;
 alter table deployment_config add constraint deployment_config_deployment_id_fkey FOREIGN KEY (deployment_id) REFERENCES deployment(id)  on update cascade;
 alter table deployment_config add constraint deployment_config_config_template_id_fkey FOREIGN KEY (config_template_id) REFERENCES config_template(id)  on update cascade;

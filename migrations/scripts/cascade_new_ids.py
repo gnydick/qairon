@@ -34,7 +34,7 @@ provider_classes = {
 
 deployment_classes = {
     # DeploymentTargetBin: "name",
-    Deployment: "deployment_target_bin_id",
+    Deployment: "deployment_target_id",
     Fleet: "deployment_target_id",
     Fleet: "fleet_type_id",
     Capacity: "fleet_id",
@@ -42,6 +42,7 @@ deployment_classes = {
     Allocation: "deployment_proc_id",
     Allocation: "allocation_type_id",
     Release: "deployment_id",
+    ReleaseArtifact: "release_id",
     DeploymentConfig: "config_template_id",
     DeploymentConfig: "deployment_id",
     Deployment: "current_release_id"

@@ -87,7 +87,8 @@ mapping = {
             'withme:monitoring': 'default',
             'withme:resources': 'default',
             'withme:security': 'default',
-            'withme:services': 'withmedev'
+            'withme:services': 'withmedev',
+            'withme:astral': 'withmedev'
 
         },
     'infra':
