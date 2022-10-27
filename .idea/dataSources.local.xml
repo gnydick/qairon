@@ -70,25 +70,14 @@
       </schema-mapping>
     </data-source>
     <data-source name="project based -- blue" uuid="caa1e742-61fc-40b7-8947-3305d356acc4">
-      <database-info product="PostgreSQL" version="10.18" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.5.0" dbms="POSTGRES" exact-version="10.18" exact-driver-version="42.5">
-        <identifier-quote-string>&quot;</identifier-quote-string>
-      </database-info>
-      <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
-      <user-name>qairon</user-name>
-      <schema-mapping>
-        <introspection-scope>
-          <node kind="database" qname="qairon">
-            <node kind="schema" qname="public" />
-          </node>
-        </introspection-scope>
-      </schema-mapping>
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" exact-version="0" />
+      <schema-mapping />
     </data-source>
     <data-source name="project based -- green" uuid="cf7ead21-9363-4cdb-9527-234139d58073">
       <database-info product="PostgreSQL" version="10.18" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.5.0" dbms="POSTGRES" exact-version="10.18" exact-driver-version="42.5">
         <identifier-quote-string>&quot;</identifier-quote-string>
       </database-info>
       <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
-      <secret-storage>master_key</secret-storage>
       <user-name>qairon</user-name>
       <schema-mapping>
         <introspection-scope>

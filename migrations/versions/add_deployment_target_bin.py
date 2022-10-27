@@ -80,16 +80,21 @@ def schema_upgrades():
 
 
 def upgrades_post():
-    op.execute("update deployment as d" \
-               " set deployment_target_bin_id=b.db_id," \
-               " id=concat(b.db_id, ':', d.service_id, ':', d.tag)"
-               " from (select db.id as db_id," \
-               " dt.id as dt_id" \
-               " from deployment_target_bin db," \
-               " deployment_target dt" \
-               " where db.deployment_target_id = dt.id) as b" \
-               " where d.deployment_target_id = b.dt_id;"
-               )
+    op.execute(" update deployment d " \
+               " set id=concat(b.db_id, ':', b.s_id, ':', b.d_tag), " \
+               " deployment_target_bin_id=b.db_id " \
+               " from (select concat(dt.id, ':', b.bin) as db_id, d.id as old_d_id, " \
+               " dt.id dt_id, s.id s_id, d.tag d_tag, bin " \
+               " from service s " \
+               " join stack st on s.stack_id = st.id " \
+               " join deployment d on d.service_id = s.id " \
+               " join deployment_target dt on dt.id = d.deployment_target_id " \
+               " join partition p on p.id = dt.partition_id " \
+               " join region r on r.id = p.region_id " \
+               " join provider pv on pv.id = r.provider_id " \
+               " join bin_map b on b.env_id = pv.environment_id and b.stack_id = st.id " \
+               " group by s.id, d.id, dt_id, d.tag, bin) as b " \
+               " where d.id=b.old_d_id; ")
 
     remap_dep_ids()
     op.create_foreign_key('deployment_deployment_target_bin_id_fkey', 'deployment', 'deployment_target_bin',
