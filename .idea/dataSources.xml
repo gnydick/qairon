@@ -26,7 +26,7 @@
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5433/qairon</jdbc-url>
+      <jdbc-url>jdbc:postgresql://qairon-dev0.cluster-cspdtp4lk2su.us-west-2.rds.amazonaws.com:5432/qairon</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
     <data-source source="LOCAL" name="project based -- blue" uuid="caa1e742-61fc-40b7-8947-3305d356acc4">

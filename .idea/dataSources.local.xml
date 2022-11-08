@@ -55,7 +55,7 @@
       </schema-mapping>
     </data-source>
     <data-source name="project based -- dev" uuid="ac53af47-7288-4cc7-8ae1-57f0ffb711b1">
-      <database-info product="PostgreSQL" version="10.18" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.5.0" dbms="POSTGRES" exact-version="10.18">
+      <database-info product="PostgreSQL" version="10.18" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.5.0" dbms="POSTGRES" exact-version="10.18" exact-driver-version="42.5">
         <identifier-quote-string>&quot;</identifier-quote-string>
       </database-info>
       <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
