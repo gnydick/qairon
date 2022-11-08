@@ -169,14 +169,15 @@ def step_impl(context, dep_target_bin_id, service, tag, defaults):
     assert new_dep['tag'] == tag
 
 
-@then(
-    'service_config_template "{service_config_template}" can be created for service "{service}" via rest')
-def step_impl(context, service_config_template, service):
-    response = context.rest.create_resource(
-        {'resource': 'service_config_template', 'name': service_config_template, 'service_id': service, 'template': ''}
-    )
-    new_svc_config = response.json()
-    assert new_svc_config['id'] == '%s:%s' % (service, service_config_template)
+# @then(
+#     'service_config_template "{service_config_template}" can be created for service "{service}" via rest')
+# def step_impl(context, service_config_template, service):
+#     response = context.rest.create_resource(
+#         {'resource': 'service_config_template', 'name': service_config_template, 'service_id': service, 'template': ''}
+#     )
+#     new_svc_config = response.json()
+#     assert new_svc_config['id'] == '%s:%s' % (service, service_config_template)
+
 
 
 @when('add first "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')

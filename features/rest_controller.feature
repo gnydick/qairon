@@ -16,6 +16,7 @@ Feature: full test
     Then create "stack" "teststack" under "application_id" "testapp" via rest
     Then create "service" "testservice" under "stack_id" "testapp:teststack" via rest
     Then create config for resource "service" named "testsvccfg" from template "testcfgtmpl" can be created for "testapp:teststack:testservice" tagged "tag" via rest
+    Then create config for resource "stack" named "teststackcfg" from template "testcfgtmpl" can be created for "testapp:teststack" tagged "tag" via rest
 
 
   Scenario: deployment
@@ -50,6 +51,7 @@ Feature: full test
 
     When delete "deployment_config" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:testcfgtmpl:testdepcfg:tag" via rest
     When delete "service_config" "testapp:teststack:testservice:testcfgtmpl:testsvccfg:tag" via rest
+    When delete "stack_config" "testapp:teststack:testcfgtmpl:teststackcfg:tag" via rest
     When delete "config_template" "testcfgtmpl" via rest
 
     Then delete "release_artifact" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456:test_release_artifact_helm" via rest

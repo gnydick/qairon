@@ -51,6 +51,14 @@ class QaironSchema:
             {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
             {'-d': {'args': {'dest': 'defaults'}}}
         ],
+        stack_config=[
+            {'config_template_id': {'dotters': {'completer': 'config_template_completer'}}},
+            {'stack_id': {'dotters': {'completer': 'stack_completer'}}},
+            'name',
+            {'-c': {'args': {'dest': 'config', 'default': '{}'}}},
+            {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
+            {'-d': {'args': {'dest': 'defaults'}}}
+        ],
         config_template=[
             {'language_id': {'dotters': {'completer': 'language_completer'}}},
             'id',
