@@ -12,7 +12,7 @@ import ipaddress as ip
 class Subnet(db.Model):
     __tablename__ = "subnet"
     id = Column(String, primary_key=True)
-    network_id = Column(String, ForeignKey('network.id'), nullable=False, index=true)
+    network_id = Column(String, ForeignKey('network.id',  onupdate='CASCADE'), nullable=False, index=true)
     native_id = Column(String, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)

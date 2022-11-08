@@ -40,6 +40,7 @@ admin.add_view(WithIdView(Environment, db.session, category='META'))
 
 admin.add_view(WithIdView(Application, db.session, category='Services'))
 admin.add_view(DefaultView(Stack, db.session, category='Services'))
+admin.add_view(DefaultView(StackConfig, db.session, category='Services'))
 admin.add_view(ServiceView(Service, db.session, category='Services'))
 admin.add_view(DefaultView(ServiceConfig, db.session, category='Services'))
 

@@ -46,7 +46,7 @@ def schema_upgrades():
                     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
                     sa.Column('last_updated_at', sa.DateTime(), nullable=True),
                     sa.Column('defaults', sa.Text(), nullable=True),
-                    sa.ForeignKeyConstraint(['deployment_target_id'], ['deployment_target.id'], ),
+                    sa.ForeignKeyConstraint(['deployment_target_id'], ['deployment_target.id'], onupdate='CASCADE'),
                     sa.PrimaryKeyConstraint('id')
                     )
     op.create_index(op.f('ix_deployment_target_bin_created_at'), 'deployment_target_bin', ['created_at'], unique=False)
@@ -99,11 +99,13 @@ def upgrades_post():
     remap_dep_ids()
     op.create_foreign_key('deployment_deployment_target_bin_id_fkey', 'deployment', 'deployment_target_bin',
                           ['deployment_target_bin_id'],
-                          ['id'])
+                          ['id'], onupdate='CASCADE')
     # op.drop_constraint('deployment_deployment_target_id_fkey', 'deployment', type_='foreignkey')
     op.drop_column('deployment', 'deployment_target_id')
     op.drop_column('deployment', 'old_id')
     op.drop_column('release', 'old_id')
+
+    op.drop_table('bin_map')
 
 
 def downgrades_pre():
@@ -114,7 +116,7 @@ def downgrades_pre():
 
     op.add_column('deployment', sa.Column('deployment_target_id', sa.VARCHAR(), autoincrement=False, nullable=True))
     op.create_foreign_key('deployment_deployment_target_id_fkey', 'deployment', 'deployment_target',
-                          ['deployment_target_id'], ['id'])
+                          ['deployment_target_id'], ['id'], onupdate='CASCADE')
 
 
 def schema_downgrades():

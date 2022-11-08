@@ -56,7 +56,7 @@ def schema_upgrades():
     op.execute(update_query)
     op.execute("update provider set environment_id='legacy' where environment_id is null")
     op.alter_column('provider', 'environment_id', nullable=False)
-    op.create_foreign_key('provider_environment_id_fkey', 'provider', 'environment', ['environment_id'], ['id'])
+    op.create_foreign_key('provider_environment_id_fkey', 'provider', 'environment', ['environment_id'], ['id'], onupdate='CASCADE')
     op.drop_constraint('deployment_target_environment_id_fkey', 'deployment_target', type_='foreignkey')
     op.drop_column('deployment_target', 'environment_id')
 
@@ -90,7 +90,7 @@ def schema_downgrades():
     op.execute(downgrade_query)
     op.alter_column('deployment_target', 'environment_id', nullable=False)
     op.create_foreign_key('deployment_target_environment_id_fkey', 'deployment_target', 'environment',
-                          ['environment_id'], ['id'])
+                          ['environment_id'], ['id'], onupdate='CASCADE')
     op.drop_constraint('provider_environment_id_fkey', 'provider', type_='foreignkey')
     op.drop_column('provider', 'environment_id')
 

@@ -40,8 +40,8 @@ def schema_upgrades():
     op.create_table('target_bins_fleets',
     sa.Column('deployment_target_bin_id', sa.String(), nullable=True),
     sa.Column('fleet_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_target_bin_id'], ['deployment_target_bin.id'], ),
-    sa.ForeignKeyConstraint(['fleet_id'], ['fleet.id'], )
+    sa.ForeignKeyConstraint(['deployment_target_bin_id'], ['deployment_target_bin.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['fleet_id'], ['fleet.id'], onupdate='CASCADE' )
     )
     op.create_index('ix_target_bins_to_fleets_deployment_target_bin_id', 'target_bins_fleets', ['deployment_target_bin_id'], unique=False)
     op.create_index('ix_target_bins_to_fleets_fleet_id', 'target_bins_fleets', ['fleet_id'], unique=False)

@@ -2,9 +2,10 @@ from flask_admin.contrib.sqla import ModelView
 from wtforms import StringField
 
 from models import Deployment
+from views.QaironModelView import QaironModelView
 
 
-class DeploymentTargetView(ModelView):
+class DeploymentTargetView(QaironModelView):
     # edit_template = 'config_edit.html'
     # create_template = 'config_create.html'
     # column_list = ['id', 'name', 'type']

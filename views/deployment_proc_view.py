@@ -3,9 +3,10 @@ from flask_admin.contrib.sqla.ajax import QueryAjaxModelLoader
 
 from db import db
 from models import *
+from views.QaironModelView import QaironModelView
 
 
-class DeploymentProcView(ModelView):
+class DeploymentProcView(QaironModelView):
     can_view_details = True
     # column_searchable_list = [Environment.id, Deployment.tag]
     # column_filters = [Environment.id]

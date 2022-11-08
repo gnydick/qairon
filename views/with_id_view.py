@@ -1,8 +1,10 @@
 from flask_admin.contrib.sqla import ModelView
 from wtforms import StringField
 
+from views.QaironModelView import QaironModelView
 
-class WithIdView(ModelView):
+
+class WithIdView(QaironModelView):
     can_view_details = True
     column_searchable_list = ['id']
     column_sortable_list = ['id']

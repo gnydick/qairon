@@ -78,7 +78,7 @@ def schema_upgrades():
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('doc', sa.Text(), nullable=False),
     sa.Column('language_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['language_id'], ['language.id'], ),
+    sa.ForeignKeyConstraint(['language_id'], ['language.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('fleet_type',
@@ -86,7 +86,7 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('provider_type_id', sa.String(), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['provider_type_id'], ['provider_type.id'], ),
+    sa.ForeignKeyConstraint(['provider_type_id'], ['provider_type.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('provider',
@@ -95,7 +95,7 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('native_id', sa.String(), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['provider_type_id'], ['provider_type.id'], ),
+    sa.ForeignKeyConstraint(['provider_type_id'], ['provider_type.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('repo',
@@ -104,7 +104,7 @@ def schema_upgrades():
     sa.Column('repo_type_id', sa.String(), nullable=True),
     sa.Column('url', sa.String(length=253), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['repo_type_id'], ['repo_type.id'], ),
+    sa.ForeignKeyConstraint(['repo_type_id'], ['repo_type.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('stack',
@@ -112,7 +112,7 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('application_id', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['application_id'], ['application.id'], ),
+    sa.ForeignKeyConstraint(['application_id'], ['application.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
 
@@ -122,7 +122,7 @@ def schema_upgrades():
     sa.Column('provider_id', sa.String(), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.Column('native_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['provider_id'], ['provider.id'], ),
+    sa.ForeignKeyConstraint(['provider_id'], ['provider.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('service',
@@ -131,7 +131,7 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('artifact_name', sa.String(), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['stack_id'], ['stack.id'], ),
+    sa.ForeignKeyConstraint(['stack_id'], ['stack.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
 
@@ -140,7 +140,7 @@ def schema_upgrades():
     sa.Column('build_num', sa.Integer(), nullable=False),
     sa.Column('service_id', sa.String(), nullable=False),
     sa.Column('git_tag', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['service_id'], ['service.id'], ),
+    sa.ForeignKeyConstraint(['service_id'], ['service.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
 
@@ -151,14 +151,14 @@ def schema_upgrades():
     sa.Column('native_id', sa.String(), nullable=True),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['region_id'], ['region.id'], ),
+    sa.ForeignKeyConstraint(['region_id'], ['region.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('proc',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('service_id', sa.String(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=False),
-    sa.ForeignKeyConstraint(['service_id'], ['service.id'], ),
+    sa.ForeignKeyConstraint(['service_id'], ['service.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('service_config',
@@ -168,15 +168,15 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('tag', sa.String(), nullable=False),
     sa.Column('config', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['config_template_id'], ['config_template.id'], ),
-    sa.ForeignKeyConstraint(['service_id'], ['service.id'], ),
+    sa.ForeignKeyConstraint(['config_template_id'], ['config_template.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['service_id'], ['service.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('services_repos',
     sa.Column('service_id', sa.String(), nullable=True),
     sa.Column('repo_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['repo_id'], ['repo.id'], ),
-    sa.ForeignKeyConstraint(['service_id'], ['service.id'], )
+    sa.ForeignKeyConstraint(['repo_id'], ['repo.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['service_id'], ['service.id'], onupdate='CASCADE' )
     )
     op.create_table('zone',
     sa.Column('id', sa.String(), nullable=False),
@@ -184,7 +184,7 @@ def schema_upgrades():
     sa.Column('region_id', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.Column('native_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['region_id'], ['region.id'], ),
+    sa.ForeignKeyConstraint(['region_id'], ['region.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
 
@@ -196,9 +196,9 @@ def schema_upgrades():
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.Column('native_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_target_type_id'], ['deployment_target_type.id'], ),
-    sa.ForeignKeyConstraint(['environment_id'], ['environment.id'], ),
-    sa.ForeignKeyConstraint(['partition_id'], ['partition.id'], ),
+    sa.ForeignKeyConstraint(['deployment_target_type_id'], ['deployment_target_type.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['environment_id'], ['environment.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['partition_id'], ['partition.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('deployment',
@@ -208,8 +208,8 @@ def schema_upgrades():
     sa.Column('current_release_id', sa.String(), nullable=True),
     sa.Column('tag', sa.String(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_target_id'], ['deployment_target.id'], ),
-    sa.ForeignKeyConstraint(['service_id'], ['service.id'], ),
+    sa.ForeignKeyConstraint(['deployment_target_id'], ['deployment_target.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['service_id'], ['service.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
 
@@ -218,8 +218,8 @@ def schema_upgrades():
     sa.Column('deployment_id', sa.String(), nullable=True),
     sa.Column('proc_id', sa.String(), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
-    sa.ForeignKeyConstraint(['proc_id'], ['proc.id'], ),
+    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['proc_id'], ['proc.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
 
@@ -229,8 +229,8 @@ def schema_upgrades():
     sa.Column('deployment_id', sa.String(), nullable=False),
     sa.Column('build_num', sa.Integer(), nullable=False),
     sa.Column('tag', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['build_id'], ['build.id'], ),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
+    sa.ForeignKeyConstraint(['build_id'], ['build.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
 
@@ -241,16 +241,16 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('tag', sa.String(), nullable=False),
     sa.Column('config', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['config_template_id'], ['config_template.id'], ),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
+    sa.ForeignKeyConstraint(['config_template_id'], ['config_template.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
 
     op.create_table('deployments_zones',
     sa.Column('deployment_id', sa.String(), nullable=True),
     sa.Column('zone_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], ),
-    sa.ForeignKeyConstraint(['zone_id'], ['zone.id'], )
+    sa.ForeignKeyConstraint(['deployment_id'], ['deployment.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['zone_id'], ['zone.id'], onupdate='CASCADE' )
     )
     op.create_table('network',
     sa.Column('id', sa.String(), nullable=False),
@@ -259,7 +259,7 @@ def schema_upgrades():
     sa.Column('cidr', postgresql.CIDR(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.Column('native_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['partition_id'], ['partition.id'], ),
+    sa.ForeignKeyConstraint(['partition_id'], ['partition.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('allocation',
@@ -269,8 +269,8 @@ def schema_upgrades():
     sa.Column('deployment_proc_id', sa.String(), nullable=True),
     sa.Column('watermark', sa.Enum('HIGH', 'LOW', name='watermark'), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['allocation_type_id'], ['allocation_type.id'], ),
-    sa.ForeignKeyConstraint(['deployment_proc_id'], ['deployment_proc.id'], ),
+    sa.ForeignKeyConstraint(['allocation_type_id'], ['allocation_type.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['deployment_proc_id'], ['deployment_proc.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('fleet',
@@ -280,8 +280,8 @@ def schema_upgrades():
     sa.Column('name', sa.String(length=256), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.Column('native_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['deployment_target_id'], ['deployment_target.id'], ),
-    sa.ForeignKeyConstraint(['fleet_type_id'], ['fleet_type.id'], ),
+    sa.ForeignKeyConstraint(['deployment_target_id'], ['deployment_target.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['fleet_type_id'], ['fleet_type.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('subnet',
@@ -291,7 +291,7 @@ def schema_upgrades():
     sa.Column('cidr', postgresql.CIDR(), nullable=False),
     sa.Column('defaults', sa.Text(), nullable=True),
     sa.Column('native_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['network_id'], ['network.id'], ),
+    sa.ForeignKeyConstraint(['network_id'], ['network.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('capacity',
@@ -300,15 +300,15 @@ def schema_upgrades():
     sa.Column('value', sa.Float(), nullable=False),
     sa.Column('allocation_type_id', sa.String(), nullable=True),
     sa.Column('defaults', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['allocation_type_id'], ['allocation_type.id'], ),
-    sa.ForeignKeyConstraint(['fleet_id'], ['fleet.id'], ),
+    sa.ForeignKeyConstraint(['allocation_type_id'], ['allocation_type.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['fleet_id'], ['fleet.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('subnets_fleets',
     sa.Column('subnet_id', sa.String(), nullable=True),
     sa.Column('fleet_id', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['fleet_id'], ['fleet.id'], ),
-    sa.ForeignKeyConstraint(['subnet_id'], ['subnet.id'], )
+    sa.ForeignKeyConstraint(['fleet_id'], ['fleet.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['subnet_id'], ['subnet.id'], onupdate='CASCADE' )
     )
 
 

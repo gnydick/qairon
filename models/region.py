@@ -9,7 +9,7 @@ class Region(db.Model):
     __tablename__ = "region"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
-    provider_id = Column(String, ForeignKey('provider.id'), nullable=True, index=true)
+    provider_id = Column(String, ForeignKey('provider.id',  onupdate='CASCADE'), nullable=True, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)

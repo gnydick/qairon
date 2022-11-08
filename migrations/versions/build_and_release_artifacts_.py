@@ -45,9 +45,9 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('upload_path', sa.String(), nullable=False),
     sa.Column('data', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['build_id'], ['build.id'], ),
-    sa.ForeignKeyConstraint(['input_repo_id'], ['repo.id'], ),
-    sa.ForeignKeyConstraint(['output_repo_id'], ['repo.id'], ),
+    sa.ForeignKeyConstraint(['build_id'], ['build.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['input_repo_id'], ['repo.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['output_repo_id'], ['repo.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('release_artifact',
@@ -58,9 +58,9 @@ def schema_upgrades():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('upload_path', sa.String(), nullable=False),
     sa.Column('data', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['input_repo_id'], ['repo.id'], ),
-    sa.ForeignKeyConstraint(['output_repo_id'], ['repo.id'], ),
-    sa.ForeignKeyConstraint(['release_id'], ['release.id'], ),
+    sa.ForeignKeyConstraint(['input_repo_id'], ['repo.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['output_repo_id'], ['repo.id'], onupdate='CASCADE'),
+    sa.ForeignKeyConstraint(['release_id'], ['release.id'], onupdate='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

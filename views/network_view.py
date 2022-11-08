@@ -1,9 +1,10 @@
 from flask_admin.contrib.sqla import ModelView
 from models import Partition, Network
 from converters import NetworkModelConverter
+from views.QaironModelView import QaironModelView
 
 
-class NetworkView(ModelView):
+class NetworkView(QaironModelView):
     model_form_converter = NetworkModelConverter
     can_view_details = True
     column_searchable_list = [Partition.id, Network.name]

@@ -10,12 +10,13 @@ class Stack(db.Model):
 
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
-    application_id = Column(String, ForeignKey('application.id'), nullable=False, index=true)
+    application_id = Column(String, ForeignKey('application.id',  onupdate='CASCADE'), nullable=False, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
     application = relationship('Application', back_populates='stacks')
+    configs = relationship("StackConfig", back_populates="stack", lazy='selectin')
     services = relationship("Service", back_populates="stack", lazy='selectin')
 
     def __repr__(self):

@@ -15,7 +15,7 @@ class Network(db.Model):
         self.__dict__.update(entries)
 
     id = Column(String, primary_key=True)
-    partition_id = Column(String, ForeignKey('partition.id'), nullable=False, index=true)
+    partition_id = Column(String, ForeignKey('partition.id',  onupdate='CASCADE'), nullable=False, index=true)
     native_id = Column(String, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)

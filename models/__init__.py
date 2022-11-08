@@ -1,7 +1,7 @@
 from .release import Release
 from .deployment import Deployment
 from .environment import Environment
-from .config import ServiceConfig, DeploymentConfig
+from .config import ServiceConfig, DeploymentConfig, StackConfig
 from .provider import Provider
 from .region import Region
 from .service import Service

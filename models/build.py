@@ -17,7 +17,7 @@ class Build(db.Model):
     build_num = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
-    service_id = Column(String, ForeignKey('service.id'), nullable=False, index=true)
+    service_id = Column(String, ForeignKey('service.id',  onupdate='CASCADE'), nullable=False, index=true)
     ver = Column(String, nullable=False)
     vcs_ref = Column(String, nullable=False)
     defaults = Column(Text)
