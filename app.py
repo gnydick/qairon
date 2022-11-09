@@ -43,7 +43,7 @@ with app.app_context():
                      m[1].__module__.startswith('models.')]
     for model_class in model_classes:
         restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                               url_prefix='/api/rest/v1')
+                               url_prefix='/api/rest/v1', max_page_size=200)
     # set optional bootswatch theme
     app.config['FLASK_ADMIN_SWATCH'] = 'slate'
     admin = Admin(app, name='QAIRON: %s' % version, template_mode='bootstrap3', base_template='admin/master.html')
