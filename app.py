@@ -2,7 +2,7 @@ import inspect
 from os.path import exists
 
 import models
-import flask_restless
+from flask_restless import APIManager
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 
@@ -35,7 +35,7 @@ if app.debug:
 from views.menus.divider import DividerMenu
 
 migrate = Migrate(app, db)
-restmanager = flask_restless.APIManager(app, session=db.session)
+restmanager = APIManager(app, session=db.session)
 
 with app.app_context():
     # dynamically generate the rest endpoint for each data model
@@ -43,7 +43,7 @@ with app.app_context():
                      m[1].__module__.startswith('models.')]
     for model_class in model_classes:
         restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                               url_prefix='/api/rest/v1', max_page_size=200)
+                               url_prefix='/api/rest/v1', max_page_size=100)
     # set optional bootswatch theme
     app.config['FLASK_ADMIN_SWATCH'] = 'slate'
     admin = Admin(app, name='QAIRON: %s' % version, template_mode='bootstrap3', base_template='admin/master.html')
