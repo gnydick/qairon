@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="behave unit tests" type="CompoundRunConfigurationType">
+    <toRun name="qairon unit tests" type="PyBehaveRunConfigurationType" />
+    <toRun name="unit-test local qairon local db" type="Python.FlaskServer" />
+    <method v="2" />
+  </configuration>
+</component>
