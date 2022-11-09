@@ -13,9 +13,11 @@ def _compile_drop_table(element, compiler, **kwargs):
 
 
 def before_all(context):
-    context.rest = RestController()
-    context.args = CLIArgs(context.rest)
+    from app import app, migrate
+    with app.app_context():
+        context.rest = RestController()
+        context.args = CLIArgs(context.rest)
 
-    migrate.db.drop_all()
-    migrate.db.create_all()
+        migrate.db.drop_all()
+        migrate.db.create_all()
 
