@@ -2,16 +2,17 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
-import datetime
-from models import Release
 
 
 class Deployment(db.Model):
+    additional_attributes=['service_id']
     __tablename__ = "deployment"
     id = Column(String, primary_key=True)
-    deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id',  onupdate='CASCADE'), index=true)
-    service_id = Column(String, ForeignKey('service.id',  onupdate='CASCADE'), index=true)
-    current_release_id = Column(String, ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey', link_to_name=True,  onupdate='CASCADE'), index=true)
+    deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id', onupdate='CASCADE'), index=true)
+    service_id = Column(String, ForeignKey('service.id', onupdate='CASCADE'), index=true)
+    current_release_id = Column(String,
+                                ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey',
+                                           link_to_name=True, onupdate='CASCADE'), index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     tag = Column(String, nullable=False, default='default', index=true)
@@ -35,6 +36,9 @@ class Deployment(db.Model):
 
     def __repr__(self):
         return self.id
+
+
+
 
     # makes sure the release is actually one that belongs to the deployment
     @validates('current_release')

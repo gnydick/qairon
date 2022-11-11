@@ -38,12 +38,19 @@ migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
 
 with app.app_context():
-    # dynamically generate the rest endpoint for each data model
+#    dynamically generate the rest endpoint for each data model
     model_classes = [getattr(models, m[0]) for m in inspect.getmembers(models, inspect.isclass) if
                      m[1].__module__.startswith('models.')]
     for model_class in model_classes:
-        restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
-                               url_prefix='/api/rest/v1', max_page_size=100)
+        if model_class==Deployment:
+            restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
+                           url_prefix='/api/rest/v1', page_size=5, max_page_size=100, additional_attributes=model_class.additional_attributes)
+        else:
+            restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PUT'],
+                                   url_prefix='/api/rest/v1', page_size=5, max_page_size=100)
+
+
+
     # set optional bootswatch theme
     app.config['FLASK_ADMIN_SWATCH'] = 'slate'
     admin = Admin(app, name='QAIRON: %s' % version, template_mode='bootstrap3', base_template='admin/master.html')

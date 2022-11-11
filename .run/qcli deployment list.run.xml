@@ -7,7 +7,6 @@
       <env name="PYTHONUNBUFFERED" value="1" />
       <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://qairon:qairon@localhost/qairon" />
       <env name="SECRET_KEY" value="12345" />
-      <env name="QAIRON_ENDPOINT" value="http://qairon.dev.withme.com:5001" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -15,8 +14,13 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli" />
-    <option name="PARAMETERS" value="deployment list" />
+    <option name="PARAMETERS" value="deployment list -o id -o service.id" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

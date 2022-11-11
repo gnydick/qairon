@@ -17,7 +17,7 @@ class RestController:
         pass
 
     URL = '%s/api/rest/v1/' % endpoint
-    HEADERS = {'Content-Type': 'application/json'}
+    HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/vnd.api+json'}
 
     def add_to_many_to_many(self, owner_res, owner_res_id, col_res, col_res_id):
         owner = self.get_instance(owner_res, owner_res_id)
@@ -207,11 +207,16 @@ class RestController:
             output_fields = [output_fields]
         elif output_fields is None:
             output_fields = ['id']
-        for obj in response.json()['objects']:
+        for obj in response.json()['data']:
             if len(output_fields) > 1:
                 row = []
                 for field in output_fields:
-                    row.append(obj[field])
+                    if field == 'id':
+                        row.append(obj[field])
+                    elif field in obj['attributes']:
+                        row.append(obj['attributes'][field])
+                    elif field in (obj['relationships']):
+                        row.append(obj['relationships'][field])
                 results.append(row)
             elif len(output_fields) == 1:
                 for field in output_fields:
