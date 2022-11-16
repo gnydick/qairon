@@ -67,7 +67,10 @@ class RestController:
             resource_id=parsed_args.owner_id,
             plural=plural)
 
-        headers = {'Content-Type': 'application/json'}
+        headers = {
+            'Accept': 'application/vnd.api+json',
+            'Content-Type': 'application/vnd.api+json'
+        }
         response = requests.get(url, headers=headers)
         assert response.status_code == 200
         results = requests.get(url, headers=headers).json()
@@ -88,7 +91,10 @@ class RestController:
 
     def _get_search_(self, prefix, resource=None, **kwargs):
         url = self.URL + "{resource}".format(resource=resource)
-        headers = {'Content-Type': 'application/json'}
+        headers = {
+            'Accept': 'application/vnd.api+json',
+            'Content-Type': 'application/vnd.api+json'
+        }
         filters = [dict(name='id', op='like', val=str(prefix) + '%')]
         params = dict(q=json.dumps(dict(filters=filters)))
         response = requests.get(url, params=params, headers=headers)
@@ -100,7 +106,10 @@ class RestController:
 
     def _get_attr_search_(self, prefix, parsed_args, resource=None, attribute=None, **kwargs):
         url = self.URL + "{resource}/{id}/{attr}".format(resource=resource, id=parsed_args.owner_id, attr=attribute)
-        headers = {'Content-Type': 'application/json'}
+        headers = {
+            'Accept': 'application/vnd.api+json',
+            'Content-Type': 'application/vnd.api+json'
+        }
         filters = [dict(name='id', op='like', val=str(prefix) + '%')]
         params = dict(q=json.dumps(dict(filters=filters)))
         response = requests.get(url, params=params, headers=headers)
