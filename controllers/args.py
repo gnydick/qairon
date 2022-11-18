@@ -9,16 +9,16 @@ from .schema import QaironSchema
 def __gen_completers__(rest):
     resources = QaironSchema.CREATE_FIELDS.keys()
     for res in resources:
-        def completer(self, prefix, parsed_args, resource=res, **kwargs):
-            return rest.resource_get_search(prefix, resource, **kwargs)
+        def completer(self, prefix, parsed_args, resource=res):
+            return rest.resource_get_search(prefix, resource)
 
         completer.__name__ = "%s_completer" % res
         setattr(RestController, ("%s_completer" % res), completer)
 
 
 def __gen_attr_completers__(rest, res, attr):
-    def completer(self, prefix, parsed_args, resource=res, attribute=attr, **kwargs):
-        return rest.resource_get_attr_search(prefix, parsed_args, resource, attribute, **kwargs)
+    def completer(self, prefix, parsed_args, resource=res, attribute=attr):
+        return rest.resource_get_attr_search(prefix, parsed_args, resource, attribute)
 
     name = "%s_%s_completer" % (res, attr)
     completer.__name__ = "%s_completer" % res
@@ -78,6 +78,20 @@ def __add_get_field_parser__(rest, parsers, resource):
     field_update_parser.add_argument('field')
 
 
+def __add_get_collection_parser__(rest, parsers, resource):
+    get_collection_parser = parsers.add_parser('get_collection')
+    get_collection_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
+    get_collection_parser.add_argument('collection')
+    get_collection_parser.add_argument('-p', help='page', dest='page')
+    get_collection_parser.add_argument('-r', help='results per page', dest='resperpage')
+
+
+def __add_get_relation_parser__(rest, parsers, resource):
+    get_relation_parser = parsers.add_parser('get_relation')
+    get_relation_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
+    get_relation_parser.add_argument('relation')
+
+
 class CLIArgs:
     def __init__(self, rest):
         self.rest = rest
@@ -88,7 +102,7 @@ class CLIArgs:
         __gen_attr_completers__(rest, 'service', 'repos')
         __gen_attr_completers__(rest, 'deployment', 'zones')
 
-    def subnet_allocator_bits_completer(self, prefix, **kwargs):
+    def subnet_allocator_bits_completer(self, prefix):
         return ['additional_mask_bits']
 
     def __gen_parsers__(self, context_parsers):
@@ -125,6 +139,8 @@ class CLIArgs:
             __add_list_parser__(parsers_for_model_parser)
             __add_set_field_parser__(self.rest, parsers_for_model_parser, model)
             __add_get_field_parser__(self.rest, parsers_for_model_parser, model)
+            __add_get_collection_parser__(self.rest, parsers_for_model_parser, model)
+            __add_get_relation_parser__(self.rest, parsers_for_model_parser, model)
             _model_com_get_parser = parsers_for_model_parser.add_parser('get')
             _model_com_get_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
             _model_com_create_parser = parsers_for_model_parser.add_parser('create')

@@ -20,18 +20,18 @@ class CLIController:
                     print(' '.join(row))
                 else:
                     print(row)
+
     def get(self, resource, command=None, id=None, q=False):
         print(json.dumps(rest.get_instance(resource, id)))
 
     def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, format=None, q=False):
         rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
-        self.__output__(rows,format)
+        self.__output__(rows, format)
 
     def query(self, resource, command=None, query=None, output_fields=None, resperpage=None,
               page=None, format=None, q=False):
         rows = rest.query(resource, query, output_fields, resperpage=resperpage, page=page)
         self.__output__(rows, format)
-
 
     def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')
@@ -41,7 +41,18 @@ class CLIController:
     def get_field(self, resource, field, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field=field)
         if not q:
-            print(json.dumps(value))
+            print(value)
+
+    def get_relation(self, resource, relation, command=None, id=None, q=False):
+        value = rest.get_field(resource, id, field=relation, index='relationships')
+        if not q:
+            print(value['data']['id'])
+
+    def get_collection(self, resource, collection, command=None, id=None, resperpage=None, page=None, q=False):
+        results = rest.get_collection(resource, id, collection, resperpage, page)
+        if not q:
+            for line in results:
+                print(line)
 
     def set_field(self, resource, id, field, value, command=None, q=False):
         response = self._set_field_(resource, id, field, value)

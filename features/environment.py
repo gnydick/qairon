@@ -8,7 +8,7 @@ from controllers import RestController, CLIArgs
 
 
 @compiles(DropTable, "postgresql")
-def _compile_drop_table(element, compiler, **kwargs):
+def _compile_drop_table(element, compiler):
     return compiler.visit_drop_table(element) + " CASCADE"
 
 

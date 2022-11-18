@@ -32,36 +32,36 @@ class RestController:
         collection['data'] = list(filter(lambda x: x['id'] != col_res_id, owner['data']['relationships'][plural_resource]['data']))
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
-    def resource_get_search(self, prefix, resource, **kwargs):
-        return self._get_search_(prefix, resource=resource, **kwargs)
+    def resource_get_search(self, prefix, resource):
+        return self._get_search_(prefix, resource=resource)
 
-    def resource_get_attr_search(self, prefix, parsed_args, resource, attribute, **kwargs):
-        return self._get_attr_search_(prefix, parsed_args, resource=resource, attribute=attribute, **kwargs)
+    def resource_get_attr_search(self, prefix, parsed_args, resource, attribute):
+        return self._get_attr_search_(prefix, parsed_args, resource=resource, attribute=attribute)
 
     def __collection_for_resource_completer__(self, prefix, parsed_args, plural):
         results = self._get_members_of_collection_(prefix, parsed_args, plural)
         return results
 
-    def add_service_config_for_service_completer(self, prefix, parsed_args, **kwargs):
+    def add_service_config_for_service_completer(self, prefix, parsed_args):
         current_service_config_templates = self.__collection_for_resource_completer__(prefix, parsed_args,
                                                                                       'service_config_templates')
         filters = [dict(name='id', op='not_in', val=current_service_config_templates)]
         filtered_service_config_templates = [x[0] for x in self._complex_list_('service_config_template', filters)]
         return filtered_service_config_templates
 
-    def del_service_config_for_service_completer(self, prefix, parsed_args, **kwargs):
+    def del_service_config_for_service_completer(self, prefix, parsed_args):
         return self.__collection_for_resource_completer__(prefix, parsed_args, 'service_config_templates')
 
-    def add_zone_for_deployment_completer(self, prefix, parsed_args, **kwargs):
+    def add_zone_for_deployment_completer(self, prefix, parsed_args):
         current_zones = self.__collection_for_resource_completer__(prefix, parsed_args, 'zones')
         filters = [dict(name='id', op='not_in', val=current_zones)]
         filtered_zones = [x[0] for x in self._complex_list_('zone', filters)]
         return filtered_zones
 
-    def del_zone_for_deployment_completer(self, prefix, parsed_args, **kwargs):
+    def del_zone_for_deployment_completer(self, prefix, parsed_args):
         return self.__collection_for_resource_completer__(prefix, parsed_args, 'zones')
 
-    def _get_members_of_collection_(self, prefix, parsed_args, plural, **kwargs):
+    def _get_members_of_collection_(self, prefix, parsed_args, plural):
         url = self.URL + "{resource}/{resource_id}/{plural}".format(
             resource=parsed_args.resource,
             resource_id=parsed_args.owner_id,
@@ -89,7 +89,7 @@ class RestController:
         subnet['cidr'] = subc.allocate_subnet(additional_mask_bits, name)
         return self.create_resource(subnet)
 
-    def _get_search_(self, prefix, resource=None, **kwargs):
+    def _get_search_(self, prefix, resource=None):
         url = self.URL + "{resource}".format(resource=resource)
         headers = {
             'Accept': 'application/vnd.api+json',
@@ -104,7 +104,7 @@ class RestController:
         ids = [x['id'] for x in objs]
         return ids
 
-    def _get_attr_search_(self, prefix, parsed_args, resource=None, attribute=None, **kwargs):
+    def _get_attr_search_(self, prefix, parsed_args, resource=None, attribute=None):
         url = self.URL + "{resource}/{id}/{attr}".format(resource=resource, id=parsed_args.owner_id, attr=attribute)
         headers = {
             'Accept': 'application/vnd.api+json',
@@ -119,7 +119,24 @@ class RestController:
         ids = [x['id'] for x in objs]
         return ids
 
-    def _get_rest_(self, resource, resource_id=None, params={}, headers=HEADERS):
+    def __recursive_get__(self,  url, headers, params=None):
+        response = requests.get(url, params=params, headers=headers)
+        rdata = response.json()
+        self.results = self.results + rdata['data']
+        if rdata['links']['next'] is not None:
+            self.__recursive_get__(rdata['links']['next'], headers=headers)
+
+    def _get_all_(self, resource, resource_id=None, params={}, path=None, headers=HEADERS):
+        self.results = list()
+        res_url = self.URL + resource
+        if resource_id is not None:
+            res_url += '/' + resource_id
+            if path is not None:
+                res_url += '/' + path
+        self.__recursive_get__(res_url,  headers=headers, params=params)
+        return self.results
+
+    def _get_rest_(self, resource, resource_id=None, params={}, path=None, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
@@ -185,27 +202,33 @@ class RestController:
             res_url += '/' + resource_id + '/relationships/' + collection
         return requests.patch(res_url, data, json=json, params=params, headers=headers)
 
-    def get_instance(self, resource, resource_id, **kwargs):
+    def get_instance(self, resource, resource_id):
         response = self._get_rest_(resource, resource_id)
         return response.json()
 
-    def pretty_get_instance(self, resource, resource_id, **kwargs):
+    def pretty_get_instance(self, resource, resource_id):
         return json.dumps(self.get_instance(resource, resource_id), indent=4, sort_keys=True)
 
-    def get_field(self, resource, resource_id, field, **kwargs):
-        response = self._get_rest_(resource, resource_id, kwargs)
-        return response.json()[field]
+    def get_field(self, resource, resource_id, field, resperpage=None, page=None, index='attributes', ):
+        params = {'page[size]': resperpage, 'page[number]': page}
+        response = self._get_rest_(resource, resource_id, params)
+        return response.json()['data'][index][field]
+
+    def get_collection(self, resource, resource_id, collection, resperpage, page):
+        params = {'page[size]': resperpage, 'page[number]': page}
+        response = self._get_rest_(resource, resource_id, params, path=collection)
+        return [x['id'] for x in response.json()['data']['relationships'][collection]['data']]
 
     def query(self, resource, query, output_fields=None, resperpage=None, page=None,
               **kwargs):
-        return self._list_(resource, query, output_fields, resperpage, page, **kwargs)
+        return self._list_(resource, query, output_fields, resperpage, page)
 
     def list(self, resource):
         return self._list_(resource)
 
     def _list_(self, resource, query=None, output_fields=None, resperpage=None, page=None,
                **kwargs):
-        params = dict(results_per_page=resperpage, page=page)
+        params = {'page[size]': resperpage, 'page[number]': page}
         if query is not None:
             filters = json.loads(query)
             if type(filters) == dict:
@@ -251,7 +274,7 @@ class RestController:
             results.append(row)
         return results
 
-    def qairon_wrapped_deployment_search(self, prefix, parsed_args, **kwargs):
+    def qairon_wrapped_deployment_search(self, prefix, parsed_args):
         return self._get_search_(prefix, 'deployment')
 
     def _clone_config_for_dep_clone_(self, configs, new_dep_id):
