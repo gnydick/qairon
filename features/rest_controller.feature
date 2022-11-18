@@ -26,8 +26,8 @@ Feature: full test
     Then create deployment at "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0" for "testapp:teststack:testservice" tagged "default" with defaults "{}" via rest
     Then create config for resource "deployment" named "testdepcfg" from template "testcfgtmpl" can be created for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" tagged "tag" via rest
 
-    When add first "zones" "testenv:testprovider_type:testprovider:testregion:testzone" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
-    And add second "zones" "testenv:testprovider_type:testprovider:testregion:testzone2" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
+    When add first "zone" to "zones" "testenv:testprovider_type:testprovider:testregion:testzone" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
+    And add second "zone" to "zones" "testenv:testprovider_type:testprovider:testregion:testzone2" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
 
 
   Scenario: cicd

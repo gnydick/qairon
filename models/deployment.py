@@ -5,7 +5,6 @@ from db import db
 
 
 class Deployment(db.Model):
-    additional_attributes=['service_id']
     __tablename__ = "deployment"
     id = Column(String, primary_key=True)
     deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id', onupdate='CASCADE'), index=true)

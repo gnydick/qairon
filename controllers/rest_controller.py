@@ -17,20 +17,20 @@ class RestController:
         pass
 
     URL = '%s/api/rest/v1/' % endpoint
-    HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/vnd.api+json'}
+    HEADERS = {'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json'}
 
-    def add_to_many_to_many(self, owner_res, owner_res_id, col_res, col_res_id):
+    def add_to_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
         owner = self.get_instance(owner_res, owner_res_id)
-        collection = [{'id': x['id']} for x in owner[col_res]]
-        collection.append({"id": col_res_id})
-        attr = {col_res: collection}
-        return self._put_rest_(owner_res, owner_res_id, json=attr)
+        collection = dict()
+        collection['data'] = list([{'type': singular_resource, 'id': x['id']} for x in owner['data']['relationships'][plural_resource]['data']])
+        collection['data'].append({'type': singular_resource, 'id':  col_res_id})
+        return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
-    def del_from_many_to_many(self, owner_res, owner_res_id, col_res, col_res_id):
+    def del_from_many_to_many(self, owner_res, owner_res_id, plural_resource, col_res_id):
         owner = self.get_instance(owner_res, owner_res_id)
-        collection = list(filter(lambda x: x['id'] != col_res_id, owner[col_res]))
-        attr = {col_res: collection}
-        return self._put_rest_(owner_res, owner_res_id, json=attr)
+        collection = dict()
+        collection['data'] = list(filter(lambda x: x['id'] != col_res_id, owner['data']['relationships'][plural_resource]['data']))
+        return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
     def resource_get_search(self, prefix, resource, **kwargs):
         return self._get_search_(prefix, resource=resource, **kwargs)
@@ -157,13 +157,15 @@ class RestController:
         #     if opt in args_dict:
         #         if args_dict[opt] is not None:
         #             post_data[opt] = args_dict[opt]
-        return self._post_rest_(args_dict['resource'], json=post_data)
+        post_data['type'] = args_dict['resource']
+        data_post_data = {'data': post_data}
+        return self._post_rest_(args_dict['resource'], json=data_post_data)
 
-    def _delete_rest_(self, resource, resource_id):
+    def _delete_rest_(self, resource, resource_id, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
-        return requests.delete(res_url)
+        return requests.delete(res_url, headers=headers)
 
     def delete_resource(self, resource, resource_id, command=None):
         return self._delete_rest_(resource, resource_id)
@@ -177,11 +179,11 @@ class RestController:
     def update_resource(self, resource, resource_id, json={}, q=False):
         return self._put_rest_(resource, resource_id, data=None, json=json)
 
-    def _put_rest_(self, resource, resource_id, data=None, json=None, params={}, headers=HEADERS):
+    def _put_rest_(self, resource, resource_id, collection, data=None, json=None, params={}, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
-            res_url += '/' + resource_id
-        return requests.put(res_url, data, json=json, params=params, headers=headers)
+            res_url += '/' + resource_id + '/relationships/' + collection
+        return requests.patch(res_url, data, json=json, params=params, headers=headers)
 
     def get_instance(self, resource, resource_id, **kwargs):
         response = self._get_rest_(resource, resource_id)
