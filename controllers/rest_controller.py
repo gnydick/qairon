@@ -22,14 +22,16 @@ class RestController:
     def add_to_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
         owner = self.get_instance(owner_res, owner_res_id)
         collection = dict()
-        collection['data'] = list([{'type': singular_resource, 'id': x['id']} for x in owner['data']['relationships'][plural_resource]['data']])
-        collection['data'].append({'type': singular_resource, 'id':  col_res_id})
+        collection['data'] = list([{'type': singular_resource, 'id': x['id']} for x in
+                                   owner['data']['relationships'][plural_resource]['data']])
+        collection['data'].append({'type': singular_resource, 'id': col_res_id})
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
     def del_from_many_to_many(self, owner_res, owner_res_id, plural_resource, col_res_id):
         owner = self.get_instance(owner_res, owner_res_id)
         collection = dict()
-        collection['data'] = list(filter(lambda x: x['id'] != col_res_id, owner['data']['relationships'][plural_resource]['data']))
+        collection['data'] = list(
+            filter(lambda x: x['id'] != col_res_id, owner['data']['relationships'][plural_resource]['data']))
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
     def resource_get_search(self, prefix, resource):
@@ -119,24 +121,7 @@ class RestController:
         ids = [x['id'] for x in objs]
         return ids
 
-    def __recursive_get__(self,  url, headers, params=None):
-        response = requests.get(url, params=params, headers=headers)
-        rdata = response.json()
-        self.results = self.results + rdata['data']
-        if rdata['links']['next'] is not None:
-            self.__recursive_get__(rdata['links']['next'], headers=headers)
-
-    def _get_all_(self, resource, resource_id=None, params={}, path=None, headers=HEADERS):
-        self.results = list()
-        res_url = self.URL + resource
-        if resource_id is not None:
-            res_url += '/' + resource_id
-            if path is not None:
-                res_url += '/' + path
-        self.__recursive_get__(res_url,  headers=headers, params=params)
-        return self.results
-
-    def _get_rest_(self, resource, resource_id=None, params={}, path=None, headers=HEADERS):
+    def _get_rest_(self, resource, resource_id=None, params={}, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
@@ -214,10 +199,35 @@ class RestController:
         response = self._get_rest_(resource, resource_id, params)
         return response.json()['data'][index][field]
 
-    def get_collection(self, resource, resource_id, collection, resperpage, page):
-        params = {'page[size]': resperpage, 'page[number]': page}
-        response = self._get_rest_(resource, resource_id, params, path=collection)
-        return [x['id'] for x in response.json()['data']['relationships'][collection]['data']]
+    def _get_all_(self, resource, resource_id, path, headers=HEADERS):
+        res_url = self.URL + resource
+        if resource_id is not None:
+            res_url += '/' + resource_id
+            if path is not None:
+                res_url += '/' + path
+
+            params = {'page[size]': 1}
+            response = requests.get(res_url, headers=headers)
+            rdata = response.json()
+            total = rdata['meta']['total']
+
+            # this section loops through the pages, yielding page (batch of rows) to the caller
+            for page in range(1, int(total / 200 + 2)):
+                params = {'page[num]': page, 'page[size]': 100}
+                response = requests.get(res_url, params=params, headers=headers)
+                data = response.json()['data']
+                yield data
+
+    def get_collection(self, resource, resource_id, collection, resperpage=None, page=None):
+        # receiving the yield for the pages (batches of rows)
+        batches = self._get_all_(resource, resource_id, collection)
+
+        # loop over each batch
+        for batch in batches:
+            # loop over each row of each batch
+            for member in batch:
+                # stream each line back to the caller to loop over
+                yield member['id']
 
     def query(self, resource, query, output_fields=None, resperpage=None, page=None,
               **kwargs):

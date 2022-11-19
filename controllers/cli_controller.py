@@ -48,8 +48,9 @@ class CLIController:
         if not q:
             print(value['data']['id'])
 
-    def get_collection(self, resource, collection, command=None, id=None, resperpage=None, page=None, q=False):
-        results = rest.get_collection(resource, id, collection, resperpage, page)
+    def get_collection(self, resource, collection, command=None, resperpage=None, page=None, id=None, q=False):
+        # receives a stream of rows via yield
+        results = rest.get_collection(resource, id, collection)
         if not q:
             for line in results:
                 print(line)
