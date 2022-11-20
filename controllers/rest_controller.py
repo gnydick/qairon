@@ -22,7 +22,7 @@ class RestController:
     def add_to_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
         owner = self.get_collection(owner_res, owner_res_id, plural_resource)
         collection = dict()
-        collection['data'] = list([{'type': singular_resource, 'id': x} for x in
+        collection['data'] = list([x for x in
                                    owner])
         collection['data'].append({'type': singular_resource, 'id': col_res_id})
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
@@ -30,8 +30,8 @@ class RestController:
     def del_from_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
         owner = self.get_collection(owner_res, owner_res_id, plural_resource)
         collection = dict()
-        collection['data'] = list(filter(lambda x: x != col_res_id, owner))
-        collection['data'] = [{'type': singular_resource, 'id': x} for x in collection['data']]
+        collection['data'] = list(filter(lambda x: x['id'] != col_res_id, owner))
+        # collection['data'] = [{'type': singular_resource, 'id': x} for x in collection['data']]
 
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
@@ -228,7 +228,7 @@ class RestController:
             # loop over each row of each batch
             for member in batch:
                 # stream each line back to the caller to loop over
-                yield member['id']
+                yield member
 
     def query(self, resource, query, output_fields=None, resperpage=None, page=None,
               **kwargs):
