@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 from subprocess import call
@@ -5,6 +6,21 @@ from subprocess import call
 from .rest_controller import RestController
 
 rest = RestController()
+
+
+class SerializableGenerator(list):
+    """Generator that is serializable by JSON"""
+
+    def __init__(self, iterable):
+        tmp_body = iter(iterable)
+        try:
+            self._head = iter([next(tmp_body)])
+            self.append(tmp_body)
+        except StopIteration:
+            self._head = []
+
+    def __iter__(self):
+        return itertools.chain(self._head, *self[:1])
 
 
 class CLIController:
@@ -49,14 +65,13 @@ class CLIController:
             print(value['data']['id'])
 
     def get_collection(self, resource, collection, command=None, resperpage=None, page=None, id=None, q=False):
+
         # receives a stream of rows via yield
-        results = rest.get_collection(resource, id, collection)
+        # simplejson can handle a stream of objects and print them as array
+        data = rest.get_collection(resource, id, collection)
         if not q:
-            if len(results) > 0:
-                print('[')
-                for line in results:
-                    print(line)
-                print(']')
+            print(json.dumps(SerializableGenerator(iter(data))))
+
     def set_field(self, resource, id, field, value, command=None, q=False):
         response = self._set_field_(resource, id, field, value)
         if not q:
