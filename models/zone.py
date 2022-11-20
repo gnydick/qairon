@@ -2,22 +2,22 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
-import datetime
 
 
 class Zone(db.Model):
+    exclude = ['deployments']
+
     __tablename__ = "zone"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
-    region_id = Column(String, ForeignKey('region.id',  onupdate='CASCADE'), nullable=False, index=true)
+    region_id = Column(String, ForeignKey('region.id', onupdate='CASCADE'), nullable=False, index=true)
     native_id = Column(String, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
-
     region = relationship("Region", back_populates="zones")
-    deployments = relationship("Deployment", secondary='deployments_zones', back_populates="zones", lazy='selectin')
+    deployments = relationship("Deployment", secondary='deployments_zones', back_populates="zones", lazy='select')
 
     def __repr__(self):
         return self.id

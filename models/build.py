@@ -11,6 +11,8 @@ import datetime
 
 
 class Build(db.Model):
+    exclude = ['releases', 'build_artifacts']
+
     __tablename__ = "build"
 
     id = Column(String, primary_key=True)
@@ -22,9 +24,9 @@ class Build(db.Model):
     vcs_ref = Column(String, nullable=False)
     defaults = Column(Text)
     service = relationship('Service', back_populates='builds')
-    releases = relationship('Release', back_populates='build', lazy='selectin')
+    releases = relationship('Release', back_populates='build', lazy='select')
 
-    build_artifacts = relationship('BuildArtifact', back_populates='build', lazy='selectin')
+    build_artifacts = relationship('BuildArtifact', back_populates='build', lazy='select')
 
     @hybrid_property
     def git_tag(self):

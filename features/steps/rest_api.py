@@ -187,10 +187,10 @@ def step_impl(context, singular_resource, plural_resource, item_id, dest_resourc
     assert response.status_code == 204
 
 
-@then('remove first "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
-@then('remove second "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
-def step_impl(context, plural_resource, item_id, dest_resource, dest_id):
-    response = context.rest.del_from_many_to_many(dest_resource, dest_id, plural_resource, item_id)
+@then('remove first "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
+@then('remove second "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
+def step_impl(context, singular_resource, plural_resource, item_id, dest_resource, dest_id):
+    response = context.rest.del_from_many_to_many(dest_resource, dest_id, singular_resource, plural_resource, item_id)
     assert response.status_code == 204
 
 

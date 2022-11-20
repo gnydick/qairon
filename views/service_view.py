@@ -1,10 +1,10 @@
 from models import Service, Stack
 
 from views import DefaultView
-from views.QaironModelView import QaironModelView
+from views.default_view import DefaultView
 
 
-class ServiceView(QaironModelView):
+class ServiceView(DefaultView):
     column_searchable_list = [Service.id]
     column_filters = [Service.id, Stack.id, ]
     column_sortable_list = ['name', 'stack']

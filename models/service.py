@@ -6,6 +6,9 @@ import datetime
 
 
 class Service(db.Model):
+    exclude = ['builds', 'deployments', 'repos', 'configs', 'procs']
+    children = ['builds', 'deployments', 'repos', 'configs', 'procs']
+
     __tablename__ = "service"
     id = Column(String, primary_key=True)
     stack_id = Column(String, ForeignKey('stack.id',  onupdate='CASCADE'), nullable=False, index=true)
@@ -17,12 +20,12 @@ class Service(db.Model):
     defaults = Column(Text)
 
     stack = relationship("Stack", back_populates="services")
-    builds = relationship("Build", back_populates="service", lazy='selectin')
-    deployments = relationship("Deployment", back_populates="service", lazy='selectin')
-    repos = relationship("Repo", secondary='services_repos', back_populates="services", lazy='selectin')
+    builds = relationship("Build", back_populates="service", lazy='select')
+    deployments = relationship("Deployment", back_populates="service", lazy='select')
+    repos = relationship("Repo", secondary='services_repos', back_populates="services", lazy='select')
 
-    configs = relationship("ServiceConfig", back_populates="service", lazy='selectin')
-    procs = relationship("Proc", back_populates="service", lazy='selectin')
+    configs = relationship("ServiceConfig", back_populates="service", lazy='select')
+    procs = relationship("Proc", back_populates="service", lazy='select')
 
     def __repr__(self):
         return self.id

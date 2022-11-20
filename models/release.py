@@ -8,6 +8,8 @@ import datetime
 
 
 class Release(db.Model):
+    exclude = ['release_artifacts']
+
     __tablename__ = "release"
 
     id = Column(String, primary_key=True)
@@ -21,7 +23,7 @@ class Release(db.Model):
 
     deployment = relationship('Deployment', back_populates='releases', foreign_keys=[deployment_id])
 
-    release_artifacts = relationship('ReleaseArtifact', back_populates='release', lazy='selectin')
+    release_artifacts = relationship('ReleaseArtifact', back_populates='release', lazy='select')
 
     def __repr__(self):
         return self.id

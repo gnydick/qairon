@@ -6,6 +6,8 @@ import datetime
 
 
 class ConfigTemplate(db.Model):
+    exclude = ['service_configs', 'stack_configs', 'deployment_configs']
+
     __tablename__ = "config_template"
     id = Column(String, primary_key=True)
     language_id = Column(String, ForeignKey('language.id',  onupdate='CASCADE'), index=true)
@@ -14,9 +16,9 @@ class ConfigTemplate(db.Model):
     doc = Column(Text, nullable=False)
     defaults = Column(Text)
 
-    service_configs = relationship('ServiceConfig', back_populates='template', lazy='selectin')
-    stack_configs = relationship('StackConfig', back_populates='template', lazy='selectin')
-    deployment_configs = relationship('DeploymentConfig', back_populates='template', lazy='selectin')
+    service_configs = relationship('ServiceConfig', back_populates='template', lazy='select')
+    stack_configs = relationship('StackConfig', back_populates='template', lazy='select')
+    deployment_configs = relationship('DeploymentConfig', back_populates='template', lazy='select')
     language = relationship('Language', back_populates='config_templates')
 
     def __repr__(self):

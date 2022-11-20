@@ -1,18 +1,19 @@
-import sqlalchemy
+import ipaddress as ip
+
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import CIDR
-from sqlalchemy.orm import relationship, Session
-from models import Network
-from db import db
-import datetime
+from sqlalchemy.orm import relationship
 
-import ipaddress as ip
+from db import db
+from models import Network
 
 
 class Subnet(db.Model):
+    exclude = ['fleets']
+
     __tablename__ = "subnet"
     id = Column(String, primary_key=True)
-    network_id = Column(String, ForeignKey('network.id',  onupdate='CASCADE'), nullable=False, index=true)
+    network_id = Column(String, ForeignKey('network.id', onupdate='CASCADE'), nullable=False, index=true)
     native_id = Column(String, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
@@ -20,10 +21,9 @@ class Subnet(db.Model):
     cidr = Column(CIDR, nullable=False, index=true)
 
     defaults = Column(Text)
-    native_id = Column(String, index=true)
 
     network = relationship("Network", back_populates="subnets")
-    fleets = relationship("Fleet", secondary='subnets_fleets', back_populates="subnets", lazy='selectin')
+    fleets = relationship("Fleet", secondary='subnets_fleets', back_populates="subnets", lazy='select')
 
     def __repr__(self):
         return self.id
@@ -50,8 +50,6 @@ def my_before_insert_listener(mapper, connection, subnet):
     newsubnet = ip.IPv4Network(address=subnet.cidr)
     session = db.session
     network = session.query(Network).filter_by(id=subnet.network_id).first()
-
-
 
     if newsubnet in [ip.IPv4Network(subnet.cidr) for subnet in network.subnets if subnet.id is not None]:
         error = SubnetUnavailableError("Already Used", null)

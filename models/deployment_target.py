@@ -6,6 +6,8 @@ import datetime
 
 
 class DeploymentTarget(db.Model):
+    exclude = ['fleets', 'deployment_target_bins']
+
     __tablename__ = "deployment_target"
 
     id = Column(String, primary_key=True)
@@ -20,9 +22,9 @@ class DeploymentTarget(db.Model):
 
     partition = relationship("Partition", back_populates="deployment_targets")
 
-    fleets = relationship("Fleet", back_populates="deployment_target", lazy='selectin')
+    fleets = relationship("Fleet", back_populates="deployment_target", lazy='select')
     type = relationship("DeploymentTargetType", back_populates="targets")
-    deployment_target_bins = relationship('DeploymentTargetBin', back_populates='deployment_target', lazy='selectin')
+    deployment_target_bins = relationship('DeploymentTargetBin', back_populates='deployment_target', lazy='select')
 
 
 

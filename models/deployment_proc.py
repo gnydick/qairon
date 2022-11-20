@@ -6,6 +6,8 @@ import datetime
 
 
 class DeploymentProc(db.Model):
+    exclude = ['allocations']
+
     __tablename__ = "deployment_proc"
     id = Column(String, primary_key=True)
     deployment_id = Column(String, ForeignKey('deployment.id',  onupdate='CASCADE'), index=true)

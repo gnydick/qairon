@@ -20,18 +20,19 @@ class RestController:
     HEADERS = {'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json'}
 
     def add_to_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
-        owner = self.get_instance(owner_res, owner_res_id)
+        owner = self.get_collection(owner_res, owner_res_id, plural_resource)
         collection = dict()
-        collection['data'] = list([{'type': singular_resource, 'id': x['id']} for x in
-                                   owner['data']['relationships'][plural_resource]['data']])
+        collection['data'] = list([{'type': singular_resource, 'id': x} for x in
+                                   owner])
         collection['data'].append({'type': singular_resource, 'id': col_res_id})
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
-    def del_from_many_to_many(self, owner_res, owner_res_id, plural_resource, col_res_id):
-        owner = self.get_instance(owner_res, owner_res_id)
+    def del_from_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
+        owner = self.get_collection(owner_res, owner_res_id, plural_resource)
         collection = dict()
-        collection['data'] = list(
-            filter(lambda x: x['id'] != col_res_id, owner['data']['relationships'][plural_resource]['data']))
+        collection['data'] = list(filter(lambda x: x != col_res_id, owner))
+        collection['data'] = [{'type': singular_resource, 'id': x} for x in collection['data']]
+
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
     def resource_get_search(self, prefix, resource):
@@ -98,7 +99,7 @@ class RestController:
             'Content-Type': 'application/vnd.api+json'
         }
         filters = [dict(name='id', op='like', val=str(prefix) + '%')]
-        params = dict(q=json.dumps(dict(filters=filters)))
+        params = {'filter[object]': json.dumps(dict(filters=filters))}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code == 200
         results = requests.get(url, headers=headers).json()

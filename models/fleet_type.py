@@ -6,6 +6,8 @@ import datetime
 
 
 class FleetType(db.Model):
+    exclude = ['fleets']
+
     __tablename__ = "fleet_type"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
@@ -15,7 +17,7 @@ class FleetType(db.Model):
     defaults = Column(Text)
 
     provider_type = relationship("ProviderType", back_populates="fleet_types")
-    fleets = relationship("Fleet", back_populates="type", lazy='selectin')
+    fleets = relationship("Fleet", back_populates="type", lazy='select')
 
     def __repr__(self):
         return self.id

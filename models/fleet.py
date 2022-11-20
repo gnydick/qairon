@@ -6,6 +6,9 @@ import datetime
 
 
 class Fleet(db.Model):
+    exclude = ['deployment_target_bins', 'subnets', 'capacities']
+
+
     __tablename__ = "fleet"
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id',  onupdate='CASCADE'), index=true)
@@ -19,10 +22,10 @@ class Fleet(db.Model):
     defaults = Column(Text)
 
     deployment_target = relationship("DeploymentTarget", back_populates="fleets")
-    deployment_target_bins = relationship("DeploymentTargetBin", secondary='target_bins_fleets', back_populates="fleets", lazy='selectin')
-    subnets = relationship("Subnet", secondary='subnets_fleets', back_populates="fleets", lazy='selectin')
+    deployment_target_bins = relationship("DeploymentTargetBin", secondary='target_bins_fleets', back_populates="fleets", lazy='select')
+    subnets = relationship("Subnet", secondary='subnets_fleets', back_populates="fleets", lazy='select')
     type = relationship("FleetType", back_populates="fleets")
-    capacities = relationship("Capacity", back_populates="fleet", lazy='selectin')
+    capacities = relationship("Capacity", back_populates="fleet", lazy='select')
 
     def __repr__(self):
         return self.id

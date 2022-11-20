@@ -6,6 +6,8 @@ import datetime
 
 
 class Proc(db.Model):
+    exclude = ['deployment_procs']
+
     __tablename__ = "proc"
 
     id = Column(String, primary_key=True, nullable=False)
@@ -17,7 +19,7 @@ class Proc(db.Model):
 
     service = relationship("Service", back_populates="procs")
 
-    deployment_procs = relationship("DeploymentProc", back_populates="proc", lazy='selectin')
+    deployment_procs = relationship("DeploymentProc", back_populates="proc", lazy='select')
 
     def __repr__(self):
         return self.id

@@ -7,6 +7,8 @@ import datetime
 
 
 class BuildArtifact(db.Model):
+    exclude = ['']
+
     __tablename__ = "build_artifact"
     id = Column(String, primary_key=True)
 
@@ -28,6 +30,7 @@ class BuildArtifact(db.Model):
 
 
 class ReleaseArtifact(db.Model):
+    exclude = []
     __tablename__ = "release_artifact"
     id = Column(String, primary_key=True)
     release_id = Column(String, ForeignKey('release.id',  onupdate='CASCADE'), nullable=False)

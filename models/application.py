@@ -6,6 +6,8 @@ import datetime
 
 
 class Application(db.Model):
+    exclude = ['stacks']
+
     __tablename__ = "application"
 
     id = Column(String, primary_key=True)
@@ -13,7 +15,7 @@ class Application(db.Model):
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
-    stacks = relationship('Stack', back_populates='application', lazy='selectin')
+    stacks = relationship('Stack', back_populates='application', lazy='select')
 
     def __repr__(self):
         return self.id

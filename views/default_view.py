@@ -1,11 +1,15 @@
 from flask_admin.contrib.sqla import ModelView
 
-from views.QaironModelView import QaironModelView
+
+@property
+def column_exclude_list(self):
+    c = getattr(self.model, 'exclude')
+    return c
 
 
-class DefaultView(QaironModelView):
+class DefaultView(ModelView):
     can_view_details = True
-    form_excluded_columns = ['created_at', 'last_updated_at']
+    form_excluded_columns = column_exclude_list
     column_searchable_list = ['id']
     column_sortable_list = ['id']
     list_display_pk = True

@@ -6,6 +6,8 @@ import datetime
 
 
 class DeploymentTargetBin(db.Model):
+    exclude = ['deployments', 'fleets']
+
     __tablename__ = "deployment_target_bin"
 
     id = Column(String, primary_key=True)
@@ -16,8 +18,8 @@ class DeploymentTargetBin(db.Model):
     defaults = Column(Text)
 
     deployment_target = relationship('DeploymentTarget', back_populates='deployment_target_bins')
-    deployments = relationship("Deployment", back_populates="deployment_target_bin", lazy='selectin')
-    fleets = relationship("Fleet", secondary='target_bins_fleets', back_populates="deployment_target_bins", lazy='selectin')
+    deployments = relationship("Deployment", back_populates="deployment_target_bin", lazy='select')
+    fleets = relationship("Fleet", secondary='target_bins_fleets', back_populates="deployment_target_bins", lazy='select')
 
     def __repr__(self):
         return self.id

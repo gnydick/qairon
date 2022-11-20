@@ -5,6 +5,8 @@ from db import db
 
 
 class Deployment(db.Model):
+    exclude = ['configs', 'zones', 'deployment_procs', 'releases']
+
     __tablename__ = "deployment"
     id = Column(String, primary_key=True)
     deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id', onupdate='CASCADE'), index=true)
@@ -20,16 +22,16 @@ class Deployment(db.Model):
 
     deployment_target_bin = relationship("DeploymentTargetBin", back_populates="deployments")
     service = relationship("Service", back_populates="deployments")
-    configs = relationship("DeploymentConfig", back_populates="deployment", lazy='selectin')
+    configs = relationship("DeploymentConfig", back_populates="deployment", lazy='select')
 
-    zones = relationship("Zone", secondary='deployments_zones', back_populates="deployments", lazy='selectin')
-    deployment_procs = relationship("DeploymentProc", back_populates="deployment", lazy='selectin')
+    zones = relationship("Zone", secondary='deployments_zones', back_populates="deployments", lazy='select')
+    deployment_procs = relationship("DeploymentProc", back_populates="deployment", lazy='select')
 
     # safely circular relationship
     releases = relationship("Release", primaryjoin='Deployment.id==Release.deployment_id',
                             foreign_keys="Release.deployment_id", back_populates="deployment")
 
-    # releases = relationship('Release', back_populates='deployment', lazy='selectin')
+    # releases = relationship('Release', back_populates='deployment', lazy='select')
     current_release = relationship("Release", primaryjoin='Deployment.current_release_id==Release.id',
                                    foreign_keys=[current_release_id], post_update=True)
 

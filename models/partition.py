@@ -6,6 +6,8 @@ import datetime
 
 
 class Partition(db.Model):
+    exclude = ['deployment_targets', 'networks']
+
     __tablename__ = "partition"
 
     id = Column(String, primary_key=True)
@@ -18,9 +20,9 @@ class Partition(db.Model):
 
     region = relationship("Region", uselist=False, back_populates="partitions")
 
-    deployment_targets = relationship("DeploymentTarget", back_populates="partition", lazy='selectin')
+    deployment_targets = relationship("DeploymentTarget", back_populates="partition", lazy='select')
 
-    networks = relationship("Network", back_populates="partition", lazy='selectin')
+    networks = relationship("Network", back_populates="partition", lazy='select')
 
     def __repr__(self):
         return self.id

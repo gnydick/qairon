@@ -6,6 +6,8 @@ import datetime
 
 
 class Capacity(db.Model):
+    exclude = []
+
     __tablename__ = "capacity"
 
     id = Column(String, primary_key=True)

@@ -6,14 +6,16 @@ import datetime
 
 
 class ProviderType(db.Model):
+    exclude = ['providers', 'fleet_types']
+
     __tablename__ = "provider_type"
     id = Column(String, primary_key=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
-    providers = relationship("Provider", back_populates="type", lazy='selectin')
-    fleet_types = relationship("FleetType", back_populates="provider_type", lazy='selectin')
+    providers = relationship("Provider", back_populates="type", lazy='select')
+    fleet_types = relationship("FleetType", back_populates="provider_type", lazy='select')
 
     def __repr__(self):
         return self.id

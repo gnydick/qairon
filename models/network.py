@@ -9,6 +9,8 @@ from sqlalchemy.dialects.postgresql.base import CIDR
 import ipaddress as ip
 
 class Network(db.Model):
+    exclude = ['subnets']
+
     __tablename__ = "network"
 
     def __init__(self, **entries):
@@ -26,7 +28,7 @@ class Network(db.Model):
 
 
     partition = relationship("Partition", back_populates="networks")
-    subnets = relationship("Subnet", back_populates='network', lazy='selectin')
+    subnets = relationship("Subnet", back_populates='network', lazy='select')
 
     def __repr__(self):
         return self.id

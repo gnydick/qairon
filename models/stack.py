@@ -6,6 +6,9 @@ import datetime
 
 
 class Stack(db.Model):
+    exclude = ['services', 'configs']
+
+
     __tablename__ = "stack"
 
     id = Column(String, primary_key=True)
@@ -16,8 +19,8 @@ class Stack(db.Model):
     defaults = Column(Text)
 
     application = relationship('Application', back_populates='stacks')
-    configs = relationship("StackConfig", back_populates="stack", lazy='selectin')
-    services = relationship("Service", back_populates="stack", lazy='selectin')
+    configs = relationship("StackConfig", back_populates="stack", lazy='select')
+    services = relationship("Service", back_populates="stack", lazy='select')
 
     def __repr__(self):
         return self.id

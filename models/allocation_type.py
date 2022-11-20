@@ -6,6 +6,9 @@ import datetime
 
 
 class AllocationType(db.Model):
+    exclude = ['allocations', 'capacities']
+
+
     __tablename__ = "allocation_type"
     id = Column(String, primary_key=True)
     unit = Column(String, nullable=False)
@@ -13,8 +16,8 @@ class AllocationType(db.Model):
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     defaults = Column(Text)
 
-    allocations = relationship("Allocation", back_populates="type", lazy='selectin')
-    capacities = relationship("Capacity", back_populates="type", lazy='selectin')
+    allocations = relationship("Allocation", back_populates="type", lazy='select')
+    capacities = relationship("Capacity", back_populates="type", lazy='select')
 
     def __repr__(self):
         return self.id

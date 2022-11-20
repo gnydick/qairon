@@ -1,9 +1,9 @@
 from flask_admin.contrib.sqla import ModelView
 from models import Service
-from views.QaironModelView import QaironModelView
+from views.default_view import DefaultView
 
 
-class ServiceConfigView(QaironModelView):
+class ServiceConfigView(DefaultView):
     # edit_template = 'service_config_edit.html'
     # create_template = 'service_config_create.html'
     column_searchable_list = [Service.id]

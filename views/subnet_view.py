@@ -1,10 +1,10 @@
 from flask_admin.contrib.sqla import ModelView
 from models import Network, Subnet
 from converters import NetworkModelConverter
-from views.QaironModelView import QaironModelView
+from views.default_view import DefaultView
 
 
-class SubnetView(QaironModelView):
+class SubnetView(DefaultView):
     model_form_converter = NetworkModelConverter
     can_view_details = True
     column_searchable_list = [Subnet.name, Network.name]

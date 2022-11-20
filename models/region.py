@@ -6,6 +6,9 @@ import datetime
 
 
 class Region(db.Model):
+    exclude = ['partitions', 'zones']
+
+
     __tablename__ = "region"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
@@ -15,9 +18,9 @@ class Region(db.Model):
     defaults = Column(Text)
     native_id = Column(String, index=true)
 
-    partitions = relationship("Partition", back_populates="region", lazy='selectin')
+    partitions = relationship("Partition", back_populates="region", lazy='select')
     provider = relationship("Provider", back_populates="regions")
-    zones = relationship("Zone", back_populates="region", lazy='selectin')
+    zones = relationship("Zone", back_populates="region", lazy='select')
 
     def __repr__(self):
         return self.id

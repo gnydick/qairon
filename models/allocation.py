@@ -9,6 +9,8 @@ class Allocation(db.Model):
     watermarks = ('HIGH', 'LOW')
     watermarks_enum = Enum(*watermarks, name='watermark')
 
+    exclude = []
+
     __tablename__ = "allocation"
 
     id = Column(String, primary_key=True)

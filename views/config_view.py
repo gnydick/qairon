@@ -2,10 +2,10 @@ from flask_admin.contrib.sqla import ModelView
 from models import Deployment
 
 from db import db
-from views.QaironModelView import QaironModelView
+from views.default_view import DefaultView
 
 
-class ConfigView(QaironModelView):
+class ConfigView(DefaultView):
     # edit_template = 'config_edit.html'
     # create_template = 'config_create.html'
     column_searchable_list = [Deployment.id]

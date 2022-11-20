@@ -6,6 +6,8 @@ from db import db
 
 
 class DeploymentConfig(db.Model):
+    exclude = []
+
     __tablename__ = "deployment_config"
     id = Column(String, primary_key=True)
 
@@ -29,6 +31,8 @@ class DeploymentConfig(db.Model):
 
 
 class ServiceConfig(db.Model):
+    exclude = []
+
     __tablename__ = "service_config"
     id = Column(String, primary_key=True)
 
@@ -51,6 +55,7 @@ class ServiceConfig(db.Model):
 
 
 class StackConfig(db.Model):
+    exclude = []
     __tablename__ = "stack_config"
     id = Column(String, primary_key=True)
 

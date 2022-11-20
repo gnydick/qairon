@@ -6,6 +6,8 @@ import datetime
 
 
 class Provider(db.Model):
+    exclude = ['regions']
+
     __tablename__ = "provider"
     id = Column(String, primary_key=True)
     provider_type_id = Column(String, ForeignKey('provider_type.id',  onupdate='CASCADE'), nullable=False, index=true)
@@ -17,7 +19,7 @@ class Provider(db.Model):
 
     environment = relationship("Environment", back_populates="providers")
     type = relationship("ProviderType", back_populates="providers")
-    regions = relationship("Region", back_populates="provider", lazy='selectin')
+    regions = relationship("Region", back_populates="provider", lazy='select')
 
     def __repr__(self):
         return self.id
