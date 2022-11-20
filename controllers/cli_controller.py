@@ -52,9 +52,11 @@ class CLIController:
         # receives a stream of rows via yield
         results = rest.get_collection(resource, id, collection)
         if not q:
-            for line in results:
-                print(line)
-
+            if len(results) > 0:
+                print('[')
+                for line in results:
+                    print(line)
+                print(']')
     def set_field(self, resource, id, field, value, command=None, q=False):
         response = self._set_field_(resource, id, field, value)
         if not q:
