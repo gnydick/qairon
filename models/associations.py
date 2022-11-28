@@ -1,7 +1,6 @@
 from sqlalchemy import *
 
 from db import db
-import datetime
 
 deps_to_zones = Table('deployments_zones', db.metadata,
                       Column('deployment_id', String, ForeignKey('deployment.id', onupdate='CASCADE')),
@@ -18,13 +17,12 @@ subnets_to_fleets = Table('subnets_fleets', db.metadata,
                           )
 
 target_bins_to_fleets = Table('target_bins_fleets', db.metadata,
-                          Column('deployment_target_bin_id', String, ForeignKey('deployment_target_bin.id', onupdate='CASCADE')),
-                          Column('fleet_id', String, ForeignKey('fleet.id', onupdate='CASCADE')),
-                          Index('ix_target_bins_to_fleets_deployment_target_bin_id', 'deployment_target_bin_id'),
-                          Index('ix_target_bins_to_fleets_fleet_id', 'fleet_id')
-                          )
-
-
+                              Column('deployment_target_bin_id', String,
+                                     ForeignKey('deployment_target_bin.id', onupdate='CASCADE')),
+                              Column('fleet_id', String, ForeignKey('fleet.id', onupdate='CASCADE')),
+                              Index('ix_target_bins_to_fleets_deployment_target_bin_id', 'deployment_target_bin_id'),
+                              Index('ix_target_bins_to_fleets_fleet_id', 'fleet_id')
+                              )
 
 svcs_to_repos = Table('services_repos', db.metadata,
                       Column('service_id', String, ForeignKey('service.id', onupdate='CASCADE')),

@@ -5,7 +5,7 @@ from db import db
 
 
 class Repo(db.Model):
-    exclude = ['services', 'input_build_artifacts', 'output_build_artifacts', 'input_release_artifacts',
+    exclude = ['input_build_artifacts', 'output_build_artifacts', 'input_release_artifacts',
               'output_release_artifacts']
 
     __tablename__ = "repo"

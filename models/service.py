@@ -6,7 +6,7 @@ import datetime
 
 
 class Service(db.Model):
-    exclude = ['builds', 'deployments', 'repos', 'configs', 'procs']
+    exclude = ['builds', 'deployments', 'configs', 'procs']
     children = ['builds', 'deployments', 'repos', 'configs', 'procs']
 
     __tablename__ = "service"
