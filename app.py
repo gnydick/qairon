@@ -1,4 +1,5 @@
 import inspect
+import os
 from os.path import exists
 
 from flask_admin import Admin
@@ -14,7 +15,7 @@ from views import *
 
 app.url_map.strict_slashes = False
 
-version = "development"
+version = os.getenv('VERSION', 'development')
 version_file = "./qairon-version"
 if exists(version_file):
     with open(version_file) as file:
