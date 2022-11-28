@@ -4,6 +4,9 @@ ENV FLASK_APP=app.py
 ENV SECRET_KEY=12345
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+ARG version
+
+ENV VERSION $version
 
 RUN apt-get update && \
     apt-get upgrade -y && \
