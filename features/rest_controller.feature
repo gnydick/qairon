@@ -8,6 +8,8 @@ Feature: full test
     Then create "zone" "testzone" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
     Then create "zone" "testzone2" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
     Then create "partition" "testpartition" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
+    Then create "cidr" "1.1.1.1" "network" "testnet" under "partition_id" "testenv:testprovider_type:testprovider:testregion:testpartition" via rest
+    Then allocate subnet "testenv:testprovider_type:testprovider:testregion:testpartition:testnet" "12" "testsubnet0"
 
   Scenario: application hierarchy
     Given create "application" "testapp" via rest
@@ -61,6 +63,8 @@ Feature: full test
     Then delete "deployment_target" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" via rest
     Then delete "zone" "testenv:testprovider_type:testprovider:testregion:testzone" via rest
     Then delete "zone" "testenv:testprovider_type:testprovider:testregion:testzone2" via rest
+    Then delete "subnet" "testenv:testprovider_type:testprovider:testregion:testpartition:testnet:testsubnet0" via rest
+    Then delete "network" "testenv:testprovider_type:testprovider:testregion:testpartition:testnet" via rest
     Then delete "partition" "testenv:testprovider_type:testprovider:testregion:testpartition" via rest
     Then delete "region" "testenv:testprovider_type:testprovider:testregion" via rest
     Then delete "provider" "testenv:testprovider_type:testprovider" via rest

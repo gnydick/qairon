@@ -9,22 +9,27 @@ def step_impl(context, resource, res_id):
     assert data['data']['id'] == res_id
 
 
-@then('create build_artifact for "{build_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}"')
+@then(
+    'create build_artifact for "{build_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}"')
 def step_impl(context, build_id, input_repo_id, output_repo_id, name, upload_path):
     res = context.rest.create_resource(
-        {'resource': 'build_artifact', 'build_id': build_id, 'input_repo_id': input_repo_id, 'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}
+        {'resource': 'build_artifact', 'build_id': build_id, 'input_repo_id': input_repo_id,
+         'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}
     )
     data = res.json()
     assert data['data']['id'] == ':'.join([build_id, name])
 
 
-@then('create release_artifact for "{release_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}"')
+@then(
+    'create release_artifact for "{release_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}"')
 def step_impl(context, release_id, input_repo_id, output_repo_id, name, upload_path):
     res = context.rest.create_resource(
-        {'resource': 'release_artifact', 'release_id': release_id, 'input_repo_id': input_repo_id, 'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}
+        {'resource': 'release_artifact', 'release_id': release_id, 'input_repo_id': input_repo_id,
+         'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}
     )
     data = res.json()
     assert data['data']['id'] == ':'.join([release_id, name])
+
 
 @then('create "{resource}" with parent id "{parent_id}" in parent field "{parent_field}" named "{name}"')
 def step_impl(context, resource, parent_id, parent_field, name):
@@ -44,6 +49,22 @@ def step_impl(context, environment_id, provider_type_id, native_id):
     )
     data = res.json()
     assert data['data']['id'] == ':'.join([environment_id, provider_type_id, native_id])
+
+
+@then('allocate subnet "{network_id}" "{additional_mask_bits}" "{subnet_name}"')
+def step_impl(context, network_id, additional_mask_bits, subnet_name):
+    res = context.rest.allocate_subnet(network_id, additional_mask_bits, subnet_name)
+    data = res.json()
+    assert data['data']['id'] == '%s:%s' % (network_id, subnet_name)
+
+
+@then('create "{field}" "{field_val}" "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" via rest')
+def step_impl(context, field, field_val, resource, res_name, parent_fk_field, parent_id):
+    res = context.rest.create_resource(
+        {'name': res_name, parent_fk_field: parent_id, 'resource': resource, field: field_val}
+    )
+    data = res.json()
+    assert data['data']['id'] == '%s:%s' % (parent_id, res_name)
 
 
 @then('create "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" via rest')
@@ -155,6 +176,7 @@ def step_impl(context, deployment_id, build_id, build_num):
     data = response.json()
     assert data['data']['id'] == '%s:%s' % (deployment_id, build_num)
 
+
 @then(
     'create deployment at "{dep_target_bin_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via rest')
 def step_impl(context, dep_target_bin_id, service, tag, defaults):
@@ -165,8 +187,8 @@ def step_impl(context, dep_target_bin_id, service, tag, defaults):
     data = response.json()
     assert data['data']['id'] == '%s:%s:%s' % (dep_target_bin_id, service, tag)
     new_dep = context.rest.get_instance('deployment', data['data']['id'])
-    assert new_dep['data']['attributes']['defaults'] == defaults
-    assert new_dep['data']['attributes']['tag'] == tag
+    assert new_dep['attributes']['defaults'] == defaults
+    assert new_dep['attributes']['tag'] == tag
 
 
 # @then(
@@ -179,7 +201,6 @@ def step_impl(context, dep_target_bin_id, service, tag, defaults):
 #     assert new_svc_config['id'] == '%s:%s' % (service, service_config_template)
 
 
-
 @when('add first "{singular_resource}" to "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
 @when('add second "{singular_resource}" to "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
 def step_impl(context, singular_resource, plural_resource, item_id, dest_resource, dest_id):
@@ -187,8 +208,10 @@ def step_impl(context, singular_resource, plural_resource, item_id, dest_resourc
     assert response.status_code == 204
 
 
-@then('remove first "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
-@then('remove second "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
+@then(
+    'remove first "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
+@then(
+    'remove second "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
 def step_impl(context, singular_resource, plural_resource, item_id, dest_resource, dest_id):
     response = context.rest.del_from_many_to_many(dest_resource, dest_id, singular_resource, plural_resource, item_id)
     assert response.status_code == 204

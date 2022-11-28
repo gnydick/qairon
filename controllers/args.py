@@ -53,16 +53,18 @@ def __add_list_parser__(parsers):
     list_parser.required = False
     list_parser.add_argument('-p', help='page', dest='page')
     list_parser.add_argument('-r', help='results per page', dest='resperpage')
-    list_parser.add_argument('-o', help='output fields', dest='output_fields', action='append')
-    list_parser.add_argument('-f', help='format', dest='format')
+    list_parser.add_argument('-f', help='output fields', dest='output_fields', action='append')
+    list_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
+
 
     query_parser = parsers.add_parser('query')
     query_parser.required = False
     query_parser.add_argument('query')
     query_parser.add_argument('-p', help='page', dest='page')
     query_parser.add_argument('-r', help='results per page', dest='resperpage')
-    query_parser.add_argument('-o', help='output fields', dest='output_fields', action='append')
-    query_parser.add_argument('-f', help='format', dest='format')
+    query_parser.add_argument('-f', help='output fields', dest='output_fields', action='append')
+    query_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
+
 
 
 def __add_set_field_parser__(rest, parsers, resource):
@@ -76,20 +78,22 @@ def __add_get_field_parser__(rest, parsers, resource):
     field_update_parser = parsers.add_parser('get_field')
     field_update_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
     field_update_parser.add_argument('field')
+    field_update_parser.add_argument('-f', help='output field for related object', dest='output_fields', action='append')
+    field_update_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
 
 
-def __add_get_collection_parser__(rest, parsers, resource):
-    get_collection_parser = parsers.add_parser('get_collection')
-    get_collection_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
-    get_collection_parser.add_argument('collection')
-    get_collection_parser.add_argument('-p', help='page', dest='page')
-    get_collection_parser.add_argument('-r', help='results per page', dest='resperpage')
+# def __add_get_collection_parser__(rest, parsers, resource):
+#     get_collection_parser = parsers.add_parser('get_collection')
+#     get_collection_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
+#     get_collection_parser.add_argument('collection')
+#     get_collection_parser.add_argument('-p', help='page', dest='page')
+#     get_collection_parser.add_argument('-r', help='results per page', dest='resperpage')
 
 
-def __add_get_relation_parser__(rest, parsers, resource):
-    get_relation_parser = parsers.add_parser('get_relation')
-    get_relation_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
-    get_relation_parser.add_argument('relation')
+# def __add_get_relation_parser__(rest, parsers, resource):
+#     get_relation_parser = parsers.add_parser('get_relation')
+#     get_relation_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
+#     get_relation_parser.add_argument('relation')
 
 
 class CLIArgs:
@@ -138,9 +142,7 @@ class CLIArgs:
 
             __add_list_parser__(parsers_for_model_parser)
             __add_set_field_parser__(self.rest, parsers_for_model_parser, model)
-            __add_get_field_parser__(self.rest, parsers_for_model_parser, model)
-            __add_get_collection_parser__(self.rest, parsers_for_model_parser, model)
-            __add_get_relation_parser__(self.rest, parsers_for_model_parser, model)
+            __add_get_field_parser__(self.rest, parsers_for_model_parser, model)        
             _model_com_get_parser = parsers_for_model_parser.add_parser('get')
             _model_com_get_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
             _model_com_create_parser = parsers_for_model_parser.add_parser('create')
@@ -189,7 +191,7 @@ class CLIArgs:
 
     def assign_args(self):
         parser = argparse.ArgumentParser(description='qaironRegistry CLI')
-        parser.add_argument('-q', help='Quiet', required=False, action='store_true')
+        parser.add_argument('-q', help='Quiet', required=False, action='store_true')       
         context_parsers = parser.add_subparsers(help='context to operate in', dest='resource')
 
         self.__gen_parsers__(context_parsers)

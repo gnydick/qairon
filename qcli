@@ -14,8 +14,7 @@ def _main_():
     qaironargs = CLIArgs(rest)
 
     (args, junk) = qaironargs.parse_args(rest)
-    commands = ['delete', 'get', 'get_version', 'list', 'promote', 'query', 'get_field', 'get_collection',
-                'get_relation', 'set_field']
+    commands = ['delete', 'get', 'get_version', 'list', 'promote', 'query', 'get_field', 'set_field']
     if hasattr(args, 'resource'):
         if args.resource in QaironSchema.MODELS:
             if hasattr(args, 'command'):

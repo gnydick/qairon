@@ -39,22 +39,13 @@ class SubnetUnavailableError(RuntimeError):
         self.errors = errors
 
 
+
+
+
 @db.event.listens_for(Subnet, 'before_update')
-def my_before_update_listener(mapper, connection, subnet):
-    __update_id__(subnet)
-
-
-# TODO this shouldn't be a rest call, refactor it'
 @db.event.listens_for(Subnet, 'before_insert')
 def my_before_insert_listener(mapper, connection, subnet):
-    newsubnet = ip.IPv4Network(address=subnet.cidr)
-    session = db.session
-    network = session.query(Network).filter_by(id=subnet.network_id).first()
-
-    if newsubnet in [ip.IPv4Network(subnet.cidr) for subnet in network.subnets if subnet.id is not None]:
-        error = SubnetUnavailableError("Already Used", null)
-        return error
-    __update_id__(subnet)
+       __update_id__(subnet)
 
 
 def __update_id__(subnet):
