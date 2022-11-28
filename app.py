@@ -15,8 +15,8 @@ from views import *
 
 app.url_map.strict_slashes = False
 
-version = os.getenv('VERSION', 'development')
-version_file = "./qairon-version"
+version = 'development'
+version_file = ".version"
 if exists(version_file):
     with open(version_file) as file:
         version = file.readline().strip()
