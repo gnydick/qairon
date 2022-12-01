@@ -9,7 +9,7 @@ from .schema import QaironSchema
 def __gen_completers__(rest):
     resources = QaironSchema.CREATE_FIELDS.keys()
     for res in resources:
-        def completer(self, prefix, parsed_args, resource=res):
+        def completer(self, prefix, action=None, parser=None, parsed_args=None, resource=res):
             return rest.resource_get_search(prefix, resource)
 
         completer.__name__ = "%s_completer" % res
@@ -56,7 +56,6 @@ def __add_list_parser__(parsers):
     list_parser.add_argument('-f', help='output fields', dest='output_fields', action='append')
     list_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
 
-
     query_parser = parsers.add_parser('query')
     query_parser.required = False
     query_parser.add_argument('query')
@@ -64,7 +63,6 @@ def __add_list_parser__(parsers):
     query_parser.add_argument('-r', help='results per page', dest='resperpage')
     query_parser.add_argument('-f', help='output fields', dest='output_fields', action='append')
     query_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
-
 
 
 def __add_set_field_parser__(rest, parsers, resource):
@@ -78,7 +76,10 @@ def __add_get_field_parser__(rest, parsers, resource):
     field_update_parser = parsers.add_parser('get_field')
     field_update_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
     field_update_parser.add_argument('field')
-    field_update_parser.add_argument('-f', help='output field for related object', dest='output_fields', action='append')
+    field_update_parser.add_argument('-p', help='page', dest='page')
+    field_update_parser.add_argument('-r', help='results per page', dest='resperpage')
+    field_update_parser.add_argument('-f', help='output field for related object', dest='output_fields',
+                                     action='append')
     field_update_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
 
 
@@ -142,7 +143,7 @@ class CLIArgs:
 
             __add_list_parser__(parsers_for_model_parser)
             __add_set_field_parser__(self.rest, parsers_for_model_parser, model)
-            __add_get_field_parser__(self.rest, parsers_for_model_parser, model)        
+            __add_get_field_parser__(self.rest, parsers_for_model_parser, model)
             _model_com_get_parser = parsers_for_model_parser.add_parser('get')
             _model_com_get_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
             _model_com_create_parser = parsers_for_model_parser.add_parser('create')
@@ -191,7 +192,7 @@ class CLIArgs:
 
     def assign_args(self):
         parser = argparse.ArgumentParser(description='qaironRegistry CLI')
-        parser.add_argument('-q', help='Quiet', required=False, action='store_true')       
+        parser.add_argument('-q', help='Quiet', required=False, action='store_true')
         context_parsers = parser.add_subparsers(help='context to operate in', dest='resource')
 
         self.__gen_parsers__(context_parsers)

@@ -77,7 +77,7 @@ class RestController:
         response = requests.get(url, headers=headers)
         assert response.status_code == 200
         results = requests.get(url, headers=headers).json()
-        objs = results['objects']
+        objs = results['data']
         ids = [x['id'] for x in objs]
         return ids
 
@@ -99,11 +99,11 @@ class RestController:
             'Content-Type': 'application/vnd.api+json'
         }
         filters = [dict(name='id', op='like', val=str(prefix) + '%')]
-        params = {'filter[object]': json.dumps(dict(filters=filters))}
+        params = {'filter[objects]': json.dumps(filters)}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code == 200
-        results = requests.get(url, headers=headers).json()
-        objs = results['objects']
+        results = response.json()
+        objs = results['data']
         ids = [x['id'] for x in objs]
         return ids
 
@@ -114,11 +114,11 @@ class RestController:
             'Content-Type': 'application/vnd.api+json'
         }
         filters = [dict(name='id', op='like', val=str(prefix) + '%')]
-        params = dict(q=json.dumps(dict(filters=filters)))
+        params = {'filter[objects]': json.dumps(dict(filter=filters))}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code == 200
         results = requests.get(url, headers=headers).json()
-        objs = results['objects']
+        objs = results['data']
         ids = [x['id'] for x in objs]
         return ids
 
@@ -260,7 +260,7 @@ class RestController:
             output_fields = [output_fields]
         elif output_fields is None:
             output_fields = ['id']
-        for obj in response.json()['objects']:
+        for obj in response.json()['data']:
             row = []
             for field in output_fields:
                 row.append(obj[field])

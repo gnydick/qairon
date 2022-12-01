@@ -102,8 +102,8 @@ class CLIController:
             print(value)
 
     # This will always return an ID or list of IDs
-    def get_field(self, resource, id, field, command=None, output_fields=None, output_format=None, q=False):
-        value = rest.get_field(resource, id, field=field)
+    def get_field(self, resource, id, field, command=None, resperpage=None, page=None, output_fields=None, output_format=None, q=False):
+        value = rest.get_field(resource, id, field=field, resperpage=resperpage, page=page)
         self.__output__(q, value, field=field, output_fields=output_fields, output_format=output_format)
 
     def get_parent(self, resource, relation, command=None, id=None, q=False):
