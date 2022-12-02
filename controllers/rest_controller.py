@@ -163,7 +163,7 @@ class RestController:
         #         if args_dict[opt] is not None:
         #             post_data[opt] = args_dict[opt]
 
-        data_post_data = {'data': {'attributes': post_data, 'type': args_dict['resource'] }}
+        data_post_data = {'data': {'attributes': post_data, 'type': args_dict['resource']}}
         return self._post_rest_(args_dict['resource'], json=data_post_data)
 
     def _delete_rest_(self, resource, resource_id, headers=HEADERS):
@@ -243,7 +243,8 @@ class RestController:
                **kwargs):
         params = {'page[size]': resperpage, 'page[number]': page}
         if filters is not None:
-            params['filter[objects]']=json.loads(filters)
+            params['filter[objects]'] = list()
+            params['filter[objects]'].append(filters)
         response = self._get_rest_(resource, params=params)
         return response.json()['data']
 
