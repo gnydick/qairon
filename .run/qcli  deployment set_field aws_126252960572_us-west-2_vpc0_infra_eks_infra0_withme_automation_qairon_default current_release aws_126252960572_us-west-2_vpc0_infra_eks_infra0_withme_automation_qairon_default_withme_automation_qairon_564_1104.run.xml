@@ -15,6 +15,11 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli" />
     <option name="PARAMETERS" value="deployment set_field aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default current_release aws:126252960572:us-west-2:vpc0:infra:eks:infra0:withme:automation:qairon:default:withme:automation:qairon:564:1104" />
     <option name="SHOW_COMMAND_LINE" value="true" />

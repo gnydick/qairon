@@ -1,25 +1,24 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="unit test flask db upgrade" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="cascade_new_ids" type="PythonConfigurationType" factoryName="Python">
     <module name="qairon" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
-      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://ut:ut@localhost/unit_test_qairon" />
-      <env name="SECRET_KEY" value="12345" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://qairon:qairon@127.0.0.1:5436/qairon" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/migrations/scripts" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
-    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="false" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
       <option name="credential" />
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/python/db_migrate.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/migrations/scripts/cascade_new_ids.py" />
     <option name="PARAMETERS" value="" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

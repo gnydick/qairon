@@ -1,15 +1,22 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="unit test flask db upgrade" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="ddtrace-run" type="PythonConfigurationType" factoryName="Python">
     <module name="qairon" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
-      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://ut:ut@localhost/unit_test_qairon" />
+      <env name="DD_API_KEY" value="4f78cb2413c470f78e12ca9fbdf771f9" />
+      <env name="DD_GEVENT_PATCH_ALL" value="1" />
+      <env name="FLASK_DEBUG" value="True" />
+      <env name="PROPAGATE_EXCEPTIONS" value="True" />
       <env name="SECRET_KEY" value="12345" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://qairon:qairon@localhost:5432/qairon" />
+      <env name="DD_SERVICE" value="qairon" />
+      <env name="DD_ENV" value="local" />
+      <env name="DD_VERSION" value="dev" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="WORKING_DIRECTORY" value="" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -19,8 +26,8 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/python/db_migrate.py" />
-    <option name="PARAMETERS" value="" />
+    <option name="SCRIPT_NAME" value="$USER_HOME$/.pyenv/versions/3.9.2/envs/qairon-3.9.2/bin/ddtrace-run" />
+    <option name="PARAMETERS" value="flask run" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

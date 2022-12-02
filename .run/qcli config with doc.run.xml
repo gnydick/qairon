@@ -15,6 +15,11 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli" />
     <option name="PARAMETERS" value="config_template create cfn-gamelift-fleet json 1 -c { &quot;Type&quot; : &quot;AWS::GameLift::Fleet&quot;, &quot;Properties&quot; : { &quot;BuildId&quot; : String, &quot;CertificateConfiguration&quot; : CertificateConfiguration, &quot;Description&quot; : String, &quot;DesiredEC2Instances&quot; : Integer, &quot;EC2InboundPermissions&quot; : [ IpPermission, ... ], &quot;EC2InstanceType&quot; : String, &quot;FleetType&quot; : String, &quot;InstanceRoleARN&quot; : String, &quot;LogPaths&quot; : [ String, ... ], &quot;MaxSize&quot; : Integer, &quot;MetricGroups&quot; : [ String, ... ], &quot;MinSize&quot; : Integer, &quot;Name&quot; : String, &quot;NewGameSessionProtectionPolicy&quot; : String, &quot;PeerVpcAwsAccountId&quot; : String, &quot;PeerVpcId&quot; : String, &quot;ResourceCreationLimitPolicy&quot; : ResourceCreationLimitPolicy, &quot;RuntimeConfiguration&quot; : RuntimeConfiguration, &quot;ScriptId&quot; : String, &quot;ServerLaunchParameters&quot; : String, &quot;ServerLaunchPath&quot; : String } }" />
     <option name="SHOW_COMMAND_LINE" value="false" />

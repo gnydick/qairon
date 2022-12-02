@@ -13,6 +13,11 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli" />
     <option name="PARAMETERS" value="baker bake dev:aws:702861675511:us-west-2:vpc0:eks:dev0:withme:services:account-manager:default withme:services:account-manager:15 88" />
     <option name="SHOW_COMMAND_LINE" value="true" />

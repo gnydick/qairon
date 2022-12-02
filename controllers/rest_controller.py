@@ -243,8 +243,7 @@ class RestController:
                **kwargs):
         params = {'page[size]': resperpage, 'page[number]': page}
         if filters is not None:
-            filters = filters
-            params = {'filter[objects]': json.dumps(filters)}
+            params['filter[objects']=json.loads(filters)
         response = self._get_rest_(resource, params=params)
         return response.json()['data']
 
