@@ -5,7 +5,7 @@
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
-      <env name="DD_API_KEY" value="4f78cb2413c470f78e12ca9fbdf771f9" />
+      <env name="DD_API_KEY" value="" />
       <env name="DD_ENV" value="local" />
       <env name="DD_GEVENT_PATCH_ALL" value="1" />
       <env name="DD_SERVICE" value="qairon" />
