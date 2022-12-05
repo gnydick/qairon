@@ -3,8 +3,8 @@
     <option name="additionalOptions" value="-p 5001" />
     <option name="flaskDebug" value="true" />
     <module name="qairon" />
-    <option name="target" value="$PROJECT_DIR$/app.py" />
-    <option name="targetType" value="PATH" />
+    <option name="target" value="app" />
+    <option name="targetType" value="PYTHON" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>

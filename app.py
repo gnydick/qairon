@@ -140,7 +140,7 @@ def allocate_subnet(network_id, mask, name):
 def gen_config(dep_id, config_tag=None):
     from db import db
     s = db.session
-    config_tag = 'default' if config_tag == None else config_tag
+    config_tag = 'default' if config_tag is None else config_tag
     tfs = s.query(Config).filter(Config.deployment_id == dep_id, Config.config_type_id == 'tf',
                                  Config.tag == config_tag).all()
     tf_files = list(map(lambda x: x.name, tfs))
