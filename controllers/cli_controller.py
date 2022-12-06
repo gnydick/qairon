@@ -108,7 +108,7 @@ class CLIController:
 
     def get(self, resource, command=None, id=None, included=None, output_fields=None, output_format=None, q=False):
         row = rest.get_instance(resource, id, included=included)
-        __output__(q, row, resource, included=included, output_fields=output_fields, output_format=output_format)
+        __output__(q, row, included=included, output_fields=output_fields, output_format=output_format)
 
     def list(self, resource, command=None, included=None, resperpage=10, page=None, output_fields=None,
              output_format=None, q=False):
