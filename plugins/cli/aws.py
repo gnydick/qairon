@@ -26,6 +26,8 @@ COMMANDS = dict(
 
 def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
                     resource=None, command=None, q=False):
+    import pydevd_pycharm
+    pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
     result = aws.register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag=secret_tag,
                                  kms_key_alias=kms_key_alias)
     if not q:
@@ -43,8 +45,6 @@ def update_secret(deployment_id, secret_name, secret_value, secret_tag="default"
 
 
 def get_secret_string(resource, command, deployment_id, secret_name, q=False):
-    import pydevd_pycharm
-    pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
     result = aws.get_secret_string_for_deployment(deployment_id, secret_name)
     if result is not None:
         if not q:

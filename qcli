@@ -19,8 +19,6 @@ def _main_():
         if args.resource in QaironSchema.MODELS:
             if hasattr(args, 'command'):
                 command = args.command
-                # import pydevd_pycharm
-                # pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
                 if args.command in commands:
                     getattr(cli, command)(**vars(args))
                 elif args.command == 'setver':

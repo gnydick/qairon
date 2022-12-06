@@ -147,9 +147,6 @@ def downgrades_post():
     op.drop_table('deployment_target_bin')
     op.create_index(op.f('ix_deployment_deployment_target_id'), 'deployment', ['deployment_target_id'], unique=False)
 
-
-# import pydevd_pycharm
-# pydevd_pycharm.settrace('localhost', port=1234, stdoutToServer=True, stderrToServer=True)
 def remap_dep_ids():
     op.execute('update deployment_config as dc' \
                ' set deployment_id=d.id' \

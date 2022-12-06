@@ -51,7 +51,7 @@ class AwsController:
     def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag, kms_key_alias=None):
         template = rest.get_instance('config_template', 'secret_name_map_item')
 
-        doc = template['doc']
+        doc = template['attributes']['doc']
         doc = str(doc).replace("%--key--%", secret_name).replace("%--value--%", secret_id)
 
         payload = {'resource': 'deployment_config',
