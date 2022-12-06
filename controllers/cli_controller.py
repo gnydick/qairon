@@ -92,7 +92,7 @@ def __output__(q, rows, data_label=None, included=None, output_fields=None, outp
                 output = {data_label: [x for x in items]}
                 print(json.dumps(output))
             elif type(rows) == dict:
-                print(json.dumps({data_label: item}))
+                print(json.dumps(item))
         elif output_format == 'plain':
             if type(rows) == list:
                 for row in items:
@@ -103,8 +103,8 @@ def __output__(q, rows, data_label=None, included=None, output_fields=None, outp
 
 
 class CLIController:
-    # import pydevd_pycharm
-    # pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
+    import pydevd_pycharm
+    pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
 
     def get(self, resource, command=None, id=None, included=None, output_fields=None, output_format=None, q=False):
         row = rest.get_instance(resource, id, included=included)
