@@ -26,8 +26,6 @@ COMMANDS = dict(
 
 def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
                     resource=None, command=None, q=False):
-    import pydevd_pycharm
-    pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
     result = aws.register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag=secret_tag,
                                  kms_key_alias=kms_key_alias)
     if not q:

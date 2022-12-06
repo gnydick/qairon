@@ -52,7 +52,7 @@ def serialize_row(row, output_fields=None):
     return output
 
 
-def __output__(q, rows, field=None, output_fields=None, output_format=None):
+def __output__(q, rows, data_label=None, output_fields=None, output_format=None):
     if not q:
         if output_format is None:
             output_format = "json"
@@ -63,16 +63,12 @@ def __output__(q, rows, field=None, output_fields=None, output_format=None):
             item = serialize_row(rows, output_fields)
 
         if output_format == 'json':
-
             if type(rows) == list:
-                output = {field: [x for x in items]}
-
+                output = {data_label: [x for x in items]}
                 print(json.dumps(output))
             elif type(rows) == dict:
-                print(json.dumps({field: item}))
-
+                print(json.dumps({data_label: item}))
         elif output_format == 'plain':
-
             if type(rows) == list:
                 for row in items:
                     print(' '.join(str(x) for x in row.values()))
@@ -89,12 +85,18 @@ class CLIController:
 
     def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, output_format=None, q=False):
         rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
-        __output__(q, rows, output_fields=output_fields, field=None, output_format=output_format)
+        __output__(q, rows, output_fields=output_fields, data_label=None, output_format=output_format)
 
     def query(self, resource, command=None, query=None, output_fields=None, resperpage=None,
               page=None, output_format=None, q=False):
         rows = rest.query(resource, query, output_fields, resperpage=resperpage, page=page)
-        __output__(q, rows, output_fields=output_fields, output_format=output_format)
+        __output__(q, rows, data_label=resource, output_fields=output_fields, output_format=output_format)
+
+    def get_field_query(self, resource, field, command=None, query=None, output_fields=None, resperpage=None,
+                        page=None, output_format=None, q=False):
+        rows = rest.get_field_query(resource, field, query, resperpage=resperpage, page=page)
+
+        __output__(q, rows, data_label=resource, output_fields=output_fields, output_format=output_format)
 
     def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')
@@ -105,7 +107,7 @@ class CLIController:
     def get_field(self, resource, id, field, command=None, resperpage=None, page=None, output_fields=None,
                   output_format=None, q=False):
         value = rest.get_field(resource, id, field=field, resperpage=resperpage, page=page)
-        __output__(q, value, field=field, output_fields=output_fields, output_format=output_format)
+        __output__(q, value, data_label=field, output_fields=output_fields, output_format=output_format)
 
     def get_parent(self, resource, relation, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field=relation, index='relationships')

@@ -131,7 +131,12 @@ class RestController:
             ids = [x['id'] for x in objs]
             return ids
 
-    def _get_rest_(self, resource, resource_id=None, field=None, params={}, headers=HEADERS):
+    def _get_list_(self, resource, params={}, headers=HEADERS):
+        res_url = self.URL + resource
+        response = requests.get(res_url, params=params, headers=headers)
+        return response
+
+    def _get_record_(self, resource, resource_id=None, field=None, params={}, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
@@ -172,7 +177,7 @@ class RestController:
         #         if args_dict[opt] is not None:
         #             post_data[opt] = args_dict[opt]
 
-        data_post_data = {'data': {'attributes': post_data, 'type': args_dict['resource'] }}
+        data_post_data = {'data': {'attributes': post_data, 'type': args_dict['resource']}}
         return self._post_rest_(args_dict['resource'], json=data_post_data)
 
     def _delete_rest_(self, resource, resource_id, headers=HEADERS):
@@ -200,7 +205,7 @@ class RestController:
         return requests.patch(res_url, data, json=json, params=params, headers=headers)
 
     def get_instance(self, resource, resource_id):
-        response = self._get_rest_(resource, resource_id)
+        response = self._get_record_(resource, resource_id)
         results = response.json()
         if 'data' not in results:
             exit(255)
@@ -212,12 +217,17 @@ class RestController:
 
     def get_field(self, resource, resource_id, field, resperpage=None, page=None):
         params = {'page[size]': resperpage, 'page[number]': page}
-        response = self._get_rest_(resource, resource_id, field=field, params=params)
+        response = self._get_record_(resource, resource_id, field=field, params=params)
         results = response.json()
         if 'data' not in results:
             exit(255)
         else:
             return results['data']
+
+    def get_field_query(self, resource, field, query, resperpage=None, page=None):
+        params = {'page[size]': resperpage, 'page[number]': page, 'include': field}
+        rows = self._query_(resource, query=query, field=field, params=params)
+        return rows
 
     def _get_all_(self, resource, resource_id, path, headers=HEADERS):
         res_url = self.URL + resource
@@ -255,18 +265,18 @@ class RestController:
 
     def query(self, resource, query, output_fields=None, resperpage=None, page=None,
               **kwargs):
-        return self._list_(resource, query, output_fields=output_fields, resperpage=resperpage, page=page)
+        return self._query_(resource, query, output_fields=output_fields, resperpage=resperpage, page=page)
 
     def list(self, resource):
-        return self._list_(resource)
+        return self._query_(resource)
 
-    def _list_(self, resource, query=None, output_fields=None, resperpage=None, page=None,
-               **kwargs):
+    def _query_(self, resource, query=None, resperpage=None, page=None,
+                **kwargs):
         params = {'page[size]': resperpage, 'page[number]': page}
         if query is not None:
             filters = json.loads(query)
             params['filter[objects]'] = query
-        response = self._get_rest_(resource, params=params)
+        response = self._get_list_(resource, params=params)
         results = response.json()
         if 'data' not in results:
             exit(255)
@@ -276,7 +286,7 @@ class RestController:
     def _complex_list_(self, resource, filters, output_fields=None, resperpage=100):
         params = dict(results_per_page=resperpage)
         params['q'] = json.dumps(dict(filters=filters))
-        response = self._get_rest_(resource, params=params)
+        response = self._get_record_(resource, params=params)
         results = []
         if type(output_fields) == str:
             output_fields = [output_fields]
