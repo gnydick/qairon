@@ -120,7 +120,7 @@ class RestController:
             'Content-Type': 'application/vnd.api+json'
         }
         filters = [dict(name='id', op='like', val=str(prefix) + '%')]
-        params = {'filter[objects]': json.dumps(dict(filter=filters))}
+        params = {'filter[objects]': json.dumps(filters)}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code == 200
         results = requests.get(url, headers=headers).json()
@@ -265,10 +265,7 @@ class RestController:
         params = {'page[size]': resperpage, 'page[number]': page}
         if query is not None:
             filters = json.loads(query)
-            if type(filters) == dict:
-                params['q'] = json.dumps(dict(filters=[filters]))
-            elif type(filters) == list:
-                params['q'] = json.dumps(dict(filters=filters))
+            params['filter[objects]'] = query
         response = self._get_rest_(resource, params=params)
         results = response.json()
         if 'data' not in results:
