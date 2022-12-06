@@ -204,25 +204,25 @@ class RestController:
             res_url += '/' + resource_id + '/relationships/' + collection
         return requests.patch(res_url, data, json=json, params=params, headers=headers)
 
-    def get_instance(self, resource, resource_id):
-        response = self._get_record_(resource, resource_id)
-        results = response.json()
-        if 'data' not in results:
-            exit(255)
+    def get_instance(self, resource, resource_id, included=None):
+        if included:
+            params = {'include': included }
         else:
-            return response.json()['data']
+            params=None
+        response = self._get_record_(resource, resource_id, params=params)
+        results = response.json()
+        return __handle_return_data__(results, included)['data']
 
     def pretty_get_instance(self, resource, resource_id):
         return json.dumps(self.get_instance(resource, resource_id), indent=4, sort_keys=True)
 
-    def get_field(self, resource, resource_id, field, resperpage=None, page=None):
+    def get_field(self, resource, resource_id, field, included=None, resperpage=None, page=None):
         params = {'page[size]': resperpage, 'page[number]': page}
+        if included:
+            params['include'] = included
         response = self._get_record_(resource, resource_id, field=field, params=params)
         results = response.json()
-        if 'data' not in results:
-            exit(255)
-        else:
-            return results['data']
+        return __handle_return_data__(results, included)['data']
 
     def get_field_query(self, resource, field, query, resperpage=None, page=None):
         params = {'page[size]': resperpage, 'page[number]': page, 'include': field}
@@ -314,3 +314,13 @@ class RestController:
             config['deployment_id'] = new_dep_id
             config['resource'] = 'config'
             self.create_resource(config)
+
+
+def __handle_return_data__(results, included):
+    if 'data' not in results:
+        exit(255)
+    else:
+        result = results
+        if included:
+            result['included'] = results['included']
+        return result

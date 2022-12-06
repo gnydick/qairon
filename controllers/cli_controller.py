@@ -23,9 +23,14 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def serialize_rows(rows, output_fields=None):
+def serialize_rows(rows, output_fields=None, included=None):
     for row in rows:
         row_id = row['id']
+
+        if 'relationships' in row:
+            for k, v in row['relationships'].items():
+                if type(v['data']) == dict:
+                    row['attributes'][k + '_id'] = v['data']['id']
 
         if output_fields:
             keys = output_fields
@@ -35,11 +40,24 @@ def serialize_rows(rows, output_fields=None):
         output = {'id': row_id}
         for key in [x for x in keys if x != "id"]:
             output[key] = row['attributes'][key]
+        if included:
+            if 'included' in row:
+                includes = dict()
+            for i in row['included']:
+                if i['type'] not in includes:
+                    includes[i['type']] = []
+                includes[i['type']].append(i)
+            output['included'] = includes
         yield output
 
 
-def serialize_row(row, output_fields=None):
+def serialize_row(row, output_fields=None, included=None):
     row_id = row['id']
+
+    if 'relationships' in row:
+        for k, v in row['relationships'].items():
+            if type(v['data']) == dict:
+                row['attributes'][k + '_id'] = v['data']['id']
 
     if output_fields:
         keys = output_fields
@@ -49,18 +67,25 @@ def serialize_row(row, output_fields=None):
     output = {'id': row_id}
     for key in [x for x in keys if x != "id"]:
         output[key] = row['attributes'][key]
+    if included:
+        includes = dict()
+        for i in row['included']:
+            if i['type'] not in includes:
+                includes[i['type']] = []
+            includes[i['type']].append(i)
+        output['included'] = includes
     return output
 
 
-def __output__(q, rows, data_label=None, output_fields=None, output_format=None):
+def __output__(q, rows, data_label=None, included=None, output_fields=None, output_format=None):
     if not q:
         if output_format is None:
             output_format = "json"
         if type(rows) == list:
-            items = serialize_rows(rows, output_fields)
+            items = serialize_rows(rows, output_fields, included)
             pass
         elif type(rows) == dict:
-            item = serialize_row(rows, output_fields)
+            item = serialize_row(rows, output_fields, included)
 
         if output_format == 'json':
             if type(rows) == list:
@@ -78,19 +103,24 @@ def __output__(q, rows, data_label=None, output_fields=None, output_format=None)
 
 
 class CLIController:
+    # import pydevd_pycharm
+    # pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
 
-    def get(self, resource, command=None, id=None, output_fields=None, output_format=None, q=False):
-        row = rest.get_instance(resource, id)
-        __output__(q, row, resource, output_fields=output_fields, output_format=output_format)
+    def get(self, resource, command=None, id=None, included=None, output_fields=None, output_format=None, q=False):
+        row = rest.get_instance(resource, id, included=included)
+        __output__(q, row, resource, included=included, output_fields=output_fields, output_format=output_format)
 
-    def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, output_format=None, q=False):
+    def list(self, resource, command=None, included=None, resperpage=10, page=None, output_fields=None,
+             output_format=None, q=False):
         rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
-        __output__(q, rows, output_fields=output_fields, data_label=None, output_format=output_format)
+        __output__(q, rows, included=included, output_fields=output_fields, data_label=None,
+                   output_format=output_format)
 
-    def query(self, resource, command=None, query=None, output_fields=None, resperpage=None,
+    def query(self, resource, command=None, query=None, included=None, output_fields=None, resperpage=None,
               page=None, output_format=None, q=False):
         rows = rest.query(resource, query, output_fields, resperpage=resperpage, page=page)
-        __output__(q, rows, data_label=resource, output_fields=output_fields, output_format=output_format)
+        __output__(q, rows, data_label=resource, included=included, output_fields=output_fields,
+                   output_format=output_format)
 
     def get_field_query(self, resource, field, command=None, query=None, output_fields=None, resperpage=None,
                         page=None, output_format=None, q=False):
@@ -104,10 +134,12 @@ class CLIController:
             print(value)
 
     # This will always return an ID or list of IDs
-    def get_field(self, resource, id, field, command=None, resperpage=None, page=None, output_fields=None,
+    def get_field(self, resource, id, field, command=None, included=None, resperpage=None, page=None,
+                  output_fields=None,
                   output_format=None, q=False):
-        value = rest.get_field(resource, id, field=field, resperpage=resperpage, page=page)
-        __output__(q, value, data_label=field, output_fields=output_fields, output_format=output_format)
+        value = rest.get_field(resource, id, field=field, included=included, resperpage=resperpage, page=page)
+        __output__(q, value, data_label=field, included=included, output_fields=output_fields,
+                   output_format=output_format)
 
     def get_parent(self, resource, relation, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field=relation, index='relationships')

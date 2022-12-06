@@ -76,6 +76,7 @@ def __add_get_field_parser__(rest, parsers, resource):
     get_field_parser = parsers.add_parser('get_field')
     get_field_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
     get_field_parser.add_argument('field')
+    get_field_parser.add_argument('-i', help='included', dest='included', action='append')
     get_field_parser.add_argument('-p', help='page', dest='page')
     get_field_parser.add_argument('-r', help='results per page', dest='resperpage')
     get_field_parser.add_argument('-f', help='output field for related object', dest='output_fields',
@@ -158,6 +159,7 @@ class CLIArgs:
             __add_get_field_query_parser__(self.rest, parsers_for_model_parser, model)
             _model_com_get_parser = parsers_for_model_parser.add_parser('get')
             _model_com_get_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
+            _model_com_get_parser.add_argument('-i', help='included', dest='included', action='append')
             _model_com_create_parser = parsers_for_model_parser.add_parser('create')
             __populate_args__(self.rest, _model_com_create_parser, self.schema.CREATE_FIELDS[model])
             _model_com_delete_parser = parsers_for_model_parser.add_parser('delete')
