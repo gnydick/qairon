@@ -77,7 +77,7 @@ def serialize_row(row, output_fields=None, included=None):
     return output
 
 
-def __output__(q, rows, data_label=None, included=None, output_fields=None, output_format=None):
+def __output__(q, rows, included=None, output_fields=None, output_format=None):
     if not q:
         if output_format is None:
             output_format = "json"
@@ -89,7 +89,7 @@ def __output__(q, rows, data_label=None, included=None, output_fields=None, outp
 
         if output_format == 'json':
             if type(rows) == list:
-                output = {data_label: [x for x in items]}
+                output = [x for x in items]
                 print(json.dumps(output))
             elif type(rows) == dict:
                 print(json.dumps(item))
@@ -103,8 +103,8 @@ def __output__(q, rows, data_label=None, included=None, output_fields=None, outp
 
 
 class CLIController:
-    import pydevd_pycharm
-    pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
+    # import pydevd_pycharm
+    # pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
 
     def get(self, resource, command=None, id=None, included=None, output_fields=None, output_format=None, q=False):
         row = rest.get_instance(resource, id, included=included)
@@ -113,20 +113,20 @@ class CLIController:
     def list(self, resource, command=None, included=None, resperpage=10, page=None, output_fields=None,
              output_format=None, q=False):
         rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
-        __output__(q, rows, included=included, output_fields=output_fields, data_label=None,
+        __output__(q, rows, included=included, output_fields=output_fields,
                    output_format=output_format)
 
     def query(self, resource, command=None, query=None, included=None, output_fields=None, resperpage=None,
               page=None, output_format=None, q=False):
         rows = rest.query(resource, query, output_fields, resperpage=resperpage, page=page)
-        __output__(q, rows, data_label=resource, included=included, output_fields=output_fields,
+        __output__(q, rows, included=included, output_fields=output_fields,
                    output_format=output_format)
 
     def get_field_query(self, resource, field, command=None, query=None, output_fields=None, resperpage=None,
                         page=None, output_format=None, q=False):
         rows = rest.get_field_query(resource, field, query, resperpage=resperpage, page=page)
 
-        __output__(q, rows, data_label=resource, output_fields=output_fields, output_format=output_format)
+        __output__(q, rows, output_fields=output_fields, output_format=output_format)
 
     def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')
@@ -138,7 +138,7 @@ class CLIController:
                   output_fields=None,
                   output_format=None, q=False):
         value = rest.get_field(resource, id, field=field, included=included, resperpage=resperpage, page=page)
-        __output__(q, value, data_label=field, included=included, output_fields=output_fields,
+        __output__(q, value, included=included, output_fields=output_fields,
                    output_format=output_format)
 
     def get_parent(self, resource, relation, command=None, id=None, q=False):
