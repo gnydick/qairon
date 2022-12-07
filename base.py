@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask
-
+from flask_talisman import Talisman
 
 SQLALCHEMY_ENGINE_OPTIONS = {
     'pool_size': 32,
@@ -12,6 +12,8 @@ SQLALCHEMY_ENGINE_OPTIONS = {
     'pool_timeout': 2
 }
 app = Flask(__name__)
+Talisman(app)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'SQLALCHEMY_TRACK_MODIFICATIONS' in os.environ
