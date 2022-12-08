@@ -1,5 +1,4 @@
 import inspect
-import os
 from os.path import exists
 
 from flask_admin import Admin
