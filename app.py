@@ -1,6 +1,7 @@
 import inspect
 from os.path import exists
 
+from flask import request
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 from flask_restless import APIManager
@@ -21,6 +22,13 @@ if exists(version_file):
         version = file.readline().strip()
 
 print(("version: %s" % version))
+
+
+@app.before_request
+def change_url():
+    base_url = request.base_url
+    if 'X-FORWARDED-PROTO' in request.headers:
+        request.base_url = base_url.replace('http://', 'https://')
 
 
 @app.after_request

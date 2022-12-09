@@ -3,6 +3,7 @@ import json
 # from controllers.bakers.baker import BakerInterface
 import os
 
+from controllers.output_controller import serialize_rows, serialize_row
 from plugins.controller.bakers import AbstractBakerController
 from plugins.controller.aws import AwsController
 
@@ -17,8 +18,8 @@ class HelmBakerController(AbstractBakerController):
             'build_id': metadata.build_id
         }
         blob_repo_type = 'ecr'
-        candidate_repos = [repo for repo in self.rest.get_field('service', self.deployment['service_id'], 'repos') if
-                           repo['repo_type_id'] == blob_repo_type]
+        candidate_repos = [repo for repo in serialize_rows(self.rest.get_field('service', self.deployment['service_id'], 'repos')) if
+                           repo['type_id'] == blob_repo_type]
         # this condition supports old DSL for baking of repo as a single object on the baker
         if len(candidate_repos) == 1:
             self.repo = candidate_repos[0]
@@ -29,9 +30,9 @@ class HelmBakerController(AbstractBakerController):
                 self.repos[repo['id']] = repo
 
     def bake(self):
-        svc_configs = self.rest.get_field('service', self.deployment['service_id'], 'configs')
+        svc_configs = serialize_rows(self.rest.get_field('service', self.deployment['service_id'], 'configs'))
         svc_cfg = [svc_cfg for svc_cfg in svc_configs if
-                   svc_cfg['config_template_id'] == 'helm_bake' and svc_cfg['name'] == 'default']
+                   svc_cfg['template_id'] == 'helm_bake' and svc_cfg['name'] == 'default']
         assert len(svc_cfg) == 1
         cfg = svc_cfg[0]['config']
         data = json.loads(cfg)

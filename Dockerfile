@@ -47,8 +47,8 @@ USER qairon_user
 RUN export SECRET_KEY=$SECRET_KEY
 RUN export LC_ALL=$LC_ALL
 RUN export LANG=$LANG
-
+RUN mkdir /opt/config
 WORKDIR /opt/qairon
 RUN echo $version > .version
 
-#CMD gunicorn app:app -b 0.0.0.0:5001 --keep-alive 86400 --preload --workers=16 -k gevent
+
