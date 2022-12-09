@@ -17,14 +17,15 @@ app = Flask(__name__)
 from flask import request
 
 
+
 def change_url():
     base_url = request.base_url
-    print("fofofofof")
     if 'X-FORWARDED-PROTO' in request.headers and request.path not in ('/up', '/up/'):
         request.base_url = base_url.replace('http://', 'https://')
 
 
 app.before_request(change_url)
+
 Talisman(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
@@ -33,3 +34,4 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'SQLALCHEMY_TRACK_MODIFICATIONS' 
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = SQLALCHEMY_ENGINE_OPTIONS
 app.config['SQLALCHEMY_RECORD_QUERIES'] = 'SQLALCHEMY_RECORD_QUERIES' in os.environ
 app.config['SQLALCHEMY_ECHO'] = 'SQLALCHEMY_ECHO' in os.environ
+app.config['FLASK_ADMIN_SWATCH'] = str(os.getenv('FLASK_ADMIN_SWATCH', default='superhero'))
