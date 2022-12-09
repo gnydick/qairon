@@ -39,15 +39,15 @@ ADD qcli /opt/qairon
 
 
 
-
-RUN chown -R qairon_user:qairon_user /opt/qairon
+RUN mkdir /opt/config
+RUN chown -R qairon_user:qairon_user /opt/qairon /opt/config
 
 
 USER qairon_user
 RUN export SECRET_KEY=$SECRET_KEY
 RUN export LC_ALL=$LC_ALL
 RUN export LANG=$LANG
-RUN mkdir /opt/config
+
 WORKDIR /opt/qairon
 RUN echo $version > .version
 
