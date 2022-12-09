@@ -23,20 +23,6 @@ if exists(version_file):
 
 print(("version: %s" % version))
 
-
-@app.before_request
-def change_url():
-    base_url = request.base_url
-    if 'X-FORWARDED-PROTO' in request.headers:
-        request.base_url = base_url.replace('http://', 'https://')
-
-
-@app.after_request
-def apply_headers(response):
-    response.headers["qairon-version"] = version
-    return response
-
-
 if app.debug:
     from werkzeug.debug import DebuggedApplication
 
@@ -45,6 +31,11 @@ from views.menus.divider import DividerMenu
 
 migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
+
+
+
+
+
 
 with app.app_context():
     #    dynamically generate the rest endpoint for each data model
@@ -114,8 +105,6 @@ with app.app_context():
     admin.add_view(WithIdView(RepoType, db.session, category='Types'))
     admin.add_view(DefaultView(Repo, db.session, category='CICD'))
 
-from socket import gethostname
-
 from flask import Response
 
 from models import Deployment, Environment, Provider, Region
@@ -123,9 +112,15 @@ from models import Deployment, Environment, Provider, Region
 rest = RestController()
 
 
-@app.route('/api/health')
+@app.after_request
+def after_request(response):
+    response.headers["qairon-version"] = version
+    return response
+
+
+@app.route('/up')
 def health():
-    return "I'm Alive!! " + gethostname()
+    return "hello"
 
 
 @app.route('/api/rest/v1/deployment/<deployment_id>/json', methods=['GET'])
@@ -221,7 +216,3 @@ def _gen_tf(dep_id, config_type, name, tag=None):
     post_svc_cfg = Template(svc_cfg)
     app_cfg = post_svc_cfg.safe_substitute(appvars)
     return app_cfg
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')

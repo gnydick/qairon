@@ -9,8 +9,6 @@ rest = RestController()
 
 
 class CLIController:
-    # import pydevd_pycharm
-    # pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
 
     def get(self, resource, command=None, id=None, included=None, output_fields=None, output_format=None, q=False):
         row = rest.get_instance(resource, id, included=included)

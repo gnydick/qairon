@@ -11,7 +11,20 @@ SQLALCHEMY_ENGINE_OPTIONS = {
     'pool_use_lifo': True,
     'pool_timeout': 2
 }
+
 app = Flask(__name__)
+
+from flask import request
+
+
+def change_url():
+    base_url = request.base_url
+    print("fofofofof")
+    if 'X-FORWARDED-PROTO' in request.headers and request.path not in ('/up', '/up/'):
+        request.base_url = base_url.replace('http://', 'https://')
+
+
+app.before_request(change_url)
 Talisman(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
