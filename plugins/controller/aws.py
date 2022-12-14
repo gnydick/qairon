@@ -35,10 +35,9 @@ def __fqsn__(deployment_id, secret_name):
 
 
 def __get_secret_id__(deployment_id, secret_name) -> object:
-    config_templs = rest.query("config_template", '[{"name":"id","op":"eq","val":"secret_name_map_item"}]')
+    config_templs = rest.query("config_template", '[{"name": "id", "op": "eq", "val": "secret_name_map_item"}]')
     possible_configs = rest.get_field("deployment", deployment_id, 'configs')
-    configs = [c for c in possible_configs if c['attributes']['name'] == secret_name]
-
+    configs = [c for c in possible_configs if c['attributes']['name'] == secret_name and c['relationships']['template']['data']['id'] in config_templs[0]['id']]
     if len(configs) != 1:
         exit(255)
 
@@ -52,7 +51,7 @@ class AwsController:
     def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag, kms_key_alias=None):
         template = rest.get_instance('config_template', 'secret_name_map_item')
 
-        doc = template['doc']
+        doc = template['attributes']['doc']
         doc = str(doc).replace("%--key--%", secret_name).replace("%--value--%", secret_id)
 
         payload = {'resource': 'deployment_config',

@@ -39,8 +39,8 @@ ADD qcli /opt/qairon
 
 
 
-
-RUN chown -R qairon_user:qairon_user /opt/qairon
+RUN mkdir /opt/config
+RUN chown -R qairon_user:qairon_user /opt/qairon /opt/config
 
 
 USER qairon_user
@@ -51,4 +51,4 @@ RUN export LANG=$LANG
 WORKDIR /opt/qairon
 RUN echo $version > .version
 
-#CMD gunicorn app:app -b 0.0.0.0:5001 --keep-alive 86400 --preload --workers=16 -k gevent
+

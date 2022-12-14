@@ -14,13 +14,11 @@ def _main_():
     qaironargs = CLIArgs(rest)
 
     (args, junk) = qaironargs.parse_args(rest)
-    commands = ['delete', 'get', 'get_version', 'list', 'promote', 'query', 'get_field', 'set_field']
+    commands = ['delete', 'get', 'get_version', 'list', 'promote', 'query', 'get_field', 'get_field_query', 'set_field']
     if hasattr(args, 'resource'):
         if args.resource in QaironSchema.MODELS:
             if hasattr(args, 'command'):
                 command = args.command
-                # import pydevd_pycharm
-                # pydevd_pycharm.settrace('localhost', port=54321, stdoutToServer=True, stderrToServer=True)
                 if args.command in commands:
                     getattr(cli, command)(**vars(args))
                 elif args.command == 'setver':

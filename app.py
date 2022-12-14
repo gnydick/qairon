@@ -1,5 +1,4 @@
 import inspect
-import os
 from os.path import exists
 
 from flask_admin import Admin
@@ -23,18 +22,10 @@ if exists(version_file):
 
 print(("version: %s" % version))
 
-
-@app.after_request
-def apply_headers(response):
-    response.headers["qairon-version"] = version
-    return response
-
-
 if app.debug:
     from werkzeug.debug import DebuggedApplication
 
     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
-from views.menus.divider import DividerMenu
 
 migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
@@ -50,64 +41,89 @@ with app.app_context():
                                exclude=getattr(model_class, 'exclude'))
 
     # set optional bootswatch theme
-    app.config['FLASK_ADMIN_SWATCH'] = 'slate'
     admin = Admin(app, name='QAIRON: %s' % version, template_mode='bootstrap3', base_template='admin/master.html')
-    admin.add_menu_item(DividerMenu(name='meta'), target_category='META')
-    admin.add_menu_item(DividerMenu(name='provider'), target_category='Platform')
-    admin.add_menu_item(DividerMenu(name='software'), target_category='Services')
-    admin.add_menu_item(DividerMenu(name='cicd'), target_category='CICD')
-    admin.add_menu_item(DividerMenu(name='deployment_targeting'), target_category='Deployment Targeting')
-    admin.add_menu_item(DividerMenu(name='deploying'), target_category='Deploying')
-    admin.add_menu_item(DividerMenu(name='configs'), target_category='Templating')
-    admin.add_menu_item(DividerMenu(name='types'), target_category='Types')
+    categories = {
+        'Global': {},
+        'Platform': {},
+        'Partition': {
+            'Networking': {},
+        },
+        'Resources': {},
+        'Software': {
+            'Services': {},
+            'Stacks': {
+                'Foo': {
+                    'Bar': {
+                        'Baz': {}
+                    }
+                }
+            }
+        },
+        'CI/CD': {},
+        'Deploy': {},
+        'Templates': {},
+        'Types': {}
+    }
 
-    admin.add_view(WithIdView(Environment, db.session, category='META'))
 
-    admin.add_view(WithIdView(Application, db.session, category='Services'))
-    admin.add_view(DefaultView(Stack, db.session, category='Services'))
-    admin.add_view(DefaultView(StackConfig, db.session, category='Services'))
+    def add_sub_category(children, parent):
+        for k, v in children.items():
+            admin.add_sub_category(k, parent)
+            add_sub_category(v, k)
+
+
+    for parent, children in categories.items():
+        admin.add_category(parent)
+        for k, v in children.items():
+            admin.add_sub_category(k, parent)
+            add_sub_category(v, k)
+
+    admin.add_view(WithIdView(Environment, db.session, category='Global'))
+
+    admin.add_view(WithIdView(Application, db.session, category='Software', name='Applications'))
+    admin.add_view(DefaultView(Stack, db.session, category='Stacks'))
+    admin.add_view(DefaultView(StackConfig, db.session, category='Stacks'))
     admin.add_view(ServiceView(Service, db.session, category='Services'))
     admin.add_view(DefaultView(ServiceConfig, db.session, category='Services'))
 
-    admin.add_view(DefaultView(Build, db.session, category='CICD'))
-    admin.add_view(DefaultView(BuildArtifact, db.session, category='CICD'))
-    admin.add_view(DefaultView(Release, db.session, category='CICD'))
-    admin.add_view(DefaultView(ReleaseArtifact, db.session, category='CICD'))
+    admin.add_view(DefaultView(Build, db.session, category='CI/CD'))
+    admin.add_view(DefaultView(BuildArtifact, db.session, category='CI/CD'))
+    admin.add_view(DefaultView(Release, db.session, category='CI/CD'))
+    admin.add_view(DefaultView(ReleaseArtifact, db.session, category='CI/CD'))
 
-    admin.add_view(WithIdView(ProviderType, db.session, category='Types'))
+    admin.add_view(WithIdView(ProviderType, db.session, category='Types'
+                                                                 ''))
     admin.add_view(DefaultView(Provider, db.session, category='Platform'))
     admin.add_view(DefaultView(Region, db.session, category='Platform'))
     admin.add_view(DefaultView(Zone, db.session, category='Platform'))
 
     admin.add_view(WithIdView(DeploymentTargetType, db.session, category='Types'))
-    admin.add_view(DefaultView(DeploymentTarget, db.session, category='Deployment Targeting'))
-    admin.add_view(DefaultView(DeploymentTargetBin, db.session, category='Deployment Targeting'))
+    admin.add_view(DefaultView(DeploymentTarget, db.session, category='Deploy'))
+    admin.add_view(DefaultView(DeploymentTargetBin, db.session, category='Deploy'))
 
     admin.add_view(DefaultView(FleetType, db.session, category='Types'))
-    admin.add_view(DefaultView(Fleet, db.session, category='Deployment Targeting'))
+    admin.add_view(DefaultView(Fleet, db.session, category='Resources'))
 
-    admin.add_view(DefaultView(Deployment, db.session, category='Deploying'))
-    admin.add_view(DefaultView(DeploymentConfig, db.session, category='Deploying'))
+    admin.add_view(DefaultView(Deployment, db.session, category='Deploy'))
+    admin.add_view(DefaultView(DeploymentConfig, db.session, category='Deploy'))
 
-    admin.add_view(DefaultView(DeploymentProc, db.session, category='Deploying'))
+    admin.add_view(DefaultView(DeploymentProc, db.session, category='Deploy'))
 
     admin.add_view(WithIdView(ConfigTemplate, db.session, category='Templating'))
     admin.add_view(WithIdView(Language, db.session, category='Templating'))
 
-    admin.add_view(DefaultView(Proc, db.session, category='Services'))
+    admin.add_view(DefaultView(Proc, db.session, category='Software'))
 
-    admin.add_view(DefaultView(Partition, db.session, category='Platform'))
-    admin.add_view(NetworkView(Network, db.session, category='Platform'))
-    admin.add_view(SubnetView(Subnet, db.session, category='Platform'))
+    admin.add_view(DefaultView(Partition, db.session, category='Partition'))
+    admin.add_view(NetworkView(Network, db.session, category='Networking', name='VPC CIDR'))
+    admin.add_view(SubnetView(Subnet, db.session, category='Networking'))
 
     admin.add_view(WithIdView(AllocationType, db.session, category='Types'))
-    admin.add_view(DefaultView(Allocation, db.session, category='Deploying'))
-    admin.add_view(DefaultView(Capacity, db.session, category='Deployment Targeting'))
+    admin.add_view(DefaultView(Allocation, db.session, category='Resources'))
+    admin.add_view(DefaultView(Capacity, db.session, category='Resources'))
 
     admin.add_view(WithIdView(RepoType, db.session, category='Types'))
-    admin.add_view(DefaultView(Repo, db.session, category='CICD'))
-
-from socket import gethostname
+    admin.add_view(DefaultView(Repo, db.session, category='CI/CD'))
 
 from flask import Response
 
@@ -116,9 +132,15 @@ from models import Deployment, Environment, Provider, Region
 rest = RestController()
 
 
-@app.route('/api/health')
+@app.after_request
+def after_request(response):
+    response.headers["qairon-version"] = version
+    return response
+
+
+@app.route('/up')
 def health():
-    return "I'm Alive!! " + gethostname()
+    return "hello"
 
 
 @app.route('/api/rest/v1/deployment/<deployment_id>/json', methods=['GET'])
@@ -140,7 +162,7 @@ def allocate_subnet(network_id, mask, name):
 def gen_config(dep_id, config_tag=None):
     from db import db
     s = db.session
-    config_tag = 'default' if config_tag == None else config_tag
+    config_tag = 'default' if config_tag is None else config_tag
     tfs = s.query(Config).filter(Config.deployment_id == dep_id, Config.config_type_id == 'tf',
                                  Config.tag == config_tag).all()
     tf_files = list(map(lambda x: x.name, tfs))
@@ -214,7 +236,3 @@ def _gen_tf(dep_id, config_type, name, tag=None):
     post_svc_cfg = Template(svc_cfg)
     app_cfg = post_svc_cfg.safe_substitute(appvars)
     return app_cfg
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')

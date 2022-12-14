@@ -2,80 +2,61 @@ import json
 import os
 from subprocess import call
 
+from .output_controller import __output__, SerializableGenerator
 from .rest_controller import RestController
 
 rest = RestController()
 
 
-def serialize_row(row, output_fields=None):
-    id = row['id']
-
-    if output_fields:
-        keys = output_fields
-    else:
-        keys = row['attributes'].keys()
-
-    output = {'id': id}
-    for key in [x for x in keys if x != "id"]:
-        output[key] = row['attributes'][key]
-    return output
-
-
-def __output__(q, rows, field=None, output_fields=None, output_format=None):
-    if not q:
-        if type(rows) == list:
-            items = [serialize_row(row, output_fields) for row in rows]
-            for row in rows:
-                items.append(serialize_row(row, output_fields))
-
-            if output_format in (None, "json"):
-                output = {field: [x for x in items]}
-                print(json.dumps(output))
-            elif output_format == "plain":
-                for row in items:
-                    print(' '.join(str(x) for x in row.values()))
-
-        elif type(rows) == dict:
-            item = serialize_row(rows, output_fields)
-
-            if output_format in (None, "json"):
-                print(json.dumps({field: item}))
-            elif output_format == "plain":
-                output = ['""' if x is None else str(x) for x in item.values()]
-                print(' '.join(output))
-
-
 class CLIController:
 
-    def get(self, resource, command=None, res_id=None, output_fields=None, output_format=None, q=False):
-        row = rest.get_instance(resource, res_id)
-        __output__(q, row, resource, output_fields=output_fields, output_format=output_format)
+    def get(self, resource, command=None, id=None, included=None, output_fields=None, output_format=None, q=False):
+        row = rest.get_instance(resource, id, included=included)
+        __output__(q, row, included=included, output_fields=output_fields, output_format=output_format)
 
-    def list(self, resource, command=None, resperpage=10, page=None, output_fields=None, output_format=None, q=False):
+    def list(self, resource, command=None, included=None, resperpage=10, page=None, output_fields=None,
+             output_format=None, q=False):
         rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
-        __output__(q, rows, output_fields=output_fields, field=None, output_format=output_format)
+        __output__(q, rows, included=included, output_fields=output_fields,
+                   output_format=output_format)
 
-    def query(self, resource, command=None, query=None, output_fields=None, resperpage=None,
+    def query(self, resource, command=None, query=None, included=None, output_fields=None, resperpage=None,
               page=None, output_format=None, q=False):
         rows = rest.query(resource, query, output_fields, resperpage=resperpage, page=page)
+        __output__(q, rows, included=included, output_fields=output_fields,
+                   output_format=output_format)
+
+    def get_field_query(self, resource, field, command=None, query=None, output_fields=None, resperpage=None,
+                        page=None, output_format=None, q=False):
+        rows = rest.get_field_query(resource, field, query, resperpage=resperpage, page=page)
+
         __output__(q, rows, output_fields=output_fields, output_format=output_format)
 
-    def get_version(self, resource, command=None, res_id=None, q=False):
-        value = rest.get_field(resource, res_id, field='version')
+    def get_version(self, resource, command=None, id=None, q=False):
+        value = rest.get_field(resource, id, field='version')
         if not q:
             print(value)
 
     # This will always return an ID or list of IDs
-    def get_field(self, resource, id, field, command=None, resperpage=None, page=None, output_fields=None,
+    def get_field(self, resource, id, field, command=None, included=None, resperpage=None, page=None,
+                  output_fields=None,
                   output_format=None, q=False):
-        value = rest.get_field(resource, id, field=field, resperpage=resperpage, page=page)
-        __output__(q, value, field=field, output_fields=output_fields, output_format=output_format)
+        value = rest.get_field(resource, id, field=field, included=included, resperpage=resperpage, page=page)
+        __output__(q, value, included=included, output_fields=output_fields,
+                   output_format=output_format)
 
-    def get_parent(self, resource, relation, command=None, res_id=None, q=False):
-        value = rest.get_field(resource, res_id, field=relation, index='relationships')
+    def get_parent(self, resource, relation, command=None, id=None, q=False):
+        value = rest.get_field(resource, id, field=relation, index='relationships')
         if not q:
             print(value['data']['id'])
 
+    def get_collection(self, resource, collection, command=None, resperpage=None, page=None, id=None, q=False):
+
+        # receives a stream of rows via yield
+        # simplejson can handle a stream of objects and print them as array
+        data = rest.get_collection(resource, id, collection)
+        if not q:
+            print(json.dumps(SerializableGenerator(iter(data))))
 
     def set_field(self, resource, id, field, value, command=None, q=False):
         response = self._set_field_(resource, id, field, value)

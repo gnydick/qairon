@@ -77,9 +77,12 @@ class RestController:
         response = requests.get(url, headers=headers)
         assert response.status_code == 200
         results = requests.get(url, headers=headers).json()
-        objs = results['data']
-        ids = [x['id'] for x in objs]
-        return ids
+        if 'data' not in results:
+            exit(255)
+        else:
+            objs = results['data']
+            ids = [x['id'] for x in objs]
+            return ids
 
     def allocate_subnet(self, network_id, additional_mask_bits, name):
         from .subnets import SubnetController
@@ -103,9 +106,12 @@ class RestController:
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code == 200
         results = response.json()
-        objs = results['data']
-        ids = [x['id'] for x in objs]
-        return ids
+        if 'data' not in results:
+            exit(255)
+        else:
+            objs = results['data']
+            ids = [x['id'] for x in objs]
+            return ids
 
     def _get_attr_search_(self, prefix, parsed_args, resource=None, attribute=None):
         url = self.URL + "{resource}/{id}/{attr}".format(resource=resource, id=parsed_args.owner_id, attr=attribute)
@@ -118,11 +124,19 @@ class RestController:
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code == 200
         results = requests.get(url, headers=headers).json()
-        objs = results['data']
-        ids = [x['id'] for x in objs]
-        return ids
+        if 'data' not in results:
+            exit(255)
+        else:
+            objs = results['data']
+            ids = [x['id'] for x in objs]
+            return ids
 
-    def _get_rest_(self, resource, resource_id=None, field=None, params={}, headers=HEADERS):
+    def _get_list_(self, resource, params={}, headers=HEADERS):
+        res_url = self.URL + resource
+        response = requests.get(res_url, params=params, headers=headers)
+        return response
+
+    def _get_record_(self, resource, resource_id=None, field=None, params={}, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
@@ -190,17 +204,30 @@ class RestController:
             res_url += '/' + resource_id + '/relationships/' + collection
         return requests.patch(res_url, data, json=json, params=params, headers=headers)
 
-    def get_instance(self, resource, resource_id):
-        response = self._get_rest_(resource, resource_id)
-        return response.json()['data']
+    def get_instance(self, resource, resource_id, included=None):
+        if included:
+            params = {'include': included }
+        else:
+            params=None
+        response = self._get_record_(resource, resource_id, params=params)
+        results = response.json()
+        return __handle_return_data__(results, included)['data']
 
     def pretty_get_instance(self, resource, resource_id):
         return json.dumps(self.get_instance(resource, resource_id), indent=4, sort_keys=True)
 
-    def get_field(self, resource, resource_id, field, resperpage=None, page=None):
+    def get_field(self, resource, resource_id, field, included=None, resperpage=None, page=None):
         params = {'page[size]': resperpage, 'page[number]': page}
-        response = self._get_rest_(resource, resource_id, field=field, params=params)
-        return response.json()['data']
+        if included:
+            params['include'] = included
+        response = self._get_record_(resource, resource_id, field=field, params=params)
+        results = response.json()
+        return __handle_return_data__(results, included)['data']
+
+    def get_field_query(self, resource, field, query, resperpage=None, page=None):
+        params = {'page[size]': resperpage, 'page[number]': page, 'include': field}
+        rows = self._query_(resource, query=query, field=field, params=params)
+        return rows
 
     def _get_all_(self, resource, resource_id, path, headers=HEADERS):
         res_url = self.URL + resource
@@ -218,8 +245,12 @@ class RestController:
             for page in range(1, int(total / 200 + 2)):
                 params = {'page[num]': page, 'page[size]': 100}
                 response = requests.get(res_url, params=params, headers=headers)
-                data = response.json()['data']
-                yield data
+                results = response.json()
+                if 'data' not in results:
+                    exit(255)
+                else:
+                    data = results['data']
+                    yield data
 
     def get_collection(self, resource, resource_id, collection, resperpage=None, page=None):
         # receiving the yield for the pages (batches of rows)
@@ -234,36 +265,45 @@ class RestController:
 
     def query(self, resource, query, output_fields=None, resperpage=None, page=None,
               **kwargs):
-        return self._list_(resource, query, output_fields=output_fields, resperpage=resperpage, page=page)
+        return self._query_(resource, query, output_fields=output_fields, resperpage=resperpage, page=page)
 
     def list(self, resource):
-        return self._list_(resource)
+        return self._query_(resource)
 
-    def _list_(self, resource, filters=None, output_fields=None, resperpage=None, page=None,
-               **kwargs):
+    def _query_(self, resource, query=None, resperpage=None, page=None,
+                **kwargs):
         params = {'page[size]': resperpage, 'page[number]': page}
-        if filters is not None:
-            params['filter[objects]'] = list()
-            params['filter[objects]'].append(filters)
-        response = self._get_rest_(resource, params=params)
-        return response.json()['data']
+        if query is not None:
+            filters = json.loads(query)
+            params['filter[objects]'] = query
+        response = self._get_list_(resource, params=params)
+        results = response.json()
+        if 'data' not in results:
+            exit(255)
+        else:
+            return results['data']
 
     def _complex_list_(self, resource, filters, output_fields=None, resperpage=100):
         params = dict(results_per_page=resperpage)
         params['q'] = json.dumps(dict(filters=filters))
-        response = self._get_rest_(resource, params=params)
+        response = self._get_record_(resource, params=params)
         results = []
         if type(output_fields) == str:
             output_fields = [output_fields]
         elif output_fields is None:
             output_fields = ['id']
-        for obj in response.json()['data']:
-            row = []
-            for field in output_fields:
-                row.append(obj[field])
 
-            results.append(row)
-        return results
+        json_results = response.json()
+        if 'data' not in json_results:
+            exit(255)
+        else:
+            for obj in json_results['data']:
+                row = []
+                for field in output_fields:
+                    row.append(obj[field])
+
+                results.append(row)
+            return results
 
     def qairon_wrapped_deployment_search(self, prefix, parsed_args):
         return self._get_search_(prefix, 'deployment')
@@ -274,3 +314,13 @@ class RestController:
             config['deployment_id'] = new_dep_id
             config['resource'] = 'config'
             self.create_resource(config)
+
+
+def __handle_return_data__(results, included):
+    if 'data' not in results:
+        exit(255)
+    else:
+        result = results
+        if included:
+            result['included'] = results['included']
+        return result
