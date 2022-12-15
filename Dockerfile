@@ -31,11 +31,13 @@ ADD migrations /opt/qairon/migrations
 ADD models /opt/qairon/models
 ADD views /opt/qairon/views
 ADD templates /opt/qairon/templates
+ADD serializers /opt/qairon/serializers
 ADD static /opt/qairon/static
 ADD app.py /opt/qairon
 ADD base.py /opt/qairon
 ADD db.py /opt/qairon
 ADD qcli /opt/qairon
+
 
 
 
