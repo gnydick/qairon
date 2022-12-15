@@ -30,6 +30,7 @@ if app.debug:
 
 migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
+qclimanager = APIManager(app, session=db.session)
 
 with app.app_context():
     def postprocessor(result, **kwargs):
@@ -46,7 +47,7 @@ with app.app_context():
                                url_prefix='/api/rest/v1', page_size=5, max_page_size=100,
                                allow_client_generated_ids=True, allow_to_many_replacement=True,
                                exclude=getattr(model_class, 'exclude'))
-        restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
+        qclimanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
                                url_prefix='/api/qcli/v1', page_size=5, max_page_size=100,
                                allow_client_generated_ids=True, allow_to_many_replacement=True,
                                exclude=getattr(model_class, 'exclude'), serializer=custom_serializer)
