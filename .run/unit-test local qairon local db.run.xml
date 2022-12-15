@@ -3,8 +3,8 @@
     <option name="additionalOptions" value="-p 5002" />
     <option name="flaskDebug" value="true" />
     <module name="qairon" />
-    <option name="target" value="$PROJECT_DIR$/app.py" />
-    <option name="targetType" value="PATH" />
+    <option name="target" value="app" />
+    <option name="targetType" value="PYTHON" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
@@ -12,9 +12,9 @@
       <env name="SECRET_KEY" value="12345" />
       <env name="SQAIRON_ENDPOINT" value="http://127.0.0.1:5002" />
     </envs>
-    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2-modern/bin/python" />
+    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-dev-modernize-3.9.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="IS_MODULE_SDK" value="false" />
+    <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />

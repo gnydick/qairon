@@ -10,6 +10,7 @@ from base import app
 from controllers import RestController
 from db import db
 from models import *
+from serializers.default import QcliSerializer
 from views import *
 
 app.url_map.strict_slashes = False
@@ -31,14 +32,24 @@ migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
 
 with app.app_context():
+    def postprocessor(result, **kwargs):
+        result = result['data']
+
+
+
     #    dynamically generate the rest endpoint for each data model
     model_classes = [getattr(models, m[0]) for m in inspect.getmembers(models, inspect.isclass) if
                      m[1].__module__.startswith('models.')]
     for model_class in model_classes:
+        custom_serializer = QcliSerializer(model_class, str(model_class), restmanager, primary_key='id')
         restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
                                url_prefix='/api/rest/v1', page_size=5, max_page_size=100,
                                allow_client_generated_ids=True, allow_to_many_replacement=True,
                                exclude=getattr(model_class, 'exclude'))
+        restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
+                               url_prefix='/api/qcli/v1', page_size=5, max_page_size=100,
+                               allow_client_generated_ids=True, allow_to_many_replacement=True,
+                               exclude=getattr(model_class, 'exclude'), serializer=custom_serializer)
 
     # set optional bootswatch theme
     admin = Admin(app, name='QAIRON: %s' % version, template_mode='bootstrap3', base_template='admin/master.html')
