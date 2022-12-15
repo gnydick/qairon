@@ -1,6 +1,7 @@
 import inspect
 from os.path import exists
 
+import json_api_doc
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 from flask_restless import APIManager
