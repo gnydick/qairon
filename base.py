@@ -6,7 +6,7 @@ from flask_talisman import Talisman
 SQLALCHEMY_ENGINE_OPTIONS = {
     'pool_size': 32,
     'pool_recycle': 4,
-    'pool_pre_ping': True,
+    'pool_pre_ping': True,          
     'logging_name': 'PoolLog',
     'pool_use_lifo': True,
     'pool_timeout': 2
@@ -15,12 +15,11 @@ SQLALCHEMY_ENGINE_OPTIONS = {
 app = Flask(__name__)
 
 from flask import request
-
-
+import logging
 
 def change_url():
     base_url = request.base_url
-    if 'X-FORWARDED-PROTO' in request.headers and request.path not in ('/up', '/up/'):
+    if request.headers.get('X-FORWARDED-PROTO', 'http') == 'https' and request.path not in ('/up', '/up/'):
         request.base_url = base_url.replace('http://', 'https://')
 
 

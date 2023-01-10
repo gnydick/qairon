@@ -11,4 +11,4 @@ keepalive = 9999
 def pre_request(worker, req):
     req.headers.append(tuple(['X-FORWARDED-PROTO', 'https']))
     for header in req.headers:
-        worker.log.info(header)
+        worker.log.debug(header)

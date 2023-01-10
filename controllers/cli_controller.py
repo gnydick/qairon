@@ -84,8 +84,8 @@ class CLIController:
 
     def create(self, args_dict, q=False):
         results = self.__create__(args_dict)
-        data = results.json()
-
+        outer_data = results.json()
+        data = outer_data['data']
         if not q:
             if results.status_code == 201:
                 if 'id' in data.keys():
