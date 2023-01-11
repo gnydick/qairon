@@ -82,17 +82,19 @@ def serialize(rows, included=None, output_fields=None):
         cleaned = __serialize_row__(rows, output_fields, included)
     return cleaned
 
+
 def __output__(q, rows, included=None, output_fields=None, output_format=None):
     if not q:
-
         cleaned = serialize(rows, included, output_fields)
+        if output_format == None:
+            output_format = 'json'
         if output_format == 'json':
             if type(rows) == list:
                 output = [x for x in cleaned]
                 print(json.dumps(output))
             elif type(rows) == dict:
                 print(json.dumps(cleaned))
-        else:
+        elif output_format == 'plain':
             if type(rows) == list:
                 for row in cleaned:
                     print(' '.join(str(x) for x in row.values()))
