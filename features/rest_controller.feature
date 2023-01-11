@@ -1,4 +1,4 @@
-Feature: full test
+Feature: REST
 
   Scenario: provider hierarchy
     Given create "environment" "testenv" via rest
@@ -8,8 +8,8 @@ Feature: full test
     Then create "zone" "testzone" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
     Then create "zone" "testzone2" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
     Then create "partition" "testpartition" under "region_id" "testenv:testprovider_type:testprovider:testregion" via rest
-    Then create "cidr" "1.1.1.1" "network" "testnet" under "partition_id" "testenv:testprovider_type:testprovider:testregion:testpartition" via rest
-    Then allocate subnet "testenv:testprovider_type:testprovider:testregion:testpartition:testnet" "12" "testsubnet0"
+    Then create "cidr" "10.10.0.0/16" "network" "testnet" under "partition_id" "testenv:testprovider_type:testprovider:testregion:testpartition" via rest
+    Then allocate subnet "testenv:testprovider_type:testprovider:testregion:testpartition:testnet" "12" "testsubnet0" via rest
 
   Scenario: application hierarchy
     Given create "application" "testapp" via rest
@@ -24,7 +24,7 @@ Feature: full test
   Scenario: deployment
     Given create "deployment_target_type" "k8s" via rest
     And create deployment_target "testdt" of type "k8s" in "testenv:testprovider_type:testprovider:testregion:testpartition" via rest
-    Then create "deployment_target_bin" with parent id "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" in parent field "deployment_target_id" named "bin0"
+    Then create "deployment_target_bin" with parent id "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" in parent field "deployment_target_id" named "bin0" via rest
     Then create deployment at "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0" for "testapp:teststack:testservice" tagged "default" with defaults "{}" via rest
     Then create config for resource "deployment" named "testdepcfg" from template "testcfgtmpl" can be created for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" tagged "tag" via rest
 
@@ -37,13 +37,13 @@ Feature: full test
     Given create "repo_type" "helm" via rest
     Given create "repo_type" "s3" via rest
     Given create "repo_type" "git" via rest
-    Then create "repo" with parent id "git" in parent field "repo_type_id" named "testsvcreposrc"
-    Then create "repo" with parent id "ecr" in parent field "repo_type_id" named "testsvcrepobuildartifact"
-    Then create "repo" with parent id "helm" in parent field "repo_type_id" named "testsvcreporeleaseartifact"
+    Then create "repo" with parent id "git" in parent field "repo_type_id" named "testsvcreposrc" via rest
+    Then create "repo" with parent id "ecr" in parent field "repo_type_id" named "testsvcrepobuildartifact" via rest
+    Then create "repo" with parent id "helm" in parent field "repo_type_id" named "testsvcreporeleaseartifact" via rest
     Then create build for "testapp:teststack:testservice" from job "123" tagged "v1.0" via rest
     Then create release for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" from build "testapp:teststack:testservice:123" from job "456" via rest
-    Then create build_artifact for "testapp:teststack:testservice:123" from "git:testsvcreposrc" uploaded to "ecr:testsvcrepobuildartifact" named "test_build_artifact_ecr" in path "some_output_path"
-    Then create release_artifact for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456" from "ecr:testsvcrepobuildartifact" uploaded to "helm:testsvcreporeleaseartifact" named "test_release_artifact_helm" in path "some_output_path"
+    Then create build_artifact for "testapp:teststack:testservice:123" from "git:testsvcreposrc" uploaded to "ecr:testsvcrepobuildartifact" named "test_build_artifact_ecr" in path "some_output_path" via rest
+    Then create release_artifact for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456" from "ecr:testsvcrepobuildartifact" uploaded to "helm:testsvcreporeleaseartifact" named "test_release_artifact_helm" in path "some_output_path" via rest
 
 
   Scenario: cleanup

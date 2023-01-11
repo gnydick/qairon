@@ -10,7 +10,7 @@ def step_impl(context, resource, res_id):
 
 
 @then(
-    'create build_artifact for "{build_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}"')
+    'create build_artifact for "{build_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}" via rest')
 def step_impl(context, build_id, input_repo_id, output_repo_id, name, upload_path):
     res = context.rest.create_resource(
         {'resource': 'build_artifact', 'build_id': build_id, 'input_repo_id': input_repo_id,
@@ -21,7 +21,7 @@ def step_impl(context, build_id, input_repo_id, output_repo_id, name, upload_pat
 
 
 @then(
-    'create release_artifact for "{release_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}"')
+    'create release_artifact for "{release_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}" via rest')
 def step_impl(context, release_id, input_repo_id, output_repo_id, name, upload_path):
     res = context.rest.create_resource(
         {'resource': 'release_artifact', 'release_id': release_id, 'input_repo_id': input_repo_id,
@@ -31,7 +31,7 @@ def step_impl(context, release_id, input_repo_id, output_repo_id, name, upload_p
     assert data['data']['id'] == ':'.join([release_id, name])
 
 
-@then('create "{resource}" with parent id "{parent_id}" in parent field "{parent_field}" named "{name}"')
+@then('create "{resource}" with parent id "{parent_id}" in parent field "{parent_field}" named "{name}" via rest')
 def step_impl(context, resource, parent_id, parent_field, name):
     res = context.rest.create_resource(
         {'resource': resource, parent_field: parent_id, 'name': name}
@@ -51,7 +51,7 @@ def step_impl(context, environment_id, provider_type_id, native_id):
     assert data['data']['id'] == ':'.join([environment_id, provider_type_id, native_id])
 
 
-@then('allocate subnet "{network_id}" "{additional_mask_bits}" "{subnet_name}"')
+@then('allocate subnet "{network_id}" "{additional_mask_bits}" "{subnet_name}" via rest')
 def step_impl(context, network_id, additional_mask_bits, subnet_name):
     res = context.rest.allocate_subnet(network_id, additional_mask_bits, subnet_name)
     data = res.json()

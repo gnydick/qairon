@@ -5,6 +5,7 @@ from subprocess import call
 
 from .rest_controller import RestController
 
+
 class SerializableGenerator(list):
     """Generator that is serializable by JSON"""
 
@@ -20,7 +21,7 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def serialize_rows(rows, output_fields=None, included=None):
+def __serialize_rows__(rows, output_fields=None, included=None):
     for row in rows:
         row_id = row['id']
 
@@ -48,7 +49,7 @@ def serialize_rows(rows, output_fields=None, included=None):
         yield output
 
 
-def serialize_row(row, output_fields=None, included=None):
+def __serialize_row__(row, output_fields=None, included=None):
     row_id = row['id']
 
     if 'relationships' in row:
@@ -74,29 +75,27 @@ def serialize_row(row, output_fields=None, included=None):
     return output
 
 
+def serialize(rows, included=None, output_fields=None):
+    if type(rows) == list:
+        cleaned = __serialize_rows__(rows, output_fields, included)
+    elif type(rows) == dict:
+        cleaned = __serialize_row__(rows, output_fields, included)
+    return cleaned
+
 def __output__(q, rows, included=None, output_fields=None, output_format=None):
     if not q:
-        if output_format is None:
-            output_format = "json"
-        if type(rows) == list:
-            items = serialize_rows(rows, output_fields, included)
-            pass
-        elif type(rows) == dict:
-            item = serialize_row(rows, output_fields, included)
 
+        cleaned = serialize(rows, included, output_fields)
         if output_format == 'json':
             if type(rows) == list:
-                output = [x for x in items]
+                output = [x for x in cleaned]
                 print(json.dumps(output))
             elif type(rows) == dict:
-                print(json.dumps(item))
-        elif output_format == 'plain':
+                print(json.dumps(cleaned))
+        else:
             if type(rows) == list:
-                for row in items:
+                for row in cleaned:
                     print(' '.join(str(x) for x in row.values()))
             elif type(rows) == dict:
-                output = ['""' if x is None else str(x) for x in item.values()]
+                output = ['""' if x is None else str(x) for x in cleaned.values()]
                 print(' '.join(output))
-
-
-

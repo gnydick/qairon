@@ -186,7 +186,7 @@ class RestController:
             res_url += '/' + resource_id
         return requests.delete(res_url, headers=headers)
 
-    def delete_resource(self, resource, resource_id, command=None):
+    def delete_resource(self, resource, resource_id):
         return self._delete_rest_(resource, resource_id)
 
     def _post_rest_(self, resource, resource_id=None, data=None, json=None, params={}, headers=HEADERS):

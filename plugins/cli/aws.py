@@ -25,7 +25,7 @@ COMMANDS = dict(
 
 
 def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
-                    resource=None, command=None, q=False):
+                    resource=None, q=False):
     result = aws.register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag=secret_tag,
                                  kms_key_alias=kms_key_alias)
     if not q:
@@ -33,7 +33,7 @@ def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_
 
 
 def update_secret(deployment_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
-                  resource=None, command=None, q=False):
+                  resource=None, q=False):
     """
     Creates a new secret. The secret value can be a string or bytes.
     """

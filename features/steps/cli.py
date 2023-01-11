@@ -1,108 +1,302 @@
-# from behave import *
-# from behave import then, when
-#
-#
-# @given('create "{pk}" "{resource}" "{resource_id}" in "{parent_field}" "{parent_id}" via cli')
-# def step_impl(context, pk, resource, resource_id, parent_field, parent_id):
-#     context.cli.create({'resource': resource, pk: resource_id, parent_field: parent_id})
-#     resource_obj = context.rest.get_instance(resource, parent_id + ':' + resource_id)
-#     assert resource_obj[pk] == resource_id
-#     assert resource_obj[parent_field] == parent_id
-#
-#
-# @given('create "{pk}" "{resource}" "{resource_id}" via cli')
-# def step_impl(context, pk, resource, resource_id):
-#     context.cli.create({'resource': resource, pk: resource_id})
-#     resource_obj = context.rest.get_instance(resource, resource_id)
-#     assert resource_obj[pk] == resource_id
-#
-#
-# @given('create service_config_template "{svc_config_name}" for "{svc}" via cli')
-# def step_impl(context, svc_config_name, svc):
-#     expected_svc_cfg_id = '%s:%s' % (svc, svc_config_name)
-#     context.cli.create({'resource': 'service_config_template', 'name': svc_config_name, 'service_id': svc})
-#     svc_cfg = context.rest.get_instance('service_config_template', expected_svc_cfg_id)
-#     assert svc_cfg['id'] == expected_svc_cfg_id
-#
-#
-# @given('create environment "{env}" via cli')
-# def step_impl(context, env):
-#     expected_env_id = env
-#     context.cli.create(
-#         {'resource': 'environment', 'id': env}
+import json
+
+from behave import *
+
+
+@given('create "{resource}" "{res_id}" via cli')
+def step_impl(context, resource, res_id):
+    context.cli.create(
+        {'id': res_id, 'resource': resource})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == res_id
+
+
+@then(
+    'create build_artifact for "{build_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}" via cli')
+def step_impl(context, build_id, input_repo_id, output_repo_id, name, upload_path):
+    context.cli.create(
+        {'resource': 'build_artifact', 'build_id': build_id, 'input_repo_id': input_repo_id,
+         'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == ':'.join([build_id, name])
+
+
+@then(
+    'create release_artifact for "{release_id}" from "{input_repo_id}" uploaded to "{output_repo_id}" named "{name}" in path "{upload_path}" via cli')
+def step_impl(context, release_id, input_repo_id, output_repo_id, name, upload_path):
+    context.cli.create(
+        {'resource': 'release_artifact', 'release_id': release_id, 'input_repo_id': input_repo_id,
+         'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == ':'.join([release_id, name])
+
+
+@then('create "{resource}" with parent id "{parent_id}" in parent field "{parent_field}" named "{name}" via cli')
+def step_impl(context, resource, parent_id, parent_field, name):
+    context.cli.create(
+        {'resource': resource, parent_field: parent_id, 'name': name}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == ':'.join([parent_id, name])
+
+
+@then(
+    'create provider in env "{environment_id}" of type "{provider_type_id}" with native_id "{native_id}" via cli')
+def step_impl(context, environment_id, provider_type_id, native_id):
+    context.cli.create(
+        {'environment_id': environment_id, 'provider_type_id': provider_type_id, 'resource': 'provider',
+         'native_id': native_id}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == ':'.join([environment_id, provider_type_id, native_id])
+
+
+@then(
+    'allocate subnet "{network_id}" from vpc_cidr "{cidr}" with "{additional_mask_bits}" additional bits named "{subnet_name}" via cli')
+def step_impl(context, network_id, cidr, additional_mask_bits, subnet_name):
+    context.cli.allocate_subnet(None, id=network_id, additional_mask_bits=additional_mask_bits, output_format='json',
+                                name=subnet_name)
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    subnet = json.loads(output)
+    net_base = cidr.split(sep='/')
+    assert subnet['id'] == '%s:%s' % (network_id, subnet_name)
+    assert subnet['cidr'] == "%s/%d" % (net_base[0], int(net_base[1]) + int(additional_mask_bits))
+
+
+@then('create "{field}" "{field_val}" "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" via cli')
+def step_impl(context, field, field_val, resource, res_name, parent_fk_field, parent_id):
+    context.cli.create(
+        {'name': res_name, parent_fk_field: parent_id, 'resource': resource, field: field_val}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s' % (parent_id, res_name)
+
+
+@then('create "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" via cli')
+def step_impl(context, resource, res_name, parent_fk_field, parent_id):
+    context.cli.create(
+        {'name': res_name, parent_fk_field: parent_id, 'resource': resource}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s' % (parent_id, res_name)
+
+
+@then(
+    'create textresource "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" with doc "{doc}" via cli')
+def step_impl(context, resource, res_name, parent_fk_field, parent_id, doc):
+    context.cli.create(
+        {'id': res_name, parent_fk_field: parent_id, 'resource': resource, 'doc': doc}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == res_name
+
+
+# use_step_matcher("re")
+@given('provider "{provider}" can be created via cli')
+def step_impl(context, provider):
+    context.cli.create(
+        {'id': provider, 'resource': 'provider'})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == provider
+
+
+@given('region "{region}" can be created for provider "{provider}" via cli')
+def step_impl(context, region, provider):
+    context.cli.create(
+        {'name': region, 'provider_id': provider, 'resource': 'region'})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s' % (provider, region)
+
+
+@given('zone "{zone}" can be created for region "{region}" via cli')
+def step_impl(context, zone, region):
+    context.cli.create(
+        {'name': zone, 'region_id': region, 'resource': 'zone', 'defaults': '{}'})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s' % (region, zone)
+
+
+@when('delete "{resource}" "{res_id}" via cli')
+@then('delete "{resource}" "{res_id}" via cli')
+def step_impl(context, resource, res_id):
+    context.cli.delete(resource, res_id)
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s-%d' % (res_id, 204)
+
+
+@given('application "{app_id}" can be created via cli')
+def step_impl(context, app_id):
+    context.cli.create(
+        {'id': app_id, 'resource': 'application', 'defaults': '{}'})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == app_id
+
+
+@given('stack "{stack}" can be created for app "{app_id}" via cli')
+def step_impl(context, stack, app_id):
+    context.cli.create(
+        {'name': stack, 'application_id': app_id, 'resource': 'stack', 'defaults': '{}'})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s' % (app_id, stack)
+
+
+@given('service "{service}" can be created for stack "{stack}" via cli')
+def step_impl(context, service, stack):
+    context.cli.create(
+        {'name': service, 'stack_id': stack, 'resource': 'service', 'defaults': '{}'})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s' % (stack, service)
+
+
+@given('environment "{environment}" can be created at "{deployment_url}" via cli')
+def step_impl(context, environment, deployment_url, role):
+    context.cli.create(
+        {'resource': 'environment', 'id': environment, 'deployment_url': deployment_url, 'defaults': '{}'}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == environment
+
+
+@given('create deployment_target "{name}" of type "{dep_target_type}" in "{partition_id}" via cli')
+def step_impl(context, name, dep_target_type, partition_id):
+    context.cli.create(
+        {'resource': 'deployment_target', 'deployment_target_type_id': dep_target_type,
+         'partition_id': partition_id, 'name': name}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s:%s' % (partition_id, dep_target_type, name)
+
+
+@then('create build for "{service_id}" from job "{job_number}" tagged "{tag}" via cli')
+def step_impl(context, service_id, job_number, tag):
+    context.cli.create(
+        {'resource': 'build', 'service_id': service_id, 'build_num': job_number, 'vcs_ref': tag})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s' % (service_id, job_number)
+
+
+@then('create release for "{deployment_id}" from build "{build_id}" from job "{build_num}" via cli')
+def step_impl(context, deployment_id, build_id, build_num):
+    context.cli.create(
+        {'resource': 'release', 'deployment_id': deployment_id, 'build_id': build_id, 'build_num': build_num})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s' % (deployment_id, build_num)
+
+
+@then(
+    'create deployment at "{dep_target_bin_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via cli')
+def step_impl(context, dep_target_bin_id, service, tag, defaults):
+    context.cli.create(
+        {'resource': 'deployment', 'deployment_target_bin_id': dep_target_bin_id, 'service_id': service,
+         'tag': tag, 'defaults': defaults}
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s:%s' % (dep_target_bin_id, service, tag)
+    context.cli.get('deployment', output, output_format='json')
+    new_dep = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert new_dep['defaults'] == defaults
+    assert new_dep['tag'] == tag
+
+
+# @then(
+#     'service_config_template "{service_config_template}" can be created for service "{service}" via cli')
+# def step_impl(context, service_config_template, service):
+#     response = context.cli.create(
+#         {'resource': 'service_config_template', 'name': service_config_template, 'service_id': service, 'template': ''}
 #     )
-#     environment = context.rest.get_instance('environment', expected_env_id)
-#     assert environment['id'] == expected_env_id
-#
-#
-# @given('create deployment for service "{service_id}" in k8s "{deployment_target}" via cli')
-# def step_impl(context, service_id, deployment_target):
-#     expected_dep_id = '%s:%s:default' % (deployment_target, service_id)
-#     context.cli.create(
-#         {'resource': 'deployment', 'service_id': service_id, 'deployment_target_id': deployment_target,
-#          'tag': 'default'})
-#     deployment = context.rest.get_instance('deployment', expected_dep_id)
-#     assert deployment['id'] == expected_dep_id
-#
-#
-# @given('create k8s_cluster "{name}" in "{environment}" via cli')
-# def step_impl(context, name, environment):
-#     expected_k8s_id = '%s:%s:k8s' % (environment, name)
-#     context.cli.create(
-#         {'resource': 'k8s_cluster', 'environment_id': environment, 'name': name}
-#     )
-#     k8s_cluster = context.rest.get_instance('k8s_cluster', expected_k8s_id)
-#     assert k8s_cluster['id'] == expected_k8s_id
-#     assert k8s_cluster['name'] == name
-#
-#
-# @given('create config "{config_name}" type "{config_type_id}" for deployment "{deployment_id}" tagged "{tag}" via cli')
-# def step_impl(context, config_name, config_type_id, deployment_id, tag):
-#     expected_config_id = '%s:%s:%s:%s' % (deployment_id, config_type_id, config_name, tag)
-#     context.cli.create(
-#         {'resource': 'config', 'name': config_name, 'config_type_id': config_type_id, 'deployment_id': deployment_id,
-#          'tag': tag})
-#     config = context.rest.get_instance('config', expected_config_id)
-#     assert config['id'] == expected_config_id
-#
-#
-# @when('get "{resource}" "{resource_id}" via cli')
-# def step_impl(context, resource, resource_id):
-#     context.cli.get(**{'resource': resource, 'id': resource_id})
-#
-#
-# @when('modify "{resource}" "{resource_id}" "{field}" "{value}" via cli')
-# def step_impl(context, resource, resource_id, field, value):
-#     context.cli.set_field(**{'resource': resource, 'id': resource_id, 'field': field, 'value': value})
-#
-#
-# @then('delete "{resource}" "{resource_id}" via cli')
-# def step_impl(context, resource, resource_id):
-#     context.cli.delete(**{'resource': resource, 'id': resource_id})
-#     results = context.rest.get_instance(resource, resource_id)
-#     assert results == {}
-#
-#
-# @when('add_to_collection "{item_id}" "{number:d}" to "{items}" on "{owner}" "{owner_id}" via cli')
-# def step_impl(context, number, item_id, items, owner, owner_id):
-#     owner_obj = context.rest.get_instance(owner, owner_id)
-#     assert len(owner_obj[items]) == number - 1
-#     context.cli.add_to_collection(owner, owner_id, items, item_id)
-#     owner_obj = context.rest.get_instance(owner, owner_id)
-#     assert len(owner_obj[items]) == number
-#
-#
-# @then('del_from_collection "{item_id}" "{number:d}" to "{items}" on "{owner}" "{owner_id}" via cli')
-# def step_impl(context, number, item_id, items, owner, owner_id):
-#     owner_obj = context.rest.get_instance(owner, owner_id)
-#     assert len(owner_obj[items]) == number
-#     context.cli.del_from_collection(owner, owner_id, items, item_id)
-#     owner_obj = context.rest.get_instance(owner, owner_id)
-#     assert len(owner_obj[items]) == number - 1
-#
-#
-# @then('query something "{resource}" "{field}" "{op}" "{value}"')
-# def step_impl(context, resource, field, op, value):
-#     resource_ids = context.cli.query(
-#         **{'resource': resource, 'search_field': field, 'op': op, 'value': value, 'output_fields': 'id'})
-#     pass
+#     new_svc_config = response.json()
+#     assert new_svc_config['id'] == '%s:%s' % (service, service_config_template)
+
+@then(
+    'create config for resource "{resource}" named "{name}" from template "{config_template_id}" can be created for "{resource_id}" tagged "{tag}" via cli')
+@given(
+    'create config for resource "{resource}" named "{name}" from template "{config_template_id}" can be created for "{resource_id}" tagged "{tag}" via cli')
+def step_impl(context, resource, name, config_template_id, resource_id, tag):
+    payload = {'resource': "%s_config" % resource, 'name': name, 'config_template_id': config_template_id,
+               '%s_id' % resource: resource_id, 'tag': tag}
+    context.cli.create(payload)
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == '%s:%s:%s:%s' % (resource_id, config_template_id, name, tag)
+
+
+@given('update "{field}" for "{resource}" "{resource_id}" to "{value}" via cli')
+def step_impl(context, resource, resource_id, field, value):
+    context.cli.update_resource(resource, resource_id, field, value)
+
+
+@given('create environment "{env}" for "{role_id}" via cli')
+def step_impl(context, env, role_id):
+    expected_env_id = '%s:%s' % (role_id, env)
+    context.cli.create(
+        {'resource': 'environment', 'role_id': role_id, 'name': env}
+    )
+    environment = context.cli.get_instance('environment', expected_env_id)
+    assert environment['id'] == expected_env_id
+
+
+@step('create k8s_cluster "{name}" in "{environment}" via cli')
+def step_impl(context, name, environment):
+    expected_cluster_id = '%s:%s:k8s' % (environment, name)
+    context.cli.create(
+        {'resource': 'k8s_cluster', 'environment_id': environment, 'name': name}
+    )
+    k8s_cluster = context.cli.get_instance('k8s_cluster', expected_cluster_id)
+    assert k8s_cluster['id'] == expected_cluster_id
+
+
+@step('environment "{id}" can be created via cli')
+def step_impl(context, id):
+    context.cli.create(
+        {'id': id, 'resource': 'environment'})
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == id
