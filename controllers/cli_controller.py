@@ -10,47 +10,47 @@ rest = RestController()
 
 class CLIController:
 
-    def get(self, resource, id, included=None, output_fields=None, output_format=None, q=False):
+    def get(self, resource, id, command=None, included=None, output_fields=None, output_format=None, q=False):
         row = rest.get_instance(resource, id, included=included)
         __output__(q, row, included=included, output_fields=output_fields, output_format=output_format)
 
-    def list(self, resource, included=None, resperpage=10, page=None, output_fields=None,
+    def list(self, resource, command=None, included=None, resperpage=10, page=None, output_fields=None,
              output_format=None, q=False):
         rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
         __output__(q, rows, included=included, output_fields=output_fields,
                    output_format=output_format)
 
-    def query(self, resource, query=None, included=None, output_fields=None, resperpage=None,
+    def query(self, resource, command=None, query=None, included=None, output_fields=None, resperpage=None,
               page=None, output_format=None, q=False):
         rows = rest.query(resource, query, output_fields, resperpage=resperpage, page=page)
         __output__(q, rows, included=included, output_fields=output_fields,
                    output_format=output_format)
 
-    def get_field_query(self, resource, field, query=None, output_fields=None, resperpage=None,
+    def get_field_query(self, resource, field, command=None, query=None, output_fields=None, resperpage=None,
                         page=None, output_format=None, q=False):
         rows = rest.get_field_query(resource, field, query, resperpage=resperpage, page=page)
 
         __output__(q, rows, output_fields=output_fields, output_format=output_format)
 
-    def get_version(self, resource, id=None, q=False):
+    def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')
         if not q:
             print(value)
 
     # This will always return an ID or list of IDs
-    def get_field(self, resource, id, field, included=None, resperpage=None, page=None,
+    def get_field(self, resource, id, field, command=None, included=None, resperpage=None, page=None,
                   output_fields=None,
                   output_format=None, q=False):
         value = rest.get_field(resource, id, field=field, included=included, resperpage=resperpage, page=page)
         __output__(q, value, included=included, output_fields=output_fields,
                    output_format=output_format)
 
-    def get_parent(self, resource, relation, id=None, q=False):
+    def get_parent(self, resource, relation, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field=relation, index='relationships')
         if not q:
             print(value['data']['id'])
 
-    def get_collection(self, resource, collection, resperpage=None, page=None, id=None, q=False):
+    def get_collection(self, resource, collection, command=None, resperpage=None, page=None, id=None, q=False):
 
         # receives a stream of rows via yield
         # simplejson can handle a stream of objects and print them as array
@@ -58,20 +58,20 @@ class CLIController:
         if not q:
             print(json.dumps(SerializableGenerator(iter(data))))
 
-    def set_field(self, resource, id, field, value, q=False):
+    def set_field(self, resource, id, field, value, command=None, q=False):
         response = self._set_field_(resource, id, field, value)
         if not q:
             if response.status_code == 200:
                 print(response.json()['id'] + ': ' + field + '=' + value)
 
-    def set_version(self, id, version, resource, q=False):
+    def set_version(self, id, version, resource, command=None, q=False):
         body = {"id": id, "version": version}
         response = rest.update_resource(resource, id, json=body)
         if response.status_code == 200:
             if q is False:
                 print(id + ' ' + version)
 
-    def promote(self, resource, srcid, dstid, q=False):
+    def promote(self, resource, srcid, dstid, command=None, q=False):
         src_version = rest.get_instance('deployment', srcid)['version']
         response = self._set_field_('deployment', dstid, 'version', src_version)
 
@@ -96,13 +96,13 @@ class CLIController:
                 print(results.reason)
                 exit(255)
 
-    def delete(self, resource, id, q=False):
+    def delete(self, resource, id, command=None, q=False):
         results = rest.delete_resource(resource, id)
         if results.status_code == 204:
             if not q:
                 print(id + '-' + str(results.status_code))
 
-    def allocate_subnet(self, resource, id, additional_mask_bits=None, name=None,output_format=None, q=False):
+    def allocate_subnet(self, resource, id, command=None, additional_mask_bits=None, name=None,output_format=None, q=False):
         results = rest.allocate_subnet(id, additional_mask_bits, name)
         outer_data = results.json()
         data = outer_data['data']
@@ -116,7 +116,7 @@ class CLIController:
             else:
                 print(results.status_code)
 
-    def clone_nodegroup(self, id, name, resource, version=None, q=False):
+    def clone_nodegroup(self, id, name, resource, command=None, version=None, q=False):
         nodegroup = rest.get_instance('deployment', id)
 
         subnets = nodegroup['subnets']
@@ -132,7 +132,7 @@ class CLIController:
             if not q:
                 print(new_dep_id)
 
-    def clone_deployment(self, id, deployment_target_id, resource, version=None, q=False):
+    def clone_deployment(self, id, deployment_target_id, resource, command=None, version=None, q=False):
         dep = rest.get_instance('deployment', id)
         configs = dep['configs']
         dep_procs = dep['deployment_proces']
@@ -203,7 +203,7 @@ class CLIController:
         config['resource'] = 'config'
         return config
 
-    def clone_config(self, id, deployment_id, resource, version=None, q=False):
+    def clone_config(self, id, deployment_id, resource, command=None, version=None, q=False):
         config = rest.get_instance('config', id)
         new_config = self.__clone_config__(config, deployment_id)
         response = rest.create_resource(new_config)
@@ -213,14 +213,14 @@ class CLIController:
             if not q:
                 print(new_config_id)
 
-    def add_to_collection(self, resource, owner_id, items, item_id, q=False):
+    def add_to_collection(self, resource, owner_id, items, item_id, command=None, q=False):
         response = rest.add_to_many_to_many(resource, owner_id, items, item_id)
         data = response.json()
         collection = data[items]
         if not q:
             self.__print_object_list__(collection)
 
-    def del_from_collection(self, resource, owner_id, items, item_id, q=False):
+    def del_from_collection(self, resource, owner_id, items, item_id, command=None, q=False):
         response = rest.del_from_many_to_many(resource, owner_id, items, item_id)
         data = response.json()
         collection = data[items]
