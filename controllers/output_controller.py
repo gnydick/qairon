@@ -86,7 +86,7 @@ def serialize(rows, included=None, output_fields=None):
 def __output__(q, rows, included=None, output_fields=None, output_format=None):
     if not q:
         cleaned = serialize(rows, included, output_fields)
-        if output_format == None:
+        if output_format is None:
             output_format = 'json'
         if output_format == 'json':
             if type(rows) == list:

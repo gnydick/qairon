@@ -1,0 +1,92 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+source =
+    .
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/aniso8601
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/argcomplete
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/attr
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/attrs
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/behave
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/boto3
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/botocore
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/certifi
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/chardet
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/charset_normalizer
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/click
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/contextlib2
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/coverage
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/dateutil
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/exceptiongroup
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/flask
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/flask_admin
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/flask_cors
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/flask_marshmallow
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/flask_migrate
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/flask_restless
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/flask_sqlalchemy
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/flask_talisman
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/gevent
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/greenlet
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/gunicorn
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/idna
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/importlib_metadata
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/iniconfig
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/itsdangerous
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/jinja2
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/jmespath
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/json_api_doc
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/json_stream
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/json_stream_rs_tokenizer
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/mako
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/markupsafe
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/marshmallow
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/marshmallow_sqlalchemy
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/monk
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/packaging
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/parse_type
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/pip
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/pkg_resources
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/pluggy
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/psycopg2
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/pyparsing
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/pytest
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/pytest_cov
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/pytz
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/requests
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/s3transfer
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/setuptools
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/simplejson
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/sqlalchemy
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/tomli
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/urllib3
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/werkzeug
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/wtforms
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/zipp
+    /home/gnydick/.pyenv/versions/3.9.2/envs/qairon-3.9.2-modern/lib/python3.9/site-packages/zope
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+
+    # Don't complain about abstract methods, they aren't run:
+    @(abc\.)?abstractmethod
+
+ignore_errors = True
+include_namespace_packages = True
+[html]
+directory = coverage_html_report

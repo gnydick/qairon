@@ -8,7 +8,7 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
-      <env name="FLASK_ADMIN_SWATCH" value="yeti" />
+      <env name="FLASK_ADMIN_SWATCH" value="superhero" />
       <env name="PREFERRED_URL_SCHEME" value="https" />
       <env name="PROPAGATE_EXCEPTIONS" value="True" />
       <env name="SECRET_KEY" value="12345" />
