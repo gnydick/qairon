@@ -143,3 +143,4 @@ fabric.properties
 !nextgen/ops/skel/**
 
 qcli.egg-info/
+/.coverage
