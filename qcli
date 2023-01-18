@@ -7,7 +7,7 @@ from controllers import CLIController
 from controllers import RestController
 from controllers.schema import QaironSchema
 
-import coverage
+
 
 def _main_():
     rest = RestController()
