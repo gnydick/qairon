@@ -25,32 +25,7 @@ def __serialize_rows__(batch, output_fields=None, included=None):
     serialized = list()
     for rows in batch:
         for row in rows:
-            row_id = row['id']
-
-            if 'relationships' in row:
-                for k, v in row['relationships'].items():
-                    if type(v['data']) == dict:
-                        row['attributes'][k + '_id'] = v['data']['id']
-
-            if output_fields:
-                keys = output_fields
-            else:
-                keys = row['attributes'].keys()
-
-            output = dict()
-            if 'id' in keys:
-                output['id'] = row['id']
-            for key in [x for x in keys if x != "id"]:
-                output[key] = row['attributes'][key]
-            if included:
-                if 'included' in row:
-                    includes = dict()
-                for i in row['included']:
-                    if i['type'] not in includes:
-                        includes[i['type']] = []
-                    includes[i['type']].append(i)
-                output['included'] = includes
-            serialized.append(output)
+            serialized.append(__serialize_row__(row, output_fields, included))
     return serialized
 
 

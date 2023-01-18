@@ -24,8 +24,18 @@ def change_url():
 
 
 app.before_request(change_url)
+csp = {
+    # 'default-src':  ['\'self\'',
+    #       '\'unsafe-inline\''],
+    # 'script-src': '\'self\'',
+    # 'img-src': '*',
+}
+talisman = Talisman(
+    app,
+    content_security_policy=csp,
+    content_security_policy_nonce_in=['script-src']
+)
 
-Talisman(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
