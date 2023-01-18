@@ -241,7 +241,7 @@ class RestController:
 
         # this section loops through the pages, yielding page (batch of rows) to the caller
         page_num = 1
-        while rdata['links']['next'] is not None:
+        while page_num == 1 or rdata['links']['next'] is not None:
             params = {'page[number]': page_num, 'page[size]': 100}
             response = requests.get(res_url, params=params, headers=headers)
             rdata = response.json()
