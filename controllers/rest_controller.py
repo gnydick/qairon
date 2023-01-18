@@ -20,7 +20,7 @@ class RestController:
     HEADERS = {'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json'}
 
     def add_to_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
-        owner = self.get_collection(owner_res, owner_res_id, plural_resource)
+        owner = self._get_all_(owner_res, owner_res_id, plural_resource)
         collection = dict()
         collection['data'] = list([x for x in
                                    owner])
@@ -28,7 +28,7 @@ class RestController:
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
     def del_from_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
-        owner = self.get_collection(owner_res, owner_res_id, plural_resource)
+        owner = self._get_all_(owner_res, owner_res_id, plural_resource)
         collection = dict()
         collection['data'] = list(filter(lambda x: x['id'] != col_res_id, owner))
         # collection['data'] = [{'type': singular_resource, 'id': x} for x in collection['data']]
@@ -131,11 +131,6 @@ class RestController:
             ids = [x['id'] for x in objs]
             return ids
 
-    def _get_list_(self, resource, params={}, headers=HEADERS):
-        res_url = self.URL + resource
-        response = requests.get(res_url, params=params, headers=headers)
-        return response
-
     def _get_record_(self, resource, resource_id=None, field=None, params={}, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
@@ -206,7 +201,7 @@ class RestController:
 
     def get_instance(self, resource, resource_id, included=None):
         if included:
-            params = {'include': included }
+            params = {'include': included}
         else:
             params=None
         response = self._get_record_(resource, resource_id, params=params)
@@ -224,44 +219,38 @@ class RestController:
         results = response.json()
         return __handle_return_data__(results, included)['data']
 
-    def get_field_query(self, resource, field, query, resperpage=None, page=None):
+    def get_field_query(self, resource, field, query, included=None, resperpage=None, page=None):
         params = {'page[size]': resperpage, 'page[number]': page, 'include': field}
         rows = self._query_(resource, query=query, field=field, params=params)
         return rows
 
-    def _get_all_(self, resource, resource_id, path, headers=HEADERS):
+    def _get_all_(self, resource, resource_id=None, path=None, included=None, resperpage=None, page=None, headers=HEADERS):
+        params = dict()
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
             if path is not None:
                 res_url += '/' + path
+        if resperpage:
+            params['page[size]'] = resperpage
+        if page:
+            params['page[number]'] = page
+        response = requests.get(res_url, params=params, headers=headers)
+        rdata = response.json()
 
-            params = {'page[size]': 1}
-            response = requests.get(res_url, headers=headers)
+
+        # this section loops through the pages, yielding page (batch of rows) to the caller
+        page_num = 1
+        while rdata['links']['next'] is not None:
+            params = {'page[number]': page_num, 'page[size]': 100}
+            response = requests.get(res_url, params=params, headers=headers)
             rdata = response.json()
-            total = rdata['meta']['total']
-
-            # this section loops through the pages, yielding page (batch of rows) to the caller
-            for page in range(1, int(total / 200 + 2)):
-                params = {'page[num]': page, 'page[size]': 100}
-                response = requests.get(res_url, params=params, headers=headers)
-                results = response.json()
-                if 'data' not in results:
-                    exit(255)
-                else:
-                    data = results['data']
-                    yield data
-
-    def get_collection(self, resource, resource_id, collection, resperpage=None, page=None):
-        # receiving the yield for the pages (batches of rows)
-        batches = self._get_all_(resource, resource_id, collection)
-
-        # loop over each batch
-        for batch in batches:
-            # loop over each row of each batch
-            for member in batch:
-                # stream each line back to the caller to loop over
-                yield member
+            if 'data' not in rdata:
+                exit(255)
+            else:
+                data = rdata['data']
+                yield data
+            page_num += 1
 
     def query(self, resource, query, output_fields=None, resperpage=None, page=None,
               **kwargs):
@@ -276,12 +265,9 @@ class RestController:
         if query is not None:
             filters = json.loads(query)
             params['filter[objects]'] = query
-        response = self._get_list_(resource, params=params)
-        results = response.json()
-        if 'data' not in results:
-            exit(255)
-        else:
-            return results['data']
+        response = self._get_all_(resource, resperpage=resperpage, page=page)
+
+        return response
 
     def _complex_list_(self, resource, filters, output_fields=None, resperpage=100):
         params = dict(results_per_page=resperpage)
@@ -314,6 +300,9 @@ class RestController:
             config['deployment_id'] = new_dep_id
             config['resource'] = 'config'
             self.create_resource(config)
+
+    def _paginate_(self, result):
+        pass
 
 
 def __handle_return_data__(results, included):

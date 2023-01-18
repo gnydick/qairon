@@ -17,6 +17,7 @@ class CLIController:
     def list(self, resource, command=None, included=None, resperpage=10, page=None, output_fields=None,
              output_format=None, q=False):
         rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
+
         __output__(q, rows, included=included, output_fields=output_fields,
                    output_format=output_format)
 
@@ -26,11 +27,11 @@ class CLIController:
         __output__(q, rows, included=included, output_fields=output_fields,
                    output_format=output_format)
 
-    def get_field_query(self, resource, field, command=None, query=None, output_fields=None, resperpage=None,
+    def get_field_query(self, resource, field, command=None, query=None, output_fields=None, included=None, resperpage=None,
                         page=None, output_format=None, q=False):
         rows = rest.get_field_query(resource, field, query, resperpage=resperpage, page=page)
 
-        __output__(q, rows, output_fields=output_fields, output_format=output_format)
+        __output__(q, rows, included=included, output_fields=output_fields, output_format=output_format)
 
     def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')
@@ -41,7 +42,7 @@ class CLIController:
     def get_field(self, resource, id, field, command=None, included=None, resperpage=None, page=None,
                   output_fields=None,
                   output_format=None, q=False):
-        value = rest.get_field(resource, id, field=field, included=included, resperpage=resperpage, page=page)
+        value = rest._get_all_(resource, id, path=field, included=included, resperpage=resperpage, page=page)
         __output__(q, value, included=included, output_fields=output_fields,
                    output_format=output_format)
 
@@ -54,7 +55,7 @@ class CLIController:
 
         # receives a stream of rows via yield
         # simplejson can handle a stream of objects and print them as array
-        data = rest.get_collection(resource, id, collection)
+        data = rest._get_all_(resource, id, included=collection)
         if not q:
             print(json.dumps(SerializableGenerator(iter(data))))
 
@@ -213,31 +214,10 @@ class CLIController:
             if not q:
                 print(new_config_id)
 
-    def add_to_collection(self, resource, owner_id, items, item_id, command=None, q=False):
-        response = rest.add_to_many_to_many(resource, owner_id, items, item_id)
-        data = response.json()
-        collection = data[items]
-        if not q:
-            self.__print_object_list__(collection)
-
-    def del_from_collection(self, resource, owner_id, items, item_id, command=None, q=False):
-        response = rest.del_from_many_to_many(resource, owner_id, items, item_id)
-        data = response.json()
-        collection = data[items]
-        if not q:
-            self.__print_object_list__(collection)
-
     def _set_field_(self, resource, resource_id, field, value):
         body = {"id": resource_id, field: value}
         response = rest.update_resource(resource, resource_id, json=body)
         return response
-
-    def __print_object_list__(self, collection):
-        for item in collection:
-            print(item['id'])
-
-    def test(self, parama):
-        pass
 
     def jenkins(self, args):  # dir, git_url, recursive=False):
         rest.list('service', 0, 'equal', args.git_url)

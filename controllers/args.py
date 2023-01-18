@@ -160,6 +160,9 @@ class CLIArgs:
             _model_com_get_parser = parsers_for_model_parser.add_parser('get')
             _model_com_get_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
             _model_com_get_parser.add_argument('-i', help='included', dest='included', action='append')
+            _model_com_get_parser.add_argument('-f', help='output field for related object', dest='output_fields',
+                                          action='append')
+            _model_com_get_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
             _model_com_create_parser = parsers_for_model_parser.add_parser('create')
             __populate_args__(self.rest, _model_com_create_parser, self.schema.CREATE_FIELDS[model])
             _model_com_delete_parser = parsers_for_model_parser.add_parser('delete')
