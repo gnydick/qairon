@@ -37,7 +37,14 @@ def __fqsn__(deployment_id, secret_name):
 def __get_secret_id__(deployment_id, secret_name) -> object:
     config_templs = rest.query("config_template", '[{"name": "id", "op": "eq", "val": "secret_name_map_item"}]')
     possible_configs = rest.get_field("deployment", deployment_id, 'configs')
-    configs = [c for c in possible_configs if c['attributes']['name'] == secret_name and c['relationships']['template']['data']['id'] in config_templs[0]['id']]
+
+    configs = []
+    for ct in config_templs:
+        for ct_data in ct:
+            for pc in possible_configs:
+                if pc['attributes']['name'] == secret_name and pc['relationships']['template']['data']['id'] == ct_data['id']:
+                    configs.append(pc)
+
     if len(configs) != 1:
         exit(255)
 
