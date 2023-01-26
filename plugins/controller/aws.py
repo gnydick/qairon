@@ -35,7 +35,6 @@ def __fqsn__(deployment_id, secret_name):
 
 
 def __get_secret_id__(deployment_id, secret_name) -> object:
-    import pprint
     config_templs = rest.query("config_template", '[{"name": "id", "op": "eq", "val": "secret_name_map_item"}]')
     possible_configs = rest.get_field("deployment", deployment_id, 'configs')
 
