@@ -1,0 +1,1 @@
+from plugins.baker.cli.baker import COMMANDS

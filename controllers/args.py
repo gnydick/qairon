@@ -87,6 +87,8 @@ def __add_get_field_query_parser__(rest, parsers, resource):
 
 
 class CLIArgs:
+    plugins_installed = 'aws', 'baker'
+
     def __init__(self, rest):
         self.rest = rest
         __gen_completers__(rest)
@@ -102,7 +104,7 @@ class CLIArgs:
     def __gen_parsers__(self, context_parsers):
         import importlib
         import pkgutil
-        import plugins.cli
+        import plugins.aws.cli
 
         def iter_namespace(ns_pkg):
             # Specifying the second argument (prefix) to iter_modules makes the
@@ -111,18 +113,21 @@ class CLIArgs:
             # the name.
             return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
 
+
         self.discovered_plugins = dict()
-        for finder, name, ispkg in iter_namespace(plugins.cli):
-            cli_plugin_name = name.replace('plugins.cli.', '')
-            plugin = importlib.import_module(name)
-            self.discovered_plugins[cli_plugin_name] = plugin
-            plugin_parser = context_parsers.add_parser(cli_plugin_name)
-            new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
-            new_subparsers.required = True
-            for command in plugin.COMMANDS.keys():
-                fields = plugin.COMMANDS[command]
-                parser = new_subparsers.add_parser(command)
-                __populate_args__(self.rest, parser, plugin.COMMANDS[command])
+        for package_name in self.plugins_installed:
+            plugin = importlib.import_module('plugins.%s.cli' % package_name)
+            ins = iter_namespace(plugin)
+
+            for finder, name, ispkg in ins:
+                self.discovered_plugins[name] = plugin
+                plugin_parser = context_parsers.add_parser(package_name)
+                new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
+                new_subparsers.required = True
+                for command in plugin.COMMANDS.keys():
+                    fields = plugin.COMMANDS[command]
+                    parser = new_subparsers.add_parser(command)
+                    __populate_args__(self.rest, parser, plugin.COMMANDS[command])
 
         for model in self.schema.MODELS:
             model_parser = context_parsers.add_parser(model)
@@ -137,7 +142,7 @@ class CLIArgs:
             _model_com_get_parser = parsers_for_model_parser.add_parser('get')
             _model_com_get_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
             _model_com_get_parser.add_argument('-f', help='output field for related object', dest='output_fields',
-                                          action='append')
+                                               action='append')
             _model_com_get_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
             _model_com_create_parser = parsers_for_model_parser.add_parser('create')
             __populate_args__(self.rest, _model_com_create_parser, self.schema.CREATE_FIELDS[model])

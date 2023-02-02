@@ -4,8 +4,8 @@ import json
 import os
 
 from controllers.output_controller import __serialize_rows__, __serialize_row__
-from plugins.controller.bakers import AbstractBakerController
-from plugins.controller.aws import AwsController
+from plugins.baker.controller.bakers import AbstractBakerController
+from plugins.aws.controller import AwsServiceController
 
 
 class HelmBakerController(AbstractBakerController):
@@ -97,7 +97,7 @@ class HelmBakerController(AbstractBakerController):
                     assert len(objs) == 1
                     value = objs[0][data_field]
                 if field['type'] == 'aws_secret':
-                    aws = AwsController()
+                    aws = AwsServiceController()
                     secret = aws.get_secret_string_for_deployment(self.local_data['deployment_id'], field['secret_name'])
                     value = secret['SecretString']
                 if field['type'] == 'config_kv_list':
