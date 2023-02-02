@@ -89,6 +89,7 @@ def __add_get_field_query_parser__(rest, parsers, resource):
 
 
 class CLIArgs:
+    plugins_installed = 'aws', 'baker'
 
     def __init__(self, rest):
         self.rest = rest
@@ -116,8 +117,7 @@ class CLIArgs:
 
 
         self.discovered_plugins = dict()
-        # have to hard-code plugin names for now until i learn a better way
-        for package_name in ['aws', 'baker']:
+        for package_name in self.plugins_installed:
             plugin = importlib.import_module('plugins.%s.cli' % package_name)
             ins = iter_namespace(plugin)
 
