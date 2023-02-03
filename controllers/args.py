@@ -1,4 +1,6 @@
 import argparse
+import os
+import re
 
 import argcomplete
 
@@ -87,7 +89,6 @@ def __add_get_field_query_parser__(rest, parsers, resource):
 
 
 class CLIArgs:
-    plugins_installed = 'aws', 'baker'
 
     def __init__(self, rest):
         self.rest = rest
@@ -115,7 +116,8 @@ class CLIArgs:
 
 
         self.discovered_plugins = dict()
-        for package_name in self.plugins_installed:
+        plugins = [dir for dir in os.listdir('plugins') if re.match('^[a-z]+', dir)]
+        for package_name in plugins:
             plugin = importlib.import_module('plugins.%s.cli' % package_name)
             ins = iter_namespace(plugin)
 
