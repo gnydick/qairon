@@ -27,11 +27,11 @@ class CLIController:
         __output__(q, rows, included=included, output_fields=output_fields,
                    output_format=output_format)
 
-    def get_field_query(self, resource, field, command=None, query=None, output_fields=None, included=None, resperpage=None,
-                        page=None, output_format=None, q=False):
-        rows = rest.get_field_query(resource, field, query, resperpage=resperpage, page=page)
-
-        __output__(q, rows, included=included, output_fields=output_fields, output_format=output_format)
+    # def get_field_query(self, resource, field, command=None, query=None, output_fields=None, included=None, resperpage=None,
+    #                     page=None, output_format=None, q=False):
+    #     rows = rest.get_field_query(resource, field, query, resperpage=resperpage, page=page)
+    #
+    #     __output__(q, rows, included=included, output_fields=output_fields, output_format=output_format)
 
     def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')

@@ -20,18 +20,16 @@ class RestController:
     HEADERS = {'Content-Type': 'application/vnd.api+json', 'Accept': 'application/vnd.api+json'}
 
     def add_to_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
-        owner = self._get_all_(owner_res, owner_res_id, plural_resource)
+        owner = self._get_all_(owner_res, owner_res_id, path=plural_resource)
         collection = dict()
         collection['data'] = []
         for wrapper in owner:
-            for x in wrapper:
-                collection['data'].append(x)
+            collection['data'] + wrapper
         collection['data'].append({'type': singular_resource, 'id': col_res_id})
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
-
     def del_from_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
-        owner = self._get_all_(owner_res, owner_res_id, plural_resource)
+        owner = self._get_all_(owner_res, owner_res_id, path=plural_resource)
         collection = dict()
         for wrapper in owner:
             collection['data'] = list(filter(lambda x: x.get('id') != col_res_id, wrapper))
@@ -207,7 +205,7 @@ class RestController:
         if included:
             params = {'include': included}
         else:
-            params=None
+            params = None
         response = self._get_record_(resource, resource_id, params=params)
         results = response.json()
         return __handle_return_data__(results, included)['data']
@@ -223,17 +221,19 @@ class RestController:
         results = response.json()
         return __handle_return_data__(results, included)['data']
 
-    def get_field_query(self, resource, field, query, included=None, resperpage=None, page=None):
-        params = {'page[size]': resperpage, 'page[number]': page, 'include': field}
-        rows = self._query_(resource, query=query, field=field, params=params)
-        return rows
+    # def get_field_query(self, resource, field, query, included=None, resperpage=None, page=None):
+    #     params = {'page[size]': resperpage, 'page[number]': page, 'include': field}
+    #     rows = self._query_(resource, query=query, field=field, params=params)
+    #     return rows
+    #
+    #     for wrapper in owner:
+    #         for x in wrapper:
+    #             collection['data'].append(x)
+    #     collection['data'].append({'type': singular_resource, 'id': col_res_id})
+    #     return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
-        for wrapper in owner:
-            for x in wrapper:
-                collection['data'].append(x)
-        collection['data'].append({'type': singular_resource, 'id': col_res_id})
-        return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
-    def _get_all_(self, resource, resource_id=None, path=None, included=None, resperpage=None, page=None, headers=HEADERS):
+    def _get_all_(self, resource, resource_id=None, query=None, path=None, included=None, resperpage=None, page=None,
+                  headers=HEADERS):
         params = dict()
         res_url = self.URL + resource
         if resource_id is not None:
@@ -244,14 +244,18 @@ class RestController:
             params['page[size]'] = resperpage
         if page:
             params['page[number]'] = page
+        if query:
+            params['filter[objects]'] = query
+        if included:
+            params['include'] = included
         response = requests.get(res_url, params=params, headers=headers)
         rdata = response.json()
 
-
         # this section loops through the pages, yielding page (batch of rows) to the caller
         page_num = 1
-        while page_num == 1 or rdata['links']['next'] is not None:
-            params = {'page[number]': page_num, 'page[size]': 100}
+        if page_num == 1 or ('links' in rdata and rdata['links']['next'] is not None):
+            params['page[number]'] = page_num
+            params['page[size]'] = 100
             response = requests.get(res_url, params=params, headers=headers)
             rdata = response.json()
             if 'data' not in rdata:
@@ -259,7 +263,7 @@ class RestController:
             else:
                 data = rdata['data']
                 yield data
-            page_num += 1
+                page_num += 1
 
     def query(self, resource, query, output_fields=None, resperpage=None, page=None,
               **kwargs):
@@ -274,7 +278,7 @@ class RestController:
         if query is not None:
             filters = json.loads(query)
             params['filter[objects]'] = query
-        response = self._get_all_(resource, resperpage=resperpage, page=page)
+        response = self._get_all_(resource, query=query, resperpage=resperpage, page=page)
 
         return response
 
