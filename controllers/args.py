@@ -86,20 +86,6 @@ def __add_get_field_query_parser__(rest, parsers, resource):
     get_field_query_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
 
 
-# def __add_get_collection_parser__(rest, parsers, resource):
-#     get_collection_parser = parsers.add_parser('get_collection')
-#     get_collection_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
-#     get_collection_parser.add_argument('collection')
-#     get_collection_parser.add_argument('-p', help=, dest=)
-#     get_collection_parser.add_argument('-r', help='results per page', dest='')
-
-
-# def __add_get_relation_parser__(rest, parsers, resource):
-#     get_relation_parser = parsers.add_parser('get_relation')
-#     get_relation_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
-#     get_relation_parser.add_argument('relation')
-
-
 class CLIArgs:
     def __init__(self, rest):
         self.rest = rest
