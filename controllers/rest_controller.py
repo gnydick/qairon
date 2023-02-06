@@ -22,15 +22,19 @@ class RestController:
     def add_to_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
         owner = self._get_all_(owner_res, owner_res_id, plural_resource)
         collection = dict()
-        collection['data'] = list([x for x in
-                                   owner])
+        collection['data'] = []
+        for wrapper in owner:
+            for x in wrapper:
+                collection['data'].append(x)
         collection['data'].append({'type': singular_resource, 'id': col_res_id})
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
+
 
     def del_from_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
         owner = self._get_all_(owner_res, owner_res_id, plural_resource)
         collection = dict()
-        collection['data'] = list(filter(lambda x: x['id'] != col_res_id, owner))
+        for wrapper in owner:
+            collection['data'] = list(filter(lambda x: x.get('id') != col_res_id, wrapper))
         # collection['data'] = [{'type': singular_resource, 'id': x} for x in collection['data']]
 
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
@@ -224,6 +228,11 @@ class RestController:
         rows = self._query_(resource, query=query, field=field, params=params)
         return rows
 
+        for wrapper in owner:
+            for x in wrapper:
+                collection['data'].append(x)
+        collection['data'].append({'type': singular_resource, 'id': col_res_id})
+        return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
     def _get_all_(self, resource, resource_id=None, path=None, included=None, resperpage=None, page=None, headers=HEADERS):
         params = dict()
         res_url = self.URL + resource
