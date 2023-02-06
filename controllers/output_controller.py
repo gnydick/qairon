@@ -21,15 +21,15 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def __serialize_rows__(batch, output_fields=None, included=None):
+def __serialize_rows__(batch, output_fields=None):
     serialized = list()
     for rows in batch:
         for row in rows:
-            serialized.append(__serialize_row__(row, output_fields, included))
+            serialized.append(__serialize_row__(row, output_fields))
     return serialized
 
 
-def __serialize_row__(row, output_fields=None, included=None):
+def __serialize_row__(row, output_fields=None):
     row_id = row['id']
 
     if 'relationships' in row:
@@ -48,28 +48,22 @@ def __serialize_row__(row, output_fields=None, included=None):
 
     for key in [x for x in keys if x != "id"]:
         output[key] = row['attributes'][key]
-    if included:
-        includes = dict()
-        for i in row['included']:
-            if i['type'] not in includes:
-                includes[i['type']] = []
-            includes[i['type']].append(i)
-        output['included'] = includes
+
     return output
 
 
-def serialize(rows, included=None, output_fields=None):
+def serialize(rows, output_fields=None):
     if type(rows) == dict:
-        cleaned = __serialize_row__(rows, output_fields, included)
+        cleaned = __serialize_row__(rows, output_fields)
     else:
-        cleaned = __serialize_rows__(rows, output_fields, included)
+        cleaned = __serialize_rows__(rows, output_fields)
 
     return cleaned
 
 
-def __output__(q, rows, included=None, output_fields=None, output_format=None):
+def __output__(q, rows, output_fields=None, output_format=None):
     if not q:
-        cleaned = serialize(rows, included, output_fields)
+        cleaned = serialize(rows, output_fields)
         if output_format is None:
             output_format = 'json'
         if output_format == 'json':

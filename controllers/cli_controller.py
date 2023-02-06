@@ -10,28 +10,20 @@ rest = RestController()
 
 class CLIController:
 
-    def get(self, resource, id, command=None, included=None, output_fields=None, output_format=None, q=False):
-        row = rest.get_instance(resource, id, included=included)
-        __output__(q, row, included=included, output_fields=output_fields, output_format=output_format)
+    def get(self, resource, id, command=None, output_fields=None, output_format=None, q=False):
+        row = rest.get_instance(resource, id)
+        __output__(q, row, output_fields=output_fields, output_format=output_format)
 
-    def list(self, resource, command=None, included=None, resperpage=10, page=None, output_fields=None,
+    def list(self, resource, command=None, output_fields=None,
              output_format=None, q=False):
-        rows = rest.query(resource, None, output_fields=output_fields, resperpage=resperpage, page=page)
-
-        __output__(q, rows, included=included, output_fields=output_fields,
+        rows = rest.query(resource)
+        __output__(q, rows, output_fields=output_fields,
                    output_format=output_format)
 
-    def query(self, resource, command=None, query=None, included=None, output_fields=None, resperpage=None,
-              page=None, output_format=None, q=False):
-        rows = rest.query(resource, query, output_fields, resperpage=resperpage, page=page)
-        __output__(q, rows, included=included, output_fields=output_fields,
+    def query(self, resource, command=None, query=None, output_fields=None, output_format=None, q=False):
+        rows = rest.query(resource, query, output_fields)
+        __output__(q, rows, output_fields=output_fields,
                    output_format=output_format)
-
-    # def get_field_query(self, resource, field, command=None, query=None, output_fields=None, included=None, resperpage=None,
-    #                     page=None, output_format=None, q=False):
-    #     rows = rest.get_field_query(resource, field, query, resperpage=resperpage, page=page)
-    #
-    #     __output__(q, rows, included=included, output_fields=output_fields, output_format=output_format)
 
     def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')
@@ -39,11 +31,12 @@ class CLIController:
             print(value)
 
     # This will always return an ID or list of IDs
-    def get_field(self, resource, id, field, command=None, included=None, resperpage=None, page=None,
+    def get_field(self, resource, id, field, command=None,
                   output_fields=None,
                   output_format=None, q=False):
-        value = rest._get_all_(resource, id, path=field, included=included, resperpage=resperpage, page=page)
-        __output__(q, value, included=included, output_fields=output_fields,
+
+        value = rest._get_all_(resource, id, path=field)
+        __output__(q, value, output_fields=output_fields,
                    output_format=output_format)
 
     def get_parent(self, resource, relation, command=None, id=None, q=False):
@@ -51,11 +44,11 @@ class CLIController:
         if not q:
             print(value['data']['id'])
 
-    def get_collection(self, resource, collection, command=None, resperpage=None, page=None, id=None, q=False):
+    def get_collection(self, resource, collection, command=None, id=None, q=False):
 
         # receives a stream of rows via yield
         # simplejson can handle a stream of objects and print them as array
-        data = rest._get_all_(resource, id, included=collection)
+        data = rest._get_all_(resource, id, collection)
         if not q:
             print(json.dumps(SerializableGenerator(iter(data))))
 
@@ -103,7 +96,8 @@ class CLIController:
             if not q:
                 print(id + '-' + str(results.status_code))
 
-    def allocate_subnet(self, resource, id, command=None, additional_mask_bits=None, name=None,output_format=None, q=False):
+    def allocate_subnet(self, resource, id, command=None, additional_mask_bits=None, name=None, output_format=None,
+                        q=False):
         results = rest.allocate_subnet(id, additional_mask_bits, name)
         outer_data = results.json()
         data = outer_data['data']

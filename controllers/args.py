@@ -51,16 +51,12 @@ def __populate_args__(rest, parser, fields):
 def __add_list_parser__(parsers):
     list_parser = parsers.add_parser('list')
     list_parser.required = False
-    list_parser.add_argument('-p', help='page', dest='page')
-    list_parser.add_argument('-r', help='results per page', dest='resperpage')
     list_parser.add_argument('-f', help='output fields', dest='output_fields', action='append')
     list_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
 
     query_parser = parsers.add_parser('query')
     query_parser.required = False
     query_parser.add_argument('query')
-    query_parser.add_argument('-p', help='page', dest='page')
-    query_parser.add_argument('-r', help='results per page', dest='resperpage')
     query_parser.add_argument('-f', help='output fields', dest='output_fields', action='append')
     query_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
 
@@ -76,9 +72,6 @@ def __add_get_field_parser__(rest, parsers, resource):
     get_field_parser = parsers.add_parser('get_field')
     get_field_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
     get_field_parser.add_argument('field')
-    get_field_parser.add_argument('-i', help='included', dest='included', action='append')
-    get_field_parser.add_argument('-p', help='page', dest='page')
-    get_field_parser.add_argument('-r', help='results per page', dest='resperpage')
     get_field_parser.add_argument('-f', help='output field for related object', dest='output_fields',
                                   action='append')
     get_field_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
@@ -89,8 +82,6 @@ def __add_get_field_query_parser__(rest, parsers, resource):
     get_field_query_parser.add_argument('field')
     get_field_query_parser.required = False
     get_field_query_parser.add_argument('query')
-    get_field_query_parser.add_argument('-p', help='page', dest='page')
-    get_field_query_parser.add_argument('-r', help='results per page', dest='resperpage')
     get_field_query_parser.add_argument('-f', help='output fields', dest='output_fields', action='append')
     get_field_query_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
 
@@ -99,8 +90,8 @@ def __add_get_field_query_parser__(rest, parsers, resource):
 #     get_collection_parser = parsers.add_parser('get_collection')
 #     get_collection_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
 #     get_collection_parser.add_argument('collection')
-#     get_collection_parser.add_argument('-p', help='page', dest='page')
-#     get_collection_parser.add_argument('-r', help='results per page', dest='resperpage')
+#     get_collection_parser.add_argument('-p', help=, dest=)
+#     get_collection_parser.add_argument('-r', help='results per page', dest='')
 
 
 # def __add_get_relation_parser__(rest, parsers, resource):
@@ -159,7 +150,6 @@ class CLIArgs:
             __add_get_field_query_parser__(self.rest, parsers_for_model_parser, model)
             _model_com_get_parser = parsers_for_model_parser.add_parser('get')
             _model_com_get_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
-            _model_com_get_parser.add_argument('-i', help='included', dest='included', action='append')
             _model_com_get_parser.add_argument('-f', help='output field for related object', dest='output_fields',
                                           action='append')
             _model_com_get_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')

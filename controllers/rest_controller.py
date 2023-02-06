@@ -133,13 +133,13 @@ class RestController:
             ids = [x['id'] for x in objs]
             return ids
 
-    def _get_record_(self, resource, resource_id=None, field=None, params={}, headers=HEADERS):
+    def _get_record_(self, resource, resource_id=None, field=None, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
         if field is not None:
             res_url += '/' + field
-        response = requests.get(res_url, params=params, headers=headers)
+        response = requests.get(res_url, headers=headers)
         return response
 
     def create_complete_application(self, args_dict):
@@ -201,62 +201,39 @@ class RestController:
             res_url += '/' + resource_id + '/relationships/' + collection
         return requests.patch(res_url, data, json=json, params=params, headers=headers)
 
-    def get_instance(self, resource, resource_id, included=None):
-        if included:
-            params = {'include': included}
-        else:
-            params = None
-        response = self._get_record_(resource, resource_id, params=params)
+    def get_instance(self, resource, resource_id):
+        response = self._get_record_(resource, resource_id)
         results = response.json()
-        return __handle_return_data__(results, included)['data']
+        return results['data']
 
     def pretty_get_instance(self, resource, resource_id):
         return json.dumps(self.get_instance(resource, resource_id), indent=4, sort_keys=True)
 
-    def get_field(self, resource, resource_id, field, included=None, resperpage=None, page=None):
-        params = {'page[size]': resperpage, 'page[number]': page}
-        if included:
-            params['include'] = included
-        response = self._get_record_(resource, resource_id, field=field, params=params)
+    def get_field(self, resource, resource_id, field):
+        response = self._get_record_(resource, resource_id, field=field)
         results = response.json()
-        return __handle_return_data__(results, included)['data']
+        return results['data']
 
-    # def get_field_query(self, resource, field, query, included=None, resperpage=None, page=None):
-    #     params = {'page[size]': resperpage, 'page[number]': page, 'include': field}
-    #     rows = self._query_(resource, query=query, field=field, params=params)
-    #     return rows
-    #
-    #     for wrapper in owner:
-    #         for x in wrapper:
-    #             collection['data'].append(x)
-    #     collection['data'].append({'type': singular_resource, 'id': col_res_id})
-    #     return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
-    def _get_all_(self, resource, resource_id=None, query=None, path=None, included=None, resperpage=None, page=None,
-                  headers=HEADERS):
-        params = dict()
+    # this method takes req_params since more complex cli calls use it
+    # pagination is only used internally here
+    # the req_params passed in is usually a query
+    def _get_all_(self, resource, resource_id=None, req_params={}, path=None, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
             if path is not None:
                 res_url += '/' + path
-        if resperpage:
-            params['page[size]'] = resperpage
-        if page:
-            params['page[number]'] = page
-        if query:
-            params['filter[objects]'] = query
-        if included:
-            params['include'] = included
-        response = requests.get(res_url, params=params, headers=headers)
+
+        response = requests.get(res_url, params=req_params, headers=headers)
         rdata = response.json()
 
         # this section loops through the pages, yielding page (batch of rows) to the caller
         page_num = 1
         if page_num == 1 or ('links' in rdata and rdata['links']['next'] is not None):
-            params['page[number]'] = page_num
-            params['page[size]'] = 100
-            response = requests.get(res_url, params=params, headers=headers)
+            req_params['page[number]'] = page_num
+            req_params['page[size]'] = 100
+            response = requests.get(res_url, params=req_params, headers=headers)
             rdata = response.json()
             if 'data' not in rdata:
                 exit(255)
@@ -265,44 +242,20 @@ class RestController:
                 yield data
                 page_num += 1
 
-    def query(self, resource, query, output_fields=None, resperpage=None, page=None,
-              **kwargs):
-        return self._query_(resource, query, output_fields=output_fields, resperpage=resperpage, page=page)
+    def query(self, resource, query=None, output_fields=None):
+        return self._query_(resource, query=query)
 
     def list(self, resource):
-        return self._query_(resource)
+        return self._get_all_(resource)
 
-    def _query_(self, resource, query=None, resperpage=None, page=None,
-                **kwargs):
-        params = {'page[size]': resperpage, 'page[number]': page}
+    def _query_(self, resource, query):
+
+        req_params = dict()
         if query is not None:
-            filters = json.loads(query)
-            params['filter[objects]'] = query
-        response = self._get_all_(resource, query=query, resperpage=resperpage, page=page)
+            req_params['filter[objects]'] = query
+        response = self._get_all_(resource, req_params=req_params)
 
         return response
-
-    def _complex_list_(self, resource, filters, output_fields=None, resperpage=100):
-        params = dict(results_per_page=resperpage)
-        params['q'] = json.dumps(dict(filters=filters))
-        response = self._get_record_(resource, params=params)
-        results = []
-        if type(output_fields) == str:
-            output_fields = [output_fields]
-        elif output_fields is None:
-            output_fields = ['id']
-
-        json_results = response.json()
-        if 'data' not in json_results:
-            exit(255)
-        else:
-            for obj in json_results['data']:
-                row = []
-                for field in output_fields:
-                    row.append(obj[field])
-
-                results.append(row)
-            return results
 
     def qairon_wrapped_deployment_search(self, prefix, parsed_args):
         return self._get_search_(prefix, 'deployment')
@@ -317,12 +270,3 @@ class RestController:
     def _paginate_(self, result):
         pass
 
-
-def __handle_return_data__(results, included):
-    if 'data' not in results:
-        exit(255)
-    else:
-        result = results
-        if included:
-            result['included'] = results['included']
-        return result
