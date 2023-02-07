@@ -2,7 +2,7 @@ import json
 import os
 from subprocess import call
 
-from .output_controller import __output__, serialize, SerializableGenerator
+from .output_controller import output, serialize, SerializableGenerator
 from .rest_controller import RestController
 
 rest = RestController()
@@ -12,18 +12,18 @@ class CLIController:
 
     def get(self, resource, id, command=None, output_fields=None, output_format=None, q=False):
         row = rest.get_instance(resource, id)
-        __output__(q, row, output_fields=output_fields, output_format=output_format)
+        output(q, row, output_fields=output_fields, output_format=output_format)
 
     def list(self, resource, command=None, output_fields=None,
              output_format=None, q=False):
         rows = rest.query(resource)
-        __output__(q, rows, output_fields=output_fields,
-                   output_format=output_format)
+        output(q, rows, output_fields=output_fields,
+               output_format=output_format)
 
     def query(self, resource, command=None, query=None, output_fields=None, output_format=None, q=False):
         rows = rest.query(resource, query, output_fields)
-        __output__(q, rows, output_fields=output_fields,
-                   output_format=output_format)
+        output(q, rows, output_fields=output_fields,
+               output_format=output_format)
 
     def get_version(self, resource, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field='version')
@@ -36,8 +36,8 @@ class CLIController:
                   output_format=None, q=False):
 
         value = rest._get_all_(resource, id, path=field)
-        __output__(q, value, output_fields=output_fields,
-                   output_format=output_format)
+        output(q, value, output_fields=output_fields,
+               output_format=output_format)
 
     def get_parent(self, resource, relation, command=None, id=None, q=False):
         value = rest.get_field(resource, id, field=relation, index='relationships')
@@ -103,11 +103,12 @@ class CLIController:
         data = outer_data['data']
         if not q:
             if 200 <= results.status_code <= 299:
-                clean = serialize(data)
-                if output_format == 'json':
-                    print(json.dumps(clean))
-                else:
-                    print(clean)
+                wrapper = serialize(data)
+                for clean in wrapper:
+                    if output_format == 'json':
+                        print(json.dumps(clean))
+                    else:
+                        print(clean)
             else:
                 print(results.status_code)
 

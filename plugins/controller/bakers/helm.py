@@ -18,8 +18,10 @@ class HelmBakerController(AbstractBakerController):
             'build_id': metadata.build_id
         }
         blob_repo_type = 'ecr'
-        candidate_repos = [repo for repo in __serialize_rows__(self.rest.get_field('service', self.deployment['service_id'], 'repos')) if
-                           repo['type_id'] == blob_repo_type]
+        wrapper = __serialize_rows__(self.rest.get_field('service', self.deployment['service_id'], 'repos'))
+        candidate_repos = []
+        for repos in wrapper:
+            candidate_repos = candidate_repos + [repo for repo in repos if repo['type_id'] == blob_repo_type]
         # this condition supports old DSL for baking of repo as a single object on the baker
         if len(candidate_repos) == 1:
             self.repo = candidate_repos[0]
@@ -30,8 +32,10 @@ class HelmBakerController(AbstractBakerController):
                 self.repos[repo['id']] = repo
 
     def bake(self):
-        svc_configs = __serialize_rows__(self.rest.get_field('service', self.deployment['service_id'], 'configs'))
-        svc_cfg = [svc_cfg for svc_cfg in svc_configs if
+        wrapper = __serialize_rows__(self.rest.get_field('service', self.deployment['service_id'], 'configs'))
+        svc_cfg = ""
+        for svc_configs in wrapper:
+            svc_cfg = [svc_cfg for svc_cfg in svc_configs if
                    svc_cfg['template_id'] == 'helm_bake' and svc_cfg['name'] == 'default']
         assert len(svc_cfg) == 1
         cfg = svc_cfg[0]['config']
@@ -100,16 +104,18 @@ class HelmBakerController(AbstractBakerController):
                     object_type = field['value']['object']
                     field_name = field['value']['field']
                     filter_value = field['value']['filter']
-                    objs = [cfg for cfg in getattr(self, object_type) if cfg[field_name] == filter_value]
-                    value = ""
-                    x = 0
-                    for cfg_obj in objs:
-                        for k, v in json.loads(cfg_obj['config']).items():
-                            # assume all config kv's get indented
-                            if x > 0:
-                                value += "\n"
-                            value += format("  %s=%s" % (k, v))
-                            x=x+1
+                    wrapper = getattr(self, object_type)
+                    for cfgs in wrapper:
+                        objs = [cfg for cfg in cfgs if cfg[field_name] == filter_value]
+                        value = ""
+                        x = 0
+                        for cfg_obj in objs:
+                            for k, v in json.loads(cfg_obj['config']).items():
+                                # assume all config kv's get indented
+                                if x > 0:
+                                    value += "\n"
+                                value += format("  %s=%s" % (k, v))
+                                x=x+1
                 elif field['type'] == 'local':
                     value = self.local_data[field['value']]
 

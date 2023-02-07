@@ -227,36 +227,3 @@ def step_impl(context, resource, name, config_template_id, resource_id, tag):
     cfg = context.rest.create_resource(payload)
     data = cfg.json()
     assert data['data']['relationships']['template']['data']['id'] == config_template_id
-
-
-@given('update "{field}" for "{resource}" "{resource_id}" to "{value}" via rest')
-def step_impl(context, resource, resource_id, field, value):
-    results = context.rest.update_resource(resource, resource_id, field, value)
-
-
-@given('create environment "{env}" for "{role_id}" via rest')
-def step_impl(context, env, role_id):
-    expected_env_id = '%s:%s' % (role_id, env)
-    context.cli.create(
-        {'resource': 'environment', 'role_id': role_id, 'name': env}
-    )
-    environment = context.rest.get_instance('environment', expected_env_id)
-    assert environment['id'] == expected_env_id
-
-
-@step('create k8s_cluster "{name}" in "{environment}" via rest')
-def step_impl(context, name, environment):
-    expected_cluster_id = '%s:%s:k8s' % (environment, name)
-    context.cli.create(
-        {'resource': 'k8s_cluster', 'environment_id': environment, 'name': name}
-    )
-    k8s_cluster = context.rest.get_instance('k8s_cluster', expected_cluster_id)
-    assert k8s_cluster['id'] == expected_cluster_id
-
-
-@step('environment "{id}" can be created via rest')
-def step_impl(context, id):
-    prov = context.rest.create_resource(
-        {'id': id, 'resource': 'environment'})
-    data = prov.json()
-    assert data['data']['id'] == id

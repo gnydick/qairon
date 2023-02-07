@@ -214,7 +214,6 @@ class RestController:
         results = response.json()
         return results['data']
 
-
     # this method takes req_params since more complex cli calls use it
     # pagination is only used internally here
     # the req_params passed in is usually a query
@@ -229,18 +228,20 @@ class RestController:
         rdata = response.json()
 
         # this section loops through the pages, yielding page (batch of rows) to the caller
-        page_num = 1
-        if page_num == 1 or ('links' in rdata and rdata['links']['next'] is not None):
-            req_params['page[number]'] = page_num
-            req_params['page[size]'] = 100
-            response = requests.get(res_url, params=req_params, headers=headers)
-            rdata = response.json()
-            if 'data' not in rdata:
-                exit(255)
-            else:
+
+        req_params['page[size]'] = 100
+        response = requests.get(res_url, params=req_params, headers=headers)
+        rdata = response.json()
+        if 'data' not in rdata:
+            exit(255)
+        else:
+            data = rdata['data']
+            yield data
+            while ('links' in rdata and rdata['links']['next'] is not None):
+                response = requests.get(rdata['links']['next'], params=req_params, headers=headers)
+                rdata = response.json()
                 data = rdata['data']
                 yield data
-                page_num += 1
 
     def query(self, resource, query=None, output_fields=None):
         return self._query_(resource, query=query)
@@ -269,4 +270,3 @@ class RestController:
 
     def _paginate_(self, result):
         pass
-
