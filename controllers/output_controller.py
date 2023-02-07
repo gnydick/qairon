@@ -1,6 +1,9 @@
 import itertools
 import json
-import types
+import sys
+
+from json_stream import streamable_list
+from json_stream.writer import StreamableList
 
 
 class SerializableGenerator(list):
@@ -18,16 +21,7 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def __serialize_rows__(rows, output_fields=None):
-    serialized = list()
-    for row in rows:
-        serialized.append(__serialize_row__(row, output_fields))
-    yield serialized
-
-
-def __serialize_row__(row, output_fields=None):
-    row_id = row['id']
-
+def serialize_row(row, output_fields=None):
     if 'relationships' in row:
         for k, v in row['relationships'].items():
             if type(v['data']) == dict:
@@ -47,43 +41,43 @@ def __serialize_row__(row, output_fields=None):
     return output
 
 
-def serialize(batches, output_fields=None):
+@streamable_list
+def serialize_rows(batches, output_fields=None):
     if type(batches) == dict:
-        cleaned = __serialize_row__(batches, output_fields)
+        cleaned = serialize_row(batches, output_fields)
         yield cleaned
-    elif type(batches) is types.GeneratorType:
+    else:
         for batch in batches:
             if type(batch) == dict:
-                cleaned = __serialize_row__(batch, output_fields)
+                yield serialize_row(batch, output_fields)
             elif type(batch) == list:
-                cleaned = __serialize_rows__(batch, output_fields)
-            yield cleaned
-
-    else:
-        wrapper = __serialize_rows__(batches, output_fields)
-        for cleaned in wrapper:
-            yield cleaned
+                for row in batch:
+                    yield serialize_row(row, output_fields)
 
 
 def __output__(batch, output_format):
     if output_format is None:
         output_format = 'json'
     if output_format == 'json':
-        print(json.dumps(batch))
+        if type(batch) is StreamableList:
+            json.dump(batch, sys.stdout)
+        else:
+            print(json.dumps(batch))
     elif output_format == 'plain':
         if type(batch) == dict:
             print(' '.join(str(x) for x in batch.values()))
-        elif type(batch) == list:
+        else:
             for row in batch:
                 print(' '.join(str(x) for x in row.values()))
 
 
-def output(q, rows, output_fields=None, output_format=None):
+def output(q, data, output_fields=None, output_format=None):
     if not q:
-        wrapper = serialize(rows, output_fields)
-        for cleaned in wrapper:
-            if type(cleaned) is types.GeneratorType:
-                for batch in cleaned:
-                    __output__(batch, output_format)
-            elif type(cleaned) is dict:
-                __output__(cleaned, output_format)
+        if type(data) is StreamableList:
+            result_stream = serialize_rows(data, output_fields)
+            __output__(result_stream, output_format)
+        if type(data) == list:
+            result_stream = serialize_rows(data, output_fields)
+            __output__(result_stream, output_format)
+        elif type(data) == dict:
+            __output__(serialize_row(data), output_format)

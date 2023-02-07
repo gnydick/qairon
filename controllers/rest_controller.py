@@ -3,6 +3,7 @@ import os
 import re
 
 import requests
+from json_stream import streamable_list
 
 from .schema import QaironSchema
 
@@ -217,6 +218,8 @@ class RestController:
     # this method takes req_params since more complex cli calls use it
     # pagination is only used internally here
     # the req_params passed in is usually a query
+    # @streamable_list
+    @streamable_list
     def _get_all_(self, resource, resource_id=None, req_params={}, path=None, headers=HEADERS):
         res_url = self.URL + resource
         if resource_id is not None:

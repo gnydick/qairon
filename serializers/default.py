@@ -1,6 +1,6 @@
 from flask_restless.serialization import DefaultSerializer
 
-from controllers.output_controller import __serialize_row__
+from controllers.output_controller import serialize_row
 
 
 class QcliSerializer(DefaultSerializer):
@@ -12,4 +12,4 @@ class QcliSerializer(DefaultSerializer):
 
     def serialize(self, instance, only=None):
         data = super().serialize(instance, only)
-        return __serialize_row__(data)
+        return serialize_row(data)

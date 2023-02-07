@@ -2,7 +2,7 @@ import json
 import os
 from subprocess import call
 
-from .output_controller import output, serialize, SerializableGenerator
+from .output_controller import output, serialize_rows, SerializableGenerator
 from .rest_controller import RestController
 
 rest = RestController()
@@ -103,7 +103,7 @@ class CLIController:
         data = outer_data['data']
         if not q:
             if 200 <= results.status_code <= 299:
-                wrapper = serialize(data)
+                wrapper = serialize_rows(data)
                 for clean in wrapper:
                     if output_format == 'json':
                         print(json.dumps(clean))

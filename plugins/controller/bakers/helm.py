@@ -1,11 +1,10 @@
 import json
-
 # from controllers.bakers.baker import BakerInterface
 import os
 
-from controllers.output_controller import __serialize_rows__, __serialize_row__
-from plugins.controller.bakers import AbstractBakerController
+from controllers.output_controller import serialize_rows
 from plugins.controller.aws import AwsController
+from plugins.controller.bakers import AbstractBakerController
 
 
 class HelmBakerController(AbstractBakerController):
@@ -18,10 +17,10 @@ class HelmBakerController(AbstractBakerController):
             'build_id': metadata.build_id
         }
         blob_repo_type = 'ecr'
-        wrapper = __serialize_rows__(self.rest.get_field('service', self.deployment['service_id'], 'repos'))
-        candidate_repos = []
-        for repos in wrapper:
-            candidate_repos = candidate_repos + [repo for repo in repos if repo['type_id'] == blob_repo_type]
+
+        repos = serialize_rows(self.rest.get_field('service', self.deployment['service_id'], 'repos'))
+
+        candidate_repos = [repo for repo in repos if repo['type_id'] == blob_repo_type]
         # this condition supports old DSL for baking of repo as a single object on the baker
         if len(candidate_repos) == 1:
             self.repo = candidate_repos[0]
@@ -32,10 +31,9 @@ class HelmBakerController(AbstractBakerController):
                 self.repos[repo['id']] = repo
 
     def bake(self):
-        wrapper = __serialize_rows__(self.rest.get_field('service', self.deployment['service_id'], 'configs'))
-        svc_cfg = ""
-        for svc_configs in wrapper:
-            svc_cfg = [svc_cfg for svc_cfg in svc_configs if
+        svc_configs = serialize_rows(self.rest.get_field('service', self.deployment['service_id'], 'configs'))
+
+        svc_cfg = [svc_cfg for svc_cfg in svc_configs if
                    svc_cfg['template_id'] == 'helm_bake' and svc_cfg['name'] == 'default']
         assert len(svc_cfg) == 1
         cfg = svc_cfg[0]['config']
@@ -98,24 +96,24 @@ class HelmBakerController(AbstractBakerController):
                     value = objs[0][data_field]
                 if field['type'] == 'aws_secret':
                     aws = AwsController()
-                    secret = aws.get_secret_string_for_deployment(self.local_data['deployment_id'], field['secret_name'])
+                    secret = aws.get_secret_string_for_deployment(self.local_data['deployment_id'],
+                                                                  field['secret_name'])
                     value = secret['SecretString']
                 if field['type'] == 'config_kv_list':
                     object_type = field['value']['object']
                     field_name = field['value']['field']
                     filter_value = field['value']['filter']
-                    wrapper = getattr(self, object_type)
-                    for cfgs in wrapper:
-                        objs = [cfg for cfg in cfgs if cfg[field_name] == filter_value]
-                        value = ""
-                        x = 0
-                        for cfg_obj in objs:
-                            for k, v in json.loads(cfg_obj['config']).items():
-                                # assume all config kv's get indented
-                                if x > 0:
-                                    value += "\n"
-                                value += format("  %s=%s" % (k, v))
-                                x=x+1
+                    cfgs = getattr(self, object_type)
+                    objs = [cfg for cfg in cfgs if cfg[field_name] == filter_value]
+                    value = ""
+                    x = 0
+                    for cfg_obj in objs:
+                        for k, v in json.loads(cfg_obj['config']).items():
+                            # assume all config kv's get indented
+                            if x > 0:
+                                value += "\n"
+                            value += format("  %s=%s" % (k, v))
+                            x = x + 1
                 elif field['type'] == 'local':
                     value = self.local_data[field['value']]
 
