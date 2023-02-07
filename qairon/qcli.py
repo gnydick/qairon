@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
-import os
 
 from controllers import CLIArgs
 from controllers import CLIController
@@ -8,13 +7,12 @@ from controllers import RestController
 from controllers.schema import QaironSchema
 
 
-
 def _main_():
     rest = RestController()
     cli = CLIController()
     qaironargs = CLIArgs(rest)
 
-    (args, junk) = qaironargs.parse_args(rest)
+    (args, junk) = qaironargs.parse_args()
     commands = ['delete', 'get', 'get_version', 'list', 'promote', 'query', 'get_field', 'get_field_query', 'set_field']
     if hasattr(args, 'resource'):
         if args.resource in QaironSchema.MODELS:

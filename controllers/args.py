@@ -194,7 +194,7 @@ class CLIArgs:
         test_parser.add_argument('command', nargs='*')
         return parser
 
-    def parse_args(self, rest):
+    def parse_args(self):
         parser = self.assign_args()
         argcomplete.autocomplete(parser)
 
