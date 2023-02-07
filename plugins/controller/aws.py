@@ -37,8 +37,8 @@ def __fqsn__(deployment_id, secret_name):
 def __get_secret_id__(deployment_id, secret_name) -> object:
     configs = rest.query('deployment_config', query='[{"and":[{"name": "deployment_id", "op":"eq", "val": "%s"}, {"name":"config_template_id", "op":"eq", "val":"secret_name_map_item"}, {"name":"name", "op":"eq", "val":"%s"}]}]' % (deployment_id, secret_name))
 
-    for config in configs:
-        print(config)
+    #for config in configs:
+    #   print(config)
     # if len(lconfigs) != 1:
     #     exit(255)
 
