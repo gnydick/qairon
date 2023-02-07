@@ -1,1 +1,1 @@
-from plugins.baker.cli.baker import COMMANDS
+from plugins.baker.cli.baker import *

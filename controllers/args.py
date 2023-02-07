@@ -105,7 +105,7 @@ class CLIArgs:
     def __gen_parsers__(self, context_parsers):
         import importlib
         import pkgutil
-        import plugins.aws.cli
+
 
         def iter_namespace(ns_pkg):
             # Specifying the second argument (prefix) to iter_modules makes the
@@ -116,8 +116,8 @@ class CLIArgs:
 
 
         self.discovered_plugins = dict()
-        plugins = [dir for dir in os.listdir('plugins') if re.match('^[a-z]+', dir)]
-        for package_name in plugins:
+        # have to hard-code plugin names for now until i learn a better way
+        for package_name in ['aws', 'baker']:
             plugin = importlib.import_module('plugins.%s.cli' % package_name)
             ins = iter_namespace(plugin)
 

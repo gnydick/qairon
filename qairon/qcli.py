@@ -57,8 +57,9 @@ def _main_():
                 elif args.resource == 'test':
                     cli.test(args)
         else:
-            if args.resource in qaironargs.discovered_plugins:
-                plugin = qaironargs.discovered_plugins[args.resource]
+            plugin_name = 'plugins.%s.cli.%s' %(args.resource, args.resource)
+            if plugin_name in qaironargs.discovered_plugins:
+                plugin = qaironargs.discovered_plugins[plugin_name]
                 if args.command in plugin.COMMANDS.keys():
                     command = args.command
                     getattr(plugin, command)(**vars(args))
