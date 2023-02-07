@@ -11,7 +11,7 @@ COMMANDS = dict(
 )
 
 
-def bake(deployment_id, build_id, release_job_number, resource=None, q=False):
+def bake(deployment_id, build_id, release_job_number, resource=None, command=None, q=False):
     baker_builder = BakerBuilder(deployment_id, build_id, release_job_number)
     baker = baker_builder.build()
     result = baker.bake()
