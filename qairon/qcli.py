@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
-import os
-print(os.getcwd())
+
 from controllers import CLIArgs
 from controllers import CLIController
 from controllers import RestController
