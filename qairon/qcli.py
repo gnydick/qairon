@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
+import sys
+from pathlib import Path
+
+PROJECT_DIR = Path(__file__).parents[1]
+
+sys.path.append(
+    str(PROJECT_DIR)
+)
 
 from controllers import CLIArgs
 from controllers import CLIController

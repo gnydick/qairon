@@ -164,12 +164,6 @@ def get_deployment_json(deployment_id):
     return json_api_doc.serialize(tfs)
 
 
-@app.route('/api/rest/v1/network/<network_id>/allocate_subnet/<mask>/<name>', methods=['POST'])
-def allocate_subnet(network_id, mask, name):
-    result = rest.allocate_subnet(network_id, mask, name)
-    return Response(result, mimetype='text/plain')
-
-
 @app.route('/api/tf/v1/deployment/gen/<dep_id>')
 @app.route('/api/tf/v1/deployment/gen/<dep_id>/<config_tag>')
 def gen_config(dep_id, config_tag=None):

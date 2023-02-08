@@ -20,7 +20,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
     <option name="PARAMETERS" value="network allocate_subnet dev:aws:103181391659:us-west-2:vpc1:default 12 deleteme0" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

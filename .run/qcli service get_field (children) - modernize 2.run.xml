@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="qcli service get_field (children) - modernize" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="qcli service get_field (children) - modernize 2" type="PythonConfigurationType" factoryName="Python">
     <module name="qairon" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -10,7 +10,7 @@
       <env name="QAIRON_ENDPOINT" value="https://qairon.dev.withme.com" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/qairon" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -21,7 +21,7 @@
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
-    <option name="PARAMETERS" value="service get_field withme:services:game-server-manager builds -r 2 -o plain -f id" />
+    <option name="PARAMETERS" value="service get_field withme:astral:windows-editor repos" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

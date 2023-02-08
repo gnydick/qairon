@@ -20,7 +20,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
     <option name="PARAMETERS" value="build list" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
