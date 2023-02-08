@@ -1,4 +1,4 @@
-from plugins.controller import BakerBuilder
+from plugins.baker.controller import BakerBuilder
 
 
 

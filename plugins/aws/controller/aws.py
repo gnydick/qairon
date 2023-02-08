@@ -41,7 +41,7 @@ def __get_secret_id__(deployment_id, secret_name) -> object:
     return secret_id
 
 
-class AwsController:
+class AwsServiceController:
 
     @staticmethod
     def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag, kms_key_alias=None):

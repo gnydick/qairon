@@ -1,6 +1,6 @@
-from plugins.controller.aws import AwsController
+from plugins.aws.controller import AwsServiceController
 
-aws = AwsController()
+aws = AwsServiceController()
 
 COMMANDS = dict(
     register_secret=[

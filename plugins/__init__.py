@@ -1,1 +1,2 @@
-from plugins.controller.aws import AwsController
+import plugins.aws
+import plugins.baker
