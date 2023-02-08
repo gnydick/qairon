@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/qairon.iml" filepath="$PROJECT_DIR$/qairon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qcli_as_module/qcli_as_module.iml" filepath="$PROJECT_DIR$/qcli_as_module/qcli_as_module.iml" />
     </modules>
   </component>
 </project>

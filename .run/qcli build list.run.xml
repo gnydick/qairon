@@ -9,7 +9,7 @@
       <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://qairon:qairon@localhost/qairon" />
       <env name="QAIRON_ENDPOINT" value="https://qairon.dev.withme.com" />
     </envs>
-    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
+    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/modulize-3.9.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
