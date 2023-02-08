@@ -13,6 +13,8 @@ install_requires = ["argcomplete==1.12.3",
                     "itsdangerous==2.0.1",
                     "Jinja2==3.0.1",
                     "jmespath==0.10.0",
+                    "json-stream==2.1.0",
+                    "json-stream-rs-tokenizer==0.4.12",
                     "MarkupSafe==2.0.1",
                     "python-dateutil==2.8.1",
                     "requests==2.25.1",
@@ -26,7 +28,7 @@ importlib_backport_requires = ["importlib-metadata >= 0.23, < 5"]
 
 setup(
     name='qairon-qcli',
-    version='0.7.16',
+    version='0.7.18',
     url='https://github.com/gnydick/qairon',
     project_urls={},
     license='MIT',
