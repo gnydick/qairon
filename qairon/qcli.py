@@ -17,7 +17,7 @@ from controllers.schema import QaironSchema
 
 def _main_():
     rest = RestController()
-    cli = CLIController()
+    cli = CLIController(sys.stdout)
     qaironargs = CLIArgs(rest)
 
     (args, junk) = qaironargs.parse_args()

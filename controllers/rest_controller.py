@@ -227,8 +227,6 @@ class RestController:
             if path is not None:
                 res_url += '/' + path
 
-        response = requests.get(res_url, params=req_params, headers=headers)
-        rdata = response.json()
 
         # this section loops through the pages, yielding page (batch of rows) to the caller
 

@@ -2,7 +2,7 @@ import json
 # from controllers.bakers.baker import BakerInterface
 import os
 
-from controllers.output_controller import serialize_rows
+from controllers.output_controller import OutputController
 from plugins.aws.controller.aws import AwsServiceController
 from plugins.baker.controller.bakers import AbstractBakerController
 
@@ -18,7 +18,7 @@ class HelmBakerController(AbstractBakerController):
         }
         blob_repo_type = 'ecr'
 
-        repos = serialize_rows(self.rest.get_field('service', self.deployment['service_id'], 'repos'))
+        repos = self.output.serialize_rows(self.rest.get_field('service', self.deployment['service_id'], 'repos'))
 
         candidate_repos = [repo for repo in repos if repo['type_id'] == blob_repo_type]
         # this condition supports old DSL for baking of repo as a single object on the baker
@@ -31,7 +31,7 @@ class HelmBakerController(AbstractBakerController):
                 self.repos[repo['id']] = repo
 
     def bake(self):
-        svc_configs = serialize_rows(self.rest.get_field('service', self.deployment['service_id'], 'configs'))
+        svc_configs = self.output.serialize_rows(self.rest.get_field('service', self.deployment['service_id'], 'configs'))
 
         svc_cfg = [svc_cfg for svc_cfg in svc_configs if
                    svc_cfg['template_id'] == 'helm_bake' and svc_cfg['name'] == 'default']
