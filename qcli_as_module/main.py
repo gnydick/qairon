@@ -28,7 +28,7 @@ iterable = []
 qcli = CLIController(iterable)
 
 qcli.get('service', 'withme:services:authentication-server')
-for row in foo:
+for row in iterable:
     print(row)
 
 # qcli.query('service', query='[{"name":"id", "op":"like", "val":"withme:services:%"}]')
