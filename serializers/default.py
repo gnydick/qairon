@@ -1,6 +1,7 @@
 from flask_restless.serialization import DefaultSerializer
 
-from controllers.output_controller import OutputController
+from controllers.output_controller import AbstractOutputController
+from controllers.qcli_output_format_controller import serialize_row
 
 
 class QcliSerializer(DefaultSerializer):
@@ -11,6 +12,6 @@ class QcliSerializer(DefaultSerializer):
         super().__init__(model, type_name, api_manager, primary_key, only, exclude, additional_attributes, **kwargs)
 
     def serialize(self, instance, only=None):
-        oc = OutputController()
+        oc = AbstractOutputController()
         data = super().serialize(instance, only)
-        return oc.serialize_row(data)
+        return serialize_row(data)

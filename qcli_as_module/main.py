@@ -2,33 +2,37 @@ import io
 import sys
 from pathlib import Path
 
+from controllers import CLIController, PrintingOutputController, StringIOOutputController, IterableOutputController
+
 PROJECT_DIR = Path(__file__).parents[1]
 
 sys.path.append(
     str(PROJECT_DIR)
 )
-
-from qairon.qcli import CLIController
-
-## stdout
-# this will print to stdout just by running the command
-qcli = CLIController()
+#
+# ## stdout
+# # this will print to stdout just by running the command
+poc = PrintingOutputController()
+qcli = CLIController(poc)
+# qcli.list('deployment')
 qcli.get('service', 'withme:services:authentication-server')
 
-## StringIO
+# ## StringIO
 file_like_string_io = io.StringIO()
 
-qcli = CLIController(file_like_string_io)
-qcli.get('service', 'withme:services:authentication-server')
+soc = StringIOOutputController(file_like_string_io)
+qcli = CLIController(soc)
+qcli.list('deployment')
 result = file_like_string_io.getvalue()
+file_like_string_io.flush()
+file_like_string_io.seek(0)
 print(result)
 
 ## Iterable
-iterable = []
-qcli = CLIController(iterable)
+resutls = []
+ioc = IterableOutputController(resutls)
+qcli = CLIController(ioc)
 
-qcli.get('service', 'withme:services:authentication-server')
-for row in iterable:
+qcli.list('deployment')
+for row in resutls:
     print(row)
-
-# qcli.query('service', query='[{"name":"id", "op":"like", "val":"withme:services:%"}]')

@@ -2,7 +2,7 @@ import json
 # from controllers.bakers.baker import BakerInterface
 import os
 
-from controllers.output_controller import OutputController
+from controllers.output_controller import AbstractOutputController
 from plugins.aws.controller.aws import AwsServiceController
 from plugins.baker.controller.bakers import AbstractBakerController
 

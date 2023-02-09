@@ -1,11 +1,11 @@
-import _io
-import json
-
 import itertools
+import json
 import sys
-from json_stream import streamable_list
-from json_stream.writer import StreamableList
+from abc import ABC, abstractmethod
 from collections.abc import Iterable
+
+from json_stream import streamable_list
+
 
 class SerializableGenerator(list):
     """Generator that is serializable by JSON"""
@@ -22,10 +22,7 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-class OutputController:
-
-    def __init__(self, output_stream):
-        self.output_stream = output_stream
+class AbstractOutputController(ABC):
 
     def serialize_row(self, row, output_fields=None):
         if 'relationships' in row:
@@ -59,36 +56,57 @@ class OutputController:
                     for row in batch:
                         yield self.serialize_row(row, output_fields)
 
-    def _output_(self, batch, output_format=None):
-        if output_format is None:
-            output_format = 'json'
-        if output_format == 'json':
-            if type(batch) is StreamableList:
-                for row in batch:
-                    value = json.dumps(row)
-                    self.__write_or_append__(value)
-            else:
-                value = json.dumps(batch)
-                self.__write_or_append__(value)
-        elif output_format == 'plain':
-            if type(batch) == dict:
-                value = ' '.join(str(x) for x in batch.values())
-                self.__write_or_append__(value)
-            else:
-                for row in batch:
-                    value = ' '.join(str(x) for x in row.values())
-                    self.__write_or_append__(value)
-
-    def write(self, q, data, output_fields=None, output_format=None):
+    def handle(self, q, data, output_fields=None, output_format=None):
         if not q:
             if type(data) == dict:
                 result_stream = self.serialize_row(data, output_fields)
                 self._output_(result_stream, output_format)
-            elif isinstance(self.output_stream, Iterable):
+            elif isinstance(data, Iterable):
                 self._output_(self.serialize_rows(data), output_format)
 
-    def __write_or_append__(self, value):
-        if isinstance(self.output_stream, _io.TextIOWrapper) or isinstance(self.output_stream, _io.StringIO):
-            self.output_stream.write(value)
-        elif isinstance(self.output_stream, Iterable):
-            self.output_stream.append(value)
+
+class PrintingOutputController(AbstractOutputController):
+
+    def _output_(self, data, output_format=None):
+        if output_format is None:
+            output_format = 'json'
+
+            if output_format == 'json':
+                json.dump(data, sys.stdout)
+            elif output_format == 'plain':
+                print(' '.join(str(x) for x in data.values()))
+
+
+
+class StringIOOutputController(AbstractOutputController):
+
+    def __init__(self, stringIO):
+        self.stringIO = stringIO
+
+    def _output_(self, data, output_format=None):
+        if output_format is None:
+            output_format = 'json'
+
+            if output_format == 'json':
+                json.dump(data, self.stringIO)
+            elif output_format == 'plain':
+                self.stringIO.write(' '.join(str(x) for x in data.values()))
+
+
+
+class IterableOutputController(AbstractOutputController):
+
+    def __init__(self, iterable):
+        self.iterable = iterable
+
+    def _output_(self, data, output_format=None):
+        if output_format is None:
+            output_format = 'json'
+
+            if output_format == 'json':
+                for x in data:
+                    self.iterable.append(json.dumps(x))
+            elif output_format == 'plain':
+                self.iterable.append(' '.join(str(x) for x in data.values()))
+
+

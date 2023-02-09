@@ -11,6 +11,7 @@ sys.path.append(
 
 from controllers import CLIArgs
 from controllers import CLIController
+from controllers import StringIOOutputController, PrintingOutputController, AbstractOutputController
 from controllers import RestController
 from controllers.schema import QaironSchema
 

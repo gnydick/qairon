@@ -3,7 +3,7 @@ import os
 import sys
 from subprocess import call
 
-from .output_controller import OutputController, SerializableGenerator
+from .output_controller import AbstractOutputController, SerializableGenerator, PrintingOutputController
 from .rest_controller import RestController
 
 rest = RestController()
@@ -11,22 +11,22 @@ rest = RestController()
 
 class CLIController:
 
-    def __init__(self, output_stream=sys.stdout):
-        self.output = OutputController(output_stream)
+    def __init__(self, output_controller):
+        self.output = output_controller
 
     def get(self, resource, id, command=None, output_fields=None, output_format=None, q=False):
         row = rest.get_instance(resource, id)
-        self.output.write(q, row, output_fields=output_fields, output_format=output_format)
+        self.output.handle(q, row, output_fields=output_fields, output_format=output_format)
 
     def list(self, resource, command=None, output_fields=None,
              output_format=None, q=False):
         rows = rest.query(resource)
-        self.output.write(q, rows, output_fields=output_fields,
+        self.output.handle(q, rows, output_fields=output_fields,
                           output_format=output_format)
 
     def query(self, resource, command=None, query=None, output_fields=None, output_format=None, q=False):
         rows = rest.query(resource, query, output_fields)
-        self.output.write(q, rows, output_fields=output_fields,
+        self.output.handle(q, rows, output_fields=output_fields,
                           output_format=output_format)
 
     def get_version(self, resource, command=None, id=None, q=False):
@@ -40,7 +40,7 @@ class CLIController:
                   output_format=None, q=False):
 
         value = rest._get_all_(resource, id, path=field)
-        self.output.write(q, value, output_fields=output_fields,
+        self.output.handle(q, value, output_fields=output_fields,
                           output_format=output_format)
 
     def get_parent(self, resource, relation, command=None, id=None, q=False):
