@@ -50,8 +50,8 @@ for row in resutls:
 
 poc = PrintingOutputController()
 qcli = CLIController(poc)
-# qcli.list('deployment')
-qcli.get('service', 'withme:services:authentication-server', output_format='plain')
+qcli.list('deployment')
+# qcli.get('service', 'withme:services:authentication-server', output_format='plain')
 
 ## StringIO
 file_like_string_io = io.StringIO()

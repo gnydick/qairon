@@ -76,7 +76,15 @@ class PrintingOutputController(AbstractOutputController):
         if output_format == 'json':
             json.dump(data, sys.stdout)
         elif output_format == 'plain':
-            print(' '.join(str(x) for x in data.values()))
+            if type(data) == dict:
+                print(' '.join(str(x) for x in data.values()))
+            elif isinstance(data, Iterable):
+                for row in data:
+                    print(' '.join(str(x) for x in row.values()))
+
+
+
+
 
 
 class StringIOOutputController(AbstractOutputController):
