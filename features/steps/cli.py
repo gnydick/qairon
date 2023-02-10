@@ -244,15 +244,6 @@ def step_impl(context, dep_target_bin_id, service, tag, defaults):
     assert new_dep['tag'] == tag
 
 
-# @then(
-#     'service_config_template "{service_config_template}" can be created for service "{service}" via cli')
-# def step_impl(context, service_config_template, service):
-#     response = context.cli.create(
-#         {'resource': 'service_config_template', 'name': service_config_template, 'service_id': service, 'template': ''}
-#     )
-#     new_svc_config = response.json()
-#     assert new_svc_config['id'] == '%s:%s' % (service, service_config_template)
-
 @then(
     'create config for resource "{resource}" named "{name}" from template "{config_template_id}" can be created for "{resource_id}" tagged "{tag}" via cli')
 @given(
