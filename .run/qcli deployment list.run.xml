@@ -20,7 +20,7 @@
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
-    <option name="PARAMETERS" value="deployment list" />
+    <option name="PARAMETERS" value="deployment list -f id" />
     <option name="SHOW_COMMAND_LINE" value="true" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

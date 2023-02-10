@@ -13,11 +13,11 @@ sys.path.append(
 ### JSON
 
 ## stdout
-# this will print to stdout, just like when running the qcli script
-poc = PrintingOutputController()
-qcli = CLIController(poc)
-# qcli.list('deployment')
-qcli.get('service', 'withme:services:authentication-server')
+# # this will print to stdout, just like when running the qcli script
+# poc = PrintingOutputController()
+# qcli = CLIController(poc)
+# # qcli.list('deployment')
+# qcli.get('service', 'withme:services:authentication-server')
 
 ## StringIO
 # this will return a single string that will be parseable. e.g.
