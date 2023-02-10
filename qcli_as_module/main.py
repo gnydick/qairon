@@ -37,12 +37,12 @@ print(result)
 # this will always return indvidual objects e.g.
 #  * if you request json and the result is multiple rows, the iterator will receive a Python list of json objects,
 #  * not a json array
-resutls = []
-ioc = IterableOutputController(resutls)
+results = []
+ioc = IterableOutputController(results)
 qcli = CLIController(ioc)
 
 qcli.list('deployment')
-for row in resutls:
+for row in results:
     print(row)
 
 ### Plain
@@ -65,10 +65,10 @@ file_like_string_io.seek(0)
 print(result)
 
 ## Iterable
-resutls = []
-ioc = IterableOutputController(resutls)
+results = []
+ioc = IterableOutputController(results)
 qcli = CLIController(ioc)
 
 qcli.list('deployment', output_format='plain')
-for row in resutls:
+for row in results:
     print(row)
