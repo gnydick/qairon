@@ -15,7 +15,10 @@ class BakerBuilder:
 
         self.__build__ = simplify_row(self.rest.get_instance('build', build_id))
         self.__deployment__ = simplify_row(self.rest.get_instance('deployment', deployment_id))
-        self.__configs__ = simplify_rows(self.rest.get_field('deployment', deployment_id, 'configs'))
+
+        # simplify_rows is a yield, must wrap to cache results
+        self.__configs__ = [x for x in simplify_rows(self.rest.get_field('deployment', deployment_id, 'configs'))]
+        self.__svc_configs__ = [x for x in simplify_rows(self.rest.get_field('service', self.__deployment__['service_id'], 'configs'))]
         self.__deployment_target_bin__ = simplify_row(self.rest.get_instance('deployment_target_bin',
                                                                              self.__deployment__['deployment_target_bin_id']))
         self.__deployment_target__ = simplify_row(self.rest.get_instance('deployment_target',
