@@ -1,6 +1,14 @@
+import json
+
+from controllers.output_controller import simplify_rows, IterableOutputController
+from controllers.cli_controller import CLIController
+
 class SubnetController:
 
     def __init__(self, network_id):
+        results = []
+        ioc = IterableOutputController(results)
+        self.cli = CLIController(ioc)
         self.network_id = network_id
 
     def allocate_subnet(self, additional_mask_bits, name):
@@ -8,8 +16,8 @@ class SubnetController:
         rest = RestController()
         import ipaddress as ip
         network = rest.get_instance('network', resource_id=self.network_id)['attributes']
-        subnets = [x['attributes'] for x in rest.get_field('network', resource_id=self.network_id, field='subnets')]
-
+        self.cli.get_field('network', self.network_id, field='subnets')
+        subnets = [json.loads(x) for x in self.cli.oc.iterable]
         if type(subnets) is None:
             pass
         else:

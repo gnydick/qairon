@@ -7,7 +7,7 @@
       <env name="PYTHONUNBUFFERED" value="1" />
       <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://qairon:qairon@localhost/qairon" />
       <env name="SECRET_KEY" value="12345" />
-      <env name="QAIRON_ENDPOINT" value="http://localhost:5001" />
+      <env name="QAIRON_ENDPOINT" value="https://qairon.infra.withme.com" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -21,7 +21,7 @@
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
-    <option name="PARAMETERS" value="network allocate_subnet dev:aws:103181391659:us-west-2:vpc1:default 12 deleteme0" />
+    <option name="PARAMETERS" value="network allocate_subnet int:aws:434798608807:us-west-2:vpc0:default 4 eks_nodes3" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

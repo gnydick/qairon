@@ -67,6 +67,7 @@ class AbstractOutputController(ABC):
                 self._output_(results, output_format)
 
 
+
 class PrintingOutputController(AbstractOutputController):
 
     def _output_(self, data, output_format=None):
@@ -121,3 +122,9 @@ class IterableOutputController(AbstractOutputController):
         elif output_format == 'plain':
             for row in data:
                 self.iterable.append(' '.join(str(x) for x in row.values()))
+
+    @streamable_list
+    def read_as_json(self):
+        for row in self.iterable:
+            yield json.loads(row)
+        self.iterable.clear()
