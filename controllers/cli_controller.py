@@ -199,7 +199,19 @@ class CLIController:
         config['deployment_id'] = deployment_id
         config['resource'] = 'config'
         return config
+    def add_to_collection(self, resource, owner_id, items, item_id, command=None, q=False):
+        response = rest.add_to_many_to_many(resource, owner_id, items, item_id)
+        data = response.json()
+        collection = data[items]
+        if not q:
+            self.__print_object_list__(collection)
 
+    def del_from_collection(self, resource, owner_id, items, item_id, command=None, q=False):
+        response = rest.del_from_many_to_many(resource, owner_id, items, item_id)
+        data = response.json()
+        collection = data[items]
+        if not q:
+            self.__print_object_list__(collection)
     def clone_config(self, id, deployment_id, resource, command=None, version=None, q=False):
         config = rest.get_instance('config', id)
         new_config = self.__clone_config__(config, deployment_id)
