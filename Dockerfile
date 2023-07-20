@@ -36,7 +36,7 @@ ADD static /opt/qairon/static
 ADD app.py /opt/qairon
 ADD base.py /opt/qairon
 ADD db.py /opt/qairon
-ADD qcli /opt/qairon
+ADD qairon/qcli /opt/qairon
 
 
 
