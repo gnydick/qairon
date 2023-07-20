@@ -41,6 +41,7 @@ def simplify_row(row, output_fields=None):
         output[key] = row['attributes'][key]
     return output
 
+
 @streamable_list
 def simplify_rows(batches, output_fields=None):
     if type(batches) == dict:
@@ -67,7 +68,6 @@ class AbstractOutputController(ABC):
                 self._output_(results, output_format)
 
 
-
 class PrintingOutputController(AbstractOutputController):
 
     def _output_(self, data, output_format=None):
@@ -82,10 +82,6 @@ class PrintingOutputController(AbstractOutputController):
             elif isinstance(data, Iterable):
                 for row in data:
                     print(' '.join(str(x) for x in row.values()))
-
-
-
-
 
 
 class StringIOOutputController(AbstractOutputController):
