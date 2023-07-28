@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from base import app
 from models import *
 from app import db
 
@@ -10,7 +10,7 @@ repo_classes = {
 service_classes = {
     Stack: "application_id",
     Service: "stack_id",
-
+    ServiceConfig:"config_template_id"
 }
 
 provider_classes = {
@@ -49,14 +49,14 @@ deployment_classes = {
 }
 
 klasses = [repo_classes, service_classes, provider_classes, deployment_classes, ]
+with app.app_context():
+    sess = db.session()
 
-sess = db.session()
+    for klass in klasses:
+        for k, v in klass.items():
+            instances = sess.query(k).all()
+            for instance in instances:
+                setattr(instance, v, getattr(instance, v))
 
-for klass in klasses:
-    for k, v in klass.items():
-        instances = sess.query(k).all()
-        for instance in instances:
-            setattr(instance, v, getattr(instance, v))
-
-        sess.flush()
-        sess.commit()
+            sess.flush()
+            sess.commit()
