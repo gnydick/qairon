@@ -11,6 +11,7 @@ class Stack(db.Model):
 
     __tablename__ = "stack"
 
+
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
     application_id = Column(String, ForeignKey('application.id'), nullable=False, index=true)

@@ -10,7 +10,7 @@ sys.path.append(
 )
 
 from controllers import CLIArgs
-from controllers import CLIController
+from controllers import QCLIController
 from controllers import PrintingOutputController
 from controllers import RestController
 from controllers.schema import QaironSchema
@@ -18,7 +18,7 @@ from controllers.schema import QaironSchema
 
 def _main_():
     rest = RestController()
-    cli = CLIController(PrintingOutputController())
+    cli = QCLIController(PrintingOutputController())
     qaironargs = CLIArgs(rest)
 
     (args, junk) = qaironargs.parse_args()
@@ -65,7 +65,7 @@ def _main_():
                 elif args.resource == 'test':
                     cli.test(args)
         else:
-            plugin_name = 'plugins.%s.cli.%s' % (args.resource, args.resource)
+            plugin_name = 'qcli_plugins.%s.cli.%s' % (args.resource, args.resource)
             if plugin_name in qaironargs.discovered_plugins:
                 plugin = qaironargs.discovered_plugins[plugin_name]
                 if args.command in plugin.COMMANDS.keys():

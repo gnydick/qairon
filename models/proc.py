@@ -10,6 +10,7 @@ class Proc(db.Model):
 
     __tablename__ = "proc"
 
+
     id = Column(String, primary_key=True, nullable=False)
     service_id = Column(String, ForeignKey('service.id'), nullable=False, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)

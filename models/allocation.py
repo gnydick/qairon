@@ -13,6 +13,7 @@ class Allocation(db.Model):
 
     __tablename__ = "allocation"
 
+
     id = Column(String, primary_key=True)
     value = Column(Float, nullable=False)
     allocation_type_id = Column(String, ForeignKey('allocation_type.id'), index=true)

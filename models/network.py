@@ -13,6 +13,7 @@ class Network(db.Model):
 
     __tablename__ = "network"
 
+
     def __init__(self, **entries):
         self.__dict__.update(entries)
 

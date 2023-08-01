@@ -12,6 +12,7 @@ class Release(db.Model):
 
     __tablename__ = "release"
 
+
     id = Column(String, primary_key=True)
     build_id = Column(String, ForeignKey('build.id'), nullable=False, index=true)
     deployment_id = Column(String, ForeignKey('deployment.id'), nullable=False, index=true)

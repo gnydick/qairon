@@ -32,6 +32,7 @@ class BuildArtifact(db.Model):
 class ReleaseArtifact(db.Model):
     exclude = []
     __tablename__ = "release_artifact"
+
     id = Column(String, primary_key=True)
     release_id = Column(String, ForeignKey('release.id'), nullable=False)
     input_repo_id = Column(String, ForeignKey('repo.id'), nullable=False)

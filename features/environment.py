@@ -7,7 +7,7 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.ddl import DropTable
 
 from app import migrate
-from controllers import RestController, CLIArgs, CLIController, PrintingOutputController
+from controllers import RestController, CLIArgs, QCLIController, PrintingOutputController
 
 
 @compiles(DropTable, "postgresql")
@@ -25,7 +25,7 @@ def before_feature(context, scenario):
 
         # the CLIController latches onto stdout, we have to tell it to use our mock stdout
         poc = PrintingOutputController()
-        context.cli = CLIController(poc)
+        context.cli = QCLIController(poc)
 
         migrate.db.drop_all()
         migrate.db.create_all()

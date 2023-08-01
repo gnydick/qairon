@@ -2,7 +2,7 @@ import io
 import sys
 from pathlib import Path
 
-from controllers import CLIController, PrintingOutputController, StringIOOutputController, IterableOutputController, \
+from controllers import QCLIController, PrintingOutputController, StringIOOutputController, IterableOutputController, \
     RestController
 
 PROJECT_DIR = Path(__file__).parents[1]
@@ -13,7 +13,7 @@ sys.path.append(
 
 results = []
 ioc = IterableOutputController(results)
-qcli = CLIController(ioc)
+qcli = QCLIController(ioc)
 qcli.list('service')
 rest = RestController()
 from models import *

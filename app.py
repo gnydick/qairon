@@ -1,4 +1,6 @@
+import importlib
 import inspect
+import pkgutil
 from os.path import exists
 
 import json_api_doc
@@ -29,14 +31,35 @@ if app.debug:
 
     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 
+## server plugins
+plugins_installed = ['dependencies']
+discovered_plugins = dict()
+
+
+def iter_namespace(ns_pkg):
+    # Specifying the second argument (prefix) to iter_modules makes the
+    # returned name an absolute name instead of a relative one. This allows
+    # import_module to work without having to do additional modification to
+    # the name.
+    return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
+
+
+for package_name in plugins_installed:
+    plugin = importlib.import_module('server_plugins.%s' % package_name)
+    ins = iter_namespace(plugin)
+
+
+
 migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
 qclimanager = APIManager(app, session=db.session)
 
+
+
+
 with app.app_context():
     def postprocessor(result, **kwargs):
         result = result['data']
-
 
 
     #    dynamically generate the rest endpoint for each data model

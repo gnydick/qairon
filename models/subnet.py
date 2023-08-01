@@ -12,6 +12,7 @@ class Subnet(db.Model):
     exclude = ['fleets']
 
     __tablename__ = "subnet"
+
     id = Column(String, primary_key=True)
     network_id = Column(String, ForeignKey('network.id'), nullable=False, index=true)
     native_id = Column(String, index=true)

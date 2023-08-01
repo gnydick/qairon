@@ -2,7 +2,7 @@ import io
 import sys
 from pathlib import Path
 
-from controllers import CLIController, PrintingOutputController, StringIOOutputController, IterableOutputController
+from controllers import QCLIController, PrintingOutputController, StringIOOutputController, IterableOutputController
 
 PROJECT_DIR = Path(__file__).parents[1]
 
@@ -13,11 +13,11 @@ sys.path.append(
 ### JSON
 
 ## stdout
-# # this will print to stdout, just like when running the qcli script
+# # this will print to stdout, just like when running the qcli_plugins script
 # poc = PrintingOutputController()
-# qcli = CLIController(poc)
-# # qcli.list('deployment')
-# qcli.get('service', 'withme:services:authentication-server')
+# qcli_plugins = CLIController(poc)
+# # qcli_plugins.list('deployment')
+# qcli_plugins.get('service', 'withme:services:authentication-server_plugins')
 
 ## StringIO
 # this will return a single string that will be parseable. e.g.
@@ -26,7 +26,7 @@ sys.path.append(
 file_like_string_io = io.StringIO()
 
 soc = StringIOOutputController(file_like_string_io)
-qcli = CLIController(soc)
+qcli = QCLIController(soc)
 qcli.list('deployment')
 result = file_like_string_io.getvalue()
 file_like_string_io.flush()
@@ -39,7 +39,7 @@ print(result)
 #  * not a json array
 results = []
 ioc = IterableOutputController(results)
-qcli = CLIController(ioc)
+qcli = QCLIController(ioc)
 
 qcli.list('deployment')
 for row in results:
@@ -49,15 +49,15 @@ for row in results:
 ## stdout
 
 poc = PrintingOutputController()
-qcli = CLIController(poc)
+qcli = QCLIController(poc)
 qcli.list('deployment')
-# qcli.get('service', 'withme:services:authentication-server', output_format='plain')
+# qcli_plugins.get('service', 'withme:services:authentication-server_plugins', output_format='plain')
 
 ## StringIO
 file_like_string_io = io.StringIO()
 
 soc = StringIOOutputController(file_like_string_io)
-qcli = CLIController(soc)
+qcli = QCLIController(soc)
 qcli.list('deployment', output_format='plain')
 result = file_like_string_io.getvalue()
 file_like_string_io.flush()
@@ -67,7 +67,7 @@ print(result)
 ## Iterable
 results = []
 ioc = IterableOutputController(results)
-qcli = CLIController(ioc)
+qcli = QCLIController(ioc)
 
 qcli.list('deployment', output_format='plain')
 for row in results:

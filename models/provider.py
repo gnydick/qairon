@@ -9,6 +9,7 @@ class Provider(db.Model):
     exclude = ['regions']
 
     __tablename__ = "provider"
+
     id = Column(String, primary_key=True)
     provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=False, index=true)
     environment_id = Column(String, ForeignKey('environment.id'), nullable=False, index=true)

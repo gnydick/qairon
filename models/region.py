@@ -10,6 +10,7 @@ class Region(db.Model):
 
 
     __tablename__ = "region"
+
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
     provider_id = Column(String, ForeignKey('provider.id'), nullable=True, index=true)

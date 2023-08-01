@@ -15,6 +15,7 @@ class Build(db.Model):
 
     __tablename__ = "build"
 
+
     id = Column(String, primary_key=True)
     build_num = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
