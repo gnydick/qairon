@@ -10,7 +10,6 @@ class DeploymentTargetBin(db.Model):
 
     __tablename__ = "deployment_target_bin"
 
-
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true, server_default='default')
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'), nullable=False, index=true)

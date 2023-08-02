@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="./qcli application create" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="qcli/qcli.py application create" type="PythonConfigurationType" factoryName="Python">
     <module name="qairon" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -17,7 +17,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli/qcli.py" />
     <option name="PARAMETERS" value="application create foo7" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

@@ -9,7 +9,6 @@ class DeploymentConfig(db.Model):
     exclude = []
 
     __tablename__ = "deployment_config"
-
     id = Column(String, primary_key=True)
 
     config_template_id = Column(String, ForeignKey('config_template.id'), index=true)
@@ -35,7 +34,6 @@ class ServiceConfig(db.Model):
     exclude = []
 
     __tablename__ = "service_config"
-
     id = Column(String, primary_key=True)
 
     config_template_id = Column(String, ForeignKey('config_template.id'))
@@ -59,7 +57,6 @@ class ServiceConfig(db.Model):
 class StackConfig(db.Model):
     exclude = []
     __tablename__ = "stack_config"
-
     id = Column(String, primary_key=True)
 
     config_template_id = Column(String, ForeignKey('config_template.id'))

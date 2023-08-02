@@ -20,7 +20,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli/qcli.py" />
     <option name="PARAMETERS" value="baker bake int:aws:417738154227:us-west-2:vpc0:eks:int0:withmeqa:withme:services:authentication-server:default withme:services:authentication-server:102 1" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

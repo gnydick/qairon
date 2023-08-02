@@ -9,7 +9,6 @@ class ConfigTemplate(db.Model):
     exclude = ['service_configs', 'stack_configs', 'deployment_configs']
 
     __tablename__ = "config_template"
-
     id = Column(String, primary_key=True)
     language_id = Column(String, ForeignKey('language.id'), index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)

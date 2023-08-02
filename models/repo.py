@@ -10,7 +10,6 @@ class Repo(db.Model):
 
     __tablename__ = "repo"
 
-
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     repo_type_id = Column(String, ForeignKey('repo_type.id'), index=true)

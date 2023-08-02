@@ -13,11 +13,11 @@ sys.path.append(
 ### JSON
 
 ## stdout
-# # this will print to stdout, just like when running the qcli_plugins script
+# # this will print to stdout, just like when running the plugins script
 # poc = PrintingOutputController()
-# qcli_plugins = CLIController(poc)
-# # qcli_plugins.list('deployment')
-# qcli_plugins.get('service', 'withme:services:authentication-server_plugins')
+# plugins = CLIController(poc)
+# # plugins.list('deployment')
+# plugins.get('service', 'withme:services:authentication-server_plugins')
 
 ## StringIO
 # this will return a single string that will be parseable. e.g.
@@ -51,7 +51,7 @@ for row in results:
 poc = PrintingOutputController()
 qcli = QCLIController(poc)
 qcli.list('deployment')
-# qcli_plugins.get('service', 'withme:services:authentication-server_plugins', output_format='plain')
+# plugins.get('service', 'withme:services:authentication-server_plugins', output_format='plain')
 
 ## StringIO
 file_like_string_io = io.StringIO()

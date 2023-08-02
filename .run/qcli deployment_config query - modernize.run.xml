@@ -20,7 +20,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli/qcli.py" />
     <option name="PARAMETERS" value="deployment_config query [{\&quot;name\&quot;:\&quot;id\&quot;,\&quot;op\&quot;:\&quot;eq\&quot;,\&quot;val\&quot;:\&quot;secret_map_item\&quot;}]" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

@@ -10,7 +10,6 @@ class Capacity(db.Model):
 
     __tablename__ = "capacity"
 
-
     id = Column(String, primary_key=True)
     fleet_id = Column(String, ForeignKey('fleet.id'), index=true)
     allocation_type_id = Column(String, ForeignKey('allocation_type.id'), index=true)

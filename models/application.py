@@ -9,8 +9,6 @@ class Application(db.Model):
     exclude = ['stacks']
 
     __tablename__ = "application"
-    __table_schema__ = "public"
-
 
     id = Column(String, primary_key=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)

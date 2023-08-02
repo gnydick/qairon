@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="./qcli  baker bake" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="qcli/qcli.py  baker bake" type="PythonConfigurationType" factoryName="Python">
     <module name="qairon" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -18,7 +18,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon/qcli.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli/qcli.py" />
     <option name="PARAMETERS" value="baker bake dev:aws:702861675511:us-west-2:vpc0:eks:dev0:dev:withme:services:authentication-server:default withme:services:atlas-server:10 9999" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

@@ -24,7 +24,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="qairon/qcli.py" />
+    <option name="SCRIPT_NAME" value="qcli/qcli.py" />
     <option name="PARAMETERS" value="deployment list -f id" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

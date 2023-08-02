@@ -1,9 +1,9 @@
+import json_api_doc
 import importlib
 import inspect
-import pkgutil
 from os.path import exists
 
-import json_api_doc
+
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 from flask_restless import APIManager
@@ -12,6 +12,7 @@ import models
 from base import app
 from controllers import RestController
 from db import db
+from lib.dynamic import iter_namespace
 from models import *
 from serializers.default import QcliSerializer
 from views import *
@@ -34,28 +35,18 @@ if app.debug:
 ## server plugins
 plugins_installed = ['dependencies']
 discovered_plugins = dict()
-
-
-def iter_namespace(ns_pkg):
-    # Specifying the second argument (prefix) to iter_modules makes the
-    # returned name an absolute name instead of a relative one. This allows
-    # import_module to work without having to do additional modification to
-    # the name.
-    return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
-
-
-for package_name in plugins_installed:
-    plugin = importlib.import_module('server_plugins.%s' % package_name)
-    ins = iter_namespace(plugin)
-
+import pydevd_pycharm
+pydevd_pycharm.settrace('localhost', port=1234, stdoutToServer=True, stderrToServer=True)
+for plugin_base_name in plugins_installed:
+    plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
+    discovered_plugins[plugin_base_name] = plugin_package
+    if hasattr(plugin_package, "models"):
+        plugin = importlib.import_module(plugin_package.__name__)
 
 
 migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
 qclimanager = APIManager(app, session=db.session)
-
-
-
 
 with app.app_context():
     def postprocessor(result, **kwargs):

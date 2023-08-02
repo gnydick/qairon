@@ -1,9 +1,9 @@
 import argparse
-import os
-import re
-
+import importlib
+import pkgutil
 import argcomplete
 
+from lib.dynamic import iter_namespace
 from .rest_controller import RestController
 from .schema import QaironSchema
 
@@ -104,32 +104,17 @@ class CLIArgs:
         return ['additional_mask_bits']
 
     def __gen_parsers__(self, context_parsers):
-        import importlib
-        import pkgutil
-
-
-        def iter_namespace(ns_pkg):
-            # Specifying the second argument (prefix) to iter_modules makes the
-            # returned name an absolute name instead of a relative one. This allows
-            # import_module to work without having to do additional modification to
-            # the name.
-            return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
-
-
         self.discovered_plugins = dict()
-        for package_name in self.plugins_installed:
-            plugin = importlib.import_module('qcli_plugins.%s.cli' % package_name)
-            ins = iter_namespace(plugin)
-
-            for finder, name, ispkg in ins:
-                self.discovered_plugins[name] = plugin
-                plugin_parser = context_parsers.add_parser(package_name)
+        for plugin_base_name in self.plugins_installed:
+            plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
+            self.discovered_plugins[plugin_base_name] = plugin_package
+            if hasattr(plugin_package, "cli"):
+                plugin_parser = context_parsers.add_parser(plugin_base_name)
                 new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
                 new_subparsers.required = True
-                for command in plugin.COMMANDS.keys():
-                    fields = plugin.COMMANDS[command]
+                for command in plugin_package.COMMANDS.keys():
                     parser = new_subparsers.add_parser(command)
-                    __populate_args__(self.rest, parser, plugin.COMMANDS[command])
+                    __populate_args__(self.rest, parser, plugin_package.COMMANDS[command])
 
         for model in self.schema.MODELS:
             model_parser = context_parsers.add_parser(model)

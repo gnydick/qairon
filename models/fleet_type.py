@@ -9,7 +9,6 @@ class FleetType(db.Model):
     exclude = ['fleets']
 
     __tablename__ = "fleet_type"
-
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
     provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=True, index=true)

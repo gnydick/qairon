@@ -8,7 +8,6 @@ class Zone(db.Model):
     exclude = ['deployments']
 
     __tablename__ = "zone"
-
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=true)
     region_id = Column(String, ForeignKey('region.id'), nullable=False, index=true)

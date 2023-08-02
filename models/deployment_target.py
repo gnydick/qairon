@@ -10,7 +10,6 @@ class DeploymentTarget(db.Model):
 
     __tablename__ = "deployment_target"
 
-
     id = Column(String, primary_key=True)
     deployment_target_type_id = Column(String, ForeignKey('deployment_target_type.id'), index=true)
     partition_id = Column(String, ForeignKey('partition.id'), index=true)

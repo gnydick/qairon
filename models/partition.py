@@ -10,7 +10,6 @@ class Partition(db.Model):
 
     __tablename__ = "partition"
 
-
     id = Column(String, primary_key=True)
     region_id = Column(String, ForeignKey('region.id'), nullable=False, index=true)
     native_id = Column(String, index=true)
