@@ -1,7 +1,7 @@
 FROM python:3.9.2
 
 ENV FLASK_APP=app.py
-ENV SECRET_KEY=12345
+#ENV SECRET_KEY=12345 this needs to be baked in
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 ARG version
@@ -33,6 +33,7 @@ ADD views /opt/qairon/views
 ADD templates /opt/qairon/templates
 ADD serializers /opt/qairon/serializers
 ADD static /opt/qairon/static
+ADD plugins /opt/qairon/plugins
 ADD app.py /opt/qairon
 ADD base.py /opt/qairon
 ADD db.py /opt/qairon
