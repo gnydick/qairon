@@ -89,7 +89,7 @@ def __add_get_field_query_parser__(rest, parsers, resource):
 
 
 class CLIArgs:
-    plugins_installed = 'aws', 'bake', 'baker'
+    plugins_installed = 'aws', 'bake', 'baker', 'dependencies'
 
     def __init__(self, rest):
         self.rest = rest
@@ -104,10 +104,14 @@ class CLIArgs:
         return ['additional_mask_bits']
 
     def __gen_parsers__(self, context_parsers):
+        all_model_keys = self.schema.MODELS
+
         self.discovered_plugins = dict()
         for plugin_base_name in self.plugins_installed:
             plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
             self.discovered_plugins[plugin_base_name] = plugin_package
+            if hasattr(plugin_package, "models"):
+                all_model_keys.update()
             if hasattr(plugin_package, "cli"):
                 plugin_parser = context_parsers.add_parser(plugin_base_name)
                 new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
@@ -115,6 +119,9 @@ class CLIArgs:
                 for command in plugin_package.COMMANDS.keys():
                     parser = new_subparsers.add_parser(command)
                     __populate_args__(self.rest, parser, plugin_package.COMMANDS[command])
+
+
+
 
         for model in self.schema.MODELS:
             model_parser = context_parsers.add_parser(model)

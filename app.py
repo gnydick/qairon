@@ -35,8 +35,7 @@ if app.debug:
 ## server plugins
 plugins_installed = ['dependencies']
 discovered_plugins = dict()
-import pydevd_pycharm
-pydevd_pycharm.settrace('localhost', port=1234, stdoutToServer=True, stderrToServer=True)
+
 for plugin_base_name in plugins_installed:
     plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
     discovered_plugins[plugin_base_name] = plugin_package
@@ -106,7 +105,6 @@ with app.app_context():
             add_sub_category(v, k)
 
     admin.add_view(WithIdView(Environment, db.session, category='Global'))
-
     admin.add_view(WithIdView(Application, db.session, category='Software', name='Applications'))
     admin.add_view(DefaultView(Stack, db.session, category='Stacks'))
     admin.add_view(DefaultView(StackConfig, db.session, category='Stacks'))
@@ -151,6 +149,12 @@ with app.app_context():
 
     admin.add_view(WithIdView(RepoType, db.session, category='Types'))
     admin.add_view(DefaultView(Repo, db.session, category='CI/CD'))
+
+    # look for each model in the plugin and create a view beneath a category of the name of the plugin
+    for plugin in discovered_plugins:
+        # admin.add_view()
+        pass
+
 
 from flask import Response
 

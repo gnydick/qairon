@@ -10,14 +10,19 @@
     <envs>
       <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://ut_qairon:ut_qairon@127.0.0.1/ut_qairon" />
       <env name="SECRET_KEY" value="12345" />
-      <env name="SQAIRON_ENDPOINT" value="http://127.0.0.1:5002" />
+      <env name="QAIRON_ENDPOINT" value="http://127.0.0.1:5002" />
     </envs>
-    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-dev-modernize-3.9.2/bin/python" />
+    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
+    <option name="SDK_NAME" value="Python 3.9 (qairon-3.9.2)" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <EXTENSION ID="com.fapiko.jetbrains.plugins.better_direnv.runconfigs.PycharmRunConfigurationExtension">
+      <option name="DIRENV_ENABLED" value="false" />
+      <option name="DIRENV_TRUSTED" value="false" />
+    </EXTENSION>
     <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
       <option name="credential" />
       <option name="region" />

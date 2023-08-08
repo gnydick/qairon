@@ -1,14 +1,14 @@
 import json
 
 from controllers.output_controller import simplify_rows, IterableOutputController
-from controllers.cli_controller import CLIController
+from controllers.qcli_controller import QCLIController
 
 class SubnetController:
 
     def __init__(self, network_id):
         results = []
         ioc = IterableOutputController(results)
-        self.cli = CLIController(ioc)
+        self.cli = QCLIController(ioc)
         self.network_id = network_id
 
     def allocate_subnet(self, additional_mask_bits, name):
