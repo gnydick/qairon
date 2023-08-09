@@ -1,12 +1,12 @@
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from app import db
+from db import db
 
 
 class Related(db.Model):
     __tablename__ = 'related'
-
+    exclude = []
     id = Column(String,  primary_key=True)
     related_id = Column(String)
     type = Column(String)

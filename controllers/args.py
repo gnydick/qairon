@@ -108,10 +108,9 @@ class CLIArgs:
 
         self.discovered_plugins = dict()
         for plugin_base_name in self.plugins_installed:
+            plugin = 'plugins.%s' % plugin_base_name
             plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
             self.discovered_plugins[plugin_base_name] = plugin_package
-            if hasattr(plugin_package, "models"):
-                all_model_keys.update()
             if hasattr(plugin_package, "cli"):
                 plugin_parser = context_parsers.add_parser(plugin_base_name)
                 new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
@@ -119,11 +118,15 @@ class CLIArgs:
                 for command in plugin_package.COMMANDS.keys():
                     parser = new_subparsers.add_parser(command)
                     __populate_args__(self.rest, parser, plugin_package.COMMANDS[command])
+            if hasattr(plugin_package, "controllers"):
+              pass
 
 
 
 
-        for model in self.schema.MODELS:
+
+
+        for model in all_model_keys:
             model_parser = context_parsers.add_parser(model)
             parsers_for_model_parser = model_parser.add_subparsers(help='command', dest='command')
             parsers_for_model_parser.required = True

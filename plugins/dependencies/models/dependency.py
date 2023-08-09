@@ -2,13 +2,13 @@ from sqlalchemy import Column, ForeignKey, String, Enum, ForeignKeyConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
-from app import db
-from models import CardinalityEnum
+from db import db
+
 
 
 class Dependency(db.Model):
     __tablename__ = 'dependency'
-
+    exclude = []
     id = Column(String, primary_key=True)
     dependency_case_id = Column(String,
                                 ForeignKey('dependency_case.id', onupdate='CASCADE'))

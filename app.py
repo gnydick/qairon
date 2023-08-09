@@ -1,9 +1,9 @@
-import json_api_doc
 import importlib
 import inspect
+import pkgutil
 from os.path import exists
 
-
+import json_api_doc
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 from flask_restless import APIManager
@@ -12,7 +12,6 @@ import models
 from base import app
 from controllers import RestController
 from db import db
-from lib.dynamic import iter_namespace
 from models import *
 from serializers.default import QcliSerializer
 from views import *
@@ -27,6 +26,7 @@ if exists(version_file):
 
 print(("version: %s" % version))
 
+
 if app.debug:
     from werkzeug.debug import DebuggedApplication
 
@@ -36,12 +36,6 @@ if app.debug:
 plugins_installed = ['dependencies']
 discovered_plugins = dict()
 
-for plugin_base_name in plugins_installed:
-    plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
-    discovered_plugins[plugin_base_name] = plugin_package
-    if hasattr(plugin_package, "models"):
-        plugin = importlib.import_module(plugin_package.__name__)
-
 
 migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
@@ -50,11 +44,20 @@ qclimanager = APIManager(app, session=db.session)
 with app.app_context():
     def postprocessor(result, **kwargs):
         result = result['data']
+    model_classes = []
+    plugin_models = []
+    for plugin_base_name in plugins_installed:
+        plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
+        discovered_plugins[plugin_base_name] = plugin_package
+        package_spec = importlib.util.find_spec(plugin_package.__name__ + '.models')
+        if package_spec is not None:
+            # module = __import__(plugin_package.__name__ , fromlist=["import_models"])
+            plugin_models = importlib.import_module(".".join([plugin_package.__name__, "models"]))
 
 
-    #    dynamically generate the rest endpoint for each data model
     model_classes = [getattr(models, m[0]) for m in inspect.getmembers(models, inspect.isclass) if
-                     m[1].__module__.startswith('models.')]
+                     m[1].__module__.startswith('models.')] + [getattr(plugin_models, m[0]) for m in inspect.getmembers(plugin_models, inspect.isclass)]
+
     for model_class in model_classes:
         custom_serializer = QcliSerializer(model_class, str(model_class), qclimanager, primary_key='id')
         restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
@@ -154,7 +157,6 @@ with app.app_context():
     for plugin in discovered_plugins:
         # admin.add_view()
         pass
-
 
 from flask import Response
 

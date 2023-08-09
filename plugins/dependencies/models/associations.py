@@ -1,6 +1,6 @@
 from sqlalchemy import Table, Column, String, ForeignKey
 
-from app import db
+from db import db
 
 dependency_to_relateds = Table('dependency_relateds', db.metadata,
                                Column('dependency_id', String,

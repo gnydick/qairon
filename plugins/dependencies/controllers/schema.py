@@ -1,11 +1,16 @@
 class QaironSchema:
     CREATE_FIELDS = dict(
+        dependency=[
+            {'dependency_case_id': {'dotters': {'completer': 'dependency_case_completer'}}},
+            'relatable_id'
+        ],
         relatable=[
-            {'allocation_type_id': {'dotters': {'completer': 'allocation_type_completer'}}},
-            {'deployment_proc_id': {'dotters': {'completer': 'deployment_proc_completer'}}},
-            'watermark',
-            'value',
-            {'-d': {'args': {'dest': 'defaults'}}}
+            'relatable_type',
+            'relatable_id'
+        ],
+        related=[
+            'related_type',
+            'related_id'
         ]
     )
 

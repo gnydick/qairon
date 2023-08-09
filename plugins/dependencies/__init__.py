@@ -1,6 +1,10 @@
-from plugins.dependencies.models import *
+import importlib
+
+from plugins.dependencies.cli import *
 from plugins.dependencies.controllers import *
+from plugins.dependencies.views import *
 
 
-admin.add_view(WithIdView(Environment, db.session, category='Global'))
-admin.add_view(WithIdView(Application, db.session, category='Software', name='Applications'))
+def import_models(plugin_package):
+    models_module = importlib.import_module(".".join([plugin_package.__name__, "models"]))
+    return models_module

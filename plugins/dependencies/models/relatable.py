@@ -1,12 +1,12 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from app import db
+from db import db
 
 
 class Relatable(db.Model):
     __tablename__ = 'relatable'
-
+    exclude = []
     id = Column(String, primary_key=True)
     relatable_id = Column(String, nullable=False)
     type = Column(String)

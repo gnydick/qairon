@@ -1,12 +1,12 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from app import db
+from db import db
 
 
 class Child(db.Model):
     __tablename__ = 'child'
-
+    exclude = []
     id = Column(String, primary_key=True)
     parent_id = Column(String, ForeignKey('parent.id'))
     name = Column(String, nullable=False)
