@@ -152,10 +152,8 @@ with app.app_context():
     admin.add_view(WithIdView(RepoType, db.session, category='Types'))
     admin.add_view(DefaultView(Repo, db.session, category='CI/CD'))
 
-    # look for each model in the plugin and create a view beneath a category of the name of the plugin
-    for plugin in discovered_plugins:
-        # admin.add_view()
-        pass
+    # TODO look for each model in the plugin and create a view beneath a category of the name of the plugin
+
 
 from flask import Response
 
