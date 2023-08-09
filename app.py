@@ -51,7 +51,6 @@ with app.app_context():
         discovered_plugins[plugin_base_name] = plugin_package
         package_spec = importlib.util.find_spec(plugin_package.__name__ + '.models')
         if package_spec is not None:
-            # module = __import__(plugin_package.__name__ , fromlist=["import_models"])
             plugin_models = importlib.import_module(".".join([plugin_package.__name__, "models"]))
 
 

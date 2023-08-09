@@ -93,9 +93,21 @@ class CLIArgs:
 
     def __init__(self, rest):
         self.rest = rest
-        __gen_completers__(rest)
         self.schema = QaironSchema()
         self.model_subparsers = dict()
+        self.discovered_plugins = dict()
+        for plugin_base_name in self.plugins_installed:
+            plugin = 'plugins.%s' % plugin_base_name
+            plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
+            self.discovered_plugins[plugin_base_name] = plugin_package
+            if hasattr(plugin_package, "controllers"):
+                package_spec = importlib.util.find_spec(plugin_package.__name__ + '.controllers.schema')
+                if package_spec is not None:
+                    module = importlib.import_module(plugin_package.__name__ + '.controllers')
+                    qs = getattr(module, 'QaironSchema')
+                    self.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
+        __gen_completers__(rest)
+
 
         __gen_attr_completers__(rest, 'service', 'repos')
         __gen_attr_completers__(rest, 'deployment', 'zones')
@@ -104,9 +116,6 @@ class CLIArgs:
         return ['additional_mask_bits']
 
     def __gen_parsers__(self, context_parsers):
-        all_model_keys = self.schema.MODELS
-
-        self.discovered_plugins = dict()
         for plugin_base_name in self.plugins_installed:
             plugin = 'plugins.%s' % plugin_base_name
             plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
@@ -118,15 +127,8 @@ class CLIArgs:
                 for command in plugin_package.COMMANDS.keys():
                     parser = new_subparsers.add_parser(command)
                     __populate_args__(self.rest, parser, plugin_package.COMMANDS[command])
-            if hasattr(plugin_package, "controllers"):
-              pass
 
-
-
-
-
-
-        for model in all_model_keys:
+        for model in self.schema.MODELS:
             model_parser = context_parsers.add_parser(model)
             parsers_for_model_parser = model_parser.add_subparsers(help='command', dest='command')
             parsers_for_model_parser.required = True
