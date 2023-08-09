@@ -8,11 +8,11 @@ class QaironSchema:
             'relatable_id'
         ],
         relatable=[
-            'relatable_type',
+            'type',
             'relatable_id'
         ],
         related=[
-            'related_type',
+            'type',
             'related_id'
         ]
     )

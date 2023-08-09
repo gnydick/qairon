@@ -106,6 +106,8 @@ class CLIArgs:
                     module = importlib.import_module(plugin_package.__name__ + '.controllers')
                     qs = getattr(module, 'QaironSchema')
                     self.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
+                    QaironSchema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
+                    RestController.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
         __gen_completers__(rest)
 
 

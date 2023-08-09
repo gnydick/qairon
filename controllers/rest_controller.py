@@ -9,7 +9,7 @@ from .schema import QaironSchema
 
 
 class RestController:
-    global schema
+    # global schema
     schema = QaironSchema()
     global endpoint
     endpoint = os.getenv("QAIRON_ENDPOINT", "http://localhost:5001")
@@ -147,7 +147,7 @@ class RestController:
         pass
 
     def create_resource(self, args_dict):
-        fields = schema.CREATE_FIELDS[args_dict['resource']]
+        fields = self.schema.CREATE_FIELDS[args_dict['resource']]
         post_data = {}
 
         for field in fields:
