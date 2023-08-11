@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Enum, ForeignKeyConstraint
+from sqlalchemy import Column, ForeignKey, String, Enum, ForeignKeyConstraint, DateTime, func, true
 from sqlalchemy.orm import relationship
 
 
@@ -12,7 +12,9 @@ class DependencyCase(db.Model):
     exclude = []
     id = Column(String, primary_key=True)
     allowed_related_type = Column(String)
-    allowed_relationship = db.Column(cardinality_types_enum)
+    allowed_relationship = Column(cardinality_types_enum)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     dependencies = relationship('Dependency', back_populates='dependency_case')
 
     def __repr__(self):

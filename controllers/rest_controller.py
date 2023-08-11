@@ -147,7 +147,7 @@ class RestController:
         pass
 
     def create_resource(self, args_dict):
-        fields = self.schema.CREATE_FIELDS[args_dict['resource']]
+        fields = QaironSchema.CREATE_FIELDS[args_dict['resource']]
         post_data = {}
 
         for field in fields:

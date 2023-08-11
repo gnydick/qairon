@@ -44,7 +44,7 @@ setup(
         ':python_version == "3.9.2"': importlib_backport_requires
     },
     packages=find_packages(exclude=("features", "features.*", "models", "views", "views.*")),
-    scripts=['qairon_cli/qairon_cli.py'],
+    scripts=['qairon_cli/qcli.py'],
     zip_safe=False,
     include_package_data=True,
     platforms=['MacOS X', 'Posix'],

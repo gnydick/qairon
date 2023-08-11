@@ -93,19 +93,17 @@ class CLIArgs:
 
     def __init__(self, rest):
         self.rest = rest
-        self.schema = QaironSchema()
         self.model_subparsers = dict()
         self.discovered_plugins = dict()
         for plugin_base_name in self.plugins_installed:
             plugin = 'plugins.%s' % plugin_base_name
             plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
-            self.discovered_plugins[plugin_base_name] = plugin_package
+            self.discovered_plugins[plugin] = plugin_package
             if hasattr(plugin_package, "controllers"):
                 package_spec = importlib.util.find_spec(plugin_package.__name__ + '.controllers.schema')
                 if package_spec is not None:
                     module = importlib.import_module(plugin_package.__name__ + '.controllers')
                     qs = getattr(module, 'QaironSchema')
-                    self.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
                     QaironSchema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
                     RestController.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
         __gen_completers__(rest)
@@ -130,7 +128,7 @@ class CLIArgs:
                     parser = new_subparsers.add_parser(command)
                     __populate_args__(self.rest, parser, plugin_package.COMMANDS[command])
 
-        for model in self.schema.MODELS:
+        for model in QaironSchema.MODELS:
             model_parser = context_parsers.add_parser(model)
             parsers_for_model_parser = model_parser.add_subparsers(help='command', dest='command')
             parsers_for_model_parser.required = True
@@ -146,7 +144,7 @@ class CLIArgs:
                                                action='append')
             _model_com_get_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')
             _model_com_create_parser = parsers_for_model_parser.add_parser('create')
-            __populate_args__(self.rest, _model_com_create_parser, self.schema.CREATE_FIELDS[model])
+            __populate_args__(self.rest, _model_com_create_parser, QaironSchema.CREATE_FIELDS[model])
             _model_com_delete_parser = parsers_for_model_parser.add_parser('delete')
             _model_com_delete_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
 

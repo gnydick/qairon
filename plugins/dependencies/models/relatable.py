@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String
+from sqlalchemy import DateTime, func, true
 from sqlalchemy.orm import relationship
 
 from db import db
@@ -11,6 +12,8 @@ class Relatable(db.Model):
     relatable_id = Column(String, nullable=False)
     type = Column(String)
 
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     dependency = relationship('Dependency', back_populates='relatable')
 
     __mapper_args__ = {
@@ -19,6 +22,8 @@ class Relatable(db.Model):
 
     def __repr__(self):
         return self.id
+
+
 @db.event.listens_for(Relatable, 'before_update')
 @db.event.listens_for(Relatable, 'before_insert')
 def my_before_insert_listener(mapper, connection, relatable):

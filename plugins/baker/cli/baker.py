@@ -1,4 +1,4 @@
-from plugins.baker.controller import BakerBuilder
+from plugins.baker.controllers import BakerBuilder
 
 COMMANDS = dict(
     bake=[

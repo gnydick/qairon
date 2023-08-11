@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Enum, ForeignKeyConstraint
+from sqlalchemy import Column, ForeignKey, String, Enum, ForeignKeyConstraint, DateTime, func, true
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -13,6 +13,8 @@ class Dependency(db.Model):
     dependency_case_id = Column(String,
                                 ForeignKey('dependency_case.id', onupdate='CASCADE'))
     relatable_id = Column(String, ForeignKey('relatable.id'))
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
 
     dependency_case = relationship('DependencyCase', back_populates='dependencies')
     relatable = relationship('Relatable', back_populates='dependency')
@@ -28,4 +30,4 @@ def my_before_insert_listener(mapper, connection, dependency):
 
 
 def __update_id__(dependency):
-    dependency.id = dependency.dependency_case_id + dependency.relatable_id
+    dependency.id = dependency.dependency_case_id + ':' + dependency.relatable_id

@@ -1,16 +1,15 @@
 import json
-# from controllers.bakers.baker import BakerInterface
 import os
 from collections.abc import Iterable
 
 from json_stream.writer import StreamableList
 
 from controllers.output_controller import simplify_rows
-from plugins.aws.controller.aws import AwsServiceController
-from plugins.baker.controller.bakers import AbstractBakerController
+from plugins.aws.controllers.aws import AwsServiceController
+from plugins.bake.controllers.baking.abstract_bake import AbstractBakingController
 
 
-class HelmBakerController(AbstractBakerController):
+class FileBakingController(AbstractBakingController):
 
     def __init__(self, metadata):
         super().__init__(metadata)
@@ -37,7 +36,7 @@ class HelmBakerController(AbstractBakerController):
         svc_configs = simplify_rows(self.rest.get_field('service', self.deployment['service_id'], 'configs'))
 
         svc_cfg = [svc_cfg for svc_cfg in svc_configs if
-                   svc_cfg['template_id'] == 'helm_bake' and svc_cfg['name'] == 'default']
+                   svc_cfg['template_id'] == 'bake_files' and svc_cfg['name'] == 'default']
         assert len(svc_cfg) == 1
         cfg = svc_cfg[0]['config']
         data = json.loads(cfg)
