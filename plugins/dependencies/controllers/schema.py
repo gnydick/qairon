@@ -1,7 +1,9 @@
 class QaironSchema:
     CREATE_FIELDS = dict(
         dependency_case=[
-            'id'
+            'id',
+            'allowed_related_type',
+            'allowed_relationship'
         ],
         dependency=[
             {'dependency_case_id': {'dotters': {'completer': 'dependency_case_completer'}}},

@@ -11,8 +11,8 @@ class DependencyCase(db.Model):
     __tablename__ = 'dependency_case'
     exclude = []
     id = Column(String, primary_key=True)
-    allowed_related_type = Column(String)
-    allowed_relationship = Column(cardinality_types_enum)
+    allowed_related_type = Column(String, nullable=False)
+    allowed_relationship = Column(cardinality_types_enum, nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     dependencies = relationship('Dependency', back_populates='dependency_case')
