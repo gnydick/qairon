@@ -5,8 +5,8 @@ from collections.abc import Iterable
 from json_stream.writer import StreamableList
 
 from controllers.output_controller import simplify_rows
-from plugins.aws.controller.aws import AwsServiceController
-from plugins.bake.controller.baking.abstract_bake import AbstractBakingController
+from plugins.aws.controllers.aws import AwsServiceController
+from plugins.bake.controllers.baking.abstract_bake import AbstractBakingController
 
 
 class FileBakingController(AbstractBakingController):

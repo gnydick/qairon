@@ -1,4 +1,4 @@
-from plugins.aws.controller import AwsServiceController
+from plugins.aws.controllers import AwsServiceController
 
 aws = AwsServiceController()
 

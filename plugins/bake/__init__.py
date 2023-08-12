@@ -1,1 +1,1 @@
-from plugins.bake.controller import BakingBuilder
+from plugins.bake.controllers import BakingBuilder
