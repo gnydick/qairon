@@ -76,6 +76,7 @@ def _main_():
                         getattr(plugin, command)(**vars(args))
     except Exception as e:
         logger.error(e)
+        exit(255)
 
 
 if __name__ == '__main__':
