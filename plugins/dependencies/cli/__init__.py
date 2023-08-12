@@ -1,1 +1,1 @@
-from .dependencies import COMMANDS, add_related
+from .dependencies import COMMANDS, add_related, get_related

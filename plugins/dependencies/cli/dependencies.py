@@ -1,10 +1,11 @@
+from controllers import PrintingOutputController
 from plugins.dependencies.controllers import DependencyController
 
 dependencies = DependencyController()
 
 COMMANDS = dict(
     get_related=[
-        {'dependency_id': {'dotters': {'completer': 'dependency_completer'}}}
+        {'related_id': {'dotters': {'completer': 'related_completer'}}}
     ],
     add_related=[
         {'dependency_id': {'dotters': {'completer': 'dependency_completer'}}},
@@ -12,8 +13,11 @@ COMMANDS = dict(
     ]
 )
 
-
-def add_related(dependency_id, related_id, command=None, resource=None, q=False):
+oc = PrintingOutputController()
+def add_related(dependency_id, related_id, **kwargs):
     result = dependencies.add_related(dependency_id, related_id)
-    if not q:
-        print(result)
+    oc.handle(result, **kwargs)
+
+def get_related(related_id, **kwargs):
+    result = (dependencies.get_related(related_id))
+    oc.handle(result, **kwargs)

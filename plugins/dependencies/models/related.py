@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Enum, ForeignKeyConstraint, DateTime, func, true
+from sqlalchemy import Column, String, DateTime, func, true
 from sqlalchemy.orm import relationship
 
 from db import db
@@ -7,7 +7,7 @@ from db import db
 class Related(db.Model):
     __tablename__ = 'related'
     exclude = []
-    id = Column(String,  primary_key=True)
+    id = Column(String, primary_key=True)
     related_id = Column(String)
     type = Column(String)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
@@ -19,6 +19,12 @@ class Related(db.Model):
 
     def __repr__(self):
         return self.id
+
+    # @classmethod
+    # def get(cls, session, related_id):
+    #     load_polymorphic_instance(session, related_id)
+
+
 @db.event.listens_for(Related, 'before_update')
 @db.event.listens_for(Related, 'before_insert')
 def my_before_insert_listener(mapper, connection, related):

@@ -62,7 +62,7 @@ def my_before_write_listener(mapper, connection, deployment):
 
 # DO NOT DELETE THIS SAMPLE CODE
 # @db.event.listens_for(Deployment, 'init')
-# def received_init(deployment, args, kwargs):
+# def received_init(deployment, args, **kwargs):
 #     from models import Service, Config
 #     svc = db.session.query(Service).filter(Service.id == kwargs['service_id']).first()
 #     for sc in svc.service_config_templates:

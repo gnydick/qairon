@@ -25,7 +25,8 @@ class RestController:
         collection = dict()
         collection['data'] = []
         for wrapper in owner:
-            collection['data'] + wrapper
+            for wraps in wrapper:
+                collection['data'].append({'id': wraps['id'], 'type': singular_resource})
         collection['data'].append({'type': singular_resource, 'id': col_res_id})
         return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
 
@@ -193,7 +194,7 @@ class RestController:
             res_url += '/' + resource_id
         return requests.post(res_url, data=data, json=json, params=params, headers=headers)
 
-    def update_resource(self, resource, resource_id, json={}, q=False):
+    def update_resource(self, resource, resource_id, json={}, **kwargs):
         return self._put_rest_(resource, resource_id, data=None, json=json)
 
     def _put_rest_(self, resource, resource_id, collection, data=None, json=None, params={}, headers=HEADERS):
@@ -244,7 +245,7 @@ class RestController:
                 data = rdata['data']
                 yield data
 
-    def query(self, resource, query=None, output_fields=None):
+    def query(self, resource, query=None):
         return self._query_(resource, query=query)
 
     def list(self, resource):

@@ -139,7 +139,7 @@ class CLIArgs:
             __add_get_field_parser__(self.rest, parsers_for_model_parser, model)
             __add_get_field_query_parser__(self.rest, parsers_for_model_parser, model)
             _model_com_get_parser = parsers_for_model_parser.add_parser('get')
-            _model_com_get_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
+            _model_com_get_parser.add_argument('resource_id').completer = getattr(self.rest, '%s_completer' % model)
             _model_com_get_parser.add_argument('-f', help='output field for related object', dest='output_fields',
                                                action='append')
             _model_com_get_parser.add_argument('-o', help='format: [ json(default) | plain ]', dest='output_format')

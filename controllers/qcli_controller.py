@@ -14,74 +14,76 @@ class QCLIController:
     def __init__(self, output_controller):
         self.oc = output_controller
 
-    def get(self, resource, id, command=None, output_fields=None, output_format=None, q=False):
-        row = rest.get_instance(resource, id)
-        self.oc.handle(q, row, output_fields=output_fields, output_format=output_format)
+    def get(self, resource, resource_id, **kwargs):
+        row = rest.get_instance(resource, resource_id)
+        self.oc.handle(row, **kwargs)
 
-    def list(self, resource, command=None, output_fields=None,
-             output_format=None, q=False):
+    def list(self, resource, **kwargs):
         rows = rest.query(resource)
-        self.oc.handle(q, rows, output_fields=output_fields,
-                       output_format=output_format)
+        self.oc.handle(rows, **kwargs)
 
-    def query(self, resource, command=None, query=None, output_fields=None, output_format=None, q=False):
-        rows = rest.query(resource, query, output_fields)
-        self.oc.handle(q, rows, output_fields=output_fields,
-                       output_format=output_format)
+    def query(self, resource, query=None, **kwargs):
+        rows = rest.query(resource, query, **kwargs)
+        self.oc.handle(rows, **kwargs)
 
 
 
     # This will always return a list of IDs
-    def get_field(self, resource, id, field, command=None,
-                  output_fields=None,
-                  output_format=None, q=False):
+    def get_field(self, resource, id, field, **kwargs):
 
         value = rest._get_all_(resource, id, path=field)
-        self.oc.handle(q, value, output_fields=output_fields,
-                       output_format=output_format)
+        self.oc.handle(value, **kwargs)
 
-    def get_parent(self, resource, relation, command=None, id=None, q=False):
-        value = rest.get_field(resource, id, field=relation, index='relationships')
-        if not q:
+    def get_parent(self, resource, relation, resource_id=None, **kwargs):
+        value = rest.get_field(resource, resource_id, field=relation, index='relationships')
+        q = kwargs.get('q', False)
+        if q is False:
             print(value['data']['id'])
 
-    def get_collection(self, resource, collection, command=None, id=None, q=False):
+    def add_to_collection(self, resource, singular_resource, items, owner_id, item_id, **kwargs):
+        response = rest.add_to_many_to_many(resource, owner_id, singular_resource, items, item_id)
+
+    def get_collection(self, resource, collection, resource_id=None, **kwargs):
 
         # receives a stream of rows via yield
         # simplejson can handle a stream of objects and print them as array
-        data = rest._get_all_(resource, id, collection)
-        if not q:
+        data = rest._get_all_(resource, resource_id, collection)
+        q = kwargs.get('q', False)
+        if q is False:
             print(json.dumps(SerializableGenerator(iter(data))))
 
-    def set_field(self, resource, id, field, value, command=None, q=False):
-        response = self._set_field_(resource, id, field, value)
-        if not q:
+    def set_field(self, resource, resource_id, field, value, **kwargs):
+        response = self._set_field_(resource, resource_id, field, value)
+        q = kwargs.get('q', False)
+        if q is False:
             if response.status_code == 200:
                 print(response.json()['id'] + ': ' + field + '=' + value)
 
-    def set_version(self, id, version, resource, command=None, q=False):
-        body = {"id": id, "version": version}
-        response = rest.update_resource(resource, id, json=body)
+    def set_version(self, resource_id, version, resource, **kwargs):
+        body = {"id": resource_id, "version": version}
+        response = rest.update_resource(resource, resource_id, json=body)
         if response.status_code == 200:
+            q = kwargs.get('q', False)
             if q is False:
-                print(id + ' ' + version)
+                print(resource_id + ' ' + version)
 
-    def promote(self, resource, srcid, dstid, command=None, q=False):
+    def promote(self, resource, srcid, dstid, **kwargs):
         src_version = rest.get_instance('deployment', srcid)['version']
         response = self._set_field_('deployment', dstid, 'version', src_version)
-
-        if not q:
+        q = kwargs.get('q', False)
+        if q is False:
             if response.status_code == 200:
                 print(dstid + ' ' + src_version)
 
     def __create__(self, args_dict):
         return rest.create_resource(args_dict)
 
-    def create(self, args_dict, q=False):
+    def create(self, args_dict, **kwargs):
         results = self.__create__(args_dict)
         outer_data = results.json()
         data = outer_data['data']
-        if not q:
+        q = kwargs.get('q', False)
+        if q is False:
             if results.status_code == 201:
                 if 'id' in data.keys():
                     print(data['id'])
@@ -91,45 +93,31 @@ class QCLIController:
                 print(results.reason)
                 exit(255)
 
-    def delete(self, resource, id, command=None, q=False):
-        results = rest.delete_resource(resource, id)
+    def delete(self, resource, resource_id, **kwargs):
+        results = rest.delete_resource(resource, resource_id)
         if results.status_code == 204:
-            if not q:
-                print(id + '-' + str(results.status_code))
+            q = kwargs.get('q', False)
+            if q is False:
+                print(resource_id + '-' + str(results.status_code))
 
-    def allocate_subnet(self, resource, id, command=None, additional_mask_bits=None, name=None, output_format=None,
-                        q=False):
-        results = rest.allocate_subnet(id, additional_mask_bits, name)
+    def allocate_subnet(self, network_id, additional_mask_bits, name, **kwargs):
+        results = rest.allocate_subnet(network_id, additional_mask_bits, name)
         outer_data = results.json()
         data = outer_data['data']
-        if not q:
+        q = kwargs.get('q', False)
+        if q is False:
             if 200 <= results.status_code <= 299:
-                wrapper = simplify_rows(data)
-                for clean in wrapper:
-                    if output_format == 'json':
-                        print(json.dumps(clean))
-                    else:
-                        print(clean)
+                output_format = kwargs.get('output_format', None)
+                if output_format is None:
+                    output_format = 'json'
+                if output_format == 'json':
+                    self.oc.handle(data)
             else:
                 print(results.status_code)
 
-    def clone_nodegroup(self, id, name, resource, command=None, version=None, q=False):
-        nodegroup = rest.get_instance('deployment', id)
 
-        subnets = nodegroup['subnets']
-        nodegroup['name'] = name
-        nodegroup.pop('id')
-        nodegroup['resource'] = 'nodegroup'
 
-        response = rest.create_resource(nodegroup)
-        status_code = response.status_code
-        new_dep_id = response.json()['id']
-
-        if status_code == 201:
-            if not q:
-                print(new_dep_id)
-
-    def clone_deployment(self, id, deployment_target_id, resource, command=None, version=None, q=False):
+    def clone_deployment(self, id, deployment_target_id, resource, command=None, version=None, **kwargs):
         dep = rest.get_instance('deployment', id)
         configs = dep['configs']
         dep_procs = dep['deployment_proces']
@@ -191,7 +179,8 @@ class QCLIController:
                             status_code = memory_status_code
 
         if status_code == 201:
-            if not q:
+            q = kwargs.get('q', False)
+            if q is False:
                 print(new_dep_id)
 
     def __clone_config__(self, config, deployment_id):
@@ -200,14 +189,15 @@ class QCLIController:
         config['resource'] = 'config'
         return config
 
-    def clone_config(self, id, deployment_id, resource, command=None, version=None, q=False):
+    def clone_config(self, id, deployment_id, **kwargs):
         config = rest.get_instance('config', id)
         new_config = self.__clone_config__(config, deployment_id)
         response = rest.create_resource(new_config)
         status_code = response.status_code
         new_config_id = response.json()['id']
         if status_code == 201:
-            if not q:
+            q = kwargs.get('q', False)
+            if q is False:
                 print(new_config_id)
 
     def _set_field_(self, resource, resource_id, field, value):
@@ -224,3 +214,19 @@ class QCLIController:
         envvars = os.environ.copy()
 
         call(command, env=envvars)
+def clone_nodegroup(resource_id, name, **kwargs):
+    nodegroup = rest.get_instance('deployment', resource_id)
+
+    subnets = nodegroup['subnets']
+    nodegroup['name'] = name
+    nodegroup.pop('id')
+    nodegroup['resource'] = 'nodegroup'
+
+    response = rest.create_resource(nodegroup)
+    status_code = response.status_code
+    new_dep_id = response.json()['id']
+
+    if status_code == 201:
+        q = kwargs.get('q', False)
+        if q is False:
+            print(new_dep_id)

@@ -15,19 +15,21 @@ COMMANDS = dict(
 )
 
 
-def bake(deployment_id, build_id, release_job_number, resource=None, command=None, q=False):
+def bake(deployment_id, build_id, release_job_number, resource=None, **kwargs):
     baker_builder = BakerBuilder(deployment_id, build_id, release_job_number)
     baker = baker_builder.build()
     result = baker.bake()
-    if not q:
+    q = kwargs.get('q', False)
+    if q is False:
         if result is not None:
             print(result)
 
 
-def files(deployment_id, build_id, release_job_number, resource=None, command=None, q=False):
+def files(deployment_id, build_id, release_job_number, resource=None, **kwargs):
     baker_builder = BakerBuilder(deployment_id, build_id, release_job_number)
     baker = baker_builder.files()
     result = baker.bake()
-    if not q:
+    q = kwargs.get('q', False)
+    if q is False:
         if result is not None:
             print(result)

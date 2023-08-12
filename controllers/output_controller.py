@@ -22,14 +22,16 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def simplify_row(row, output_fields=None):
+def simplify_row(row, **kwargs):
     if 'relationships' in row:
         for k, v in row['relationships'].items():
             if type(v['data']) == dict:
                 row['attributes'][k + '_id'] = v['data']['id']
 
     output = dict()
-    if output_fields:
+
+    output_fields = kwargs.get('output_fields', None)
+    if output_fields is not None:
         keys = output_fields
         if 'id' in keys:
             output['id'] = row['id']
@@ -43,39 +45,42 @@ def simplify_row(row, output_fields=None):
 
 
 @streamable_list
-def simplify_rows(batches, output_fields=None):
+def simplify_rows(batches, **kwargs):
+    output_fields = kwargs.get('output_fields', None)
     if type(batches) == dict:
-        cleaned = simplify_row(batches, output_fields)
+        cleaned = simplify_row(batches, **kwargs)
         yield cleaned
     else:
         for batch in batches:
             if type(batch) == dict:
-                yield simplify_row(batch, output_fields)
+                yield simplify_row(batch, **kwargs)
             elif type(batch) == list:
                 for row in batch:
-                    yield simplify_row(row, output_fields)
+                    yield simplify_row(row, **kwargs)
 
 
 class AbstractOutputController(ABC):
 
-    def handle(self, q, data, output_fields=None, output_format=None):
-        if not q:
+    def handle(self, data, **kwargs):
+        q = kwargs.get('q', False)
+        if q is False:
             if type(data) == dict:
-                results = simplify_row(data, output_fields)
-                self._output_(results, output_format)
+                results = simplify_row(data, **kwargs)
+                self._output_(results, **kwargs)
             elif isinstance(data, Iterable):
-                results = simplify_rows(data, output_fields)
-                self._output_(results, output_format)
+                results = simplify_rows(data, **kwargs)
+                self._output_(results, **kwargs)
 
 
 class PrintingOutputController(AbstractOutputController):
 
-    def _output_(self, data, output_format=None):
+    def _output_(self, data, **kwargs):
+        output_format = kwargs.get('output_format', None)
         if output_format is None:
             output_format = 'json'
-
         if output_format == 'json':
-            json.dump(data, sys.stdout)
+            output = json.dumps(data)
+            print(output)
         elif output_format == 'plain':
             if type(data) == dict:
                 print(' '.join(str(x) for x in data.values()))
@@ -89,7 +94,8 @@ class StringIOOutputController(AbstractOutputController):
     def __init__(self, stringIO):
         self.stringIO = stringIO
 
-    def _output_(self, data, output_format=None):
+    def _output_(self, data, **kwargs):
+        output_format = kwargs.get('output_format', None)
         if output_format is None:
             output_format = 'json'
 
@@ -108,7 +114,8 @@ class IterableOutputController(AbstractOutputController):
     def __init__(self, iterable):
         self.iterable = iterable
 
-    def _output_(self, data, output_format=None):
+    def _output_(self, data, **kwargs):
+        output_format = kwargs.get('output_format', None)
         if output_format is None:
             output_format = 'json'
 

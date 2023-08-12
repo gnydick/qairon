@@ -48,7 +48,7 @@ def _main_():
                     if args.command == 'assign_zone':
                         args_dict = vars(args)
                         args_dict['items'] = 'zones'
-                        cli.add_to_collection(**args_dict)
+                        cli.add_to_collection(singular_resource='zone', **args_dict)
                     elif args.command == 'unassign_zone':
                         args_dict = vars(args)
                         args_dict['items'] = 'zones'

@@ -66,8 +66,7 @@ def step_impl(context, environment_id, provider_type_id, native_id):
 @then(
     'allocate subnet "{network_id}" from vpc_cidr "{cidr}" with "{additional_mask_bits}" additional bits named "{subnet_name}" via cli')
 def step_impl(context, network_id, cidr, additional_mask_bits, subnet_name):
-    context.cli.allocate_subnet(None, id=network_id, additional_mask_bits=additional_mask_bits, output_format='json',
-                                name=subnet_name)
+    context.cli.allocate_subnet(network_id, additional_mask_bits, subnet_name)
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
     context.stdout_mock.truncate(0)

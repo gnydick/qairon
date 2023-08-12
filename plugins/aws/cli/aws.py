@@ -25,27 +25,30 @@ COMMANDS = dict(
 
 
 def register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None, command=None,
-                    resource=None, q=False):
+                    resource=None, **kwargs):
     result = aws.register_secret(deployment_id, secret_id, secret_name, secret_value, secret_tag=secret_tag,
                                  kms_key_alias=kms_key_alias)
-    if not q:
+    q = kwargs.get('q', False)
+    if q is False:
         print(result)
 
 
 def update_secret(deployment_id, secret_name, secret_value, secret_tag="default", kms_key_alias=None,
-                  resource=None, command=None, q=False):
+                  resource=None, **kwargs):
     """
     Creates a new secret. The secret value can be a string or bytes.
     """
     result = aws.update_secret(deployment_id, secret_name, secret_value, secret_tag, kms_key_alias=kms_key_alias)
-    if not q:
+    q = kwargs.get('q', False)
+    if q is False:
         print(result)
 
 
-def get_secret_string(resource, command, deployment_id, secret_name, q=False):
+def get_secret_string(resource, command, deployment_id, secret_name, **kwargs):
     result = aws.get_secret_string_for_deployment(deployment_id, secret_name)
     if result is not None:
-        if not q:
+        q = kwargs.get('q', False)
+        if q is False:
             print(result['SecretString'])
     else:
         print(result)

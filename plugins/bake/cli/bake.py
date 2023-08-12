@@ -9,10 +9,11 @@ COMMANDS = dict(
 )
 
 
-def files(deployment_id, build_id, release_job_number, resource=None, command=None, q=False):
+def files(deployment_id, build_id, release_job_number, resource=None, **kwargs):
     baking_builder = BakingBuilder(deployment_id, build_id, release_job_number)
     bake = baking_builder.build()
     result = bake.bake()
-    if not q:
+    q = kwargs.get('q', False)
+    if q is False:
         if result is not None:
             print(result)
