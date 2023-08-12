@@ -12,9 +12,9 @@ class BuildArtifact(db.Model):
     __tablename__ = "build_artifact"
     id = Column(String, primary_key=True)
 
-    build_id = Column(String, ForeignKey('build.id',  onupdate='CASCADE'), nullable=False, index=true)
-    input_repo_id = Column(String, ForeignKey('repo.id',  onupdate='CASCADE'), nullable=False, index=true)
-    output_repo_id = Column(String, ForeignKey('repo.id',  onupdate='CASCADE'), nullable=False, index=true)
+    build_id = Column(String, ForeignKey('build.id'), nullable=False, index=true)
+    input_repo_id = Column(String, ForeignKey('repo.id'), nullable=False, index=true)
+    output_repo_id = Column(String, ForeignKey('repo.id'), nullable=False, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     name = Column(String, nullable=False)
@@ -33,9 +33,9 @@ class ReleaseArtifact(db.Model):
     exclude = []
     __tablename__ = "release_artifact"
     id = Column(String, primary_key=True)
-    release_id = Column(String, ForeignKey('release.id',  onupdate='CASCADE'), nullable=False)
-    input_repo_id = Column(String, ForeignKey('repo.id',  onupdate='CASCADE'), nullable=False)
-    output_repo_id = Column(String, ForeignKey('repo.id',  onupdate='CASCADE'), nullable=False)
+    release_id = Column(String, ForeignKey('release.id'), nullable=False)
+    input_repo_id = Column(String, ForeignKey('repo.id'), nullable=False)
+    output_repo_id = Column(String, ForeignKey('repo.id'), nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     name = Column(String, nullable=False)

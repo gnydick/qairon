@@ -11,7 +11,7 @@ class Service(db.Model):
 
     __tablename__ = "service"
     id = Column(String, primary_key=True)
-    stack_id = Column(String, ForeignKey('stack.id',  onupdate='CASCADE'), nullable=False, index=true)
+    stack_id = Column(String, ForeignKey('stack.id'), nullable=False, index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     name = Column(String, nullable=False, index=true)

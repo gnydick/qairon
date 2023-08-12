@@ -11,8 +11,8 @@ class DeploymentConfig(db.Model):
     __tablename__ = "deployment_config"
     id = Column(String, primary_key=True)
 
-    config_template_id = Column(String, ForeignKey('config_template.id',  onupdate='CASCADE'), index=true)
-    deployment_id = Column(String, ForeignKey('deployment.id',  onupdate='CASCADE'), index=true)
+    config_template_id = Column(String, ForeignKey('config_template.id'), index=true)
+    deployment_id = Column(String, ForeignKey('deployment.id'), index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     name = Column(String, nullable=False, index=true)
@@ -36,8 +36,8 @@ class ServiceConfig(db.Model):
     __tablename__ = "service_config"
     id = Column(String, primary_key=True)
 
-    config_template_id = Column(String, ForeignKey('config_template.id',  onupdate='CASCADE'))
-    service_id = Column(String, ForeignKey('service.id',  onupdate='CASCADE'))
+    config_template_id = Column(String, ForeignKey('config_template.id'))
+    service_id = Column(String, ForeignKey('service.id'))
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     name = Column(String, nullable=False)
@@ -59,8 +59,8 @@ class StackConfig(db.Model):
     __tablename__ = "stack_config"
     id = Column(String, primary_key=True)
 
-    config_template_id = Column(String, ForeignKey('config_template.id',  onupdate='CASCADE'))
-    stack_id = Column(String, ForeignKey('stack.id',  onupdate='CASCADE'))
+    config_template_id = Column(String, ForeignKey('config_template.id'))
+    stack_id = Column(String, ForeignKey('stack.id'))
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     name = Column(String, nullable=False)

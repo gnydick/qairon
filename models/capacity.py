@@ -11,8 +11,8 @@ class Capacity(db.Model):
     __tablename__ = "capacity"
 
     id = Column(String, primary_key=True)
-    fleet_id = Column(String, ForeignKey('fleet.id',  onupdate='CASCADE'), index=true)
-    allocation_type_id = Column(String, ForeignKey('allocation_type.id',  onupdate='CASCADE'), index=true)
+    fleet_id = Column(String, ForeignKey('fleet.id'), index=true)
+    allocation_type_id = Column(String, ForeignKey('allocation_type.id'), index=true)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
     value = Column(Float, nullable=False)
