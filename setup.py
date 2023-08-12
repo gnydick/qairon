@@ -28,7 +28,7 @@ importlib_backport_requires = ["importlib-metadata >= 0.23, < 5"]
 
 setup(
     name='qairon-qcli',
-    version='1.0.5',
+    version='1.1.0',
     url='https://github.com/gnydick/qairon',
     project_urls={},
     license='MIT',
