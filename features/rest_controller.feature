@@ -47,9 +47,8 @@ Feature: REST
 
 
   Scenario: cleanup
-    Then remove second "zone" from "zones" "testenv:testprovider_type:testprovider:testregion:testzone2" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
-    And remove first "zone" from "zones" "testenv:testprovider_type:testprovider:testregion:testzone" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
-
+    Then remove second - "1" - "zone" from "zones" "testenv:testprovider_type:testprovider:testregion:testzone2" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
+    And  remove first - "0" - "zone" from "zones" "testenv:testprovider_type:testprovider:testregion:testzone" on "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via rest
 
     When delete "deployment_config" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:testcfgtmpl:testdepcfg:tag" via rest
     When delete "service_config" "testapp:teststack:testservice:testcfgtmpl:testsvccfg:tag" via rest
