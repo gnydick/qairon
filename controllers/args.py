@@ -89,7 +89,8 @@ def __add_get_field_query_parser__(rest, parsers, resource):
 
 
 class CLIArgs:
-    plugins_installed = 'aws', 'bake', 'baker', 'dependencies'
+    plugins_installed = 'aws', 'bake', 'dependencies'
+
 
     def __init__(self, rest):
         self.rest = rest
