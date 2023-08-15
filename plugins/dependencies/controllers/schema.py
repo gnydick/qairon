@@ -2,20 +2,21 @@ class QaironSchema:
     CREATE_FIELDS = dict(
         dependency_case=[
             'id',
-            'allowed_related_type',
+            'relatable_type',
+            'related_type',
             'allowed_relationship'
         ],
         dependency=[
             {'dependency_case_id': {'dotters': {'completer': 'dependency_case_completer'}}},
-            'relatable_id'
+            {'relatable_id': {'dotters': {'completer': 'relatable_completer'}}},
         ],
         relatable=[
             'type',
-            'relatable_id'
+            'object_id'
         ],
         related=[
             'type',
-            'related_id'
+            'object_id'
         ]
     )
 

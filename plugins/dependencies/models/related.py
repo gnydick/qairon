@@ -8,7 +8,7 @@ class Related(db.Model):
     __tablename__ = 'related'
     exclude = []
     id = Column(String, primary_key=True)
-    related_id = Column(String)
+    object_id = Column(String)
     type = Column(String)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
@@ -32,4 +32,4 @@ def my_before_insert_listener(mapper, connection, related):
 
 
 def __update_id__(related):
-    related.id = related.type + ':' + related.related_id
+    related.id = related.type + ':' + related.object_id

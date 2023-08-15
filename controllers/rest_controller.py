@@ -28,7 +28,10 @@ class RestController:
             for wraps in wrapper:
                 collection['data'].append({'id': wraps['id'], 'type': singular_resource})
         collection['data'].append({'type': singular_resource, 'id': col_res_id})
-        return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
+        response = self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
+        if response.status_code<=299 and response.status_code>=200:
+            return self.get_field(owner_res, owner_res_id, plural_resource)
+
 
     def del_from_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
         owner = self._get_all_(owner_res, owner_res_id, path=plural_resource)

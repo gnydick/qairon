@@ -41,7 +41,13 @@ class QCLIController:
             print(value['data']['id'])
 
     def add_to_collection(self, resource, singular_resource, items, owner_id, item_id, **kwargs):
-        response = rest.add_to_many_to_many(resource, owner_id, singular_resource, items, item_id)
+        result = rest.add_to_many_to_many(resource, owner_id, singular_resource, items, item_id)
+        self.oc.handle(result)
+
+
+    def del_from_collection(self, resource, singular_resource, items, owner_id, item_id, **kwargs):
+        result = rest.del_from_many_to_many(resource, owner_id, singular_resource, items, item_id)
+        self.oc.handle(result)
 
     def get_collection(self, resource, collection, resource_id=None, **kwargs):
 

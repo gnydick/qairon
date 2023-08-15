@@ -9,7 +9,7 @@ class Relatable(db.Model):
     __tablename__ = 'relatable'
     exclude = []
     id = Column(String, primary_key=True)
-    relatable_id = Column(String, nullable=False)
+    object_id = Column(String, nullable=False)
     type = Column(String)
 
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
@@ -31,4 +31,4 @@ def my_before_insert_listener(mapper, connection, relatable):
 
 
 def __update_id__(relatable):
-    relatable.id = relatable.type + ':' + relatable.relatable_id
+    relatable.id = relatable.type + ':' + relatable.object_id

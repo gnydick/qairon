@@ -55,7 +55,7 @@ def _main_():
                         elif args.command == 'unassign_zone':
                             args_dict = vars(args)
                             args_dict['items'] = 'zones'
-                            cli.del_from_collection(**args_dict)
+                            cli.del_from_collection(singular_resource='zone', **args_dict)
                     elif args.resource == 'service':
                         if args.command == 'assign_repo':
                             args_dict = vars(args)

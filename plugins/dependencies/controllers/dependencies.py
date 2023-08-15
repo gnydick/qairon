@@ -22,6 +22,9 @@ class DependencyController:
         else:
             return self.rest.add_to_many_to_many('dependency', dependency_id, 'related', 'relateds', related_id)
 
+    def del_related(self, dependency_id, related_id, resource=None, **kwargs):
+        return self.rest.del_from_many_to_many('dependency', dependency_id, 'related', 'relateds', related_id)
+
     def get_related(self, related_id, **kwargs):
         (type, resource_id) = related_id.split(":")
         return self.rest.get_instance(type.lower(), resource_id, **kwargs)

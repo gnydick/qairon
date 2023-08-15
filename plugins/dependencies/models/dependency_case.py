@@ -11,7 +11,8 @@ class DependencyCase(db.Model):
     __tablename__ = 'dependency_case'
     exclude = []
     id = Column(String, primary_key=True)
-    allowed_related_type = Column(String, nullable=False)
+    relatable_type = Column(String, nullable=False)
+    related_type = Column(String, nullable=False)
     allowed_relationship = Column(cardinality_types_enum, nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
