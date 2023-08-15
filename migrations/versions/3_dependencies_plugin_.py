@@ -2,7 +2,7 @@
 
 Revision ID: 3_dependencies_plugin
 Revises: 2_use_alters
-Create Date: 2023-08-15 12:18:34.737372
+Create Date: 2023-08-15 13:37:47.509894
 
 """
 
@@ -115,6 +115,7 @@ def schema_downgrades():
     op.drop_index(op.f('ix_dependency_case_last_updated_at'), table_name='dependency_case')
     op.drop_index(op.f('ix_dependency_case_created_at'), table_name='dependency_case')
     op.drop_table('dependency_case')
+    op.execute("drop type public.relationship_type;")
     # ### end Alembic commands ###
 
 

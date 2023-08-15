@@ -731,6 +731,7 @@ def schema_downgrades():
     op.drop_index(op.f('ix_allocation_type_last_updated_at'), table_name='allocation_type')
     op.drop_index(op.f('ix_allocation_type_created_at'), table_name='allocation_type')
     op.drop_table('allocation_type')
+    op.execute("drop type public.watermark;")
     # ### end Alembic commands ###
 
 
