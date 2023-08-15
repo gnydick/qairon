@@ -205,8 +205,6 @@ def step_impl(context, dep_target_bin_id, service, tag, defaults):
 @when('add second - "{number}" - "{singular_resource}" to "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
 def step_impl(context, number, singular_resource, plural_resource, item_id, dest_resource, dest_id):
     response = context.rest.add_to_many_to_many(dest_resource, dest_id, singular_resource, plural_resource, item_id)
-    assert response.status_code == 204
-    response = context.rest.get_field(dest_resource, dest_id, plural_resource)
     assert len(response) == eval(number)
 
 
@@ -216,8 +214,6 @@ def step_impl(context, number, singular_resource, plural_resource, item_id, dest
     'remove second - "{number}" - "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
 def step_impl(context, number, singular_resource, plural_resource, item_id, dest_resource, dest_id):
     response = context.rest.del_from_many_to_many(dest_resource, dest_id, singular_resource, plural_resource, item_id)
-    assert response.status_code == 204
-    response = context.rest.get_field(dest_resource, dest_id, plural_resource)
     assert len(response) == eval(number)
 
 @then(

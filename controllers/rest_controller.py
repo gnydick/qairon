@@ -29,7 +29,7 @@ class RestController:
                 collection['data'].append({'id': wraps['id'], 'type': singular_resource})
         collection['data'].append({'type': singular_resource, 'id': col_res_id})
         response = self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
-        if response.status_code<=299 and response.status_code>=200:
+        if response.status_code==204:
             return self.get_field(owner_res, owner_res_id, plural_resource)
 
 
@@ -38,9 +38,9 @@ class RestController:
         collection = dict()
         for wrapper in owner:
             collection['data'] = list(filter(lambda x: x.get('id') != col_res_id, wrapper))
-        # collection['data'] = [{'type': singular_resource, 'id': x} for x in collection['data']]
-
-        return self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
+        response = self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
+        if response.status_code==204:
+            return self.get_field(owner_res, owner_res_id, plural_resource)
 
     def resource_get_search(self, prefix, resource):
         return self._get_search_(prefix, resource=resource)
