@@ -18,7 +18,7 @@ class Dependency(db.Model):
     name = Column(String, nullable=False)
 
     dependency_case = relationship('DependencyCase', back_populates='dependencies')
-    relatable = relationship('Relatable', back_populates='dependency')
+    relatable = relationship('Relatable', back_populates='dependencies')
     relateds = relationship('Related', secondary='dependency_relateds', back_populates="dependencies", lazy='select')
 
     def __repr__(self):

@@ -14,7 +14,7 @@ class Relatable(db.Model):
 
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
-    dependency = relationship('Dependency', back_populates='relatable')
+    dependencies = relationship('Dependency', back_populates='relatable')
 
     __mapper_args__ = {
         'polymorphic_on': type,
