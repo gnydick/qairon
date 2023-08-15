@@ -9,6 +9,7 @@ class QaironSchema:
         dependency=[
             {'dependency_case_id': {'dotters': {'completer': 'dependency_case_completer'}}},
             {'relatable_id': {'dotters': {'completer': 'relatable_completer'}}},
+            'name'
         ],
         relatable=[
             'type',

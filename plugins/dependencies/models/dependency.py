@@ -15,6 +15,7 @@ class Dependency(db.Model):
     relatable_id = Column(String, ForeignKey('relatable.id'))
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    name = Column(String, nullable=False)
 
     dependency_case = relationship('DependencyCase', back_populates='dependencies')
     relatable = relationship('Relatable', back_populates='dependency')
@@ -30,4 +31,4 @@ def my_before_insert_listener(mapper, connection, dependency):
 
 
 def __update_id__(dependency):
-    dependency.id = dependency.dependency_case_id + ':' + dependency.relatable_id
+    dependency.id = ':'.join([dependency.dependency_case_id, dependency.relatable_id, dependency.name])
