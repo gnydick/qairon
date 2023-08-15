@@ -1,7 +1,5 @@
-from flask_admin.contrib.sqla import ModelView
-
-from plugins.dependencies.models import Related
-from views import DefaultView
+from plugins.dependencies.models import DependencyCase
+from views import DefaultView, WithIdView
 
 
 @property
@@ -10,8 +8,8 @@ def column_exclude_list(self):
     return c
 
 
-class RelatedView(DefaultView):
-    model = Related
+class DependencyCaseView(WithIdView):
+    model = DependencyCase
     can_view_details = True
     form_excluded_columns = column_exclude_list
     column_searchable_list = ['id']

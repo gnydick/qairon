@@ -11,13 +11,13 @@ class DeploymentConfig(db.Model):
     __tablename__ = "deployment_config"
     id = Column(String, primary_key=True)
 
-    config_template_id = Column(String, ForeignKey('config_template.id'), index=true)
-    deployment_id = Column(String, ForeignKey('deployment.id'), index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
-    name = Column(String, nullable=False, index=true)
+    config_template_id = Column(String, ForeignKey('config_template.id'), index=True)
+    deployment_id = Column(String, ForeignKey('deployment.id'), index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
+    name = Column(String, nullable=False, index=True)
 
-    tag = Column(String, nullable=False, default='default', index=true)
+    tag = Column(String, nullable=False, default='default', index=True)
 
     config = Column(Text)
     defaults = Column(Text)

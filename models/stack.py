@@ -12,10 +12,10 @@ class Stack(db.Model):
     __tablename__ = "stack"
 
     id = Column(String, primary_key=True)
-    name = Column(String, nullable=False, index=true)
-    application_id = Column(String, ForeignKey('application.id'), nullable=False, index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    name = Column(String, nullable=False, index=True)
+    application_id = Column(String, ForeignKey('application.id'), nullable=False, index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     defaults = Column(Text)
 
     application = relationship('Application', back_populates='stacks')

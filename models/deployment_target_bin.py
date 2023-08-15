@@ -11,10 +11,10 @@ class DeploymentTargetBin(db.Model):
     __tablename__ = "deployment_target_bin"
 
     id = Column(String, primary_key=True)
-    name = Column(String, nullable=False, index=true, server_default='default')
-    deployment_target_id = Column(String, ForeignKey('deployment_target.id'), nullable=False, index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    name = Column(String, nullable=False, index=True, server_default='default')
+    deployment_target_id = Column(String, ForeignKey('deployment_target.id'), nullable=False, index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     defaults = Column(Text)
 
     deployment_target = relationship('DeploymentTarget', back_populates='deployment_target_bins')

@@ -9,14 +9,14 @@ class Deployment(db.Model):
 
     __tablename__ = "deployment"
     id = Column(String, primary_key=True)
-    deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id'), index=true)
-    service_id = Column(String, ForeignKey('service.id'), index=true)
+    deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id'), index=True)
+    service_id = Column(String, ForeignKey('service.id'), index=True)
     current_release_id = Column(String,
                                 ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey',
-                                           link_to_name=True), index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
-    tag = Column(String, nullable=False, default='default', index=true)
+                                           link_to_name=True), index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
+    tag = Column(String, nullable=False, default='default', index=True)
 
     defaults = Column(Text)
 

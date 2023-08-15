@@ -10,11 +10,11 @@ class Provider(db.Model):
 
     __tablename__ = "provider"
     id = Column(String, primary_key=True)
-    provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=False, index=true)
-    environment_id = Column(String, ForeignKey('environment.id'), nullable=False, index=true)
-    native_id = Column(String, index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=False, index=True)
+    environment_id = Column(String, ForeignKey('environment.id'), nullable=False, index=True)
+    native_id = Column(String, index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     defaults = Column(Text)
 
     environment = relationship("Environment", back_populates="providers")

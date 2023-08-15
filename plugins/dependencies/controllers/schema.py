@@ -16,6 +16,7 @@ class QaironSchema:
             'object_id'
         ],
         related=[
+            'dependency_id',
             'type',
             'object_id'
         ]

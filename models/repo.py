@@ -12,9 +12,9 @@ class Repo(db.Model):
 
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
-    repo_type_id = Column(String, ForeignKey('repo_type.id'), index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    repo_type_id = Column(String, ForeignKey('repo_type.id'), index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
 
     url = Column(String(253))
     defaults = Column(Text)

@@ -11,13 +11,13 @@ class Fleet(db.Model):
 
     __tablename__ = "fleet"
     id = Column(String, primary_key=True)
-    deployment_target_id = Column(String, ForeignKey('deployment_target.id'), index=true)
-    fleet_type_id = Column(String, ForeignKey('fleet_type.id'), index=true)
-    native_id = Column(String, index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    deployment_target_id = Column(String, ForeignKey('deployment_target.id'), index=True)
+    fleet_type_id = Column(String, ForeignKey('fleet_type.id'), index=True)
+    native_id = Column(String, index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
 
-    name = Column(String, index=true)
+    name = Column(String, index=True)
 
     defaults = Column(Text)
 

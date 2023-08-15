@@ -26,7 +26,6 @@ if exists(version_file):
 
 print(("version: %s" % version))
 
-
 if app.debug:
     from werkzeug.debug import DebuggedApplication
 
@@ -36,7 +35,6 @@ if app.debug:
 plugins_installed = ['dependencies']
 discovered_plugins = dict()
 
-
 migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
 qclimanager = APIManager(app, session=db.session)
@@ -44,6 +42,8 @@ qclimanager = APIManager(app, session=db.session)
 with app.app_context():
     def postprocessor(result, **kwargs):
         result = result['data']
+
+
     model_classes = []
     plugin_models = []
     for plugin_base_name in plugins_installed:
@@ -53,9 +53,9 @@ with app.app_context():
         if package_spec is not None:
             plugin_models = importlib.import_module(".".join([plugin_package.__name__, "models"]))
 
-
     model_classes = [getattr(models, m[0]) for m in inspect.getmembers(models, inspect.isclass) if
-                     m[1].__module__.startswith('models.')] + [getattr(plugin_models, m[0]) for m in inspect.getmembers(plugin_models, inspect.isclass)]
+                     m[1].__module__.startswith('models.')] + [getattr(plugin_models, m[0]) for m in
+                                                               inspect.getmembers(plugin_models, inspect.isclass)]
 
     for model_class in model_classes:
         custom_serializer = QcliSerializer(model_class, str(model_class), qclimanager, primary_key='id')
@@ -79,18 +79,13 @@ with app.app_context():
         'Resources': {},
         'Software': {
             'Services': {},
-            'Stacks': {
-                'Foo': {
-                    'Bar': {
-                        'Baz': {}
-                    }
-                }
-            }
+            'Stacks': {}
         },
         'CI/CD': {},
         'Deploy': {},
         'Templates': {},
-        'Types': {}
+        'Types': {},
+        'Plugins':{}
     }
 
 
@@ -100,11 +95,23 @@ with app.app_context():
             add_sub_category(v, k)
 
 
+    for plugin in discovered_plugins:
+        categories['Plugins'][plugin.capitalize()]={}
+
     for parent, children in categories.items():
         admin.add_category(parent)
         for k, v in children.items():
             admin.add_sub_category(k, parent)
             add_sub_category(v, k)
+
+    for plugin in discovered_plugins:
+        view_module = importlib.import_module(plugin_package.__name__ + '.views')
+        plugin_views = [member for name, member in inspect.getmembers(view_module, inspect.isclass)]
+        for plugin_view in plugin_views:
+            admin.add_view(plugin_view(plugin_view.model, db.session, category=plugin.capitalize()))
+
+
+
 
     admin.add_view(WithIdView(Environment, db.session, category='Global'))
     admin.add_view(WithIdView(Application, db.session, category='Software', name='Applications'))
@@ -151,9 +158,6 @@ with app.app_context():
 
     admin.add_view(WithIdView(RepoType, db.session, category='Types'))
     admin.add_view(DefaultView(Repo, db.session, category='CI/CD'))
-
-    # TODO look for each model in the plugin and create a view beneath a category of the name of the plugin
-
 
 from flask import Response
 

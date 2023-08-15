@@ -1,18 +1,22 @@
-from sqlalchemy import Column, String, DateTime, func, true
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, DateTime, func, ForeignKey
+from sqlalchemy.orm import relationship, validates
 
 from db import db
 
 
 class Related(db.Model):
     __tablename__ = 'related'
-    exclude = []
+    exclude = ['created_at', 'last_updated_at', 'dependency_case']
     id = Column(String, primary_key=True)
-    object_id = Column(String)
-    type = Column(String)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
-    dependencies = relationship('Dependency', secondary='dependency_relateds', back_populates="relateds", lazy='select')
+    dependency_id = Column(String, ForeignKey('dependency.id'), nullable=False)
+    object_id = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
+
+    dependency = relationship('Dependency', back_populates='relateds')
+    dependency_case = relationship('DependencyCase', secondary='dependency', viewonly=True, uselist=False)
+
     __mapper_args__ = {
         'polymorphic_on': type,
     }
@@ -20,9 +24,12 @@ class Related(db.Model):
     def __repr__(self):
         return self.id
 
-    # @classmethod
-    # def get(cls, session, related_id):
-    #     load_polymorphic_instance(session, related_id)
+    @validates('type')
+    def before_before_insert_listener(self, key, value):
+        if self.dependency_case.related_type == value:
+            return value
+        else:
+            raise Exception
 
 
 @db.event.listens_for(Related, 'before_update')
@@ -32,4 +39,4 @@ def my_before_insert_listener(mapper, connection, related):
 
 
 def __update_id__(related):
-    related.id = related.type + ':' + related.object_id
+    related.id = ':'.join([related.type, related.dependency.id, related.object_id])

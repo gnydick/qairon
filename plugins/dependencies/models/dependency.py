@@ -1,28 +1,33 @@
-from sqlalchemy import Column, ForeignKey, String, Enum, ForeignKeyConstraint, DateTime, func, true
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, ForeignKey, String, DateTime, func, UniqueConstraint
+from sqlalchemy.orm import relationship, validates
 
 from db import db
 
 
-
 class Dependency(db.Model):
     __tablename__ = 'dependency'
-    exclude = []
+    exclude = ['created_at', 'last_updated_at']
     id = Column(String, primary_key=True)
     dependency_case_id = Column(String,
-                                ForeignKey('dependency_case.id', onupdate='CASCADE'))
-    relatable_id = Column(String, ForeignKey('relatable.id'))
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+                                ForeignKey('dependency_case.id'))
+    relatable_id = Column(String, ForeignKey('relatable.id'), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     name = Column(String, nullable=False)
 
     dependency_case = relationship('DependencyCase', back_populates='dependencies')
     relatable = relationship('Relatable', back_populates='dependencies')
-    relateds = relationship('Related', secondary='dependency_relateds', back_populates="dependencies", lazy='select')
+    relateds = relationship('Related', back_populates='dependency')
+
+    UniqueConstraint(dependency_case_id, relatable_id, name='UniqueDependency')
 
     def __repr__(self):
         return self.id
+
+    @validates('relatable')
+    def before_before_insert_listener(self, key, relatable):
+        if self.dependency_case.relatable_type == relatable.type:
+            return relatable
 
 @db.event.listens_for(Dependency, 'before_update')
 @db.event.listens_for(Dependency, 'before_insert')

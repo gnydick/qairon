@@ -13,11 +13,11 @@ class Release(db.Model):
     __tablename__ = "release"
 
     id = Column(String, primary_key=True)
-    build_id = Column(String, ForeignKey('build.id'), nullable=False, index=true)
-    deployment_id = Column(String, ForeignKey('deployment.id'), nullable=False, index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
-    build_num = Column(Integer, nullable=False, index=true)
+    build_id = Column(String, ForeignKey('build.id'), nullable=False, index=True)
+    deployment_id = Column(String, ForeignKey('deployment.id'), nullable=False, index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
+    build_num = Column(Integer, nullable=False, index=True)
     defaults = Column(Text)
     build = relationship('Build', back_populates='releases')
 

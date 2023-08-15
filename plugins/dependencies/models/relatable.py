@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String
-from sqlalchemy import DateTime, func, true
+from sqlalchemy import DateTime, func
 from sqlalchemy.orm import relationship
 
 from db import db
@@ -7,13 +7,13 @@ from db import db
 
 class Relatable(db.Model):
     __tablename__ = 'relatable'
-    exclude = []
+    exclude = ['created_at', 'last_updated_at']
     id = Column(String, primary_key=True)
     object_id = Column(String, nullable=False)
     type = Column(String)
 
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     dependencies = relationship('Dependency', back_populates='relatable')
 
     __mapper_args__ = {

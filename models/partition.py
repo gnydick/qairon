@@ -11,11 +11,11 @@ class Partition(db.Model):
     __tablename__ = "partition"
 
     id = Column(String, primary_key=True)
-    region_id = Column(String, ForeignKey('region.id'), nullable=False, index=true)
-    native_id = Column(String, index=true)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=true)
-    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=true)
-    name = Column(String, nullable=False, index=true)
+    region_id = Column(String, ForeignKey('region.id'), nullable=False, index=True)
+    native_id = Column(String, index=True)
+    created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
+    last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
+    name = Column(String, nullable=False, index=True)
     defaults = Column(Text)
 
     region = relationship("Region", uselist=False, back_populates="partitions")
