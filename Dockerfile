@@ -1,7 +1,6 @@
 FROM python:3.9.2
 
 ENV FLASK_APP=app.py
-#ENV SECRET_KEY=12345 this needs to be baked in
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 ARG version

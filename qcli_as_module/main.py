@@ -1,14 +1,15 @@
+#!/usr/bin/env python3
 import io
 import sys
 from pathlib import Path
-
-from controllers import QCLIController, PrintingOutputController, StringIOOutputController, IterableOutputController
-
 PROJECT_DIR = Path(__file__).parents[1]
 
 sys.path.append(
     str(PROJECT_DIR)
 )
+from controllers import QCLIController, PrintingOutputController, StringIOOutputController, IterableOutputController
+
+
 
 ### JSON
 
