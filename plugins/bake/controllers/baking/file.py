@@ -1,3 +1,4 @@
+import ast
 import json
 import os
 from collections.abc import Iterable
@@ -76,6 +77,16 @@ class FileBakingController(AbstractBakingController):
 
             for field in instruction['fields']:
                 value = ''
+                if field['type'] == 'dict_env_var':
+                    jp = os.getenv(field['value']['var'])
+                    try:
+                        job_parameters = json.loads(jp)
+                    except:
+                        job_parameters = ast.literal_eval(jp)
+
+
+                    parameter = field['value']['parameter']
+                    value = job_parameters[parameter]
                 if field['type'] == 'meta_hash':
                     object_type = field['value']['object']
                     key = field['value']['key']

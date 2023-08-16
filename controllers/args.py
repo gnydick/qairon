@@ -89,7 +89,7 @@ def __add_get_field_query_parser__(rest, parsers, resource):
 
 
 class CLIArgs:
-    plugins_installed = 'aws', 'bake', 'dependencies'
+    plugins_installed = ['aws', 'bake', 'dependencies']
 
 
     def __init__(self, rest):
@@ -98,7 +98,7 @@ class CLIArgs:
         self.discovered_plugins = dict()
         for plugin_base_name in self.plugins_installed:
             plugin = 'plugins.%s' % plugin_base_name
-            plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
+            plugin_package = importlib.import_module(plugin)
             self.discovered_plugins[plugin] = plugin_package
             if hasattr(plugin_package, "controllers"):
                 package_spec = importlib.util.find_spec(plugin_package.__name__ + '.controllers.schema')
@@ -119,13 +119,14 @@ class CLIArgs:
     def __gen_parsers__(self, context_parsers):
         for plugin_base_name in self.plugins_installed:
             plugin = 'plugins.%s' % plugin_base_name
-            plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
+            plugin_package = importlib.import_module(plugin)
             self.discovered_plugins[plugin_base_name] = plugin_package
             if hasattr(plugin_package, "cli"):
+                cli_module = importlib.import_module(plugin_package.__name__ + '.cli')
                 plugin_parser = context_parsers.add_parser(plugin_base_name)
                 new_subparsers = plugin_parser.add_subparsers(help='command', dest='command')
                 new_subparsers.required = True
-                for command in plugin_package.COMMANDS.keys():
+                for command in cli_module.COMMANDS.keys():
                     parser = new_subparsers.add_parser(command)
                     __populate_args__(self.rest, parser, plugin_package.COMMANDS[command])
 
