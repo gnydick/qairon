@@ -38,13 +38,13 @@ setup(
     long_description=open('README.md').read(),
     install_requires=install_requires,
     entry_points = {
-        'console_scripts': ['qcli=qairon.qcli:_main_']
+        'console_scripts': ['qcli=qairon_cli.qcli:_main_']
     },
     extras_require={
         ':python_version == "3.9.2"': importlib_backport_requires
     },
     packages=find_packages(exclude=("features", "features.*", "models", "views", "views.*")),
-    scripts=['qairon/qcli.py'],
+    scripts=['qairon_cli/qcli.py'],
     zip_safe=False,
     include_package_data=True,
     platforms=['MacOS X', 'Posix'],
