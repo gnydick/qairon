@@ -81,7 +81,6 @@ class FileBakingController(AbstractBakingController):
                     except:
                         job_parameters = ast.literal_eval(jp)
 
-
                     parameter = field['value']['parameter']
                     value = job_parameters[parameter]
                 if field['type'] == 'meta_hash':
