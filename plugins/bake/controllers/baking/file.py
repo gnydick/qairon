@@ -1,9 +1,6 @@
 import ast
 import json
 import os
-from collections.abc import Iterable
-
-from json_stream.writer import StreamableList
 
 from controllers.output_controller import simplify_rows
 from plugins.aws.controllers.aws import AwsServiceController
