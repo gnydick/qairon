@@ -1,5 +1,4 @@
 import argparse
-import collections
 import json
 import sys
 from pathlib import Path
@@ -29,7 +28,7 @@ def _main_():
 
     ioc = IterableOutputController(results)
 
-    cli = CLIController(ioc)
+    cli = QCLIController(ioc)
     rest = RestController()
 
     ioc.handle(data=cli.query('deployment_target',
