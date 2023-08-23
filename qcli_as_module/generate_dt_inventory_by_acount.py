@@ -1,5 +1,5 @@
+#!/usr/bin/env python3
 import argparse
-import collections
 import json
 import sys
 from pathlib import Path
