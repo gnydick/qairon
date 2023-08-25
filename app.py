@@ -1,6 +1,5 @@
 import importlib
 import inspect
-import pkgutil
 from os.path import exists
 
 import json_api_doc
@@ -12,6 +11,7 @@ import models
 from base import app
 from controllers import RestController
 from db import db
+from lib import dynamic
 from models import *
 from serializers.default import QcliSerializer
 from views import *
@@ -32,9 +32,8 @@ if app.debug:
     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 
 ## server plugins
-plugins_installed = ['dependencies']
-discovered_plugins = dict()
 
+plugins_installed = dynamic.discover_namespace('plugins')
 migrate = Migrate(app, db)
 restmanager = APIManager(app, session=db.session)
 qclimanager = APIManager(app, session=db.session)
@@ -46,16 +45,16 @@ with app.app_context():
 
     model_classes = []
     plugin_models = []
-    for plugin_base_name in plugins_installed:
-        plugin_package = importlib.import_module('plugins.%s' % plugin_base_name)
-        discovered_plugins[plugin_base_name] = plugin_package
-        package_spec = importlib.util.find_spec(plugin_package.__name__ + '.models')
-        if package_spec is not None:
-            plugin_models = importlib.import_module(".".join([plugin_package.__name__, "models"]))
+    for module in dynamic.plugin_has_module('models'):
+        model_module = importlib.import_module('plugins.%s.%s' % (module, 'models'))
+        plugin_models = [member for name, member in inspect.getmembers(model_module, inspect.isclass)]
 
-    model_classes = [getattr(models, m[0]) for m in inspect.getmembers(models, inspect.isclass) if
-                     m[1].__module__.startswith('models.')] + [getattr(plugin_models, m[0]) for m in
-                                                               inspect.getmembers(plugin_models, inspect.isclass)]
+    for m in inspect.getmembers(models, inspect.isclass):
+        if m[1].__module__.startswith('models.'):
+            model_classes.append(getattr(models, m[0]))
+
+    for m in plugin_models:
+        model_classes.append(m)
 
     for model_class in model_classes:
         custom_serializer = QcliSerializer(model_class, str(model_class), qclimanager, primary_key='id')
@@ -85,7 +84,7 @@ with app.app_context():
         'Deploy': {},
         'Templates': {},
         'Types': {},
-        'Plugins':{}
+        'Plugins': {}
     }
 
 
@@ -95,23 +94,22 @@ with app.app_context():
             add_sub_category(v, k)
 
 
-    for plugin in discovered_plugins:
-        categories['Plugins'][plugin.capitalize()]={}
+    plugins_with_views = dynamic.plugin_has_module('views')
+
+    for plugin in plugins_with_views:
+        categories['Plugins'][plugin.capitalize()] = {}
 
     for parent, children in categories.items():
         admin.add_category(parent)
         for k, v in children.items():
             admin.add_sub_category(k, parent)
             add_sub_category(v, k)
-
-    for plugin in discovered_plugins:
-        view_module = importlib.import_module(plugin_package.__name__ + '.views')
+    for plugin in plugins_with_views:
+        categories['Plugins'][plugin.capitalize()] = {}
+        view_module = importlib.import_module('plugins.%s.%s' % (plugin, 'views'))
         plugin_views = [member for name, member in inspect.getmembers(view_module, inspect.isclass)]
         for plugin_view in plugin_views:
             admin.add_view(plugin_view(plugin_view.model, db.session, category=plugin.capitalize()))
-
-
-
 
     admin.add_view(WithIdView(Environment, db.session, category='Global'))
     admin.add_view(WithIdView(Application, db.session, category='Software', name='Applications'))

@@ -4,6 +4,8 @@ import logging
 import sys
 from pathlib import Path
 
+from lib import dynamic
+
 PROJECT_DIR = Path(__file__).parents[1]
 
 sys.path.append(
@@ -68,9 +70,10 @@ def _main_():
                     elif args.resource == 'test':
                         cli.test(args)
             else:
-                plugin_name = 'plugins.%s' % (args.resource)
-                if plugin_name in qaironargs.discovered_plugins:
-                    plugin = qaironargs.discovered_plugins[plugin_name]
+                potential_plugin_name = args.resource
+                plugins_with_cli = dynamic.plugin_has_module('cli')
+                if potential_plugin_name in plugins_with_cli:
+                    plugin = qaironargs.discovered_plugins[potential_plugin_name]
                     if args.command in plugin.COMMANDS.keys():
                         command = args.command
                         getattr(plugin, command)(**vars(args))

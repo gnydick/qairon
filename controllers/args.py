@@ -1,9 +1,9 @@
 import argparse
 import importlib
-import pkgutil
+
 import argcomplete
 
-from lib.dynamic import iter_namespace
+from lib import dynamic
 from .rest_controller import RestController
 from .schema import QaironSchema
 
@@ -89,17 +89,26 @@ def __add_get_field_query_parser__(rest, parsers, resource):
 
 
 class CLIArgs:
-    plugins_installed = ['aws', 'bake', 'dependencies']
-
 
     def __init__(self, rest):
         self.rest = rest
         self.model_subparsers = dict()
         self.discovered_plugins = dict()
-        for plugin_base_name in self.plugins_installed:
+
+        plugins_with_controllers = dynamic.plugin_has_module('controllers')
+        for plugin_with_controllers in plugins_with_controllers:
+            package_spec = importlib.util.find_spec('plugins.%s.%s' % (plugin_with_controllers, 'controllers.schema'))
+            if package_spec is not None:
+                module = importlib.import_module('plugins.%s.%s' % (plugin_with_controllers, 'controllers'))
+                qs = getattr(module, 'QaironSchema')
+                QaironSchema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
+                RestController.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
+
+
+        for plugin_base_name in [x.name for x in dynamic.discover_namespace('plugins')]:
             plugin = 'plugins.%s' % plugin_base_name
             plugin_package = importlib.import_module(plugin)
-            self.discovered_plugins[plugin] = plugin_package
+            self.discovered_plugins[plugin_base_name] = plugin_package
             if hasattr(plugin_package, "controllers"):
                 package_spec = importlib.util.find_spec(plugin_package.__name__ + '.controllers.schema')
                 if package_spec is not None:
@@ -109,7 +118,6 @@ class CLIArgs:
                     RestController.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
         __gen_completers__(rest)
 
-
         __gen_attr_completers__(rest, 'service', 'repos')
         __gen_attr_completers__(rest, 'deployment', 'zones')
 
@@ -117,7 +125,7 @@ class CLIArgs:
         return ['additional_mask_bits']
 
     def __gen_parsers__(self, context_parsers):
-        for plugin_base_name in self.plugins_installed:
+        for plugin_base_name in self.discovered_plugins.keys():
             plugin = 'plugins.%s' % plugin_base_name
             plugin_package = importlib.import_module(plugin)
             self.discovered_plugins[plugin_base_name] = plugin_package
