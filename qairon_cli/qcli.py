@@ -4,14 +4,14 @@ import logging
 import sys
 from pathlib import Path
 
-from lib import dynamic
+
 
 PROJECT_DIR = Path(__file__).parents[1]
 
 sys.path.append(
     str(PROJECT_DIR)
 )
-
+from lib import dynamic
 from controllers import CLIArgs
 from controllers import QCLIController
 from controllers import PrintingOutputController

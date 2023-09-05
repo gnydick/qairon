@@ -53,8 +53,9 @@ with app.app_context():
         if m[1].__module__.startswith('models.'):
             model_classes.append(getattr(models, m[0]))
 
+    plugin_model_classes = list()
     for m in plugin_models:
-        model_classes.append(m)
+        plugin_model_classes.append(m)
 
     for model_class in model_classes:
         custom_serializer = QcliSerializer(model_class, str(model_class), qclimanager, primary_key='id')
@@ -66,6 +67,15 @@ with app.app_context():
                                url_prefix='/api/qcli/v1', page_size=5, max_page_size=100,
                                allow_client_generated_ids=True, allow_to_many_replacement=True,
                                exclude=getattr(model_class, 'exclude'), serializer=custom_serializer)
+    for plugin_model_class in plugin_model_classes:
+        restmanager.create_api(plugin_model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
+                               url_prefix='/api/rest/v1', page_size=5, max_page_size=100,
+                               allow_client_generated_ids=True, allow_to_many_replacement=True,
+                               exclude=getattr(plugin_model_class, 'exclude'), collection_name=getattr(plugin_model_class, 'collection_name'))
+        qclimanager.create_api(plugin_model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
+                               url_prefix='/api/qcli/v1', page_size=5, max_page_size=100,
+                               allow_client_generated_ids=True, allow_to_many_replacement=True,
+                               exclude=getattr(plugin_model_class, 'exclude'), collection_name=getattr(plugin_model_class, 'collection_name'), serializer=custom_serializer)
 
     # set optional bootswatch theme
     admin = Admin(app, name='QAIRON: %s' % version, template_mode='bootstrap3', base_template='admin/master.html')

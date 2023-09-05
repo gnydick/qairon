@@ -35,11 +35,13 @@ def simplify_row(row, **kwargs):
         keys = output_fields
         if 'id' in keys:
             output['id'] = row['id']
+        if 'type' in keys:
+            output['type'] = row['type']
     else:
         keys = row['attributes'].keys()
         output['id'] = row['id']
 
-    for key in [x for x in keys if x != "id"]:
+    for key in [x for x in keys if x not in  ['id']]:
         output[key] = row['attributes'][key]
     return output
 

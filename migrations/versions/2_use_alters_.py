@@ -11,10 +11,6 @@ revision = '2_use_alters'
 down_revision = '1_starting_point'
 
 from alembic import op
-import sqlalchemy as sa
-
-
-from alembic import context
 
 
 def upgrade():

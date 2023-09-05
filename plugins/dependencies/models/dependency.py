@@ -5,12 +5,13 @@ from db import db
 
 
 class Dependency(db.Model):
-    __tablename__ = 'dependency'
+    collection_name = 'dependency'
+    __tablename__ = 'plugin_dependencies_dependency'
     exclude = ['created_at', 'last_updated_at']
     id = Column(String, primary_key=True)
     dependency_case_id = Column(String,
-                                ForeignKey('dependency_case.id'))
-    relatable_id = Column(String, ForeignKey('relatable.id'), nullable=False)
+                                ForeignKey('plugin_dependencies_dependency_case.id'))
+    relatable_id = Column(String, ForeignKey('plugin_dependencies_relatable.id'), nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     name = Column(String, nullable=False)
@@ -26,7 +27,7 @@ class Dependency(db.Model):
 
     @validates('relatable')
     def before_before_insert_listener(self, key, relatable):
-        if self.dependency_case.relatable_type == relatable.type:
+        if self.dependency_case.relatable_type == relatable.relatable_type:
             return relatable
 
 @db.event.listens_for(Dependency, 'before_update')

@@ -10,11 +10,9 @@ Create Date: 2023-08-12 10:15:42.601509
 revision = '1_starting_point'
 down_revision = None
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
-
-from alembic import context
 
 
 def upgrade():

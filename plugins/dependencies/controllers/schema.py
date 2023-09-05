@@ -16,7 +16,7 @@ class QaironSchema:
             'object_id'
         ],
         related=[
-            'dependency_id',
+            {'dependency_id': {'dotters': {'completer': 'dependency_completer'}}},
             'type',
             'object_id'
         ]

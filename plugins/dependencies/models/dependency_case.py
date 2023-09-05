@@ -8,7 +8,8 @@ cardinality_types_enum = Enum(*cardinality_types, name='relationship_type')
 
 
 class DependencyCase(db.Model):
-    __tablename__ = 'dependency_case'
+    collection_name = 'dependency_case'
+    __tablename__ = 'plugin_dependencies_dependency_case'
     exclude = ['created_at', 'last_updated_at']
     id = Column(String, primary_key=True)
     relatable_type = Column(String, nullable=False)
