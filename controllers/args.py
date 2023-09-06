@@ -65,7 +65,7 @@ def __add_list_parser__(parsers):
 
 def __add_set_field_parser__(rest, parsers, resource):
     set_field_parser = parsers.add_parser('set_field')
-    set_field_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
+    set_field_parser.add_argument('resource_id').completer = getattr(rest, '%s_completer' % resource)
     set_field_parser.add_argument('field')
     set_field_parser.add_argument('value')
 
@@ -156,7 +156,7 @@ class CLIArgs:
             _model_com_create_parser = parsers_for_model_parser.add_parser('create')
             __populate_args__(self.rest, _model_com_create_parser, QaironSchema.CREATE_FIELDS[model])
             _model_com_delete_parser = parsers_for_model_parser.add_parser('delete')
-            _model_com_delete_parser.add_argument('id').completer = getattr(self.rest, '%s_completer' % model)
+            _model_com_delete_parser.add_argument('resource_id').completer = getattr(self.rest, '%s_completer' % model)
 
         service_subparsers = self.model_subparsers['service']
         assign_repo_parser = service_subparsers.add_parser('assign_repo')

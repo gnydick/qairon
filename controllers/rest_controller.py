@@ -197,8 +197,17 @@ class RestController:
             res_url += '/' + resource_id
         return requests.post(res_url, data=data, json=json, params=params, headers=headers)
 
+    def patch_resource(self, resource, resource_id, json={}, **kwargs):
+        return self._patch_rest_(resource, resource_id, data=None, json=json)
+
     def update_resource(self, resource, resource_id, json={}, **kwargs):
         return self._put_rest_(resource, resource_id, data=None, json=json)
+
+    def _patch_rest_(self, resource, resource_id, data=None, json=None, params={}, headers=HEADERS):
+        res_url = self.URL + resource
+        if resource_id is not None:
+            res_url += '/' + resource_id
+        return requests.patch(res_url, data, json=json, params=params, headers=headers)
 
     def _put_rest_(self, resource, resource_id, collection, data=None, json=None, params={}, headers=HEADERS):
         res_url = self.URL + resource

@@ -60,18 +60,13 @@ class QCLIController:
 
     def set_field(self, resource, resource_id, field, value, **kwargs):
         response = self._set_field_(resource, resource_id, field, value)
-        q = kwargs.get('q', False)
-        if q is False:
-            if response.status_code == 200:
-                print(response.json()['id'] + ': ' + field + '=' + value)
+        data = response.json()['data']
+        self.oc.handle(data)
 
     def set_version(self, resource_id, version, resource, **kwargs):
-        body = {"id": resource_id, "version": version}
-        response = rest.update_resource(resource, resource_id, json=body)
-        if response.status_code == 200:
-            q = kwargs.get('q', False)
-            if q is False:
-                print(resource_id + ' ' + version)
+        response = self._set_field_(resource, resource_id, "version", version)
+        data = response.json()['data']
+        self.oc.handle(data)
 
     def promote(self, resource, srcid, dstid, **kwargs):
         src_version = rest.get_instance('deployment', srcid)['version']
@@ -207,8 +202,8 @@ class QCLIController:
                 print(new_config_id)
 
     def _set_field_(self, resource, resource_id, field, value):
-        body = {"id": resource_id, field: value}
-        response = rest.update_resource(resource, resource_id, json=body)
+        body = {"data":{"id": resource_id, "type": resource, "attributes": {field: value}}}
+        response = rest.patch_resource(resource, resource_id, json=body)
         return response
 
     def jenkins(self, args):  # dir, git_url, recursive=False):
