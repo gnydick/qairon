@@ -9,11 +9,11 @@ sys.path.append(
     str(PROJECT_DIR)
 )
 
-from controllers import CLIArgs
-from controllers import CLIController
-from controllers import PrintingOutputController
-from controllers import RestController
-from controllers.schema import QaironSchema
+from qairon_qcli.controllers import CLIArgs
+from qairon_qcli.controllers import CLIController
+from qairon_qcli.controllers import PrintingOutputController
+from qairon_qcli.controllers import RestController
+from qairon_qcli.controllers import QaironSchema
 
 
 def _main_():

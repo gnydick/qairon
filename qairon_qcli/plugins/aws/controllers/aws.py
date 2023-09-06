@@ -2,7 +2,7 @@ import json
 
 from boto3 import session
 
-from controllers import RestController
+from qairon_qcli.controllers import RestController
 
 rest = RestController()
 

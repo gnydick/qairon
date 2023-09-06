@@ -1,5 +1,5 @@
-from controllers import RestController, CLIController
-from controllers.output_controller import simplify_row, simplify_rows, IterableOutputController
+from qairon_qcli.controllers import RestController, CLIController
+from qairon_qcli.controllers.output_controller import simplify_row, IterableOutputController
 
 from .baking import FileBakingController
 

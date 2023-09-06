@@ -1,7 +1,7 @@
 import json
 
-from controllers.output_controller import simplify_rows, IterableOutputController
-from controllers.cli_controller import CLIController
+from qairon_qcli.controllers.output_controller import IterableOutputController
+from qairon_qcli.controllers.cli_controller import CLIController
 
 class SubnetController:
 

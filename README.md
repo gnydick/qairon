@@ -64,7 +64,7 @@ password: <redacted>
 # QCLI
 ## Standalone Running & Debugging
 
-* Make sure to never have the package `qairon-qcli` installed in your runtime or else things will succeed that should
+* Make sure to never have the package `qairon_qcli` installed in your runtime or else things will succeed that should
 fail.
 * There is both a bash shim `./qcli` and the actual script that gets packaged `./qairon/qcli.py` that can be executed.
 * This bash shim is not packaged, it is a quick and dirty wrapper there for your convenience to be able to run the same
@@ -72,7 +72,7 @@ command, `qcli`, that you would normally run, as opposed to `qcli.py`
 
 
 ## Use as a module
-* once the `qairon-qcli` package is installed, you may 
+* once the `qairon_qcli` package is installed, you may 
 ```
 from qairon.qcli import CLIController as qcli
 ```

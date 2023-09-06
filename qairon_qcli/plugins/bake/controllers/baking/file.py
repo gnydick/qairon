@@ -2,9 +2,9 @@ import ast
 import json
 import os
 
-from controllers.output_controller import simplify_rows
-from plugins.aws.controllers.aws import AwsServiceController
-from plugins.bake.controllers.baking.abstract_bake import AbstractBakingController
+from qairon_qcli.controllers.output_controller import simplify_rows
+from qairon_qcli.plugins.aws.controllers import AwsServiceController
+from qairon_qcli.plugins.bake.controllers.baking.abstract_bake import AbstractBakingController
 
 
 class FileBakingController(AbstractBakingController):

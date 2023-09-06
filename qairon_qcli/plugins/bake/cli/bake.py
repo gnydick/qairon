@@ -1,4 +1,4 @@
-from plugins.bake.controllers import BakingBuilder
+from ..controllers import BakingBuilder
 
 COMMANDS = dict(
     files=[

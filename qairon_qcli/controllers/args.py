@@ -118,7 +118,7 @@ class CLIArgs:
 
         self.discovered_plugins = dict()
         for package_name in self.plugins_installed:
-            plugin = importlib.import_module('plugins.%s.cli' % package_name)
+            plugin = importlib.import_module('qairon_qcli.plugins.%s.cli' % package_name)
             ins = iter_namespace(plugin)
 
             for finder, name, ispkg in ins:

@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from controllers import RestController
-
 
 class AbstractBakingController(ABC):
 
