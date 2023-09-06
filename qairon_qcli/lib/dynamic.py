@@ -1,3 +1,4 @@
+import importlib
 import os
 import pkgutil
 
@@ -14,16 +15,15 @@ def discover_namespace(path):
     return __iter_namespace__(path)
 
 
-def plugin_has_module(wanted_module):
-    plugins_path = os.path.abspath('plugins')
+def plugin_has_module(wanted_module, package):
+    module = importlib.import_module(package)
 
-    # Iterate over all modules/packages in the base directory
-    all_modules = [name for finder, name, ispkg in pkgutil.iter_modules([plugins_path]) if ispkg]
+    all_modules = [name for finder, name, ispkg in pkgutil.iter_modules(module.__path__) if ispkg]
 
     hazzes_module = list()
 
     for mod in all_modules:
-        module_path = os.path.join(plugins_path, mod)
+        module_path = os.path.join(module.__path__[0], mod)
         sub_modules = [name for finder, name, ispkg in pkgutil.iter_modules([module_path])]
         if wanted_module in sub_modules:
             hazzes_module.append(mod)

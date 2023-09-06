@@ -1,6 +1,7 @@
 
-from plugins.dependencies.controllers import DependencyController
+
 from qairon_qcli.controllers import PrintingOutputController
+from qairon_qcli.plugins.dependencies.controllers import DependencyController
 
 COMMANDS = dict(
     get_related=[

@@ -1,22 +1,16 @@
-#!/usr/bin/env python3
+#!/home/gnydick/.pyenv/versions/3.9.2/envs/gen2-3.9.2/bin/python3.9
 # PYTHON_ARGCOMPLETE_OK
 import logging
-import sys
-from pathlib import Path
 
-PROJECT_DIR = Path(__file__).parents[1]
-
-sys.path.append(
-    str(PROJECT_DIR)
-)
-from lib import dynamic
 from qairon_qcli.controllers import CLIArgs
-from qairon_qcli.controllers import QCLIController
 from qairon_qcli.controllers import PrintingOutputController
-from qairon_qcli.controllers import RestController
+from qairon_qcli.controllers import QCLIController
 from qairon_qcli.controllers import QaironSchema
+from qairon_qcli.controllers import RestController
+from qairon_qcli.lib import dynamic
 
 logger = logging.getLogger()
+
 
 def _main_():
     try:
@@ -25,7 +19,8 @@ def _main_():
         qaironargs = CLIArgs(rest)
 
         (args, junk) = qaironargs.parse_args()
-        commands = ['delete', 'get', 'get_version', 'list', 'promote', 'query', 'get_field', 'get_field_query', 'set_field']
+        commands = ['delete', 'get', 'get_version', 'list', 'promote', 'query', 'get_field', 'get_field_query',
+                    'set_field']
         if hasattr(args, 'resource'):
             if args.resource in QaironSchema.MODELS:
                 if hasattr(args, 'command'):
@@ -69,7 +64,7 @@ def _main_():
                         cli.test(args)
             else:
                 potential_plugin_name = args.resource
-                plugins_with_cli = dynamic.plugin_has_module('cli')
+                plugins_with_cli = dynamic.plugin_has_module('cli', 'qairon_qcli.plugins')
                 if potential_plugin_name in plugins_with_cli:
                     plugin = qaironargs.discovered_plugins[potential_plugin_name]
                     if args.command in plugin.COMMANDS.keys():

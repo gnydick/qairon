@@ -3,7 +3,7 @@ import importlib
 
 import argcomplete
 
-from lib import dynamic
+from qairon_qcli.lib import dynamic
 from qairon_qcli.controllers.rest_controller import RestController
 from qairon_qcli.controllers.schema import QaironSchema
 
@@ -95,27 +95,17 @@ class CLIArgs:
         self.model_subparsers = dict()
         self.discovered_plugins = dict()
 
-        plugins_with_controllers = dynamic.plugin_has_module('controllers')
+        plugins_with_controllers = dynamic.plugin_has_module('controllers', 'qairon_qcli.plugins')
         for plugin_with_controllers in plugins_with_controllers:
-            package_spec = importlib.util.find_spec('plugins.%s.%s' % (plugin_with_controllers, 'controllers.schema'))
+            package_spec = importlib.util.find_spec('qairon_qcli.plugins.%s.%s' % (plugin_with_controllers, 'controllers.schema'))
             if package_spec is not None:
-                module = importlib.import_module('plugins.%s.%s' % (plugin_with_controllers, 'controllers'))
+                module = importlib.import_module('qairon_qcli.plugins.%s.%s' % (plugin_with_controllers, 'controllers'))
                 qs = getattr(module, 'QaironSchema')
                 QaironSchema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
                 RestController.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
 
 
-        for plugin_base_name in [x.name for x in dynamic.discover_namespace('plugins')]:
-            plugin = 'plugins.%s' % plugin_base_name
-            plugin_package = importlib.import_module(plugin)
-            self.discovered_plugins[plugin_base_name] = plugin_package
-            if hasattr(plugin_package, "controllers"):
-                package_spec = importlib.util.find_spec(plugin_package.__name__ + '.controllers.schema')
-                if package_spec is not None:
-                    module = importlib.import_module(plugin_package.__name__ + '.controllers')
-                    qs = getattr(module, 'QaironSchema')
-                    QaironSchema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
-                    RestController.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
+
         __gen_completers__(rest)
 
         __gen_attr_completers__(rest, 'service', 'repos')
@@ -125,8 +115,9 @@ class CLIArgs:
         return ['additional_mask_bits']
 
     def __gen_parsers__(self, context_parsers):
-        for plugin_base_name in self.discovered_plugins.keys():
-            plugin = 'plugins.%s' % plugin_base_name
+        plugins_with_controllers = dynamic.plugin_has_module('controllers','qairon_qcli.plugins')
+        for plugin_base_name in plugins_with_controllers:
+            plugin = 'qairon_qcli.plugins.%s' % plugin_base_name
             plugin_package = importlib.import_module(plugin)
             self.discovered_plugins[plugin_base_name] = plugin_package
             if hasattr(plugin_package, "cli"):
