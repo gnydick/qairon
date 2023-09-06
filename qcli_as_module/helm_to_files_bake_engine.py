@@ -1,8 +1,7 @@
-import io
 import sys
 from pathlib import Path
 
-from controllers import QCLIController, PrintingOutputController, StringIOOutputController, IterableOutputController, \
+from qairon_qcli.controllers import QCLIController, IterableOutputController, \
     RestController
 
 PROJECT_DIR = Path(__file__).parents[1]

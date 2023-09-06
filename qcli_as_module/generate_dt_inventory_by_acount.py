@@ -3,16 +3,13 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from time import sleep
-
-
 
 PROJECT_DIR = Path(__file__).parents[1]
 
 sys.path.append(
     str(PROJECT_DIR)
 )
-from controllers import *
+from qairon_qcli.controllers import *
 eks_clusters = dict()
 def _main_():
     parser = argparse.ArgumentParser(description='deployment_target inventory generator')

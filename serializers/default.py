@@ -1,6 +1,6 @@
 from flask_restless.serialization import DefaultSerializer
 
-from controllers.output_controller import AbstractOutputController, simplify_row
+from qairon_qcli.controllers.output_controller import AbstractOutputController, simplify_row
 
 
 class QcliSerializer(DefaultSerializer):

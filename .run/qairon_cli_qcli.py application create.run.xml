@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="qairon_cli/qcli.py application create" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="./qcli application create" type="PythonConfigurationType" factoryName="Python">
     <module name="qairon" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -9,7 +9,7 @@
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2-modern/bin/python" />
     <option name="SDK_NAME" value="Python 3.9 (qairon-3.9.2)" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="IS_MODULE_SDK" value="true" />
+    <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -22,7 +22,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="./qairon_cli/qcli.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon_qcli/qcli.py" />
     <option name="PARAMETERS" value="application create foo7" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

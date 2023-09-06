@@ -2,23 +2,23 @@
 import io
 import sys
 from pathlib import Path
+
+from qairon_qcli.controllers import QCLIController, PrintingOutputController, StringIOOutputController, IterableOutputController
+
 PROJECT_DIR = Path(__file__).parents[1]
 
 sys.path.append(
     str(PROJECT_DIR)
 )
-from controllers import QCLIController, PrintingOutputController, StringIOOutputController, IterableOutputController
-
-
 
 ### JSON
 
 ## stdout
-# # this will print to stdout, just like when running the plugins script
+# # this will print to stdout, just like when running the qcli script
 # poc = PrintingOutputController()
-# plugins = CLIController(poc)
-# # plugins.list('deployment')
-# plugins.get('service', 'withme:services:authentication-server_plugins')
+# qcli = CLIController(poc)
+# # qcli.list('deployment')
+# qcli.get('service', 'withme:services:authentication-server')
 
 ## StringIO
 # this will return a single string that will be parseable. e.g.
@@ -52,7 +52,6 @@ for row in results:
 poc = PrintingOutputController()
 qcli = QCLIController(poc)
 qcli.list('deployment')
-# plugins.get('service', 'withme:services:authentication-server_plugins', output_format='plain')
 
 ## StringIO
 file_like_string_io = io.StringIO()

@@ -27,8 +27,8 @@ tests_require = ["coverage", "flake8", "pexpect", "wheel", "behave"]
 importlib_backport_requires = ["importlib-metadata >= 0.23, < 5"]
 
 setup(
-    name='qairon-qcli',
-    version='1.2.0',
+    name='qairon_qcli',
+    version='1.1.2',
     url='https://github.com/gnydick/qairon',
     project_urls={},
     license='MIT',
@@ -38,13 +38,13 @@ setup(
     long_description=open('README.md').read(),
     install_requires=install_requires,
     entry_points = {
-        'console_scripts': ['qcli=qairon_cli.qcli:_main_']
+        'console_scripts': ['qcli=qairon_qcli.qcli:_main_']
     },
     extras_require={
         ':python_version == "3.9.2"': importlib_backport_requires
     },
-    packages=find_packages(exclude=("features", "features.*", "models", "views", "views.*")),
-    scripts=['qairon_cli/qcli.py'],
+    packages=["qairon_qcli"],
+    scripts=['qairon_qcli/qcli.py'],
     zip_safe=False,
     include_package_data=True,
     platforms=['MacOS X', 'Posix'],

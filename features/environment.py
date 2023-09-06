@@ -1,13 +1,16 @@
 import io
 import sys
 
-from alembic import command
-from flask_migrate import Config
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.ddl import DropTable
 
-from app import migrate
-from controllers import RestController, CLIArgs, QCLIController, PrintingOutputController
+from qairon_qcli.controllers.args import CLIArgs
+from qairon_qcli.controllers.output_controller import PrintingOutputController
+from qairon_qcli.controllers.qcli_controller import QCLIController
+from qairon_qcli.controllers.rest_controller import RestController
+
+
+# from qairon_qcli.controllers import RestController, CLIArgs, QCLIController, PrintingOutputController
 
 
 @compiles(DropTable, "postgresql")

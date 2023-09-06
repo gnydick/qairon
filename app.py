@@ -9,7 +9,6 @@ from flask_restless import APIManager
 
 import models
 from base import app
-from controllers import RestController
 from db import db
 from lib import dynamic
 from models import *
@@ -171,7 +170,6 @@ from flask import Response
 
 from models import Deployment, Environment, Provider, Region
 
-rest = RestController()
 
 
 @app.after_request
