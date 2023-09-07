@@ -10,7 +10,7 @@ from flask_restless import APIManager
 import models
 from base import app
 from db import db
-from lib import dynamic
+from qairon_qcli.lib import dynamic
 from models import *
 from serializers.default import QcliSerializer
 from views import *

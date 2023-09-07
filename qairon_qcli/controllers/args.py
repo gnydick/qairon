@@ -3,7 +3,7 @@ import importlib
 
 import argcomplete
 
-from lib import dynamic
+from qairon_qcli.lib import dynamic
 from qairon_qcli.controllers.rest_controller import RestController
 from qairon_qcli.controllers.schema import QaironSchema
 

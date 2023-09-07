@@ -9,7 +9,7 @@ PROJECT_DIR = Path(__file__).parents[1]
 sys.path.append(
     str(PROJECT_DIR)
 )
-from lib import dynamic
+from qairon_qcli.lib import dynamic
 from qairon_qcli.controllers import CLIArgs
 from qairon_qcli.controllers import QCLIController
 from qairon_qcli.controllers import PrintingOutputController
