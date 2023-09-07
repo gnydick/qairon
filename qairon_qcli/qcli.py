@@ -2,20 +2,13 @@
 # PYTHON_ARGCOMPLETE_OK
 import importlib
 import logging
-import sys
-from pathlib import Path
 
-PROJECT_DIR = Path(__file__).parents[1]
-
-sys.path.append(
-    str(PROJECT_DIR)
-)
-from qairon_qcli.lib import dynamic
 from qairon_qcli.controllers import CLIArgs
-from qairon_qcli.controllers import QCLIController
 from qairon_qcli.controllers import PrintingOutputController
-from qairon_qcli.controllers import RestController
+from qairon_qcli.controllers import QCLIController
 from qairon_qcli.controllers import QaironSchema
+from qairon_qcli.controllers import RestController
+from qairon_qcli.lib import dynamic
 
 logger = logging.getLogger()
 

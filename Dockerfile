@@ -36,7 +36,8 @@ ADD plugins /opt/qairon/plugins
 ADD app.py /opt/qairon
 ADD base.py /opt/qairon
 ADD db.py /opt/qairon
-ADD qairon_qcli/qcli.py /opt/qairon/qcli
+ADD qairon_qcli/lib /opt/qairon/qairon_qcli/lib
+ADD qairon_qcli/controllers/output_controller.py /opt/qairon/qairon_qcli/controllers/
 
 
 
