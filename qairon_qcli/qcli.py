@@ -1,5 +1,6 @@
 #!/home/gnydick/.pyenv/versions/3.9.2/envs/gen2-3.9.2/bin/python3.9
 # PYTHON_ARGCOMPLETE_OK
+import importlib
 import logging
 
 from qairon_qcli.controllers import CLIArgs
@@ -10,7 +11,6 @@ from qairon_qcli.controllers import RestController
 from qairon_qcli.lib import dynamic
 
 logger = logging.getLogger()
-
 
 def _main_():
     try:
@@ -67,9 +67,12 @@ def _main_():
                 plugins_with_cli = dynamic.plugin_has_module('cli', 'qairon_qcli.plugins')
                 if potential_plugin_name in plugins_with_cli:
                     plugin = qaironargs.discovered_plugins[potential_plugin_name]
+                    module = importlib.import_module("%s.%s.%s" % (plugin.__name__, 'cli', potential_plugin_name))
+
+
                     if args.command in plugin.COMMANDS.keys():
                         command = args.command
-                        getattr(plugin, command)(**vars(args))
+                        getattr(module, command)(**vars(args))
     except Exception as e:
         logger.error(e)
         exit(255)

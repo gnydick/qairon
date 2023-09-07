@@ -103,9 +103,6 @@ class CLIArgs:
                 qs = getattr(module, 'QaironSchema')
                 QaironSchema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
                 RestController.schema.CREATE_FIELDS.update(qs.CREATE_FIELDS)
-
-
-
         __gen_completers__(rest)
 
         __gen_attr_completers__(rest, 'service', 'repos')

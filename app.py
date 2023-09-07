@@ -44,7 +44,6 @@ with app.app_context():
 
     model_classes = []
     plugin_models = []
-
     for module in dynamic.plugin_has_module('models', 'plugins'):
         model_module = importlib.import_module('plugins.%s.%s' % (module, 'models'))
         plugin_models = [member for name, member in inspect.getmembers(model_module, inspect.isclass)]
@@ -104,7 +103,7 @@ with app.app_context():
             add_sub_category(v, k)
 
 
-    plugins_with_views = dynamic.plugin_has_module('views','plugins')
+    plugins_with_views = dynamic.plugin_has_module('views', 'plugins')
 
     for plugin in plugins_with_views:
         categories['Plugins'][plugin.capitalize()] = {}
