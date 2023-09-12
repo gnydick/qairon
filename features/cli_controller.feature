@@ -42,8 +42,20 @@ Feature: CLI
     Then create build_artifact for "testapp:teststack:testservice:123" from "git:testsvcreposrc" uploaded to "ecr:testsvcrepobuildartifact" named "test_build_artifact_ecr" in path "some_output_path" via cli
     Then create release_artifact for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456" from "ecr:testsvcrepobuildartifact" uploaded to "helm:testsvcreporeleaseartifact" named "test_release_artifact_helm" in path "some_output_path" via cli
 
+  Scenario: dependencies
+    Given create dependency_case called "test_relatable_on_single_related" with "Deployment" related to "Build" "OTO"
+    Then create "relatable" with "relatable_type" equals "Deployment" and "object_id" equals "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via cli
+    Then create "dependency" with "dependency_case_id" equals "test_relatable_on_single_related" and "relatable_id" equals "Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" named "test_dependency" via cli
+    Then create "related" with "related_type" equals "Build" and "dependency_id" equals "test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:test_dependency" and "object_id" equals "testapp:teststack:testservice:123" via cli
+
 
   Scenario: cleanup
+    Then delete "related" "Build:test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:test_dependency:testapp:teststack:testservice:123" via cli
+    Then delete "dependency" "test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:test_dependency" via cli
+    Then delete "relatable" "Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via cli
+    Then delete "dependency_case" "test_relatable_on_single_related" via cli
+
+
     Then delete "deployment_config" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:testcfgtmpl:testdepcfg:tag" via cli
     When delete "service_config" "testapp:teststack:testservice:testcfgtmpl:testsvccfg:tag" via cli
     When delete "stack_config" "testapp:teststack:testcfgtmpl:teststackcfg:tag" via cli

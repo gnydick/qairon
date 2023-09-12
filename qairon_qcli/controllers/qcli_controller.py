@@ -87,7 +87,8 @@ class QCLIController:
             self.oc.handle(data, **kwargs)
         else:
             errors = outer_data.get('errors', None)
-            self.oc._output_(errors[0], output_format='plain', **kwargs)
+            kwargs['output_format'] = 'plain'
+            self.oc._output_(errors[0], **kwargs)
 
     def delete(self, resource, resource_id, **kwargs):
         results = rest.delete_resource(resource, resource_id)

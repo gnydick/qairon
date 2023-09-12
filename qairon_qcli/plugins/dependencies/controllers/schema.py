@@ -12,12 +12,12 @@ class QaironSchema:
             'name'
         ],
         relatable=[
-            'type',
+            'relatable_type',
             'object_id'
         ],
         related=[
             {'dependency_id': {'dotters': {'completer': 'dependency_completer'}}},
-            'type',
+            'related_type',
             'object_id'
         ]
     )

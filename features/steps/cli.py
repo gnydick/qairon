@@ -32,12 +32,25 @@ def step_impl(context, build_id, input_repo_id, output_repo_id, name, upload_pat
 def step_impl(context, release_id, input_repo_id, output_repo_id, name, upload_path):
     context.cli.create(
         {'resource': 'release_artifact', 'release_id': release_id, 'input_repo_id': input_repo_id,
-         'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}, output_format='plain', output_fields=['id']
+         'output_repo_id': output_repo_id, 'name': name, 'upload_path': upload_path}, output_format='plain',
+        output_fields=['id']
     )
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
     context.stdout_mock.truncate(0)
     assert output == ':'.join([release_id, name])
+
+
+@then(
+    'create "{resource}" with parent id "{parent_id}" in parent field "{parent_field}" named "{name}" and "{field1}" equals "{value1}" via cli')
+def step_impl(context, resource, parent_id, parent_field, name, field1, value1):
+    context.cli.create(
+        {'resource': resource, parent_field: parent_id, 'name': name}, output_format='plain', output_fields=['id']
+    )
+    output = context.stdout_mock.getvalue().strip()
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert output == ':'.join([parent_id, name])
 
 
 @then('create "{resource}" with parent id "{parent_id}" in parent field "{parent_field}" named "{name}" via cli')
@@ -80,7 +93,8 @@ def step_impl(context, network_id, cidr, additional_mask_bits, subnet_name):
 @then('create "{field}" "{field_val}" "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" via cli')
 def step_impl(context, field, field_val, resource, res_name, parent_fk_field, parent_id):
     context.cli.create(
-        {'name': res_name, parent_fk_field: parent_id, 'resource': resource, field: field_val}, output_format='plain', output_fields=['id']
+        {'name': res_name, parent_fk_field: parent_id, 'resource': resource, field: field_val}, output_format='plain',
+        output_fields=['id']
     )
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
@@ -91,7 +105,8 @@ def step_impl(context, field, field_val, resource, res_name, parent_fk_field, pa
 @then('create "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" via cli')
 def step_impl(context, resource, res_name, parent_fk_field, parent_id):
     context.cli.create(
-        {'name': res_name, parent_fk_field: parent_id, 'resource': resource}, output_format='plain', output_fields=['id']
+        {'name': res_name, parent_fk_field: parent_id, 'resource': resource}, output_format='plain',
+        output_fields=['id']
     )
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
@@ -103,7 +118,8 @@ def step_impl(context, resource, res_name, parent_fk_field, parent_id):
     'create textresource "{resource}" "{res_name}" under "{parent_fk_field}" "{parent_id}" with doc "{doc}" via cli')
 def step_impl(context, resource, res_name, parent_fk_field, parent_id, doc):
     context.cli.create(
-        {'id': res_name, parent_fk_field: parent_id, 'resource': resource, 'doc': doc}, output_format='plain', output_fields=['id']
+        {'id': res_name, parent_fk_field: parent_id, 'resource': resource, 'doc': doc}, output_format='plain',
+        output_fields=['id']
     )
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
@@ -135,7 +151,8 @@ def step_impl(context, region, provider):
 @given('zone "{zone}" can be created for region "{region}" via cli')
 def step_impl(context, zone, region):
     context.cli.create(
-        {'name': zone, 'region_id': region, 'resource': 'zone', 'defaults': '{}'}, output_format='plain', output_fields=['id'])
+        {'name': zone, 'region_id': region, 'resource': 'zone', 'defaults': '{}'}, output_format='plain',
+        output_fields=['id'])
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
     context.stdout_mock.truncate(0)
@@ -165,7 +182,8 @@ def step_impl(context, app_id):
 @given('stack "{stack}" can be created for app "{app_id}" via cli')
 def step_impl(context, stack, app_id):
     context.cli.create(
-        {'name': stack, 'application_id': app_id, 'resource': 'stack', 'defaults': '{}'}, output_format='plain', output_fields=['id'])
+        {'name': stack, 'application_id': app_id, 'resource': 'stack', 'defaults': '{}'}, output_format='plain',
+        output_fields=['id'])
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
     context.stdout_mock.truncate(0)
@@ -175,7 +193,8 @@ def step_impl(context, stack, app_id):
 @given('service "{service}" can be created for stack "{stack}" via cli')
 def step_impl(context, service, stack):
     context.cli.create(
-        {'name': service, 'stack_id': stack, 'resource': 'service', 'defaults': '{}'}, output_format='plain', output_fields=['id'])
+        {'name': service, 'stack_id': stack, 'resource': 'service', 'defaults': '{}'}, output_format='plain',
+        output_fields=['id'])
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
     context.stdout_mock.truncate(0)
@@ -280,7 +299,8 @@ def step_impl(context, env, role_id):
 def step_impl(context, name, environment):
     expected_cluster_id = '%s:%s:k8s' % (environment, name)
     context.cli.create(
-        {'resource': 'k8s_cluster', 'environment_id': environment, 'name': name}, output_format='plain', output_fields=['id']
+        {'resource': 'k8s_cluster', 'environment_id': environment, 'name': name}, output_format='plain',
+        output_fields=['id']
     )
     k8s_cluster = context.cli.get_instance('k8s_cluster', expected_cluster_id)
     assert k8s_cluster['id'] == expected_cluster_id
@@ -294,3 +314,61 @@ def step_impl(context, id):
     context.stdout_mock.seek(0)
     context.stdout_mock.truncate(0)
     assert output == id
+
+
+@given('create dependency_case called "{idee}" with "{relatable_type}" related to "{related_type}" "{cardinality}"')
+def step_impl(context, idee, relatable_type, related_type, cardinality):
+    resource_dict = {'resource': 'dependency_case', 'id': idee, 'relatable_type': relatable_type,
+                     'related_type': related_type, 'allowed_relationship': cardinality}
+    context.cli.create(resource_dict)
+    output_obj = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    output_obj['resource'] = 'dependency_case'
+    assert output_obj == resource_dict
+
+
+@then('create "{resource}" with "{field1}" equals "{value1}" and "{field2}" equals "{value2}" named "{name}" via cli')
+def step_impl(context, resource, field1, value1, field2, value2, name):
+    resource_dict = {'resource': resource, field1: value1, field2: value2, 'name': name}
+    context.cli.create(resource_dict)
+    output_obj = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    output_obj['resource'] = resource
+    resource_dict['id'] = ':'.join([value1, value2, name])
+    assert output_obj == resource_dict
+
+@then('create failed "{resource}" with "{field1}" equals "{value1}" and "{field2}" equals "{value2}" and "{field3}" equals "{value3} via cli')
+def step_impl(context, resource, field1, value1, field2, value2, field3, value3):
+    resource_dict = {'resource': resource, field1: value1, field2: value2, field3: value3}
+    context.cli.create(resource_dict)
+    output_obj = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    output_obj['resource'] = resource
+    resource_dict['id'] = ':'.join([value1, value2, value3])
+    assert output_obj == resource_dict
+
+@then('create "{resource}" with "{field1}" equals "{value1}" and "{field2}" equals "{value2}" and "{field3}" equals "{value3}" via cli')
+def step_impl(context, resource, field1, value1, field2, value2, field3, value3):
+    resource_dict = {'resource': resource, field1: value1, field2: value2, field3: value3}
+    context.cli.create(resource_dict)
+    output_obj = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    output_obj['resource'] = resource
+    resource_dict['id'] = ':'.join([value1, value2, value3])
+    assert output_obj == resource_dict
+
+
+@then('create "{resource}" with "{field1}" equals "{value1}" and "{field2}" equals "{value2}" via cli')
+def step_impl(context, resource, field1, value1, field2, value2):
+    resource_dict = {'resource': resource, field1: value1, field2: value2}
+    context.cli.create(resource_dict)
+    output_obj = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    output_obj['resource'] = resource
+    resource_dict['id'] = ':'.join([value1, value2])
+    assert output_obj == resource_dict

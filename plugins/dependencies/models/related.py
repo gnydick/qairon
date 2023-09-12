@@ -36,5 +36,5 @@ def my_before_insert_listener(mapper, connection, related):
 
 def __update_id__(related):
     dep = db.session.query(Dependency).filter(Dependency.id==related.dependency_id).first()
-    assert dep.dependency_case.related_type == related.relatable_type
-    related.id = ':'.join([related.relatable_type, related.dependency_id, related.object_id])
+    assert dep.dependency_case.related_type == related.related_type
+    related.id = ':'.join([related.related_type, related.dependency_id, related.object_id])
