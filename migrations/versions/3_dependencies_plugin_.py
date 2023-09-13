@@ -78,7 +78,7 @@ def schema_upgrades():
                     sa.Column('id', sa.String(), nullable=False),
                     sa.Column('dependency_id', sa.String(), nullable=False),
                     sa.Column('object_id', sa.String(), nullable=True),
-                    sa.Column('type', sa.String(), nullable=True),
+                    sa.Column('related_type', sa.String(), nullable=True),
                     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
                     sa.Column('last_updated_at', sa.DateTime(), nullable=True),
                     sa.ForeignKeyConstraint(tuple(['dependency_id']), ['plugin_dependencies_dependency.id'], ),

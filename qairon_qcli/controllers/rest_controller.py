@@ -1,12 +1,13 @@
 import json
+import logging
 import os
 import re
 
 import requests
 from json_stream import streamable_list
+from qairon_qcli.controllers.subnets import SubnetController
 
 from .schema import QaironSchema
-from qairon_qcli.controllers.subnets import SubnetController
 
 
 class RestController:
@@ -30,9 +31,8 @@ class RestController:
                 collection['data'].append({'id': wraps['id'], 'type': singular_resource})
         collection['data'].append({'type': singular_resource, 'id': col_res_id})
         response = self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
-        if response.status_code==204:
+        if response.status_code == 204:
             return self.get_field(owner_res, owner_res_id, plural_resource)
-
 
     def del_from_many_to_many(self, owner_res, owner_res_id, singular_resource, plural_resource, col_res_id):
         owner = self._get_all_(owner_res, owner_res_id, path=plural_resource)
@@ -40,7 +40,7 @@ class RestController:
         for wrapper in owner:
             collection['data'] = list(filter(lambda x: x.get('id') != col_res_id, wrapper))
         response = self._put_rest_(owner_res, owner_res_id, plural_resource, json=collection)
-        if response.status_code==204:
+        if response.status_code == 204:
             return self.get_field(owner_res, owner_res_id, plural_resource)
 
     def resource_get_search(self, prefix, resource):
@@ -234,42 +234,45 @@ class RestController:
     # the req_params passed in is usually a query
     # @streamable_list
     @streamable_list
-    def _get_all_(self, resource, resource_id=None, req_params={}, path=None, headers=HEADERS):
+    def _get_all_(self, resource, resource_id=None, req_params={}, path=None, headers=HEADERS, **kwargs):
         res_url = self.URL + resource
         if resource_id is not None:
             res_url += '/' + resource_id
             if path is not None:
                 res_url += '/' + path
 
-
         # this section loops through the pages, yielding page (batch of rows) to the caller
 
         req_params['page[size]'] = 100
         response = requests.get(res_url, params=req_params, headers=headers)
-        rdata = response.json()
-        if 'data' not in rdata:
-            exit(255)
+        if not (response.status_code >= 200 and response.status_code < 300):
+            logging.error("Server Error: %d - %s" % (response.status_code, response.reason))
+            raise ValueError
         else:
-            data = rdata['data']
-            yield data
-            while ('links' in rdata and rdata['links']['next'] is not None):
-                response = requests.get(rdata['links']['next'], params=req_params, headers=headers)
-                rdata = response.json()
+            rdata = response.json()
+            if 'data' not in rdata:
+                exit(255)
+            else:
                 data = rdata['data']
                 yield data
+                while ('links' in rdata and rdata['links']['next'] is not None):
+                    response = requests.get(rdata['links']['next'], params=req_params, headers=headers)
+                    rdata = response.json()
+                    data = rdata['data']
+                    yield data
 
-    def query(self, resource, query=None):
-        return self._query_(resource, query=query)
+    def query(self, resource, query=None, **kwargs):
+        return self._query_(resource, query=query, **kwargs)
 
     def list(self, resource):
         return self._get_all_(resource)
 
-    def _query_(self, resource, query):
+    def _query_(self, resource, query, **kwargs):
 
         req_params = dict()
         if query is not None:
             req_params['filter[objects]'] = query
-        response = self._get_all_(resource, req_params=req_params)
+        response = self._get_all_(resource, req_params=req_params, **kwargs)
 
         return response
 
