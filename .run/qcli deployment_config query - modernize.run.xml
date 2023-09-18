@@ -5,7 +5,6 @@
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
-      <env name="QAIRON_ENDPOINT" value="https://qairon.dev.withme.com" />
       <env name="SECRET_KEY" value="12345" />
       <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://qairon:qairon@localhost/qairon" />
     </envs>
@@ -15,12 +14,16 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <EXTENSION ID="com.fapiko.jetbrains.plugins.better_direnv.runconfigs.PycharmRunConfigurationExtension">
+      <option name="DIRENV_ENABLED" value="false" />
+      <option name="DIRENV_TRUSTED" value="false" />
+    </EXTENSION>
     <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
       <option name="credential" />
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli/qcli.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon_qcli/qcli.py" />
     <option name="PARAMETERS" value="deployment_config query [{\&quot;name\&quot;:\&quot;id\&quot;,\&quot;op\&quot;:\&quot;eq\&quot;,\&quot;val\&quot;:\&quot;secret_map_item\&quot;}]" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

@@ -1,4 +1,4 @@
-#!/home/gnydick/.pyenv/versions/3.9.2/envs/gen2-3.9.2/bin/python3.9
+#!/usr/bin/env python
 # PYTHON_ARGCOMPLETE_OK
 import importlib
 import logging
