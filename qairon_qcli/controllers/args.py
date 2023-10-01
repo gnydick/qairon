@@ -179,7 +179,7 @@ class CLIArgs:
 
         network_sub_parsers = self.model_subparsers['network']
         subnet_allocator_parser = network_sub_parsers.add_parser('allocate_subnet')
-        subnet_allocator_parser.add_argument('id', help='Network ID').completer = getattr(self.rest,
+        subnet_allocator_parser.add_argument('network_id', help='Network ID').completer = getattr(self.rest,
                                                                                           'network_completer')
         subnet_allocator_parser.add_argument('additional_mask_bits',
                                              help='Subnet bits').completer = self.subnet_allocator_bits_completer

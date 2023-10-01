@@ -2,6 +2,7 @@ import json
 
 from qairon_qcli.controllers.output_controller import IterableOutputController
 
+
 class SubnetController:
 
     def __init__(self, network_id):
@@ -14,12 +15,13 @@ class SubnetController:
         rest = RestController()
         import ipaddress as ip
         network = rest.get_instance('network', resource_id=self.network_id)['attributes']
-        response = rest.get_field('network', self.network_id, field='subnets')
-        subnets = [json.loads(x) for x in response]
+        response = rest._get_all_('network', self.network_id, path='subnets')
+        collect = [x for x in response]
+        subnets = collect[0]
         if type(subnets) is None:
             pass
         else:
-            used_sbns = list(map(lambda x: ip.IPv4Network(x['cidr']), subnets))
+            used_sbns = list(map(lambda x: ip.IPv4Network(x['attributes']['cidr']), subnets))
             n = ip.IPv4Network(network['cidr'])
             psns = list(n.subnets(int(additional_mask_bits)))
 
