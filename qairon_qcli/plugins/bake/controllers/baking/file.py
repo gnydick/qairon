@@ -108,6 +108,22 @@ class FileBakingController(AbstractBakingController):
                     secret = aws.get_secret_string_for_deployment(self.local_data['deployment_id'],
                                                                   field['secret_name'])
                     value = secret['SecretString']
+                if field['type'] == 'kv_pairs':
+                    object_type = field['collection']
+                    data_fields = field['fields']
+                    output_format = field['format']
+                    obj = getattr(self, object_type)
+                    pairs = dict()
+                    for entry in data_fields:
+                        pair_key = entry['name']
+                        pair_value = str(obj[entry['value']])
+                        pairs[pair_key] = pair_value
+                    if output_format == 'json':
+                        value = str(pairs).replace('\'', '\"')
+                    elif output_format == 'yaml':
+                        value = '\n'.join([f"  {k}: {v}" for k,v in pairs.items()])
+                    else:
+                        value = str(pairs)
                 if field['type'] == 'config_kv_list':
                     object_type = field['value']['object']
                     field_name = field['value']['field']
