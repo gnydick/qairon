@@ -103,6 +103,17 @@ class FileBakingController(AbstractBakingController):
                         objs = [cfg for cfg in objs if cfg[filter['field_name']] == filter['value']]
                     assert len(objs) == 1
                     value = objs[0][data_field]
+                if field['type'] == 'template':
+                    data_dict = {
+                        'local': self.local_data,
+                        "deploy_target": self.deployment_target
+                    }
+                    cfgs = getattr(self, 'configs')
+                    template_id = field['template_id']
+                    cfg = [cfg for cfg in cfgs if cfg['template_id'] == template_id][0]
+                    template_string = cfg['config']
+                    templateEngine = JinjaTemplateEngine()
+                    value = templateEngine.render_string(data_dict, template_string)
                 if field['type'] == 'aws_secret':
                     aws = AwsServiceController()
                     secret = aws.get_secret_string_for_deployment(self.local_data['deployment_id'],
@@ -130,3 +141,37 @@ class FileBakingController(AbstractBakingController):
                 output = output.replace(pattern, value)
             with open(instruction['filename'], 'w') as file:
                 file.write(output)
+
+
+
+import jinja2
+
+class JinjaTemplateEngine:
+
+    # Jinja custome functions
+    def _kubernetes_format(self, val):
+        return val.replace(':', '/')
+
+    def _extract_service_name(self, val):
+        return val.split(':')[-2]
+
+    # render method
+    def render_string(self, dict_vals, template_source):
+        inline_functions = {
+            "k8s_fmt": self._kubernetes_format,
+            "srv_name": self._extract_service_name
+        }
+        # Load template from the string
+        TEMPLATE_FILE = "in-memory-bake-string"
+        templateLoader = jinja2.DictLoader({TEMPLATE_FILE: template_source})
+        templateEnv = jinja2.Environment( loader=templateLoader, trim_blocks=True)
+        # Read the template using the environment object.
+        template = templateEnv.get_template( TEMPLATE_FILE )
+        # Register inline functions available in template
+        template.globals.update(inline_functions)
+        # Specify any input variables to the template as a dictionary.
+        templateVars = dict_vals
+        # Process the template to produce our final text.
+        outputText = template.render( templateVars )
+        return outputText
+
