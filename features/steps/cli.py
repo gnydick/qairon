@@ -339,7 +339,9 @@ def step_impl(context, resource, field1, value1, field2, value2, name):
     resource_dict['id'] = ':'.join([value1, value2, name])
     assert output_obj == resource_dict
 
-@then('create failed "{resource}" with "{field1}" equals "{value1}" and "{field2}" equals "{value2}" and "{field3}" equals "{value3} via cli')
+
+@then(
+    'create failed "{resource}" with "{field1}" equals "{value1}" and "{field2}" equals "{value2}" and "{field3}" equals "{value3} via cli')
 def step_impl(context, resource, field1, value1, field2, value2, field3, value3):
     resource_dict = {'resource': resource, field1: value1, field2: value2, field3: value3}
     context.cli.create(resource_dict)
@@ -350,7 +352,9 @@ def step_impl(context, resource, field1, value1, field2, value2, field3, value3)
     resource_dict['id'] = ':'.join([value1, value2, value3])
     assert output_obj == resource_dict
 
-@then('create "{resource}" with "{field1}" equals "{value1}" and "{field2}" equals "{value2}" and "{field3}" equals "{value3}" via cli')
+
+@then(
+    'create "{resource}" with "{field1}" equals "{value1}" and "{field2}" equals "{value2}" and "{field3}" equals "{value3}" via cli')
 def step_impl(context, resource, field1, value1, field2, value2, field3, value3):
     resource_dict = {'resource': resource, field1: value1, field2: value2, field3: value3}
     context.cli.create(resource_dict)
@@ -372,3 +376,29 @@ def step_impl(context, resource, field1, value1, field2, value2):
     output_obj['resource'] = resource
     resource_dict['id'] = ':'.join([value1, value2])
     assert output_obj == resource_dict
+
+
+@when(
+    'add first - "{number}" - "{singular_resource}" to "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via cli')
+@when(
+    'add second - "{number}" - "{singular_resource}" to "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via cli')
+def step_impl(context, number, singular_resource, plural_resource, item_id, dest_resource, dest_id):
+    context.cli.add_to_collection(dest_resource, singular_resource, plural_resource, dest_id, item_id)
+    output_obj = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    # getattr(context.cli, command)(resource_dict)
+    # response = context.rest.add_to_many_to_many(dest_resource, dest_id, singular_resource, plural_resource, item_id)
+
+    # assert len(response) == eval(number)
+
+@then(
+    'remove first - "{number}" - "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via cli')
+@then(
+    'remove second - "{number}" - "{singular_resource}" from "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via cli')
+def step_impl(context, number, singular_resource, plural_resource, item_id, dest_resource, dest_id):
+    context.cli.del_from_collection(dest_resource, singular_resource, plural_resource, dest_id, item_id)
+    output_obj = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    assert len(output_obj) == eval(number)

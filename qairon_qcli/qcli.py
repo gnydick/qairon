@@ -55,11 +55,11 @@ def _main_():
                         if args.command == 'assign_repo':
                             args_dict = vars(args)
                             args_dict['items'] = 'repos'
-                            cli.add_to_collection(**args_dict)
+                            cli.add_to_collection(singular_resource='repo', **args_dict)
                         elif args.command == 'unassign_repo':
                             args_dict = vars(args)
                             args_dict['items'] = 'repos'
-                            cli.del_from_collection(**args_dict)
+                            cli.del_from_collection(singular_resource='repo', **args_dict)
                     elif args.resource == 'test':
                         cli.test(args)
             else:

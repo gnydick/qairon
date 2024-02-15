@@ -37,6 +37,10 @@ Feature: CLI
     Then create "repo" with parent id "git" in parent field "repo_type_id" named "testsvcreposrc" via cli
     Then create "repo" with parent id "ecr" in parent field "repo_type_id" named "testsvcrepobuildartifact" via cli
     Then create "repo" with parent id "helm" in parent field "repo_type_id" named "testsvcreporeleaseartifact" via cli
+
+    When add first - "1" - "repo" to "repos" "git:testsvcreposrc" on "service" "testapp:teststack:testservice" via cli
+    When add second - "2" - "repo" to "repos" "ecr:testsvcrepobuildartifact" on "service" "testapp:teststack:testservice" via cli
+
     Then create build for "testapp:teststack:testservice" from job "123" tagged "v1.0" via cli
     Then create release for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" from build "testapp:teststack:testservice:123" from job "456" via cli
     Then create build_artifact for "testapp:teststack:testservice:123" from "git:testsvcreposrc" uploaded to "ecr:testsvcrepobuildartifact" named "test_build_artifact_ecr" in path "some_output_path" via cli
@@ -50,6 +54,9 @@ Feature: CLI
 
 
   Scenario: cleanup
+    Then remove second - "1" - "repo" from "repos" "ecr:testsvcrepobuildartifact" on "service" "testapp:teststack:testservice" via cli
+    And remove first - "0" - "repo" from "repos" "git:testsvcreposrc" on "service" "testapp:teststack:testservice" via cli
+
     Then delete "related" "Build:test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:test_dependency:testapp:teststack:testservice:123" via cli
     Then delete "dependency" "test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:test_dependency" via cli
     Then delete "relatable" "Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via cli

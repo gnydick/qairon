@@ -200,7 +200,6 @@ def step_impl(context, dep_target_bin_id, service, tag, defaults):
 #     new_svc_config = response.json()
 #     assert new_svc_config['id'] == '%s:%s' % (service, service_config_template)
 
-
 @when('add first - "{number}" - "{singular_resource}" to "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
 @when('add second - "{number}" - "{singular_resource}" to "{plural_resource}" "{item_id}" on "{dest_resource}" "{dest_id}" via rest')
 def step_impl(context, number, singular_resource, plural_resource, item_id, dest_resource, dest_id):
@@ -226,3 +225,6 @@ def step_impl(context, resource, name, config_template_id, resource_id, tag):
     cfg = context.rest.create_resource(payload)
     data = cfg.json()
     assert data['data']['relationships']['template']['data']['id'] == config_template_id
+
+
+
