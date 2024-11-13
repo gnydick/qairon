@@ -8,7 +8,7 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
-      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://ut_qairon:ut_qairon@127.0.0.1/ut_qairon" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://ut_qairon:ut_qairon@127.0.0.1:5432/ut_qairon" />
       <env name="SECRET_KEY" value="12345" />
       <env name="QAIRON_ENDPOINT" value="http://127.0.0.1:5002" />
     </envs>

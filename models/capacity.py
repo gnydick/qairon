@@ -37,4 +37,4 @@ def my_before_insert_listener(mapper, connection, capacity):
 
 
 def __update_id__(capacity):
-    capacity.id = ':'.join([capacity.relatable_type.id, capacity.fleet.id])
+    capacity.id = ':'.join([capacity.allocation_type_id, capacity.fleet.id])
