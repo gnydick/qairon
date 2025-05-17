@@ -2,14 +2,16 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Fleet(db.Model):
+class Fleet(db.Model,TenantMixin):
     exclude = ['deployment_target_bins', 'subnets', 'capacities']
 
 
     __tablename__ = "fleet"
+
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'), index=True)
     fleet_type_id = Column(String, ForeignKey('fleet_type.id'), index=True)

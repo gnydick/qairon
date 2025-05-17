@@ -2,10 +2,11 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Partition(db.Model):
+class Partition(db.Model,TenantMixin):
     exclude = ['deployment_targets', 'networks']
 
     __tablename__ = "partition"

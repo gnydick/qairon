@@ -2,10 +2,11 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class DeploymentTargetBin(db.Model):
+class DeploymentTargetBin(db.Model,TenantMixin):
     exclude = ['deployments', 'fleets']
 
     __tablename__ = "deployment_target_bin"

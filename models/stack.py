@@ -2,10 +2,11 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Stack(db.Model):
+class Stack(db.Model,TenantMixin):
     exclude = ['services', 'configs']
 
 

@@ -2,11 +2,14 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Application(db.Model):
-    exclude = ['stacks']
+
+
+class Application(db.Model, TenantMixin):
+    exclude = ['stacks', 'tenant_id']
 
     __tablename__ = "application"
 

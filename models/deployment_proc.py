@@ -2,13 +2,15 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class DeploymentProc(db.Model):
+class DeploymentProc(db.Model,TenantMixin):
     exclude = ['allocations']
 
     __tablename__ = "deployment_proc"
+
     id = Column(String, primary_key=True)
     deployment_id = Column(String, ForeignKey('deployment.id'), index=True)
     proc_id = Column(String, ForeignKey('proc.id'), index=True)

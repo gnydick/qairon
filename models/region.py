@@ -2,14 +2,16 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Region(db.Model):
+class Region(db.Model,TenantMixin):
     exclude = ['partitions', 'zones']
 
 
     __tablename__ = "region"
+
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=True)
     provider_id = Column(String, ForeignKey('provider.id'), nullable=True, index=True)

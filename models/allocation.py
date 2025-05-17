@@ -2,14 +2,15 @@ from sqlalchemy import *
 from sqlalchemy.orm import validates, relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Allocation(db.Model):
+class Allocation(db.Model,TenantMixin):
     watermarks = ('HIGH', 'LOW')
     watermarks_enum = Enum(*watermarks, name='watermark')
 
-    exclude = []
+    exclude = ['tenant_id']
 
     __tablename__ = "allocation"
 

@@ -2,13 +2,15 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Provider(db.Model):
+class Provider(db.Model,TenantMixin):
     exclude = ['regions']
 
     __tablename__ = "provider"
+
     id = Column(String, primary_key=True)
     provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=False, index=True)
     environment_id = Column(String, ForeignKey('environment.id'), nullable=False, index=True)

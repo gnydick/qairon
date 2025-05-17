@@ -2,12 +2,14 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 
 
-class Zone(db.Model):
+class Zone(db.Model,TenantMixin):
     exclude = ['deployments']
 
     __tablename__ = "zone"
+
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=True)
     region_id = Column(String, ForeignKey('region.id'), nullable=False, index=True)

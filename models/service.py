@@ -2,14 +2,16 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Service(db.Model):
-    exclude = ['builds', 'deployments', 'configs', 'procs']
+class Service(db.Model,TenantMixin):
+    exclude = ['builds', 'deployments', 'configs', 'procs', 'tenant_id']
     children = ['builds', 'deployments', 'repos', 'configs', 'procs']
 
     __tablename__ = "service"
+
     id = Column(String, primary_key=True)
     stack_id = Column(String, ForeignKey('stack.id'), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)

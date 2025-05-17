@@ -3,6 +3,7 @@ import inspect
 from os.path import exists
 
 import json_api_doc
+from flask import g
 from flask_admin import Admin
 from flask_migrate import Migrate, Config
 from flask_restless import APIManager
@@ -10,12 +11,19 @@ from flask_restless import APIManager
 import models
 from base import app
 from db import db
-from qairon_qcli.lib import dynamic
 from models import *
+from qairon_qcli.lib import dynamic
 from serializers.default import QcliSerializer
 from views import *
 
 app.url_map.strict_slashes = False
+
+
+@app.before_request
+def detect_tenant():
+    # imagine subdomain 'acme.app.com' → tenant 'acme'
+    g.tenant_id = "1"
+
 
 version = 'development'
 version_file = ".version"
@@ -70,14 +78,18 @@ with app.app_context():
         restmanager.create_api(plugin_model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
                                url_prefix='/api/rest/v1', page_size=5, max_page_size=100,
                                allow_client_generated_ids=True, allow_to_many_replacement=True,
-                               exclude=getattr(plugin_model_class, 'exclude'), collection_name=getattr(plugin_model_class, 'collection_name'))
+                               exclude=getattr(plugin_model_class, 'exclude'),
+                               collection_name=getattr(plugin_model_class, 'collection_name'))
         qclimanager.create_api(plugin_model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
                                url_prefix='/api/qcli/v1', page_size=5, max_page_size=100,
                                allow_client_generated_ids=True, allow_to_many_replacement=True,
-                               exclude=getattr(plugin_model_class, 'exclude'), collection_name=getattr(plugin_model_class, 'collection_name'), serializer=custom_serializer)
+                               exclude=getattr(plugin_model_class, 'exclude'),
+                               collection_name=getattr(plugin_model_class, 'collection_name'),
+                               serializer=custom_serializer)
 
     # set optional bootswatch theme
     admin = Admin(app, name='QAIRON: %s' % version, template_mode='bootstrap3', base_template='admin/master.html')
+
     categories = {
         'Global': {},
         'Platform': {},
@@ -120,7 +132,7 @@ with app.app_context():
         for plugin_view in plugin_views:
             admin.add_view(plugin_view(plugin_view.model, db.session, category=plugin.capitalize()))
 
-    admin.add_view(WithIdView(Environment, db.session, category='Global'))
+    admin.add_view(TenantModelView(Environment, db.session, category='Global'))
     admin.add_view(WithIdView(Application, db.session, category='Software', name='Applications'))
     admin.add_view(DefaultView(Stack, db.session, category='Stacks'))
     admin.add_view(DefaultView(StackConfig, db.session, category='Stacks'))
@@ -169,7 +181,6 @@ with app.app_context():
 from flask import Response
 
 from models import Deployment, Environment, Provider, Region
-
 
 
 @app.after_request

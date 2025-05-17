@@ -4,10 +4,11 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Release(db.Model):
+class Release(db.Model,TenantMixin):
     exclude = ['release_artifacts']
 
     __tablename__ = "release"

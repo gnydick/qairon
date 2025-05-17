@@ -2,13 +2,15 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class FleetType(db.Model):
+class FleetType(db.Model,TenantMixin):
     exclude = ['fleets']
 
     __tablename__ = "fleet_type"
+
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False, index=True)
     provider_type_id = Column(String, ForeignKey('provider_type.id'), nullable=True, index=True)

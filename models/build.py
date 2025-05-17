@@ -7,10 +7,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, object_session, synonym
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Build(db.Model):
+class Build(db.Model,TenantMixin):
     exclude = ['releases', 'build_artifacts']
 
     __tablename__ = "build"

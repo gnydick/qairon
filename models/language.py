@@ -2,13 +2,15 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Language(db.Model):
+class Language(db.Model,TenantMixin):
     exclude = ['config_templates']
 
     __tablename__ = "language"
+
     id = Column(String, primary_key=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)

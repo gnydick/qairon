@@ -1,6 +1,7 @@
 from sqlalchemy import *
 
 from db import db
+from mixins.models import TenantMixin
 
 deps_to_zones = Table('deployments_zones', db.metadata,
                       Column('deployment_id', String, ForeignKey('deployment.id')),

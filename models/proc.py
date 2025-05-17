@@ -2,14 +2,14 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Proc(db.Model):
+class Proc(db.Model,TenantMixin):
     exclude = ['deployment_procs']
 
     __tablename__ = "proc"
-
     id = Column(String, primary_key=True, nullable=False)
     service_id = Column(String, ForeignKey('service.id'), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)

@@ -2,13 +2,14 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 from sqlalchemy.dialects.postgresql.base import CIDR
 
 import ipaddress as ip
 
-class Network(db.Model):
+class Network(db.Model,TenantMixin):
     exclude = ['subnets']
 
     __tablename__ = "network"

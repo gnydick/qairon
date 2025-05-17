@@ -2,13 +2,15 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class ConfigTemplate(db.Model):
+class ConfigTemplate(db.Model,TenantMixin):
     exclude = ['service_configs', 'stack_configs', 'deployment_configs']
 
     __tablename__ = "config_template"
+
     id = Column(String, primary_key=True)
     language_id = Column(String, ForeignKey('language.id'), index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)

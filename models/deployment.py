@@ -2,12 +2,14 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from mixins.models import TenantMixin
 
 
-class Deployment(db.Model):
+class Deployment(db.Model,TenantMixin):
     exclude = ['configs', 'zones', 'deployment_procs', 'releases']
 
     __tablename__ = "deployment"
+
     id = Column(String, primary_key=True)
     deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id'), index=True)
     service_id = Column(String, ForeignKey('service.id'), index=True)

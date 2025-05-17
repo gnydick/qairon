@@ -2,9 +2,10 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 
 
-class Repo(db.Model):
+class Repo(db.Model,TenantMixin):
     exclude = ['input_build_artifacts', 'output_build_artifacts', 'input_release_artifacts',
               'output_release_artifacts']
 

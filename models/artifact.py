@@ -3,15 +3,16 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class BuildArtifact(db.Model):
+class BuildArtifact(db.Model,TenantMixin):
     exclude = ['']
 
     __tablename__ = "build_artifact"
-    id = Column(String, primary_key=True)
 
+    id = Column(String, primary_key=True)
     build_id = Column(String, ForeignKey('build.id'), nullable=False, index=True)
     input_repo_id = Column(String, ForeignKey('repo.id'), nullable=False, index=True)
     output_repo_id = Column(String, ForeignKey('repo.id'), nullable=False, index=True)
@@ -29,7 +30,7 @@ class BuildArtifact(db.Model):
         return self.build.id + ':' + self.name
 
 
-class ReleaseArtifact(db.Model):
+class ReleaseArtifact(db.Model,TenantMixin):
     exclude = []
     __tablename__ = "release_artifact"
     id = Column(String, primary_key=True)

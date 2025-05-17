@@ -5,13 +5,15 @@ from sqlalchemy.dialects.postgresql import CIDR
 from sqlalchemy.orm import relationship
 
 from db import db
+from mixins.models import TenantMixin
 from models import Network
 
 
-class Subnet(db.Model):
+class Subnet(db.Model,TenantMixin):
     exclude = ['fleets']
 
     __tablename__ = "subnet"
+
     id = Column(String, primary_key=True)
     network_id = Column(String, ForeignKey('network.id'), nullable=False, index=True)
     native_id = Column(String, index=True)

@@ -2,10 +2,11 @@ from sqlalchemy import *
 from sqlalchemy.orm import validates, relationship
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class Capacity(db.Model):
+class Capacity(db.Model,TenantMixin):
     exclude = []
 
     __tablename__ = "capacity"

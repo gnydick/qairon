@@ -1,15 +1,17 @@
-from flask_admin.contrib.sqla import ModelView
+from views.tenant_model import TenantModelView
 
 
 @property
-def column_exclude_list(self):
+def floof(self):
     c = getattr(self.model, 'exclude')
     return c
 
 
-class DefaultView(ModelView):
+class DefaultView(TenantModelView):
     can_view_details = True
-    form_excluded_columns = column_exclude_list
+    form_excluded_columns = floof
+    column_exclude_list = floof
+    column_details_exclude_list = floof
     column_searchable_list = ['id']
     column_sortable_list = ['id']
     list_display_pk = True

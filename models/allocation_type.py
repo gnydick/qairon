@@ -2,14 +2,16 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from mixins.models import TenantMixin
 import datetime
 
 
-class AllocationType(db.Model):
-    exclude = ['allocations', 'capacities']
+class AllocationType(db.Model,TenantMixin):
+    exclude = ['allocations', 'capacities', 'tenant_id']
 
 
     __tablename__ = "allocation_type"
+
     id = Column(String, primary_key=True)
     unit = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
