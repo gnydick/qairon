@@ -49,7 +49,7 @@ sess = db.session()
 #
 # for dep in deployments:
 #     stack = dep.service.stack_id
-#     env = dep.deployment_target_bin.deployment_target.partition.region.provider.environment.id
+#     env = dep.deployment_target.partition.region.provider.environment.id
 #     print(stack)
 #     print(env)
 #     print()

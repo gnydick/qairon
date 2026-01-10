@@ -71,7 +71,7 @@ class QaironSchema:
         ],
         deployment=[
             {'service_id': {'dotters': {'completer': 'service_completer'}}},
-            {'deployment_target_bin_id': {'dotters': {'completer': 'deployment_target_bin_completer'}}},
+            {'deployment_target_id': {'dotters': {'completer': 'deployment_target_completer'}}},
             {'-d': {'args': {'dest': 'defaults'}}},
             {'-t': {'args': {'dest': 'tag', 'help': 'tag', 'default': 'default'}}},
         ],
@@ -83,11 +83,6 @@ class QaironSchema:
         deployment_target=[
             {'deployment_target_type_id': {'dotters': {'completer': 'deployment_target_type_completer'}}},
             {'partition_id': {'dotters': {'completer': 'partition_completer'}}},
-            'name',
-            {'-d': {'args': {'dest': 'defaults'}}}
-        ],
-        deployment_target_bin=[
-            {'deployment_target_id': {'dotters': {'completer': 'deployment_target_completer'}}},
             'name',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],

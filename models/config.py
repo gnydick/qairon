@@ -11,8 +11,8 @@ class DeploymentConfig(db.Model):
     __tablename__ = "deployment_config"
     id = Column(String, primary_key=True)
 
-    config_template_id = Column(String, ForeignKey('config_template.id'), index=True)
-    deployment_id = Column(String, ForeignKey('deployment.id'), index=True)
+    config_template_id = Column(String, ForeignKey('config_template.id'), nullable=False, index=True)
+    deployment_id = Column(String, ForeignKey('deployment.id'), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     name = Column(String, nullable=False, index=True)

@@ -15,8 +15,8 @@ class Allocation(db.Model):
 
     id = Column(String, primary_key=True)
     value = Column(Float, nullable=False)
-    allocation_type_id = Column(String, ForeignKey('allocation_type.id'), index=True)
-    deployment_proc_id = Column(String, ForeignKey('deployment_proc.id'), index=True)
+    allocation_type_id = Column(String, ForeignKey('allocation_type.id'), nullable=False, index=True)
+    deployment_proc_id = Column(String, ForeignKey('deployment_proc.id'), nullable=False, index=True)
     watermark = db.Column(watermarks_enum)
     UniqueConstraint('deployment_proc_id', 'type', 'watermark')
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)

@@ -23,12 +23,7 @@ class BakingBuilder:
         self.__configs__ = [x for x in ioc.read_as_json()]
         self.cli.get_field('service', self.__deployment__['service_id'], 'configs')
         self.__svc_configs__ = [x for x in ioc.read_as_json()]
-        self.__deployment_target_bin__ = simplify_row(self.rest.get_instance('deployment_target_bin',
-                                                                             self.__deployment__[
-                                                                                 'deployment_target_bin_id']))
-        self.__deployment_target__ = simplify_row(self.rest.get_instance('deployment_target',
-                                                                         self.__deployment_target_bin__[
-                                                                             'deployment_target_id']))
+        self.__deployment_target__ = simplify_row(self.rest.get_instance('deployment_target_id'))
 
     def build(self):
         return FileBakingController(self)

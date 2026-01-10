@@ -248,16 +248,16 @@ def step_impl(context, deployment_id, build_id, build_num):
 
 
 @then(
-    'create deployment at "{dep_target_bin_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via cli')
-def step_impl(context, dep_target_bin_id, service, tag, defaults):
+    'create deployment at "{dep_target_id}" for "{service}" tagged "{tag}" with defaults "{defaults}" via cli')
+def step_impl(context, dep_target_id, service, tag, defaults):
     context.cli.create(
-        {'resource': 'deployment', 'deployment_target_bin_id': dep_target_bin_id, 'service_id': service,
+        {'resource': 'deployment', 'deployment_target_id': dep_target_id, 'service_id': service,
          'tag': tag, 'defaults': defaults}, output_format='plain', output_fields=['id']
     )
     output = context.stdout_mock.getvalue().strip()
     context.stdout_mock.seek(0)
     context.stdout_mock.truncate(0)
-    assert output == '%s:%s:%s' % (dep_target_bin_id, service, tag)
+    assert output == '%s:%s:%s' % (dep_target_id, service, tag)
     context.cli.get('deployment', output, output_format='json')
     new_dep = json.loads(context.stdout_mock.getvalue().strip())
     context.stdout_mock.seek(0)

@@ -121,6 +121,10 @@ class IterableOutputController(AbstractOutputController):
             output_format = 'json'
 
         if output_format == 'json':
+            if type(data) == dict:
+                tmp_data = []
+                tmp_data.append(data)
+                data = tmp_data
             for row in data:
                 self.iterable.append(json.dumps(row))
         elif output_format == 'plain':

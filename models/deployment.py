@@ -9,18 +9,18 @@ class Deployment(db.Model):
 
     __tablename__ = "deployment"
     id = Column(String, primary_key=True)
-    deployment_target_bin_id = Column(String, ForeignKey('deployment_target_bin.id'), index=True)
-    service_id = Column(String, ForeignKey('service.id'), index=True)
+    deployment_target_id = Column(String, ForeignKey('deployment_target.id'), nullable=False, index=True)
+    service_id = Column(String, ForeignKey('service.id'), nullable=False, index=True)
     current_release_id = Column(String,
                                 ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey',
-                                           link_to_name=True), index=True)
+                                           link_to_name=True), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     tag = Column(String, nullable=False, default='default', index=True)
 
     defaults = Column(Text)
 
-    deployment_target_bin = relationship("DeploymentTargetBin", back_populates="deployments")
+    deployment_target = relationship("DeploymentTarget", back_populates="deployments")
     service = relationship("Service", back_populates="deployments")
     configs = relationship("DeploymentConfig", back_populates="deployment", lazy='select')
 
@@ -80,4 +80,4 @@ def my_before_write_listener(mapper, connection, deployment):
 
 
 def __update_id__(deployment):
-    deployment.id = deployment.deployment_target_bin_id + ':' + deployment.service_id + ':' + deployment.tag
+    deployment.id = deployment.deployment_target_id + ':' + deployment.service_id + ':' + deployment.tag

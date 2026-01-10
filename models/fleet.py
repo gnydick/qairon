@@ -6,13 +6,13 @@ import datetime
 
 
 class Fleet(db.Model):
-    exclude = ['deployment_target_bins', 'subnets', 'capacities']
+    exclude = ['deployment_targets', 'subnets', 'capacities']
 
 
     __tablename__ = "fleet"
     id = Column(String, primary_key=True)
-    deployment_target_id = Column(String, ForeignKey('deployment_target.id'), index=True)
-    fleet_type_id = Column(String, ForeignKey('fleet_type.id'), index=True)
+    deployment_target_id = Column(String, ForeignKey('deployment_target.id'), nullable=False, index=True)
+    fleet_type_id = Column(String, ForeignKey('fleet_type.id'), nullable=False, index=True)
     native_id = Column(String, index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
@@ -22,7 +22,6 @@ class Fleet(db.Model):
     defaults = Column(Text)
 
     deployment_target = relationship("DeploymentTarget", back_populates="fleets")
-    deployment_target_bins = relationship("DeploymentTargetBin", secondary='target_bins_fleets', back_populates="fleets", lazy='select')
     subnets = relationship("Subnet", secondary='subnets_fleets', back_populates="fleets", lazy='select')
     type = relationship("FleetType", back_populates="fleets")
     capacities = relationship("Capacity", back_populates="fleet", lazy='select')

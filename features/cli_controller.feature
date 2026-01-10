@@ -24,9 +24,8 @@ Feature: CLI
   Scenario: deployment
     Given create "deployment_target_type" "k8s" via cli
     And create deployment_target "testdt" of type "k8s" in "testenv:testprovider_type:testprovider:testregion:testpartition" via cli
-    Then create "deployment_target_bin" with parent id "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" in parent field "deployment_target_id" named "bin0" via cli
-    Then create deployment at "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0" for "testapp:teststack:testservice" tagged "default" with defaults "{}" via cli
-    Then create config for resource "deployment" named "testdepcfg" from template "testcfgtmpl" can be created for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" tagged "tag" via cli
+    Then create deployment at "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" for "testapp:teststack:testservice" tagged "default" with defaults "{}" via cli
+    Then create config for resource "deployment" named "testdepcfg" from template "testcfgtmpl" can be created for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" tagged "tag" via cli
 
 
   Scenario: cicd
@@ -38,33 +37,32 @@ Feature: CLI
     Then create "repo" with parent id "ecr" in parent field "repo_type_id" named "testsvcrepobuildartifact" via cli
     Then create "repo" with parent id "helm" in parent field "repo_type_id" named "testsvcreporeleaseartifact" via cli
     Then create build for "testapp:teststack:testservice" from job "123" tagged "v1.0" via cli
-    Then create release for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" from build "testapp:teststack:testservice:123" from job "456" via cli
+    Then create release for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" from build "testapp:teststack:testservice:123" from job "456" via cli
     Then create build_artifact for "testapp:teststack:testservice:123" from "git:testsvcreposrc" uploaded to "ecr:testsvcrepobuildartifact" named "test_build_artifact_ecr" in path "some_output_path" via cli
-    Then create release_artifact for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456" from "ecr:testsvcrepobuildartifact" uploaded to "helm:testsvcreporeleaseartifact" named "test_release_artifact_helm" in path "some_output_path" via cli
+    Then create release_artifact for "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:456" from "ecr:testsvcrepobuildartifact" uploaded to "helm:testsvcreporeleaseartifact" named "test_release_artifact_helm" in path "some_output_path" via cli
 
   Scenario: dependencies
     Given create dependency_case called "test_relatable_on_single_related" with "Deployment" related to "Build" "OTO"
-    Then create "relatable" with "relatable_type" equals "Deployment" and "object_id" equals "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via cli
-    Then create "dependency" with "dependency_case_id" equals "test_relatable_on_single_related" and "relatable_id" equals "Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" named "test_dependency" via cli
-    Then create "related" with "related_type" equals "Build" and "dependency_id" equals "test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:test_dependency" and "object_id" equals "testapp:teststack:testservice:123" via cli
+    Then create "relatable" with "relatable_type" equals "Deployment" and "object_id" equals "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" via cli
+    Then create "dependency" with "dependency_case_id" equals "test_relatable_on_single_related" and "relatable_id" equals "Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" named "test_dependency" via cli
+    Then create "related" with "related_type" equals "Build" and "dependency_id" equals "test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:test_dependency" and "object_id" equals "testapp:teststack:testservice:123" via cli
 
 
   Scenario: cleanup
-    Then delete "related" "Build:test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:test_dependency:testapp:teststack:testservice:123" via cli
-    Then delete "dependency" "test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:test_dependency" via cli
-    Then delete "relatable" "Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via cli
+    Then delete "related" "Build:test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:test_dependency:testapp:teststack:testservice:123" via cli
+    Then delete "dependency" "test_relatable_on_single_related:Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:test_dependency" via cli
+    Then delete "relatable" "Deployment:testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" via cli
     Then delete "dependency_case" "test_relatable_on_single_related" via cli
 
 
-    Then delete "deployment_config" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:testcfgtmpl:testdepcfg:tag" via cli
+    Then delete "deployment_config" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:testcfgtmpl:testdepcfg:tag" via cli
     When delete "service_config" "testapp:teststack:testservice:testcfgtmpl:testsvccfg:tag" via cli
     When delete "stack_config" "testapp:teststack:testcfgtmpl:teststackcfg:tag" via cli
     When delete "config_template" "testcfgtmpl" via cli
 
-    Then delete "release_artifact" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456:test_release_artifact_helm" via cli
-    Then delete "release" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default:456" via cli
-    Then delete "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0:testapp:teststack:testservice:default" via cli
-    Then delete "deployment_target_bin" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:bin0" via cli
+    Then delete "release_artifact" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:456:test_release_artifact_helm" via cli
+    Then delete "release" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default:456" via cli
+    Then delete "deployment" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt:testapp:teststack:testservice:default" via cli
     Then delete "deployment_target" "testenv:testprovider_type:testprovider:testregion:testpartition:k8s:testdt" via cli
     Then delete "zone" "testenv:testprovider_type:testprovider:testregion:testzone" via cli
     Then delete "zone" "testenv:testprovider_type:testprovider:testregion:testzone2" via cli

@@ -140,7 +140,6 @@ with app.app_context():
 
     admin.add_view(WithIdView(DeploymentTargetType, db.session, category='Types'))
     admin.add_view(DefaultView(DeploymentTarget, db.session, category='Deploy'))
-    admin.add_view(DefaultView(DeploymentTargetBin, db.session, category='Deploy'))
 
     admin.add_view(DefaultView(FleetType, db.session, category='Types'))
     admin.add_view(DefaultView(Fleet, db.session, category='Resources'))

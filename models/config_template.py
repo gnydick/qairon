@@ -10,7 +10,7 @@ class ConfigTemplate(db.Model):
 
     __tablename__ = "config_template"
     id = Column(String, primary_key=True)
-    language_id = Column(String, ForeignKey('language.id'), index=True)
+    language_id = Column(String, ForeignKey('language.id'), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     doc = Column(Text, nullable=False)

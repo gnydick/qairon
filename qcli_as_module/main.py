@@ -42,7 +42,7 @@ results = []
 ioc = IterableOutputController(results)
 qcli = QCLIController(ioc)
 
-qcli.list('deployment')
+qcli.list('provider')
 for row in results:
     print(row)
 

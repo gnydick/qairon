@@ -10,8 +10,8 @@ class DeploymentProc(db.Model):
 
     __tablename__ = "deployment_proc"
     id = Column(String, primary_key=True)
-    deployment_id = Column(String, ForeignKey('deployment.id'), index=True)
-    proc_id = Column(String, ForeignKey('proc.id'), index=True)
+    deployment_id = Column(String, ForeignKey('deployment.id'), nullable=False, index=True)
+    proc_id = Column(String, ForeignKey('proc.id'), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     defaults = Column(Text)
