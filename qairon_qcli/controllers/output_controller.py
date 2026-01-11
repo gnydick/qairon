@@ -1,7 +1,7 @@
 import itertools
 import json
-import sys
-from abc import ABC, abstractmethod
+
+from abc import ABC
 from collections.abc import Iterable
 
 from json_stream import streamable_list
