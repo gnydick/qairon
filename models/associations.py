@@ -31,3 +31,11 @@ svcs_to_repos = Table('services_repos', db.metadata,
                       Index('ix_services_repos_to_service_id', 'service_id'),
                       Index('ix_services_repos_to_repo_id', 'repo_id')
                       )
+
+deployment_current_release = Table('deployment_current_release', db.metadata,
+                                   Column('deployment_id', String, ForeignKey('deployment.id'),
+                                          primary_key=True, nullable=False),
+                                   Column('release_id', String, ForeignKey('release.id'),
+                                          primary_key=True, nullable=False),
+                                   Index('ix_deployment_current_release_release_id', 'release_id')
+                                   )

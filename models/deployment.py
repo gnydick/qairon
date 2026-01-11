@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, validates
 
 from db import db
+from models.associations import deployment_current_release
 
 
 class Deployment(db.Model):
@@ -11,9 +12,6 @@ class Deployment(db.Model):
     id = Column(String, primary_key=True)
     deployment_target_id = Column(String, ForeignKey('deployment_target.id'), nullable=False, index=True)
     service_id = Column(String, ForeignKey('service.id'), nullable=False, index=True)
-    current_release_id = Column(String,
-                                ForeignKey('release.id', use_alter=True, name='deployment_current_release_id_fkey',
-                                           link_to_name=True), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False, server_default=func.now(), index=True)
     last_updated_at = Column(DateTime, nullable=True, onupdate=func.now(), index=True)
     tag = Column(String, nullable=False, default='default', index=True)
@@ -27,19 +25,16 @@ class Deployment(db.Model):
     zones = relationship("Zone", secondary='deployments_zones', back_populates="deployments", lazy='select')
     deployment_procs = relationship("DeploymentProc", back_populates="deployment", lazy='select')
 
-    # safely circular relationship
+    # all releases for this deployment
     releases = relationship("Release", primaryjoin='Deployment.id==Release.deployment_id',
                             foreign_keys="Release.deployment_id", back_populates="deployment")
 
-    # releases = relationship('Release', back_populates='deployment', lazy='select')
-    current_release = relationship("Release", primaryjoin='Deployment.current_release_id==Release.id',
-                                   foreign_keys=[current_release_id], post_update=True)
+    # current release via join table (uselist=False ensures single result)
+    current_release = relationship("Release", secondary=deployment_current_release,
+                                   uselist=False, lazy='select')
 
     def __repr__(self):
         return self.id
-
-
-
 
     # makes sure the release is actually one that belongs to the deployment
     @validates('current_release')

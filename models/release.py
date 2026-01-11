@@ -4,6 +4,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
 from db import db
+from models.associations import deployment_current_release
 import datetime
 
 
@@ -22,6 +23,10 @@ class Release(db.Model):
     build = relationship('Build', back_populates='releases')
 
     deployment = relationship('Deployment', back_populates='releases', foreign_keys=[deployment_id])
+
+    # deployments where this release is current (via join table)
+    current_for_deployments = relationship('Deployment', secondary=deployment_current_release,
+                                           back_populates='current_release', lazy='select')
 
     release_artifacts = relationship('ReleaseArtifact', back_populates='release', lazy='select')
 
