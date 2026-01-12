@@ -2,7 +2,6 @@ import itertools
 import json
 
 from abc import ABC
-from collections.abc import Iterable
 
 from json_stream import streamable_list
 
@@ -22,43 +21,40 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def simplify_row(row, **kwargs):
+def simplify_row(row):
+    """Transform JSON:API format to flat dict format. Always returns complete data."""
     if 'relationships' in row:
         for k, v in row['relationships'].items():
             if type(v['data']) == dict:
                 row['attributes'][k + '_id'] = v['data']['id']
 
     output = dict()
+    output['resource'] = row['type']
+    output['id'] = row['id']
 
-    output_fields = kwargs.get('output_fields', None)
-    if output_fields is not None:
-        keys = output_fields
-        if 'id' in keys:
-            output['id'] = row['id']
-        if 'type' in keys:
-            output['type'] = row['type']
-    else:
-        keys = row['attributes'].keys()
-        output['id'] = row['id']
-
-    for key in [x for x in keys if x not in ['id']]:
+    for key in row['attributes'].keys():
         output[key] = row['attributes'][key]
+
     return output
 
 
 @streamable_list
-def simplify_rows(batches, **kwargs):
-    output_fields = kwargs.get('output_fields', None)
+def simplify_rows(batches):
+    """Transform batches of JSON:API data to flat format."""
     if type(batches) == dict:
-        cleaned = simplify_row(batches, **kwargs)
-        yield cleaned
+        yield simplify_row(batches)
     else:
         for batch in batches:
             if type(batch) == dict:
-                yield simplify_row(batch, **kwargs)
+                yield simplify_row(batch)
             elif type(batch) == list:
                 for row in batch:
-                    yield simplify_row(row, **kwargs)
+                    yield simplify_row(row)
+
+
+def _filter_fields(data, fields):
+    """Filter dict to only include specified fields."""
+    return {k: v for k, v in data.items() if k in fields}
 
 
 class AbstractOutputController(ABC):
@@ -66,48 +62,59 @@ class AbstractOutputController(ABC):
     def handle(self, data, **kwargs):
         q = kwargs.get('q', False)
         if q is False:
-            if type(data) == dict:
-                results = simplify_row(data, **kwargs)
-            elif isinstance(data, Iterable):
-                results = simplify_rows(data, **kwargs)
+            results = simplify_rows(data)
             self._output_(results, **kwargs)
 
 
 class PrintingOutputController(AbstractOutputController):
 
     def _output_(self, data, **kwargs):
-        output_format = kwargs.get('output_format', None)
-        if output_format is None:
-            output_format = 'json'
+        output_format = kwargs.get('output_format') or 'json'
+        output_fields = kwargs.get('output_fields')
+
+        # Materialize the iterable to a list so we can check length
+        rows = list(data)
+
+        # Apply field filtering if specified
+        if output_fields:
+            rows = [_filter_fields(row, output_fields) for row in rows]
+
         if output_format == 'json':
-            output = json.dumps(data)
-            print(output)
+            # Single item: output as scalar dict, multiple: output as list
+            if len(rows) == 1:
+                print(json.dumps(rows[0]))
+            else:
+                print(json.dumps(rows))
         elif output_format == 'plain':
-            if type(data) == dict:
-                print(' '.join(str(x) for x in data.values()))
-            elif isinstance(data, Iterable):
-                for row in data:
-                    print(' '.join(str(x) for x in row.values()))
+            for row in rows:
+                print(' '.join(str(x) for x in row.values()))
 
 
 class StringIOOutputController(AbstractOutputController):
 
-    def __init__(self, stringIO):
-        self.stringIO = stringIO
+    def __init__(self, string_io):
+        self.string_io = string_io
 
     def _output_(self, data, **kwargs):
-        output_format = kwargs.get('output_format', None)
-        if output_format is None:
-            output_format = 'json'
+        output_format = kwargs.get('output_format') or 'json'
+        output_fields = kwargs.get('output_fields')
+
+        # Materialize the iterable to a list so we can check length
+        rows = list(data)
+
+        # Apply field filtering if specified
+        if output_fields:
+            rows = [_filter_fields(row, output_fields) for row in rows]
 
         if output_format == 'json':
-            json.dump(data, self.stringIO)
+            # Single item: output as scalar dict, multiple: output as list
+            if len(rows) == 1:
+                json.dump(rows[0], self.string_io)
+            else:
+                json.dump(rows, self.string_io)
         elif output_format == 'plain':
-            if type(data) == dict:
-                self.stringIO.write(' '.join(str(x) for x in data.values()))
-            elif isinstance(data, Iterable):
-                for row in data:
-                    self.stringIO.write(' '.join(str(x) for x in row.values()))
+            for row in rows:
+                self.string_io.write(' '.join(str(x) for x in row.values()))
 
 
 class IterableOutputController(AbstractOutputController):
@@ -116,19 +123,21 @@ class IterableOutputController(AbstractOutputController):
         self.iterable = iterable
 
     def _output_(self, data, **kwargs):
-        output_format = kwargs.get('output_format', None)
-        if output_format is None:
-            output_format = 'json'
+        output_format = kwargs.get('output_format') or 'json'
+        output_fields = kwargs.get('output_fields')
+
+        # Materialize the iterable to a list so we can check length
+        rows = list(data)
+
+        # Apply field filtering if specified
+        if output_fields:
+            rows = [_filter_fields(row, output_fields) for row in rows]
 
         if output_format == 'json':
-            if type(data) == dict:
-                tmp_data = []
-                tmp_data.append(data)
-                data = tmp_data
-            for row in data:
+            for row in rows:
                 self.iterable.append(json.dumps(row))
         elif output_format == 'plain':
-            for row in data:
+            for row in rows:
                 self.iterable.append(' '.join(str(x) for x in row.values()))
 
     @streamable_list

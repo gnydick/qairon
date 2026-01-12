@@ -2,6 +2,7 @@
 # PYTHON_ARGCOMPLETE_OK
 import importlib
 import logging
+import sys
 
 from qairon_qcli.controllers import CLIArgs
 from qairon_qcli.controllers import PrintingOutputController
@@ -10,7 +11,11 @@ from qairon_qcli.controllers import QaironSchema
 from qairon_qcli.controllers import RestController
 from qairon_qcli.lib import dynamic
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
+handler = logging.StreamHandler(sys.stderr)
+handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+logger.addHandler(handler)
 
 def _main_():
     try:

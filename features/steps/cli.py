@@ -163,10 +163,12 @@ def step_impl(context, zone, region):
 @then('delete "{resource}" "{res_id}" via cli')
 def step_impl(context, resource, res_id):
     context.cli.delete(resource, res_id)
-    output = context.stdout_mock.getvalue().strip()
+    output = json.loads(context.stdout_mock.getvalue().strip())
     context.stdout_mock.seek(0)
     context.stdout_mock.truncate(0)
-    assert output == '%s-%d' % (res_id, 204)
+    assert output['id'] == res_id
+    assert output['status'] == 204
+    assert output['resource'] == resource
 
 
 @given('application "{app_id}" can be created via cli')
@@ -291,7 +293,12 @@ def step_impl(context, env, role_id):
     context.cli.create(
         {'resource': 'environment', 'role_id': role_id, 'name': env}, output_format='plain', output_fields=['id']
     )
-    environment = context.cli.get_instance('environment', expected_env_id)
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    context.cli.get('environment', expected_env_id, output_format='json')
+    environment = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
     assert environment['id'] == expected_env_id
 
 
@@ -302,7 +309,12 @@ def step_impl(context, name, environment):
         {'resource': 'k8s_cluster', 'environment_id': environment, 'name': name}, output_format='plain',
         output_fields=['id']
     )
-    k8s_cluster = context.cli.get_instance('k8s_cluster', expected_cluster_id)
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
+    context.cli.get('k8s_cluster', expected_cluster_id, output_format='json')
+    k8s_cluster = json.loads(context.stdout_mock.getvalue().strip())
+    context.stdout_mock.seek(0)
+    context.stdout_mock.truncate(0)
     assert k8s_cluster['id'] == expected_cluster_id
 
 

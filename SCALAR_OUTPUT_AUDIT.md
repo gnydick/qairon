@@ -4,7 +4,7 @@ This document traces the actual code flow for output handling and identifies iss
 
 ---
 
-## Output Controller Code Flow
+## Current Architecture
 
 ### 1. Entry Point: `handle()` (line 66-73)
 
@@ -19,11 +19,11 @@ def handle(self, data, **kwargs):
         self._output_(results, **kwargs)
 ```
 
-- Receives JSON:API data (`{id, type, attributes: {...}, relationships: {...}}`)
-- Calls `simplify_row()` or `simplify_rows()` to flatten
-- Passes result to `_output_()`
+### 2. Current `simplify_row()` (line 25-46)
 
-### 2. Transformation: `simplify_row()` (line 25-46)
+Currently mixes two responsibilities:
+- Transforms JSON:API to flat format
+- Filters fields based on `output_fields` kwarg
 
 ```python
 def simplify_row(row, **kwargs):
@@ -51,115 +51,146 @@ def simplify_row(row, **kwargs):
     return output
 ```
 
-**With `output_fields=['id']`:**
-- `keys = ['id']`
-- `output['id'] = row['id']`
-- Loop adds nothing (excludes 'id')
-- Result: `{'id': 'composite:id:value'}`
+### 3. Current `_output_()` methods
 
-**With `output_fields` not specified (default):**
-- `keys = row['attributes'].keys()`
-- `output['id'] = row['id']`
-- Loop adds all attributes
-- Result: `{'id': '...', 'attr1': '...', 'attr2': '...', ...}`
-- **NOTE: `type` (resource) is NOT included**
-
-**With `output_fields=['id', 'type']`:**
-- `output['id'] = row['id']`
-- `output['type'] = row['type']`
-- Result: `{'id': '...', 'type': '...'}`
-
-### 3. Output: `_output_()` methods
-
-**Plain format (line 85-90):**
-```python
-elif output_format == 'plain':
-    if type(data) == dict:
-        print(' '.join(str(x) for x in data.values()))
-    elif isinstance(data, Iterable):
-        for row in data:
-            print(' '.join(str(x) for x in row.values()))
-```
-
-- Joins all dict VALUES with spaces
-- With `output_fields=['id']`: outputs just the id string
-- With default fields: outputs `id attr1 attr2 ...` space-separated
-
-**JSON format (line 82-84):**
-```python
-if output_format == 'json':
-    output = json.dumps(data)
-    print(output)
-```
-
-- Dumps entire dict as JSON
-- With default fields: `{"id": "...", "attr1": "...", ...}` (no `resource`)
+Only handles format (json/plain), not field filtering.
 
 ---
 
-## Issue Summary
+## Issues with Current Design
 
-### Issue 1: `resource` Not Included in Default Output
+1. **`simplify_row()` does too much** - transforms AND filters
+2. **`resource` not included** - JSON:API `type` is dropped unless explicitly requested
+3. **Field filtering in wrong place** - should be in output controller
+4. **Inconsistent output** - different kwargs produce different shapes
 
-**Location:** `simplify_row()` lines 40-42
+---
 
-**Current behavior:**
+## Proposed Architecture: Clean Separation of Concerns
+
+### Layer 1: `simplify_row()` - Pure Transformation
+
+**Single responsibility:** Transform JSON:API format to complete flat format.
+
 ```python
-else:
-    keys = row['attributes'].keys()
+def simplify_row(row):
+    """
+    Transform JSON:API format to flat dict format.
+    Always returns complete data - no filtering.
+    """
+    # Extract relationship IDs into attributes
+    if 'relationships' in row:
+        for k, v in row['relationships'].items():
+            if type(v['data']) == dict:
+                row['attributes'][k + '_id'] = v['data']['id']
+
+    output = dict()
+    output['resource'] = row['type']
     output['id'] = row['id']
-    # type/resource is NOT added
+
+    for key in row['attributes'].keys():
+        output[key] = row['attributes'][key]
+
+    return output
 ```
 
-**Expected:** Default output should include `resource` (from JSON:API `type`)
-
-### Issue 2: `type` vs `resource` Naming
-
-**Location:** `simplify_row()` lines 38-39
-
-**Current behavior:**
+**Output format (always):**
 ```python
-if 'type' in keys:
-    output['type'] = row['type']
+{
+    'resource': 'deployment',      # from row['type']
+    'id': 'env:app:stack:svc:tag', # from row['id']
+    'attr1': 'value1',             # from row['attributes']
+    'attr2': 'value2',
+    ...
+}
 ```
 
-- Field is called `type` (JSON:API terminology)
-- Tests expect field called `resource` (input format terminology)
+### Layer 2: `simplify_rows()` - Batch Transformation
+
+```python
+@streamable_list
+def simplify_rows(batches):
+    """Transform batches of JSON:API data to flat format."""
+    if type(batches) == dict:
+        yield simplify_row(batches)
+    else:
+        for batch in batches:
+            if type(batch) == dict:
+                yield simplify_row(batch)
+            elif type(batch) == list:
+                for row in batch:
+                    yield simplify_row(row)
+```
+
+### Layer 3: `handle()` - Orchestration
+
+```python
+def handle(self, data, **kwargs):
+    q = kwargs.get('q', False)
+    if q is False:
+        if type(data) == dict:
+            results = simplify_row(data)
+        elif isinstance(data, Iterable):
+            results = simplify_rows(data)
+        self._output_(results, **kwargs)
+```
+
+### Layer 4: `_output_()` - Formatting & Field Selection
+
+**All presentation logic moves here:**
+
+```python
+def _output_(self, data, **kwargs):
+    output_format = kwargs.get('output_format', 'json')
+    output_fields = kwargs.get('output_fields', None)
+
+    if output_format == 'json':
+        if output_fields:
+            data = self._filter_fields(data, output_fields)
+        print(json.dumps(data))
+
+    elif output_format == 'plain':
+        if output_fields:
+            data = self._filter_fields(data, output_fields)
+        if type(data) == dict:
+            print(' '.join(str(x) for x in data.values()))
+        elif isinstance(data, Iterable):
+            for row in data:
+                print(' '.join(str(x) for x in row.values()))
+
+def _filter_fields(self, data, fields):
+    """Filter dict or iterable to only include specified fields."""
+    if type(data) == dict:
+        return {k: v for k, v in data.items() if k in fields}
+    else:
+        return ({k: v for k, v in row.items() if k in fields} for row in data)
+```
 
 ---
 
-## Test Workarounds in `features/steps/cli.py`
+## Benefits of New Architecture
 
-### Plain Format Tests (Working)
+1. **`simplify_row()` is simpler** - no kwargs, always complete output
+2. **Consistent data shape** - every row has `resource`, `id`, and all attributes
+3. **Output controllers own presentation** - field filtering, formatting
+4. **Easier testing** - each layer has single responsibility
+5. **List and scalar output identical format** - just different cardinality
 
-These tests use `output_format='plain', output_fields=['id']` to get just the id:
+---
 
-| Line | Call | Output |
-|------|------|--------|
-| 9 | `create(..., output_format='plain', output_fields=['id'])` | `id` value only |
-| 22 | `create(..., output_format='plain', output_fields=['id'])` | `id` value only |
-| etc. | ... | ... |
+## Test Workarounds That Can Be Removed
 
-**Flow:**
-1. `simplify_row()` with `output_fields=['id']` -> `{'id': 'value'}`
-2. `_output_()` plain -> `' '.join(['value'])` -> `'value'`
+After implementing new architecture, these workarounds become unnecessary:
 
-### JSON Format Tests (Need Workarounds)
+| Line | Current Workaround | After Fix |
+|------|-------------------|-----------|
+| 327 | `output_obj['resource'] = 'dependency_case'` | Output already has `resource` |
+| 338 | `output_obj['resource'] = resource` | Output already has `resource` |
+| 349 | `output_obj['resource'] = resource` | Output already has `resource` |
+| 360 | `output_obj['resource'] = resource` | Output already has `resource` |
+| 372 | `output_obj['resource'] = resource` | Output already has `resource` |
 
-These tests get full JSON output and must patch `resource`:
-
-| Line | Patch to OUTPUT | Patch to INPUT |
-|------|-----------------|----------------|
-| 327 | `output_obj['resource'] = 'dependency_case'` | - |
-| 338-339 | `output_obj['resource'] = resource` | `resource_dict['id'] = ':'.join([value1, value2, name])` |
-| 349-350 | `output_obj['resource'] = resource` | `resource_dict['id'] = ':'.join([value1, value2, value3])` |
-| 360-361 | `output_obj['resource'] = resource` | `resource_dict['id'] = ':'.join([value1, value2, value3])` |
-| 372-373 | `output_obj['resource'] = resource` | `resource_dict['id'] = ':'.join([value1, value2])` |
-
-**Flow:**
-1. `simplify_row()` default -> `{'id': '...', 'attr1': '...', ...}` (no `resource`)
-2. `_output_()` json -> `{"id": "...", "attr1": "...", ...}`
-3. Test parses JSON, adds `resource` manually
+**Note:** The `resource_dict['id'] = ...` patches to INPUT are still needed since tests need to construct expected `id` for comparison.
 
 ---
 
@@ -174,57 +205,17 @@ environment = context.cli.get_instance('environment', expected_env_id)
 k8s_cluster = context.cli.get_instance('k8s_cluster', expected_cluster_id)
 ```
 
-**Issue:** `QCLIController` does not have `get_instance()` method. Only `RestController` has it.
+**Issue:** `QCLIController` does not have `get_instance()` method.
 
-**Note:** `get_instance()` returns a single dict, not a stream. This is a legitimate exception to the streaming pattern - the method name explicitly indicates scalar return.
-
----
-
-## Proposed Fixes
-
-### Fix 1: Add `resource` to Default Output
-
-In `simplify_row()`, change:
-
-```python
-else:
-    keys = row['attributes'].keys()
-    output['id'] = row['id']
-```
-
-To:
-
-```python
-else:
-    keys = row['attributes'].keys()
-    output['resource'] = row['type']  # ADD THIS
-    output['id'] = row['id']
-```
-
-### Fix 2: Rename `type` to `resource` When Requested
-
-Change lines 38-39:
-
-```python
-if 'type' in keys:
-    output['type'] = row['type']
-```
-
-To:
-
-```python
-if 'type' in keys or 'resource' in keys:
-    output['resource'] = row['type']
-```
-
-### Fix 3: Add `get_instance()` to QCLIController
-
+**Fix:**
 ```python
 def get_instance(self, resource, resource_id):
     """Returns a single simplified dict (not a stream)."""
     row = self.rest.get_instance(resource, resource_id)
     return simplify_row(row)
 ```
+
+**Note:** `get_instance()` returns a single dict, not a stream. This is a legitimate exception to the streaming pattern - the method name explicitly indicates scalar return.
 
 ---
 
@@ -243,12 +234,24 @@ These work correctly because `rest.get_instance()` returns scalar dict.
 
 ---
 
+## Implementation Checklist
+
+- [ ] Refactor `simplify_row()` to always return complete format (no kwargs)
+- [ ] Update `simplify_rows()` to not pass kwargs
+- [ ] Update `handle()` to not pass kwargs to simplify functions
+- [ ] Add `_filter_fields()` helper to output controllers
+- [ ] Move field filtering to `_output_()` methods
+- [ ] Add `get_instance()` to `QCLIController`
+- [ ] Update tests to remove `output_obj['resource']` workarounds
+
+---
+
 ## Testing Checklist
 
-After fixes:
+After implementation:
 - [ ] `behave features/cli.feature` passes
 - [ ] `behave features/rest_api.feature` passes
-- [ ] Default JSON output includes `resource` field
-- [ ] Plain format with `output_fields=['id']` outputs just id
-- [ ] Remove test workarounds that add `resource` to output
+- [ ] All output includes `resource` field by default
+- [ ] `output_fields=['id']` filters to just id
+- [ ] Plain format with filtered fields outputs correct values
 - [ ] `context.cli.get_instance()` works

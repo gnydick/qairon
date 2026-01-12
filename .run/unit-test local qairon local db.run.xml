@@ -5,15 +5,15 @@
     <module name="qairon" />
     <option name="target" value="app" />
     <option name="targetType" value="PYTHON" />
+    <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
-      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://ut_qairon:ut_qairon@127.0.0.1/ut_qairon" />
-      <env name="SECRET_KEY" value="12345" />
       <env name="QAIRON_ENDPOINT" value="http://127.0.0.1:5002" />
+      <env name="SECRET_KEY" value="12345" />
+      <env name="SQLALCHEMY_DATABASE_URI" value="postgresql+psycopg2://test_qairon:test_qairon@127.0.0.1/test_qairon" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
-    <option name="SDK_NAME" value="Python 3.9 (qairon-3.9.2)" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -28,6 +28,7 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
+    <option name="RUN_TOOL" value="" />
     <option name="launchJavascriptDebuger" value="false" />
     <method v="2" />
   </configuration>

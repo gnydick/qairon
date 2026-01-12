@@ -14,7 +14,7 @@ class RestController:
     # global schema
     schema = QaironSchema()
     global endpoint
-    endpoint = os.getenv("QAIRON_ENDPOINT", "http://localhost:5001")
+    endpoint = os.getenv("QAIRON_ENDPOINT", "http://127.0.0.1:5001")
 
     def __init__(self):
         pass

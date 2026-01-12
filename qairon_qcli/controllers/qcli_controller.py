@@ -68,8 +68,7 @@ class QCLIController:
         if data is not None:
             self.oc.handle(data, **kwargs)
         else:
-            kwargs['output_format'] = 'plain'
-            self.oc._output_(errors[0], **kwargs)
+            print(errors[0])
 
     def del_from_collection(self, resource, singular_resource, items, owner_id, item_id, **kwargs):
         data = self.ops.del_from_collection(resource, singular_resource, items, owner_id, item_id)
