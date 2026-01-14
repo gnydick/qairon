@@ -2,7 +2,7 @@
 
 **A Single Source of Truth (SSoT) for Infrastructure and Operations**
 
-Qairon is a centralized platform for modeling, managing, and querying your entire infrastructure topology. It provides a unified relational model that captures applications, deployments, infrastructure, and their relationships—enabling full traceability from code to production and back.
+Qairon is a centralized platform for modeling, managing, and querying your entire infrastructure topology. It provides a unified relational model that captures applications, deployments, infrastructure, and their relationships - enabling full traceability from code to production and back.
 
 ## What is Qairon?
 
@@ -42,7 +42,7 @@ Build
 
 A **Build** produces **Build Artifacts** (compiled outputs). **Releases** bundle artifacts for deployment and produce **Release Artifacts** (the actual deployable packages). **Deployments** put releases onto specific targets with associated **Configurations**.
 
-Critically, artifacts track **where they are published**—container registries, artifact repositories, S3 buckets, etc. You never lose sight of where your binaries live.
+Critically, artifacts track **where they are published** - container registries, artifact repositories, S3 buckets, etc. You never lose sight of where your binaries live.
 
 #### Infrastructure Topology
 ```
@@ -107,10 +107,10 @@ Qairon (SSoT)              Git Repository
 └──────────────┘           └──────────────┘
 ```
 
-Qairon is the **source of intent** for infrastructure—it defines what should exist. The git repository contains the IaC that implements that intent.
+Qairon is the **source of intent** for infrastructure - it defines what should exist. The git repository contains the IaC that implements that intent.
 
 What gets recorded **into** Qairon:
-- **Build & artifact lifecycle**: Builds, build artifacts, releases, release artifacts—including where artifacts are published (registries, repos, buckets)
+- **Build & artifact lifecycle**: Builds, build artifacts, releases, release artifacts - including where artifacts are published (registries, repos, buckets)
 - **Native resource IDs**: AWS ARNs, GCP resource IDs, etc. for cross-referencing convenience
 
 What gets generated **from** Qairon:
@@ -331,15 +331,15 @@ This means you **never lose sight of where your binaries are**. Given any deploy
 
 ### vs. Terraform State
 
-Terraform state tracks what Terraform manages. Qairon tracks your complete infrastructure topology including things Terraform doesn't touch—service relationships, deployment history, capacity allocations.
+Terraform state tracks what Terraform manages. Qairon tracks your complete infrastructure topology including things Terraform doesn't touch - service relationships, deployment history, capacity allocations.
 
 ### vs. CMDB
 
-Traditional CMDBs try to track actual infrastructure state and become stale because they're updated after the fact. Qairon is the **source of intent** for infrastructure—configuration is generated *from* Qairon. The build/artifact lifecycle flows *into* Qairon, giving you complete provenance without manual updates.
+Traditional CMDBs try to track actual infrastructure state and become stale because they're updated after the fact. Qairon is the **source of intent** for infrastructure - configuration is generated *from* Qairon. The build/artifact lifecycle flows *into* Qairon, giving you complete provenance without manual updates.
 
 ### vs. Artifact Registries Alone
 
-Container registries and artifact repos store your binaries but don't track relationships. Qairon connects artifacts to builds, builds to commits, releases to deployments, and deployments to infrastructure—so you can answer "what's running where and how did it get there?"
+Container registries and artifact repos store your binaries but don't track relationships. Qairon connects artifacts to builds, builds to commits, releases to deployments, and deployments to infrastructure - so you can answer "what's running where and how did it get there?"
 
 ### vs. Spreadsheets / Wikis
 
