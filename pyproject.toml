@@ -1,8 +1,3 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[metadata]
-name = "qairon_qcli"
-version = "1.2.7"
-description = "CLI for single source of truth Qairon"
