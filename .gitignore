@@ -145,4 +145,3 @@ fabric.properties
 qcli.egg-info/
 /.coverage
 /qairon_qcli.egg-info/
-CLAUDE.md
