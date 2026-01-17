@@ -1,0 +1,372 @@
+[
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general-small"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general-medium"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general-large"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "memory-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "compute-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:ec2-spot",
+        "name": "spot-batch"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "websocket"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "presence"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:batch",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "workers"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:batch",
+        "fleet_type_id": "aws:ec2-spot",
+        "name": "spot-workers"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:batch",
+        "fleet_type_id": "aws:eks-gpu-nodes",
+        "name": "ml-inference"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:lambda:serverless",
+        "fleet_type_id": "aws:lambda",
+        "name": "event-handlers"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:lambda:serverless",
+        "fleet_type_id": "aws:lambda",
+        "name": "api-functions"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:lambda:serverless",
+        "fleet_type_id": "aws:lambda",
+        "name": "edge-functions"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general-small"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general-medium"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general-large"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "memory-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "compute-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "websocket"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "presence"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general-medium"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "memory-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:ap-southeast-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general-medium"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:ap-southeast-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "memory-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111113:us-east-1:ml-inference:eks:inference",
+        "fleet_type_id": "aws:eks-gpu-nodes",
+        "name": "gpu-inference"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111113:us-east-1:ml-inference:eks:inference",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "cpu-inference"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "memory-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:realtime",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "websocket"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "dev:aws:333333333333:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "int:aws:444444444444:us-east-1:platform:eks:main",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:shared:eks:shared",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "general"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "build-runners"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners",
+        "fleet_type_id": "aws:ec2-spot",
+        "name": "spot-runners"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability",
+        "fleet_type_id": "aws:eks-managed-nodes",
+        "name": "monitoring"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet",
+      "attributes": {
+        "deployment_target_id": "local:dev:local-001:local:local:eks:kind",
+        "fleet_type_id": "dev:docker",
+        "name": "default"
+      }
+    }
+  }
+]

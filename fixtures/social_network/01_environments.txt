@@ -1,0 +1,10 @@
+# Environments
+# Format: id
+# Command: environment create {id}
+
+prod
+stg
+dev
+int
+infra
+local

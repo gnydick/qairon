@@ -1,0 +1,50 @@
+# Subnets to Fleets (Many-to-Many)
+# Format: subnet_id	fleet_id
+# Links subnets to the fleets that use them
+
+# =============================================================================
+# PRODUCTION - us-east-1 - Main EKS Cluster
+# =============================================================================
+
+# App subnets -> Main EKS node groups
+prod:aws:111111111111:us-east-1:platform:primary:app-az1	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small
+prod:aws:111111111111:us-east-1:platform:primary:app-az2	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small
+prod:aws:111111111111:us-east-1:platform:primary:app-az3	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small
+
+prod:aws:111111111111:us-east-1:platform:primary:app-az1	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized
+prod:aws:111111111111:us-east-1:platform:primary:app-az2	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized
+prod:aws:111111111111:us-east-1:platform:primary:app-az3	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized
+
+prod:aws:111111111111:us-east-1:platform:primary:app-az1	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized
+prod:aws:111111111111:us-east-1:platform:primary:app-az2	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized
+prod:aws:111111111111:us-east-1:platform:primary:app-az3	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized
+
+# =============================================================================
+# PRODUCTION - us-east-1 - Realtime EKS Cluster
+# =============================================================================
+
+prod:aws:111111111111:us-east-1:platform:primary:app-az1	prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket
+prod:aws:111111111111:us-east-1:platform:primary:app-az2	prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket
+prod:aws:111111111111:us-east-1:platform:primary:app-az3	prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket
+
+# =============================================================================
+# PRODUCTION - us-west-2 (DR)
+# =============================================================================
+
+prod:aws:111111111111:us-west-2:platform:primary:app-az1	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small
+prod:aws:111111111111:us-west-2:platform:primary:app-az2	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small
+prod:aws:111111111111:us-west-2:platform:primary:app-az3	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small
+
+# =============================================================================
+# STAGING - us-east-1
+# =============================================================================
+
+stg:aws:222222222222:us-east-1:platform:primary:app-az1	stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:general
+stg:aws:222222222222:us-east-1:platform:primary:app-az2	stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:general
+
+# =============================================================================
+# DEVELOPMENT - us-east-1
+# =============================================================================
+
+dev:aws:333333333333:us-east-1:platform:primary:app-az1	dev:aws:333333333333:us-east-1:platform:eks:main:aws:eks-managed-nodes:general
+dev:aws:333333333333:us-east-1:platform:primary:app-az2	dev:aws:333333333333:us-east-1:platform:eks:main:aws:eks-managed-nodes:general

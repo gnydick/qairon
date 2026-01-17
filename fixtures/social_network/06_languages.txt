@@ -1,0 +1,12 @@
+# Configuration Languages
+# Format: id
+# Command: language create {id}
+
+yaml
+json
+toml
+hcl
+xml
+properties
+ini
+env

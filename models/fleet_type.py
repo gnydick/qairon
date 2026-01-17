@@ -35,4 +35,4 @@ def my_before_insert_listener(mapper, connection, fleet_type):
 
 
 def __update_id__(fleet_type):
-    fleet_type.id = ':'.join([fleet_type.pop_type_id, fleet_type.name])
+    fleet_type.id = ':'.join([fleet_type.provider_type_id, fleet_type.name])

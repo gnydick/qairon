@@ -1,0 +1,60 @@
+# Releases
+# Format: deployment_id	build_id	build_num	defaults_json
+# Generated ID: {deployment_id}:{build_num}
+# Note: build must be for the same service as the deployment
+
+# =============================================================================
+# PRODUCTION - us-east-1 - Main EKS Cluster - Current Releases
+# =============================================================================
+
+# User Stack - Identity (build 100)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-15T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:99	99	{"deployed_at": "2024-01-10T14:30:00Z", "deployed_by": "ci-system"}
+
+# User Stack - Profile (build 85)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default	social:user:profile:85	85	{"deployed_at": "2024-01-14T11:00:00Z", "deployed_by": "ci-system"}
+
+# Content Stack - Posts (build 234)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T08:00:00Z", "deployed_by": "ci-system"}
+
+# Content Stack - Media (build 178)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default	social:content:media:178	178	{"deployed_at": "2024-01-15T09:00:00Z", "deployed_by": "ci-system"}
+
+# Feed Stack - Timeline (build 267)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T06:00:00Z", "deployed_by": "ci-system"}
+
+# Feed Stack - Ranking (build 145)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:ranking:default	social:feed:ranking:145	145	{"deployed_at": "2024-01-11T08:00:00Z", "deployed_by": "ci-system"}
+
+# Platform Stack - API Gateway (build 178)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T04:00:00Z", "deployed_by": "ci-system"}
+
+# Platform Stack - Rate Limiter (build 89)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:rate-limiter:default	social:platform:rate-limiter:89	89	{"deployed_at": "2024-01-13T06:00:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# PRODUCTION - us-west-2 (DR Region)
+# =============================================================================
+
+prod:aws:111111111111:us-west-2:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-15T12:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T08:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T06:00:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# STAGING - us-east-1
+# =============================================================================
+
+stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-16T14:00:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T14:30:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T15:00:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T15:30:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# DEVELOPMENT - us-east-1
+# =============================================================================
+
+dev:aws:333333333333:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-16T16:00:00Z", "deployed_by": "developer"}
+dev:aws:333333333333:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T16:30:00Z", "deployed_by": "developer"}
+dev:aws:333333333333:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T17:00:00Z", "deployed_by": "developer"}
+dev:aws:333333333333:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T17:30:00Z", "deployed_by": "developer"}

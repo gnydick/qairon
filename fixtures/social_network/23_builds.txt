@@ -1,0 +1,125 @@
+# Builds
+# Format: service_id	build_num	vcs_ref	defaults_json
+# Command: build create {service_id} {build_num} {vcs_ref} [-d '{defaults_json}']
+# Generated ID: {service_id}:{build_num}
+
+# =============================================================================
+# SAMPLE BUILDS FOR KEY SERVICES (Latest builds for demo purposes)
+# =============================================================================
+
+# User Stack Services
+social:user:identity	100	v2.5.0	{"commit": "abc1234", "branch": "main", "ci_job": "12345"}
+social:user:identity	99	v2.4.9	{"commit": "def5678", "branch": "main", "ci_job": "12344"}
+social:user:profile	85	v1.12.0	{"commit": "ghi9012", "branch": "main", "ci_job": "11234"}
+social:user:privacy	42	v1.5.2	{"commit": "jkl3456", "branch": "main", "ci_job": "10234"}
+social:user:account	38	v1.4.0	{"commit": "mno7890", "branch": "main", "ci_job": "9234"}
+
+# Social Graph Stack Services
+social:social:connections	156	v3.2.1	{"commit": "pqr1234", "branch": "main", "ci_job": "13456"}
+social:social:blocks	67	v1.8.0	{"commit": "stu5678", "branch": "main", "ci_job": "12567"}
+social:social:suggestions	89	v2.1.5	{"commit": "vwx9012", "branch": "main", "ci_job": "11678"}
+social:social:contacts	45	v1.3.2	{"commit": "yza3456", "branch": "main", "ci_job": "10789"}
+
+# Content Stack Services
+social:content:posts	234	v4.5.0	{"commit": "bcd7890", "branch": "main", "ci_job": "14567"}
+social:content:media	178	v3.8.2	{"commit": "efg1234", "branch": "main", "ci_job": "13678"}
+social:content:stories	112	v2.4.1	{"commit": "hij5678", "branch": "main", "ci_job": "12789"}
+social:content:comments	189	v3.2.0	{"commit": "klm9012", "branch": "main", "ci_job": "11890"}
+social:content:reactions	201	v2.9.5	{"commit": "nop3456", "branch": "main", "ci_job": "10901"}
+social:content:shares	78	v1.6.3	{"commit": "qrs7890", "branch": "main", "ci_job": "10012"}
+social:content:hashtags	92	v1.9.1	{"commit": "tuv1234", "branch": "main", "ci_job": "9123"}
+
+# Feed Stack Services
+social:feed:timeline	267	v5.1.0	{"commit": "wxy5678", "branch": "main", "ci_job": "15678"}
+social:feed:ranking	145	v2.8.3	{"commit": "zab9012", "branch": "main", "ci_job": "14789"}
+social:feed:fanout	123	v2.3.0	{"commit": "cde3456", "branch": "main", "ci_job": "13890"}
+social:feed:aggregation	98	v1.7.2	{"commit": "fgh7890", "branch": "main", "ci_job": "12901"}
+
+# Messaging Stack Services
+social:messaging:dm	156	v3.0.1	{"commit": "ijk1234", "branch": "main", "ci_job": "14012"}
+social:messaging:groups	89	v2.2.0	{"commit": "lmn5678", "branch": "main", "ci_job": "13123"}
+social:messaging:realtime	201	v3.5.2	{"commit": "opq9012", "branch": "main", "ci_job": "12234"}
+social:messaging:presence	78	v1.8.1	{"commit": "rst3456", "branch": "main", "ci_job": "11345"}
+
+# Notifications Stack Services
+social:notifications:push	134	v2.6.0	{"commit": "uvw7890", "branch": "main", "ci_job": "13234"}
+social:notifications:email	89	v1.9.2	{"commit": "xyz1234", "branch": "main", "ci_job": "12345"}
+social:notifications:sms	56	v1.4.0	{"commit": "abc5678", "branch": "main", "ci_job": "11456"}
+social:notifications:inapp	112	v2.1.3	{"commit": "def9012", "branch": "main", "ci_job": "10567"}
+social:notifications:preferences	45	v1.2.1	{"commit": "ghi3456", "branch": "main", "ci_job": "9678"}
+
+# Search Stack Services
+social:search:users	78	v1.8.0	{"commit": "jkl7890", "branch": "main", "ci_job": "12456"}
+social:search:content	92	v2.0.1	{"commit": "mno1234", "branch": "main", "ci_job": "11567"}
+social:search:hashtags	67	v1.5.2	{"commit": "pqr5678", "branch": "main", "ci_job": "10678"}
+social:search:indexer	89	v1.7.3	{"commit": "stu9012", "branch": "main", "ci_job": "9789"}
+
+# Discovery Stack Services
+social:discovery:trending	112	v2.3.0	{"commit": "vwx3456", "branch": "main", "ci_job": "11678"}
+social:discovery:explore	89	v1.9.1	{"commit": "yza7890", "branch": "main", "ci_job": "10789"}
+social:discovery:recommendations	145	v2.5.2	{"commit": "bcd1234", "branch": "main", "ci_job": "9890"}
+social:discovery:interests	67	v1.4.0	{"commit": "efg5678", "branch": "main", "ci_job": "8901"}
+
+# Moderation Stack Services
+social:moderation:content-review	78	v1.6.1	{"commit": "hij9012", "branch": "main", "ci_job": "10890"}
+social:moderation:auto-mod	123	v2.8.0	{"commit": "klm3456", "branch": "main", "ci_job": "9901"}
+social:moderation:reports	56	v1.3.2	{"commit": "nop7890", "branch": "main", "ci_job": "9012"}
+social:moderation:spam	89	v1.7.5	{"commit": "qrs1234", "branch": "main", "ci_job": "8123"}
+social:moderation:trust-safety	45	v1.2.0	{"commit": "tuv5678", "branch": "main", "ci_job": "7234"}
+
+# Ads Stack Services
+social:ads:campaigns	67	v1.5.0	{"commit": "wxy9012", "branch": "main", "ci_job": "9901"}
+social:ads:targeting	89	v1.8.2	{"commit": "zab3456", "branch": "main", "ci_job": "9012"}
+social:ads:bidding	112	v2.1.0	{"commit": "cde7890", "branch": "main", "ci_job": "8123"}
+social:ads:delivery	145	v2.4.3	{"commit": "fgh1234", "branch": "main", "ci_job": "7234"}
+social:ads:ad-analytics	78	v1.6.1	{"commit": "ijk5678", "branch": "main", "ci_job": "6345"}
+
+# Payments Stack Services
+social:payments:processor	56	v1.4.2	{"commit": "lmn9012", "branch": "main", "ci_job": "8234"}
+social:payments:subscriptions	45	v1.3.0	{"commit": "opq3456", "branch": "main", "ci_job": "7345"}
+social:payments:wallet	34	v1.2.1	{"commit": "rst7890", "branch": "main", "ci_job": "6456"}
+social:payments:payouts	28	v1.1.0	{"commit": "uvw1234", "branch": "main", "ci_job": "5567"}
+
+# Creator Stack Services
+social:creator:studio	45	v1.3.2	{"commit": "xyz5678", "branch": "main", "ci_job": "7456"}
+social:creator:creator-analytics	34	v1.2.0	{"commit": "abc9012", "branch": "main", "ci_job": "6567"}
+social:creator:monetization	28	v1.1.1	{"commit": "def3456", "branch": "main", "ci_job": "5678"}
+social:creator:shop	23	v1.0.5	{"commit": "ghi7890", "branch": "main", "ci_job": "4789"}
+
+# Live Stack Services
+social:live:streaming	67	v1.5.0	{"commit": "jkl1234", "branch": "main", "ci_job": "6678"}
+social:live:live-chat	89	v1.8.2	{"commit": "mno5678", "branch": "main", "ci_job": "5789"}
+social:live:gifts	45	v1.3.0	{"commit": "pqr9012", "branch": "main", "ci_job": "4890"}
+social:live:vod	56	v1.4.1	{"commit": "stu3456", "branch": "main", "ci_job": "3901"}
+
+# Analytics Stack Services
+social:analytics:events	123	v2.2.0	{"commit": "vwx7890", "branch": "main", "ci_job": "5890"}
+social:analytics:warehouse	78	v1.6.3	{"commit": "yza1234", "branch": "main", "ci_job": "4901"}
+social:analytics:pipeline	56	v1.4.0	{"commit": "bcd5678", "branch": "main", "ci_job": "4012"}
+social:analytics:reporting	67	v1.5.2	{"commit": "efg9012", "branch": "main", "ci_job": "3123"}
+social:analytics:ml-features	89	v1.7.1	{"commit": "hij3456", "branch": "main", "ci_job": "2234"}
+
+# Platform Stack Services
+social:platform:api-gateway	178	v3.2.0	{"commit": "klm7890", "branch": "main", "ci_job": "4901"}
+social:platform:rate-limiter	89	v1.8.1	{"commit": "nop1234", "branch": "main", "ci_job": "4012"}
+social:platform:feature-flags	67	v1.5.0	{"commit": "qrs5678", "branch": "main", "ci_job": "3123"}
+social:platform:ab-testing	56	v1.4.2	{"commit": "tuv9012", "branch": "main", "ci_job": "2234"}
+social:platform:config	78	v1.6.0	{"commit": "wxy3456", "branch": "main", "ci_job": "1345"}
+
+# Infrastructure - Observability Stack Services
+infra:observability:logging	89	v1.8.0	{"commit": "zab7890", "branch": "main", "ci_job": "3012"}
+infra:observability:metrics	78	v1.6.2	{"commit": "cde1234", "branch": "main", "ci_job": "2123"}
+infra:observability:tracing	67	v1.5.1	{"commit": "fgh5678", "branch": "main", "ci_job": "1234"}
+infra:observability:alerting	56	v1.4.0	{"commit": "ijk9012", "branch": "main", "ci_job": "0345"}
+infra:observability:dashboards	45	v1.3.2	{"commit": "lmn3456", "branch": "main", "ci_job": "9456"}
+
+# Infrastructure - CICD Stack Services
+infra:cicd:pipelines	67	v1.5.0	{"commit": "opq7890", "branch": "main", "ci_job": "2012"}
+infra:cicd:artifacts	45	v1.3.1	{"commit": "rst1234", "branch": "main", "ci_job": "1123"}
+infra:cicd:deployments	56	v1.4.2	{"commit": "uvw5678", "branch": "main", "ci_job": "0234"}
+infra:cicd:testing	34	v1.2.0	{"commit": "xyz9012", "branch": "main", "ci_job": "9345"}
+
+# Infrastructure - Security Stack Services
+infra:security:vault	78	v1.6.0	{"commit": "abc3456", "branch": "main", "ci_job": "1012"}
+infra:security:scanner	56	v1.4.1	{"commit": "def7890", "branch": "main", "ci_job": "0123"}
+infra:security:compliance	45	v1.3.0	{"commit": "ghi1234", "branch": "main", "ci_job": "9234"}

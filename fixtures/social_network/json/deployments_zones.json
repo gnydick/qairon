@@ -1,0 +1,326 @@
+[
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default",
+        "zone_id": "prod:aws:111111111111:us-east-1:use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-west-2:platform:eks:main:social:user:identity:default",
+        "zone_id": "prod:aws:111111111111:us-west-2:usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-west-2:platform:eks:main:social:user:identity:default",
+        "zone_id": "prod:aws:111111111111:us-west-2:usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-west-2:platform:eks:main:social:user:identity:default",
+        "zone_id": "prod:aws:111111111111:us-west-2:usw2-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "prod:aws:111111111111:us-west-2:usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "prod:aws:111111111111:us-west-2:usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "prod:aws:111111111111:us-west-2:usw2-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default",
+        "zone_id": "stg:aws:222222222222:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default",
+        "zone_id": "stg:aws:222222222222:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "stg:aws:222222222222:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "stg:aws:222222222222:us-east-1:use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "dev:aws:333333333333:us-east-1:platform:eks:main:social:user:identity:default",
+        "zone_id": "dev:aws:333333333333:us-east-1:use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployments_zones",
+      "attributes": {
+        "deployment_id": "dev:aws:333333333333:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "zone_id": "dev:aws:333333333333:us-east-1:use1-az1"
+      }
+    }
+  }
+]

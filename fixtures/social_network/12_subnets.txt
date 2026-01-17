@@ -1,0 +1,186 @@
+# Subnets
+# Format: network_id	name	cidr	native_id
+# Command: subnet create {network_id} {name} {cidr} -n {native_id}
+# Generated ID: {network_id}:{name}
+
+# =============================================================================
+# PRODUCTION PRIMARY - us-east-1 - Platform VPC
+# =============================================================================
+
+# Public Subnets (Load Balancers, NAT Gateways)
+prod:aws:111111111111:us-east-1:platform:primary	public-az1	10.0.0.0/24	subnet-prod-use1-pub-az1
+prod:aws:111111111111:us-east-1:platform:primary	public-az2	10.0.1.0/24	subnet-prod-use1-pub-az2
+prod:aws:111111111111:us-east-1:platform:primary	public-az3	10.0.2.0/24	subnet-prod-use1-pub-az3
+
+# Private App Subnets (EKS Nodes, Application Workloads)
+prod:aws:111111111111:us-east-1:platform:primary	app-az1	10.0.8.0/22	subnet-prod-use1-app-az1
+prod:aws:111111111111:us-east-1:platform:primary	app-az2	10.0.12.0/22	subnet-prod-use1-app-az2
+prod:aws:111111111111:us-east-1:platform:primary	app-az3	10.0.16.0/22	subnet-prod-use1-app-az3
+
+# Private Data Subnets (RDS, ElastiCache, OpenSearch)
+prod:aws:111111111111:us-east-1:platform:primary	data-az1	10.0.100.0/24	subnet-prod-use1-data-az1
+prod:aws:111111111111:us-east-1:platform:primary	data-az2	10.0.101.0/24	subnet-prod-use1-data-az2
+prod:aws:111111111111:us-east-1:platform:primary	data-az3	10.0.102.0/24	subnet-prod-use1-data-az3
+
+# Private Lambda Subnets
+prod:aws:111111111111:us-east-1:platform:primary	lambda-az1	10.0.200.0/24	subnet-prod-use1-lambda-az1
+prod:aws:111111111111:us-east-1:platform:primary	lambda-az2	10.0.201.0/24	subnet-prod-use1-lambda-az2
+prod:aws:111111111111:us-east-1:platform:primary	lambda-az3	10.0.202.0/24	subnet-prod-use1-lambda-az3
+
+# Endpoints Subnets (VPC Endpoints)
+prod:aws:111111111111:us-east-1:platform:primary	endpoints-az1	10.0.250.0/26	subnet-prod-use1-ep-az1
+prod:aws:111111111111:us-east-1:platform:primary	endpoints-az2	10.0.250.64/26	subnet-prod-use1-ep-az2
+prod:aws:111111111111:us-east-1:platform:primary	endpoints-az3	10.0.250.128/26	subnet-prod-use1-ep-az3
+
+# =============================================================================
+# PRODUCTION PRIMARY - us-west-2 - Platform VPC
+# =============================================================================
+
+# Public Subnets
+prod:aws:111111111111:us-west-2:platform:primary	public-az1	10.100.0.0/24	subnet-prod-usw2-pub-az1
+prod:aws:111111111111:us-west-2:platform:primary	public-az2	10.100.1.0/24	subnet-prod-usw2-pub-az2
+prod:aws:111111111111:us-west-2:platform:primary	public-az3	10.100.2.0/24	subnet-prod-usw2-pub-az3
+
+# Private App Subnets
+prod:aws:111111111111:us-west-2:platform:primary	app-az1	10.100.8.0/22	subnet-prod-usw2-app-az1
+prod:aws:111111111111:us-west-2:platform:primary	app-az2	10.100.12.0/22	subnet-prod-usw2-app-az2
+prod:aws:111111111111:us-west-2:platform:primary	app-az3	10.100.16.0/22	subnet-prod-usw2-app-az3
+
+# Private Data Subnets
+prod:aws:111111111111:us-west-2:platform:primary	data-az1	10.100.100.0/24	subnet-prod-usw2-data-az1
+prod:aws:111111111111:us-west-2:platform:primary	data-az2	10.100.101.0/24	subnet-prod-usw2-data-az2
+prod:aws:111111111111:us-west-2:platform:primary	data-az3	10.100.102.0/24	subnet-prod-usw2-data-az3
+
+# Private Lambda Subnets
+prod:aws:111111111111:us-west-2:platform:primary	lambda-az1	10.100.200.0/24	subnet-prod-usw2-lambda-az1
+prod:aws:111111111111:us-west-2:platform:primary	lambda-az2	10.100.201.0/24	subnet-prod-usw2-lambda-az2
+prod:aws:111111111111:us-west-2:platform:primary	lambda-az3	10.100.202.0/24	subnet-prod-usw2-lambda-az3
+
+# =============================================================================
+# PRODUCTION PRIMARY - eu-west-1 - Platform VPC
+# =============================================================================
+
+# Public Subnets
+prod:aws:111111111111:eu-west-1:platform:primary	public-az1	10.200.0.0/24	subnet-prod-euw1-pub-az1
+prod:aws:111111111111:eu-west-1:platform:primary	public-az2	10.200.1.0/24	subnet-prod-euw1-pub-az2
+prod:aws:111111111111:eu-west-1:platform:primary	public-az3	10.200.2.0/24	subnet-prod-euw1-pub-az3
+
+# Private App Subnets
+prod:aws:111111111111:eu-west-1:platform:primary	app-az1	10.200.8.0/22	subnet-prod-euw1-app-az1
+prod:aws:111111111111:eu-west-1:platform:primary	app-az2	10.200.12.0/22	subnet-prod-euw1-app-az2
+prod:aws:111111111111:eu-west-1:platform:primary	app-az3	10.200.16.0/22	subnet-prod-euw1-app-az3
+
+# Private Data Subnets
+prod:aws:111111111111:eu-west-1:platform:primary	data-az1	10.200.100.0/24	subnet-prod-euw1-data-az1
+prod:aws:111111111111:eu-west-1:platform:primary	data-az2	10.200.101.0/24	subnet-prod-euw1-data-az2
+prod:aws:111111111111:eu-west-1:platform:primary	data-az3	10.200.102.0/24	subnet-prod-euw1-data-az3
+
+# =============================================================================
+# PRODUCTION PRIMARY - ap-southeast-1 - Platform VPC
+# =============================================================================
+
+# Public Subnets
+prod:aws:111111111111:ap-southeast-1:platform:primary	public-az1	10.50.0.0/24	subnet-prod-apse1-pub-az1
+prod:aws:111111111111:ap-southeast-1:platform:primary	public-az2	10.50.1.0/24	subnet-prod-apse1-pub-az2
+prod:aws:111111111111:ap-southeast-1:platform:primary	public-az3	10.50.2.0/24	subnet-prod-apse1-pub-az3
+
+# Private App Subnets
+prod:aws:111111111111:ap-southeast-1:platform:primary	app-az1	10.50.8.0/22	subnet-prod-apse1-app-az1
+prod:aws:111111111111:ap-southeast-1:platform:primary	app-az2	10.50.12.0/22	subnet-prod-apse1-app-az2
+prod:aws:111111111111:ap-southeast-1:platform:primary	app-az3	10.50.16.0/22	subnet-prod-apse1-app-az3
+
+# Private Data Subnets
+prod:aws:111111111111:ap-southeast-1:platform:primary	data-az1	10.50.100.0/24	subnet-prod-apse1-data-az1
+prod:aws:111111111111:ap-southeast-1:platform:primary	data-az2	10.50.101.0/24	subnet-prod-apse1-data-az2
+prod:aws:111111111111:ap-southeast-1:platform:primary	data-az3	10.50.102.0/24	subnet-prod-apse1-data-az3
+
+# =============================================================================
+# PRODUCTION DATA ACCOUNT - us-east-1 - Analytics VPC
+# =============================================================================
+
+prod:aws:111111111112:us-east-1:analytics:primary	emr-az1	172.16.0.0/22	subnet-data-use1-emr-az1
+prod:aws:111111111112:us-east-1:analytics:primary	emr-az2	172.16.4.0/22	subnet-data-use1-emr-az2
+prod:aws:111111111112:us-east-1:analytics:primary	emr-az3	172.16.8.0/22	subnet-data-use1-emr-az3
+prod:aws:111111111112:us-east-1:analytics:primary	glue-az1	172.16.100.0/24	subnet-data-use1-glue-az1
+prod:aws:111111111112:us-east-1:analytics:primary	athena-az1	172.16.101.0/24	subnet-data-use1-athena-az1
+
+# =============================================================================
+# PRODUCTION DATA ACCOUNT - us-east-1 - Warehouse VPC
+# =============================================================================
+
+prod:aws:111111111112:us-east-1:warehouse:primary	redshift-az1	172.17.0.0/24	subnet-data-use1-rs-az1
+prod:aws:111111111112:us-east-1:warehouse:primary	redshift-az2	172.17.1.0/24	subnet-data-use1-rs-az2
+prod:aws:111111111112:us-east-1:warehouse:primary	redshift-az3	172.17.2.0/24	subnet-data-use1-rs-az3
+
+# =============================================================================
+# PRODUCTION ML ACCOUNT - us-east-1 - Training VPC
+# =============================================================================
+
+prod:aws:111111111113:us-east-1:ml-training:primary	sagemaker-az1	172.20.0.0/22	subnet-ml-use1-sm-az1
+prod:aws:111111111113:us-east-1:ml-training:primary	sagemaker-az2	172.20.4.0/22	subnet-ml-use1-sm-az2
+prod:aws:111111111113:us-east-1:ml-training:primary	sagemaker-az3	172.20.8.0/22	subnet-ml-use1-sm-az3
+
+# =============================================================================
+# PRODUCTION ML ACCOUNT - us-east-1 - Inference VPC
+# =============================================================================
+
+prod:aws:111111111113:us-east-1:ml-inference:primary	inference-az1	172.21.0.0/22	subnet-ml-use1-inf-az1
+prod:aws:111111111113:us-east-1:ml-inference:primary	inference-az2	172.21.4.0/22	subnet-ml-use1-inf-az2
+prod:aws:111111111113:us-east-1:ml-inference:primary	inference-az3	172.21.8.0/22	subnet-ml-use1-inf-az3
+
+# =============================================================================
+# STAGING - us-east-1 - Platform VPC
+# =============================================================================
+
+stg:aws:222222222222:us-east-1:platform:primary	public-az1	10.128.0.0/24	subnet-stg-use1-pub-az1
+stg:aws:222222222222:us-east-1:platform:primary	public-az2	10.128.1.0/24	subnet-stg-use1-pub-az2
+stg:aws:222222222222:us-east-1:platform:primary	public-az3	10.128.2.0/24	subnet-stg-use1-pub-az3
+stg:aws:222222222222:us-east-1:platform:primary	app-az1	10.128.8.0/22	subnet-stg-use1-app-az1
+stg:aws:222222222222:us-east-1:platform:primary	app-az2	10.128.12.0/22	subnet-stg-use1-app-az2
+stg:aws:222222222222:us-east-1:platform:primary	app-az3	10.128.16.0/22	subnet-stg-use1-app-az3
+stg:aws:222222222222:us-east-1:platform:primary	data-az1	10.128.100.0/24	subnet-stg-use1-data-az1
+stg:aws:222222222222:us-east-1:platform:primary	data-az2	10.128.101.0/24	subnet-stg-use1-data-az2
+stg:aws:222222222222:us-east-1:platform:primary	data-az3	10.128.102.0/24	subnet-stg-use1-data-az3
+
+# =============================================================================
+# DEVELOPMENT - us-east-1 - Platform VPC
+# =============================================================================
+
+dev:aws:333333333333:us-east-1:platform:primary	public-az1	10.140.0.0/24	subnet-dev-use1-pub-az1
+dev:aws:333333333333:us-east-1:platform:primary	public-az2	10.140.1.0/24	subnet-dev-use1-pub-az2
+dev:aws:333333333333:us-east-1:platform:primary	app-az1	10.140.8.0/22	subnet-dev-use1-app-az1
+dev:aws:333333333333:us-east-1:platform:primary	app-az2	10.140.12.0/22	subnet-dev-use1-app-az2
+dev:aws:333333333333:us-east-1:platform:primary	data-az1	10.140.100.0/24	subnet-dev-use1-data-az1
+dev:aws:333333333333:us-east-1:platform:primary	data-az2	10.140.101.0/24	subnet-dev-use1-data-az2
+
+# =============================================================================
+# INTEGRATION - us-east-1 - Platform VPC
+# =============================================================================
+
+int:aws:444444444444:us-east-1:platform:primary	public-az1	10.150.0.0/24	subnet-int-use1-pub-az1
+int:aws:444444444444:us-east-1:platform:primary	public-az2	10.150.1.0/24	subnet-int-use1-pub-az2
+int:aws:444444444444:us-east-1:platform:primary	app-az1	10.150.8.0/22	subnet-int-use1-app-az1
+int:aws:444444444444:us-east-1:platform:primary	app-az2	10.150.12.0/22	subnet-int-use1-app-az2
+int:aws:444444444444:us-east-1:platform:primary	data-az1	10.150.100.0/24	subnet-int-use1-data-az1
+int:aws:444444444444:us-east-1:platform:primary	data-az2	10.150.101.0/24	subnet-int-use1-data-az2
+
+# =============================================================================
+# INFRASTRUCTURE - SHARED SERVICES - us-east-1
+# =============================================================================
+
+infra:aws:555555555555:us-east-1:shared:primary	public-az1	192.168.0.0/24	subnet-infra-use1-pub-az1
+infra:aws:555555555555:us-east-1:shared:primary	public-az2	192.168.1.0/24	subnet-infra-use1-pub-az2
+infra:aws:555555555555:us-east-1:shared:primary	app-az1	192.168.10.0/24	subnet-infra-use1-app-az1
+infra:aws:555555555555:us-east-1:shared:primary	app-az2	192.168.11.0/24	subnet-infra-use1-app-az2
+
+infra:aws:555555555555:us-east-1:cicd:primary	runners-az1	192.168.100.0/26	subnet-infra-use1-cicd-az1
+infra:aws:555555555555:us-east-1:cicd:primary	runners-az2	192.168.100.64/26	subnet-infra-use1-cicd-az2
+
+infra:aws:555555555555:us-east-1:monitoring:primary	grafana-az1	192.168.200.0/26	subnet-infra-use1-mon-az1
+infra:aws:555555555555:us-east-1:monitoring:primary	prometheus-az1	192.168.200.64/26	subnet-infra-use1-prom-az1
+
+# =============================================================================
+# LOCAL
+# =============================================================================
+
+local:dev:local-001:local:local:primary	default	192.168.50.0/26	local-subnet

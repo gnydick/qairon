@@ -1,0 +1,392 @@
+[
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "proc_id": "social:user:identity:api",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "proc_id": "social:user:identity:worker",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "proc_id": "social:user:identity:consumer",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default",
+        "proc_id": "social:user:profile:api",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default",
+        "proc_id": "social:user:profile:worker",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default",
+        "proc_id": "social:user:profile:consumer",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "proc_id": "social:content:posts:api",
+        "defaults": "{\"replicas\": 10, \"cpu\": \"2000m\", \"memory\": \"4Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "proc_id": "social:content:posts:worker",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "proc_id": "social:content:posts:consumer",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default",
+        "proc_id": "social:content:media:api",
+        "defaults": "{\"replicas\": 8, \"cpu\": \"2000m\", \"memory\": \"4Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default",
+        "proc_id": "social:content:media:worker",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"2000m\", \"memory\": \"4Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default",
+        "proc_id": "social:content:media:consumer",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "proc_id": "social:feed:timeline:api",
+        "defaults": "{\"replicas\": 10, \"cpu\": \"2000m\", \"memory\": \"4Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "proc_id": "social:feed:timeline:worker",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "proc_id": "social:feed:timeline:consumer",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:ranking:default",
+        "proc_id": "social:feed:ranking:api",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"2000m\", \"memory\": \"4Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:ranking:default",
+        "proc_id": "social:feed:ranking:worker",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "proc_id": "social:platform:api-gateway:api",
+        "defaults": "{\"replicas\": 10, \"cpu\": \"2000m\", \"memory\": \"4Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "proc_id": "social:platform:api-gateway:worker",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:rate-limiter:default",
+        "proc_id": "social:platform:rate-limiter:api",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default",
+        "proc_id": "social:messaging:dm:api",
+        "defaults": "{\"replicas\": 8, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default",
+        "proc_id": "social:messaging:dm:worker",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default",
+        "proc_id": "social:messaging:dm:consumer",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default",
+        "proc_id": "social:messaging:realtime:websocket",
+        "defaults": "{\"replicas\": 10, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default",
+        "proc_id": "social:messaging:realtime:worker",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default",
+        "proc_id": "social:user:identity:api",
+        "defaults": "{\"replicas\": 2, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default",
+        "proc_id": "social:user:identity:worker",
+        "defaults": "{\"replicas\": 1, \"cpu\": \"250m\", \"memory\": \"512Mi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:content:posts:default",
+        "proc_id": "social:content:posts:api",
+        "defaults": "{\"replicas\": 2, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:content:posts:default",
+        "proc_id": "social:content:posts:worker",
+        "defaults": "{\"replicas\": 1, \"cpu\": \"250m\", \"memory\": \"512Mi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "proc_id": "social:feed:timeline:api",
+        "defaults": "{\"replicas\": 2, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "proc_id": "social:platform:api-gateway:api",
+        "defaults": "{\"replicas\": 2, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "dev:aws:333333333333:us-east-1:platform:eks:main:social:user:identity:default",
+        "proc_id": "social:user:identity:api",
+        "defaults": "{\"replicas\": 1, \"cpu\": \"250m\", \"memory\": \"512Mi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "dev:aws:333333333333:us-east-1:platform:eks:main:social:content:posts:default",
+        "proc_id": "social:content:posts:api",
+        "defaults": "{\"replicas\": 1, \"cpu\": \"250m\", \"memory\": \"512Mi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "dev:aws:333333333333:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "proc_id": "social:feed:timeline:api",
+        "defaults": "{\"replicas\": 1, \"cpu\": \"250m\", \"memory\": \"512Mi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "dev:aws:333333333333:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "proc_id": "social:platform:api-gateway:api",
+        "defaults": "{\"replicas\": 1, \"cpu\": \"250m\", \"memory\": \"512Mi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:logging:default",
+        "proc_id": "infra:observability:logging:api",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:logging:default",
+        "proc_id": "infra:observability:logging:collector",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:metrics:default",
+        "proc_id": "infra:observability:metrics:api",
+        "defaults": "{\"replicas\": 3, \"cpu\": \"1000m\", \"memory\": \"2Gi\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_proc",
+      "attributes": {
+        "deployment_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:metrics:default",
+        "proc_id": "infra:observability:metrics:collector",
+        "defaults": "{\"replicas\": 5, \"cpu\": \"500m\", \"memory\": \"1Gi\"}"
+      }
+    }
+  }
+]

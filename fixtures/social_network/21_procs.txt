@@ -1,0 +1,379 @@
+# Procs (Process Definitions)
+# Format: service_id	name	defaults_json
+# Command: proc create {service_id} {name} [-d '{defaults_json}']
+# Generated ID: {service_id}:{name}
+
+# =============================================================================
+# USER STACK PROCS
+# =============================================================================
+
+# Identity Service
+social:user:identity	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:user:identity	worker	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:user:identity	consumer	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Profile Service
+social:user:profile	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:user:profile	worker	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:user:profile	consumer	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:user:profile	image-processor	{"replicas": 2, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+
+# Privacy Service
+social:user:privacy	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Account Service
+social:user:account	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:user:account	worker	{"replicas": 1, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# =============================================================================
+# SOCIAL GRAPH STACK PROCS
+# =============================================================================
+
+# Connections Service
+social:social:connections	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:social:connections	worker	{"replicas": 3, "cpu_request": "250m", "memory_request": "512Mi", "cpu_limit": "1", "memory_limit": "2Gi"}
+
+# Blocks Service
+social:social:blocks	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Suggestions Service
+social:social:suggestions	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "1Gi", "cpu_limit": "2", "memory_limit": "4Gi"}
+social:social:suggestions	ml-worker	{"replicas": 2, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# Contacts Service
+social:social:contacts	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:social:contacts	sync-worker	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# =============================================================================
+# CONTENT STACK PROCS
+# =============================================================================
+
+# Posts Service
+social:content:posts	api	{"replicas": 10, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:content:posts	worker	{"replicas": 5, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:content:posts	consumer	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Media Service
+social:content:media	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:content:media	worker	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:content:media	consumer	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:content:media	upload-worker	{"replicas": 5, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+social:content:media	transcode-worker	{"replicas": 3, "cpu_request": "2", "memory_request": "4Gi", "cpu_limit": "8", "memory_limit": "16Gi"}
+
+# Stories Service
+social:content:stories	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:content:stories	expiry-worker	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Comments Service
+social:content:comments	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Reactions Service
+social:content:reactions	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:content:reactions	counter-worker	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Shares Service
+social:content:shares	api	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Hashtags Service
+social:content:hashtags	api	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:content:hashtags	indexer	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# =============================================================================
+# FEED STACK PROCS
+# =============================================================================
+
+# Timeline Service
+social:feed:timeline	api	{"replicas": 10, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+social:feed:timeline	worker	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:feed:timeline	consumer	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:feed:timeline	assembler	{"replicas": 5, "cpu_request": "500m", "memory_request": "1Gi", "cpu_limit": "2", "memory_limit": "4Gi"}
+
+# Ranking Service
+social:feed:ranking	api	{"replicas": 5, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+social:feed:ranking	worker	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:feed:ranking	ml-scorer	{"replicas": 3, "cpu_request": "2", "memory_request": "4Gi", "cpu_limit": "8", "memory_limit": "16Gi"}
+
+# Fanout Service
+social:feed:fanout	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:feed:fanout	worker	{"replicas": 10, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Aggregation Service
+social:feed:aggregation	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:feed:aggregation	stream-processor	{"replicas": 5, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+
+# =============================================================================
+# MESSAGING STACK PROCS
+# =============================================================================
+
+# DM Service
+social:messaging:dm	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:messaging:dm	worker	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:messaging:dm	consumer	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Groups Service
+social:messaging:groups	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Realtime Service
+social:messaging:realtime	websocket	{"replicas": 10, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+social:messaging:realtime	worker	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:messaging:realtime	connection-manager	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Presence Service
+social:messaging:presence	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "1Gi", "cpu_limit": "2", "memory_limit": "4Gi"}
+social:messaging:presence	tracker	{"replicas": 2, "cpu_request": "250m", "memory_request": "512Mi", "cpu_limit": "1", "memory_limit": "2Gi"}
+
+# =============================================================================
+# NOTIFICATIONS STACK PROCS
+# =============================================================================
+
+# Push Service
+social:notifications:push	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:notifications:push	sender	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Email Service
+social:notifications:email	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:notifications:email	sender	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# SMS Service
+social:notifications:sms	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:notifications:sms	sender	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Inapp Service
+social:notifications:inapp	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Preferences Service
+social:notifications:preferences	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# =============================================================================
+# SEARCH STACK PROCS
+# =============================================================================
+
+# Search Users Service
+social:search:users	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Search Content Service
+social:search:content	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Search Hashtags Service
+social:search:hashtags	api	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Indexer Service
+social:search:indexer	api	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:search:indexer	worker	{"replicas": 5, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+
+# =============================================================================
+# DISCOVERY STACK PROCS
+# =============================================================================
+
+# Trending Service
+social:discovery:trending	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:discovery:trending	calculator	{"replicas": 2, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+
+# Explore Service
+social:discovery:explore	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "1Gi", "cpu_limit": "2", "memory_limit": "4Gi"}
+
+# Recommendations Service
+social:discovery:recommendations	api	{"replicas": 5, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+social:discovery:recommendations	ml-worker	{"replicas": 3, "cpu_request": "2", "memory_request": "4Gi", "cpu_limit": "8", "memory_limit": "16Gi"}
+
+# Interests Service
+social:discovery:interests	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:discovery:interests	profiler	{"replicas": 2, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# =============================================================================
+# MODERATION STACK PROCS
+# =============================================================================
+
+# Content Review Service
+social:moderation:content-review	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:moderation:content-review	worker	{"replicas": 5, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Auto Mod Service
+social:moderation:auto-mod	api	{"replicas": 3, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+social:moderation:auto-mod	image-analyzer	{"replicas": 3, "cpu_request": "2", "memory_request": "4Gi", "cpu_limit": "8", "memory_limit": "16Gi"}
+social:moderation:auto-mod	text-analyzer	{"replicas": 3, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# Reports Service
+social:moderation:reports	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Spam Service
+social:moderation:spam	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "1Gi", "cpu_limit": "2", "memory_limit": "4Gi"}
+social:moderation:spam	detector	{"replicas": 3, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# Trust Safety Service
+social:moderation:trust-safety	api	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# =============================================================================
+# ADS STACK PROCS
+# =============================================================================
+
+# Campaigns Service
+social:ads:campaigns	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Targeting Service
+social:ads:targeting	api	{"replicas": 5, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# Bidding Service
+social:ads:bidding	api	{"replicas": 5, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+
+# Delivery Service
+social:ads:delivery	api	{"replicas": 10, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:ads:delivery	pacer	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Ad Analytics Service
+social:ads:ad-analytics	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:ads:ad-analytics	aggregator	{"replicas": 5, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+
+# =============================================================================
+# PAYMENTS STACK PROCS
+# =============================================================================
+
+# Processor Service
+social:payments:processor	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:payments:processor	worker	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Subscriptions Service
+social:payments:subscriptions	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:payments:subscriptions	renewal-worker	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Wallet Service
+social:payments:wallet	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Payouts Service
+social:payments:payouts	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:payments:payouts	processor	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# =============================================================================
+# CREATOR STACK PROCS
+# =============================================================================
+
+# Studio Service
+social:creator:studio	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Creator Analytics Service
+social:creator:creator-analytics	api	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:creator:creator-analytics	aggregator	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Monetization Service
+social:creator:monetization	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Shop Service
+social:creator:shop	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# =============================================================================
+# LIVE STACK PROCS
+# =============================================================================
+
+# Streaming Service
+social:live:streaming	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:live:streaming	controller	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Live Chat Service
+social:live:live-chat	websocket	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Gifts Service
+social:live:gifts	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# VOD Service
+social:live:vod	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:live:vod	processor	{"replicas": 2, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# =============================================================================
+# ANALYTICS STACK PROCS
+# =============================================================================
+
+# Events Service
+social:analytics:events	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:analytics:events	collector	{"replicas": 10, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Warehouse Service
+social:analytics:warehouse	api	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+social:analytics:warehouse	loader	{"replicas": 3, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# Pipeline Service
+social:analytics:pipeline	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+social:analytics:pipeline	orchestrator	{"replicas": 2, "cpu_request": "500m", "memory_request": "1Gi", "cpu_limit": "2", "memory_limit": "4Gi"}
+
+# Reporting Service
+social:analytics:reporting	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# ML Features Service
+social:analytics:ml-features	api	{"replicas": 2, "cpu_request": "500m", "memory_request": "1Gi", "cpu_limit": "2", "memory_limit": "4Gi"}
+social:analytics:ml-features	sync-worker	{"replicas": 3, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# =============================================================================
+# PLATFORM STACK PROCS
+# =============================================================================
+
+# API Gateway Service
+social:platform:api-gateway	api	{"replicas": 10, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+social:platform:api-gateway	worker	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Rate Limiter Service
+social:platform:rate-limiter	api	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Feature Flags Service
+social:platform:feature-flags	api	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# A/B Testing Service
+social:platform:ab-testing	api	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Config Service
+social:platform:config	api	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# =============================================================================
+# INFRASTRUCTURE - OBSERVABILITY STACK PROCS
+# =============================================================================
+
+# Logging Service
+infra:observability:logging	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+infra:observability:logging	collector	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Metrics Service
+infra:observability:metrics	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+infra:observability:metrics	collector	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Tracing Service
+infra:observability:tracing	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+infra:observability:tracing	collector	{"replicas": 5, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Alerting Service
+infra:observability:alerting	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+infra:observability:alerting	evaluator	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Dashboards Service
+infra:observability:dashboards	web	{"replicas": 3, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# =============================================================================
+# INFRASTRUCTURE - CICD STACK PROCS
+# =============================================================================
+
+# Pipelines Service
+infra:cicd:pipelines	api	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+infra:cicd:pipelines	controller	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Artifacts Service
+infra:cicd:artifacts	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+
+# Deployments Service
+infra:cicd:deployments	api	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+infra:cicd:deployments	controller	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Testing Service
+infra:cicd:testing	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+infra:cicd:testing	runner	{"replicas": 5, "cpu_request": "1", "memory_request": "2Gi", "cpu_limit": "4", "memory_limit": "8Gi"}
+
+# =============================================================================
+# INFRASTRUCTURE - SECURITY STACK PROCS
+# =============================================================================
+
+# Vault Service
+infra:security:vault	api	{"replicas": 3, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+
+# Scanner Service
+infra:security:scanner	api	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}
+infra:security:scanner	worker	{"replicas": 3, "cpu_request": "1", "memory_request": "1Gi", "cpu_limit": "4", "memory_limit": "4Gi"}
+
+# Compliance Service
+infra:security:compliance	api	{"replicas": 2, "cpu_request": "250m", "memory_request": "256Mi", "cpu_limit": "1", "memory_limit": "1Gi"}
+infra:security:compliance	auditor	{"replicas": 2, "cpu_request": "500m", "memory_request": "512Mi", "cpu_limit": "2", "memory_limit": "2Gi"}

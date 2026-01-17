@@ -1,0 +1,197 @@
+[
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "config_template_id": "k8s-deployment",
+        "name": "identity-deployment",
+        "tag": "default",
+        "config": "{\"service_name\": \"identity\", \"namespace\": \"user\", \"replicas\": 5}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "config_template_id": "k8s-service",
+        "name": "identity-service",
+        "tag": "default",
+        "config": "{\"service_name\": \"identity\", \"namespace\": \"user\", \"port\": 8080}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default",
+        "config_template_id": "k8s-hpa",
+        "name": "identity-hpa",
+        "tag": "default",
+        "config": "{\"service_name\": \"identity\", \"min_replicas\": 3, \"max_replicas\": 10}",
+        "defaults": "{\"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "config_template_id": "k8s-deployment",
+        "name": "posts-deployment",
+        "tag": "default",
+        "config": "{\"service_name\": \"posts\", \"namespace\": \"content\", \"replicas\": 10}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "config_template_id": "k8s-service",
+        "name": "posts-service",
+        "tag": "default",
+        "config": "{\"service_name\": \"posts\", \"namespace\": \"content\", \"port\": 8080}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default",
+        "config_template_id": "k8s-hpa",
+        "name": "posts-hpa",
+        "tag": "default",
+        "config": "{\"service_name\": \"posts\", \"min_replicas\": 5, \"max_replicas\": 20}",
+        "defaults": "{\"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "config_template_id": "k8s-deployment",
+        "name": "timeline-deployment",
+        "tag": "default",
+        "config": "{\"service_name\": \"timeline\", \"namespace\": \"feed\", \"replicas\": 10}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default",
+        "config_template_id": "k8s-service",
+        "name": "timeline-service",
+        "tag": "default",
+        "config": "{\"service_name\": \"timeline\", \"namespace\": \"feed\", \"port\": 8080}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "config_template_id": "k8s-deployment",
+        "name": "gateway-deployment",
+        "tag": "default",
+        "config": "{\"service_name\": \"api-gateway\", \"namespace\": \"platform\", \"replicas\": 10}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "config_template_id": "k8s-service",
+        "name": "gateway-service",
+        "tag": "default",
+        "config": "{\"service_name\": \"api-gateway\", \"namespace\": \"platform\", \"port\": 443}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "config_template_id": "helm-values",
+        "name": "gateway-helm",
+        "tag": "default",
+        "config": "{\"replicas\": 10, \"image_repository\": \"social/api-gateway\", \"image_tag\": \"latest\", \"cpu_limit\": \"2000m\", \"memory_limit\": \"4Gi\"}",
+        "defaults": "{\"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default",
+        "config_template_id": "k8s-deployment",
+        "name": "identity-deployment",
+        "tag": "default",
+        "config": "{\"service_name\": \"identity\", \"namespace\": \"user\", \"replicas\": 2}",
+        "defaults": "{\"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "config_template_id": "k8s-deployment",
+        "name": "gateway-deployment",
+        "tag": "default",
+        "config": "{\"service_name\": \"api-gateway\", \"namespace\": \"platform\", \"replicas\": 2}",
+        "defaults": "{\"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "dev:aws:333333333333:us-east-1:platform:eks:main:social:user:identity:default",
+        "config_template_id": "k8s-deployment",
+        "name": "identity-deployment",
+        "tag": "default",
+        "config": "{\"service_name\": \"identity\", \"namespace\": \"user\", \"replicas\": 1}",
+        "defaults": "{\"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_config",
+      "attributes": {
+        "deployment_id": "dev:aws:333333333333:us-east-1:platform:eks:main:social:platform:api-gateway:default",
+        "config_template_id": "k8s-deployment",
+        "name": "gateway-deployment",
+        "tag": "default",
+        "config": "{\"service_name\": \"api-gateway\", \"namespace\": \"platform\", \"replicas\": 1}",
+        "defaults": "{\"priority\": \"medium\"}"
+      }
+    }
+  }
+]

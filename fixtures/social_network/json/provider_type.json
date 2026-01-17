@@ -1,0 +1,34 @@
+[
+  {
+    "data": {
+      "type": "provider_type",
+      "attributes": {
+        "id": "aws"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "provider_type",
+      "attributes": {
+        "id": "gcp"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "provider_type",
+      "attributes": {
+        "id": "azure"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "provider_type",
+      "attributes": {
+        "id": "dev"
+      }
+    }
+  }
+]

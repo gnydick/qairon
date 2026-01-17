@@ -1,0 +1,173 @@
+[
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az1",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az2",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az3",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az1",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az2",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az3",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az1",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az2",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az3",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az1",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az2",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-east-1:platform:primary:app-az3",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-west-2:platform:primary:app-az1",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-west-2:platform:primary:app-az2",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "prod:aws:111111111111:us-west-2:platform:primary:app-az3",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "stg:aws:222222222222:us-east-1:platform:primary:app-az1",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:general"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "stg:aws:222222222222:us-east-1:platform:primary:app-az2",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:general"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "dev:aws:333333333333:us-east-1:platform:primary:app-az1",
+        "fleet_id": "dev:aws:333333333333:us-east-1:platform:eks:main:aws:eks-managed-nodes:general"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "subnets_fleets",
+      "attributes": {
+        "subnet_id": "dev:aws:333333333333:us-east-1:platform:primary:app-az2",
+        "fleet_id": "dev:aws:333333333333:us-east-1:platform:eks:main:aws:eks-managed-nodes:general"
+      }
+    }
+  }
+]

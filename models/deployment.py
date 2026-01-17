@@ -76,3 +76,9 @@ def my_before_write_listener(mapper, connection, deployment):
 
 def __update_id__(deployment):
     deployment.id = deployment.deployment_target_id + ':' + deployment.service_id + ':' + deployment.tag
+
+
+@db.event.listens_for(Deployment, 'init')
+def set_tag_default(deployment, args, kwargs):
+    if kwargs.get('tag') is None:
+        deployment.tag = 'default'

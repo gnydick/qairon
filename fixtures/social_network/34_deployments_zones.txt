@@ -1,0 +1,78 @@
+# Deployments to Zones (Many-to-Many)
+# Format: deployment_id	zone_id
+# Links deployments to the availability zones they run in
+
+# =============================================================================
+# PRODUCTION - us-east-1 - Main EKS Cluster (3 AZs)
+# =============================================================================
+
+# Identity service across all AZs
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	prod:aws:111111111111:us-east-1:use1-az1
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	prod:aws:111111111111:us-east-1:use1-az2
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	prod:aws:111111111111:us-east-1:use1-az3
+
+# Profile service across all AZs
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default	prod:aws:111111111111:us-east-1:use1-az1
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default	prod:aws:111111111111:us-east-1:use1-az2
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default	prod:aws:111111111111:us-east-1:use1-az3
+
+# Posts service across all AZs
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	prod:aws:111111111111:us-east-1:use1-az1
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	prod:aws:111111111111:us-east-1:use1-az2
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	prod:aws:111111111111:us-east-1:use1-az3
+
+# Media service across all AZs
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default	prod:aws:111111111111:us-east-1:use1-az1
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default	prod:aws:111111111111:us-east-1:use1-az2
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default	prod:aws:111111111111:us-east-1:use1-az3
+
+# Timeline service across all AZs
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default	prod:aws:111111111111:us-east-1:use1-az1
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default	prod:aws:111111111111:us-east-1:use1-az2
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default	prod:aws:111111111111:us-east-1:use1-az3
+
+# API Gateway across all AZs
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	prod:aws:111111111111:us-east-1:use1-az1
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	prod:aws:111111111111:us-east-1:use1-az2
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	prod:aws:111111111111:us-east-1:use1-az3
+
+# =============================================================================
+# PRODUCTION - us-east-1 - Realtime EKS Cluster (3 AZs)
+# =============================================================================
+
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default	prod:aws:111111111111:us-east-1:use1-az1
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default	prod:aws:111111111111:us-east-1:use1-az2
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default	prod:aws:111111111111:us-east-1:use1-az3
+
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default	prod:aws:111111111111:us-east-1:use1-az1
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default	prod:aws:111111111111:us-east-1:use1-az2
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default	prod:aws:111111111111:us-east-1:use1-az3
+
+# =============================================================================
+# PRODUCTION - us-west-2 (DR Region - 3 AZs)
+# =============================================================================
+
+prod:aws:111111111111:us-west-2:platform:eks:main:social:user:identity:default	prod:aws:111111111111:us-west-2:usw2-az1
+prod:aws:111111111111:us-west-2:platform:eks:main:social:user:identity:default	prod:aws:111111111111:us-west-2:usw2-az2
+prod:aws:111111111111:us-west-2:platform:eks:main:social:user:identity:default	prod:aws:111111111111:us-west-2:usw2-az3
+
+prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:api-gateway:default	prod:aws:111111111111:us-west-2:usw2-az1
+prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:api-gateway:default	prod:aws:111111111111:us-west-2:usw2-az2
+prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:api-gateway:default	prod:aws:111111111111:us-west-2:usw2-az3
+
+# =============================================================================
+# STAGING - us-east-1 (2 AZs for cost savings)
+# =============================================================================
+
+stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default	stg:aws:222222222222:us-east-1:use1-az1
+stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default	stg:aws:222222222222:us-east-1:use1-az2
+
+stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default	stg:aws:222222222222:us-east-1:use1-az1
+stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default	stg:aws:222222222222:us-east-1:use1-az2
+
+# =============================================================================
+# DEVELOPMENT - us-east-1 (Single AZ)
+# =============================================================================
+
+dev:aws:333333333333:us-east-1:platform:eks:main:social:user:identity:default	dev:aws:333333333333:us-east-1:use1-az1
+dev:aws:333333333333:us-east-1:platform:eks:main:social:platform:api-gateway:default	dev:aws:333333333333:us-east-1:use1-az1

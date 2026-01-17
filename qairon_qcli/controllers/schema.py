@@ -32,6 +32,7 @@ class QaironSchema:
         ],
         capacity=[
             {'fleet_id': {'dotters': {'completer': 'fleet_completer'}}},
+            {'allocation_type_id': {'dotters': {'completer': 'allocation_type_completer'}}},
             'value',
             {'-d': {'args': {'dest': 'defaults'}}}
         ],

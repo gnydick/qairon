@@ -104,3 +104,21 @@ def my_before_insert_listener(mapper, connection, config):
 
 def __update_stack_id__(config):
     config.id = config.stack_id + ':' + config.config_template_id + ':' + config.name + ':' + config.tag
+
+
+@db.event.listens_for(DeploymentConfig, 'init')
+def set_deployment_config_tag_default(config, args, kwargs):
+    if kwargs.get('tag') is None:
+        config.tag = 'default'
+
+
+@db.event.listens_for(ServiceConfig, 'init')
+def set_service_config_tag_default(config, args, kwargs):
+    if kwargs.get('tag') is None:
+        config.tag = 'default'
+
+
+@db.event.listens_for(StackConfig, 'init')
+def set_stack_config_tag_default(config, args, kwargs):
+    if kwargs.get('tag') is None:
+        config.tag = 'default'

@@ -1,0 +1,212 @@
+[
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "k8s-deployment",
+        "language_id": "yaml",
+        "doc": "apiVersion: apps/v1\\nkind: Deployment\\nmetadata:\\n  name: {{ service_name }}\\n  namespace: {{ namespace }}\\nspec:\\n  replicas: {{ replicas }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "k8s-service",
+        "language_id": "yaml",
+        "doc": "apiVersion: v1\\nkind: Service\\nmetadata:\\n  name: {{ service_name }}\\n  namespace: {{ namespace }}\\nspec:\\n  ports:\\n  - port: {{ port }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "k8s-hpa",
+        "language_id": "yaml",
+        "doc": "apiVersion: autoscaling/v2\\nkind: HorizontalPodAutoscaler\\nmetadata:\\n  name: {{ service_name }}\\nspec:\\n  minReplicas: {{ min_replicas }}\\n  maxReplicas: {{ max_replicas }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "k8s-configmap",
+        "language_id": "yaml",
+        "doc": "apiVersion: v1\\nkind: ConfigMap\\nmetadata:\\n  name: {{ service_name }}-config\\ndata:\\n  {{ config_data }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "k8s-secret",
+        "language_id": "yaml",
+        "doc": "apiVersion: v1\\nkind: Secret\\nmetadata:\\n  name: {{ service_name }}-secret\\ntype: Opaque"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "app-config",
+        "language_id": "yaml",
+        "doc": "service:\\n  name: {{ service_name }}\\n  port: {{ port }}\\n  environment: {{ environment }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "database-config",
+        "language_id": "yaml",
+        "doc": "database:\\n  host: {{ db_host }}\\n  port: {{ db_port }}\\n  name: {{ db_name }}\\n  pool_size: {{ pool_size }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "cache-config",
+        "language_id": "yaml",
+        "doc": "cache:\\n  host: {{ redis_host }}\\n  port: {{ redis_port }}\\n  cluster_mode: {{ cluster_mode }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "logging-config",
+        "language_id": "yaml",
+        "doc": "logging:\\n  level: {{ log_level }}\\n  format: {{ log_format }}\\n  output: {{ log_output }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "tracing-config",
+        "language_id": "yaml",
+        "doc": "tracing:\\n  enabled: {{ tracing_enabled }}\\n  sampler: {{ sampler_type }}\\n  endpoint: {{ collector_endpoint }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "feature-flags",
+        "language_id": "json",
+        "doc": "{\"flags\": {\"{{ flag_name }}\": {\"enabled\": {{ enabled }}, \"rollout_percentage\": {{ rollout }}}}}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "aws-sqs-config",
+        "language_id": "json",
+        "doc": "{\"queue_url\": \"{{ queue_url }}\", \"visibility_timeout\": {{ visibility_timeout }}, \"max_receive_count\": {{ max_receive_count }}}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "aws-sns-config",
+        "language_id": "json",
+        "doc": "{\"topic_arn\": \"{{ topic_arn }}\", \"protocol\": \"{{ protocol }}\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "aws-s3-config",
+        "language_id": "json",
+        "doc": "{\"bucket\": \"{{ bucket_name }}\", \"region\": \"{{ region }}\", \"prefix\": \"{{ prefix }}\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "aws-dynamodb-config",
+        "language_id": "json",
+        "doc": "{\"table_name\": \"{{ table_name }}\", \"region\": \"{{ region }}\", \"read_capacity\": {{ read_capacity }}, \"write_capacity\": {{ write_capacity }}}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "aws-elasticache-config",
+        "language_id": "json",
+        "doc": "{\"cluster_endpoint\": \"{{ endpoint }}\", \"port\": {{ port }}, \"auth_token_enabled\": {{ auth_enabled }}}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "aws-rds-config",
+        "language_id": "json",
+        "doc": "{\"endpoint\": \"{{ endpoint }}\", \"port\": {{ port }}, \"database\": \"{{ database }}\", \"ssl_mode\": \"{{ ssl_mode }}\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "aws-opensearch-config",
+        "language_id": "json",
+        "doc": "{\"endpoint\": \"{{ endpoint }}\", \"index_prefix\": \"{{ index_prefix }}\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "aws-kinesis-config",
+        "language_id": "json",
+        "doc": "{\"stream_name\": \"{{ stream_name }}\", \"shard_count\": {{ shard_count }}, \"region\": \"{{ region }}\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "helm-values",
+        "language_id": "yaml",
+        "doc": "replicaCount: {{ replicas }}\\nimage:\\n  repository: {{ image_repository }}\\n  tag: {{ image_tag }}\\nresources:\\n  limits:\\n    cpu: {{ cpu_limit }}\\n    memory: {{ memory_limit }}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "config_template",
+      "attributes": {
+        "id": "env-vars",
+        "language_id": "env",
+        "doc": "SERVICE_NAME={{ service_name }}\\nENVIRONMENT={{ environment }}\\nLOG_LEVEL={{ log_level }}\\nPORT={{ port }}"
+      }
+    }
+  }
+]

@@ -1,0 +1,742 @@
+[
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small",
+        "value": 100
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-medium",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-medium",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-large",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-large",
+        "value": 3200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 3200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:ec2-spot:spot-batch",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:main:aws:ec2-spot:spot-batch",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "connections",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 500000
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:presence",
+        "value": 100
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:presence",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-managed-nodes:workers",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-managed-nodes:workers",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:batch:aws:ec2-spot:spot-workers",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:batch:aws:ec2-spot:spot-workers",
+        "value": 3200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-gpu-nodes:ml-inference",
+        "value": 80
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-gpu-nodes:ml-inference",
+        "value": 610
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "gpu",
+        "fleet_id": "prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-gpu-nodes:ml-inference",
+        "value": 10
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small",
+        "value": 100
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-medium",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-medium",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-large",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-large",
+        "value": 3200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 3200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:compute-optimized",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:compute-optimized",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "connections",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 500000
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:presence",
+        "value": 100
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:presence",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:eu-west-1:platform:eks:main:aws:eks-managed-nodes:general-medium",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:eu-west-1:platform:eks:main:aws:eks-managed-nodes:general-medium",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:eu-west-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:eu-west-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:ap-southeast-1:platform:eks:main:aws:eks-managed-nodes:general-medium",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:ap-southeast-1:platform:eks:main:aws:eks-managed-nodes:general-medium",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111111:ap-southeast-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111111:ap-southeast-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-gpu-nodes:gpu-inference",
+        "value": 160
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-gpu-nodes:gpu-inference",
+        "value": 1220
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "gpu",
+        "fleet_id": "prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-gpu-nodes:gpu-inference",
+        "value": 20
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-managed-nodes:cpu-inference",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-managed-nodes:cpu-inference",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:general",
+        "value": 100
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:general",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 50
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 50
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 100
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "connections",
+        "fleet_id": "stg:aws:222222222222:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket",
+        "value": 50000
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "dev:aws:333333333333:us-east-1:platform:eks:main:aws:eks-managed-nodes:general",
+        "value": 50
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "dev:aws:333333333333:us-east-1:platform:eks:main:aws:eks-managed-nodes:general",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "int:aws:444444444444:us-east-1:platform:eks:main:aws:eks-managed-nodes:general",
+        "value": 50
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "int:aws:444444444444:us-east-1:platform:eks:main:aws:eks-managed-nodes:general",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "infra:aws:555555555555:us-east-1:shared:eks:shared:aws:eks-managed-nodes:general",
+        "value": 100
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "infra:aws:555555555555:us-east-1:shared:eks:shared:aws:eks-managed-nodes:general",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners:aws:eks-managed-nodes:build-runners",
+        "value": 200
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners:aws:eks-managed-nodes:build-runners",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners:aws:ec2-spot:spot-runners",
+        "value": 400
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners:aws:ec2-spot:spot-runners",
+        "value": 1600
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability:aws:eks-managed-nodes:monitoring",
+        "value": 100
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability:aws:eks-managed-nodes:monitoring",
+        "value": 800
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "disk",
+        "fleet_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability:aws:eks-managed-nodes:monitoring",
+        "value": 2000
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "cpu",
+        "fleet_id": "local:dev:local-001:local:local:eks:kind:dev:docker:default",
+        "value": 8
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "capacity",
+      "attributes": {
+        "allocation_type_id": "memory",
+        "fleet_id": "local:dev:local-001:local:local:eks:kind:dev:docker:default",
+        "value": 16
+      }
+    }
+  }
+]

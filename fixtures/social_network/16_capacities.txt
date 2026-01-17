@@ -1,0 +1,187 @@
+# Capacities (Fleet Resource Capacities)
+# Format: allocation_type_id	fleet_id	value
+# Command: capacity create {allocation_type_id} {fleet_id} {value}
+# Generated ID: {allocation_type_id}:{fleet_id}
+
+# =============================================================================
+# PRODUCTION PRIMARY - us-east-1 - Main EKS Cluster
+# =============================================================================
+
+# General Small Nodes (t3.medium: 2 vCPU, 4 GB)
+cpu	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small	100
+memory	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-small	200
+
+# General Medium Nodes (m5.xlarge: 4 vCPU, 16 GB)
+cpu	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-medium	400
+memory	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-medium	1600
+
+# General Large Nodes (m5.2xlarge: 8 vCPU, 32 GB)
+cpu	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-large	800
+memory	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:general-large	3200
+
+# Memory Optimized Nodes (r5.2xlarge: 8 vCPU, 64 GB)
+cpu	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized	400
+memory	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized	3200
+
+# Compute Optimized Nodes (c5.2xlarge: 8 vCPU, 16 GB)
+cpu	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized	800
+memory	prod:aws:111111111111:us-east-1:platform:eks:main:aws:eks-managed-nodes:compute-optimized	1600
+
+# Spot Batch Nodes
+cpu	prod:aws:111111111111:us-east-1:platform:eks:main:aws:ec2-spot:spot-batch	400
+memory	prod:aws:111111111111:us-east-1:platform:eks:main:aws:ec2-spot:spot-batch	1600
+
+# =============================================================================
+# PRODUCTION PRIMARY - us-east-1 - Realtime EKS Cluster
+# =============================================================================
+
+# WebSocket Nodes (c5.xlarge: 4 vCPU, 8 GB)
+cpu	prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket	200
+memory	prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket	400
+connections	prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket	500000
+
+# Presence Nodes (r5.large: 2 vCPU, 16 GB)
+cpu	prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:presence	100
+memory	prod:aws:111111111111:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:presence	800
+
+# =============================================================================
+# PRODUCTION PRIMARY - us-east-1 - Batch EKS Cluster
+# =============================================================================
+
+# Worker Nodes
+cpu	prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-managed-nodes:workers	400
+memory	prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-managed-nodes:workers	1600
+
+# Spot Worker Nodes
+cpu	prod:aws:111111111111:us-east-1:platform:eks:batch:aws:ec2-spot:spot-workers	800
+memory	prod:aws:111111111111:us-east-1:platform:eks:batch:aws:ec2-spot:spot-workers	3200
+
+# GPU Nodes (p3.2xlarge: 8 vCPU, 61 GB, 1 V100)
+cpu	prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-gpu-nodes:ml-inference	80
+memory	prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-gpu-nodes:ml-inference	610
+gpu	prod:aws:111111111111:us-east-1:platform:eks:batch:aws:eks-gpu-nodes:ml-inference	10
+
+# =============================================================================
+# PRODUCTION PRIMARY - us-west-2 - Main EKS Cluster
+# =============================================================================
+
+cpu	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small	100
+memory	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-small	200
+
+cpu	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-medium	400
+memory	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-medium	1600
+
+cpu	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-large	800
+memory	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:general-large	3200
+
+cpu	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:memory-optimized	400
+memory	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:memory-optimized	3200
+
+cpu	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:compute-optimized	800
+memory	prod:aws:111111111111:us-west-2:platform:eks:main:aws:eks-managed-nodes:compute-optimized	1600
+
+# =============================================================================
+# PRODUCTION PRIMARY - us-west-2 - Realtime EKS Cluster
+# =============================================================================
+
+cpu	prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:websocket	200
+memory	prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:websocket	400
+connections	prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:websocket	500000
+
+cpu	prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:presence	100
+memory	prod:aws:111111111111:us-west-2:platform:eks:realtime:aws:eks-managed-nodes:presence	800
+
+# =============================================================================
+# PRODUCTION PRIMARY - eu-west-1 - Main EKS Cluster
+# =============================================================================
+
+cpu	prod:aws:111111111111:eu-west-1:platform:eks:main:aws:eks-managed-nodes:general-medium	200
+memory	prod:aws:111111111111:eu-west-1:platform:eks:main:aws:eks-managed-nodes:general-medium	800
+
+cpu	prod:aws:111111111111:eu-west-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized	200
+memory	prod:aws:111111111111:eu-west-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized	1600
+
+# =============================================================================
+# PRODUCTION PRIMARY - ap-southeast-1 - Main EKS Cluster
+# =============================================================================
+
+cpu	prod:aws:111111111111:ap-southeast-1:platform:eks:main:aws:eks-managed-nodes:general-medium	200
+memory	prod:aws:111111111111:ap-southeast-1:platform:eks:main:aws:eks-managed-nodes:general-medium	800
+
+cpu	prod:aws:111111111111:ap-southeast-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized	200
+memory	prod:aws:111111111111:ap-southeast-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized	1600
+
+# =============================================================================
+# PRODUCTION ML - us-east-1 - ML Inference EKS Cluster
+# =============================================================================
+
+cpu	prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-gpu-nodes:gpu-inference	160
+memory	prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-gpu-nodes:gpu-inference	1220
+gpu	prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-gpu-nodes:gpu-inference	20
+
+cpu	prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-managed-nodes:cpu-inference	200
+memory	prod:aws:111111111113:us-east-1:ml-inference:eks:inference:aws:eks-managed-nodes:cpu-inference	800
+
+# =============================================================================
+# STAGING - us-east-1 - Main EKS Cluster
+# =============================================================================
+
+cpu	stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:general	100
+memory	stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:general	400
+
+cpu	stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized	50
+memory	stg:aws:222222222222:us-east-1:platform:eks:main:aws:eks-managed-nodes:memory-optimized	400
+
+# =============================================================================
+# STAGING - us-east-1 - Realtime EKS Cluster
+# =============================================================================
+
+cpu	stg:aws:222222222222:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket	50
+memory	stg:aws:222222222222:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket	100
+connections	stg:aws:222222222222:us-east-1:platform:eks:realtime:aws:eks-managed-nodes:websocket	50000
+
+# =============================================================================
+# DEVELOPMENT - us-east-1 - Main EKS Cluster
+# =============================================================================
+
+cpu	dev:aws:333333333333:us-east-1:platform:eks:main:aws:eks-managed-nodes:general	50
+memory	dev:aws:333333333333:us-east-1:platform:eks:main:aws:eks-managed-nodes:general	200
+
+# =============================================================================
+# INTEGRATION - us-east-1 - Main EKS Cluster
+# =============================================================================
+
+cpu	int:aws:444444444444:us-east-1:platform:eks:main:aws:eks-managed-nodes:general	50
+memory	int:aws:444444444444:us-east-1:platform:eks:main:aws:eks-managed-nodes:general	200
+
+# =============================================================================
+# INFRASTRUCTURE - SHARED - us-east-1
+# =============================================================================
+
+cpu	infra:aws:555555555555:us-east-1:shared:eks:shared:aws:eks-managed-nodes:general	100
+memory	infra:aws:555555555555:us-east-1:shared:eks:shared:aws:eks-managed-nodes:general	400
+
+# =============================================================================
+# INFRASTRUCTURE - CICD - us-east-1
+# =============================================================================
+
+cpu	infra:aws:555555555555:us-east-1:cicd:eks:runners:aws:eks-managed-nodes:build-runners	200
+memory	infra:aws:555555555555:us-east-1:cicd:eks:runners:aws:eks-managed-nodes:build-runners	800
+
+cpu	infra:aws:555555555555:us-east-1:cicd:eks:runners:aws:ec2-spot:spot-runners	400
+memory	infra:aws:555555555555:us-east-1:cicd:eks:runners:aws:ec2-spot:spot-runners	1600
+
+# =============================================================================
+# INFRASTRUCTURE - MONITORING - us-east-1
+# =============================================================================
+
+cpu	infra:aws:555555555555:us-east-1:monitoring:eks:observability:aws:eks-managed-nodes:monitoring	100
+memory	infra:aws:555555555555:us-east-1:monitoring:eks:observability:aws:eks-managed-nodes:monitoring	800
+disk	infra:aws:555555555555:us-east-1:monitoring:eks:observability:aws:eks-managed-nodes:monitoring	2000
+
+# =============================================================================
+# LOCAL
+# =============================================================================
+
+cpu	local:dev:local-001:local:local:eks:kind:dev:docker:default	8
+memory	local:dev:local-001:local:local:eks:kind:dev:docker:default	16

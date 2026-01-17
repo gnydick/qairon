@@ -1,0 +1,492 @@
+[
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:us-east-1",
+        "name": "use1-az1",
+        "native_id": "use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:us-east-1",
+        "name": "use1-az2",
+        "native_id": "use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:us-east-1",
+        "name": "use1-az3",
+        "native_id": "use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:us-west-2",
+        "name": "usw2-az1",
+        "native_id": "usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:us-west-2",
+        "name": "usw2-az2",
+        "native_id": "usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:us-west-2",
+        "name": "usw2-az3",
+        "native_id": "usw2-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:eu-west-1",
+        "name": "euw1-az1",
+        "native_id": "euw1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:eu-west-1",
+        "name": "euw1-az2",
+        "native_id": "euw1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:eu-west-1",
+        "name": "euw1-az3",
+        "native_id": "euw1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:ap-southeast-1",
+        "name": "apse1-az1",
+        "native_id": "apse1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:ap-southeast-1",
+        "name": "apse1-az2",
+        "native_id": "apse1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111111:ap-southeast-1",
+        "name": "apse1-az3",
+        "native_id": "apse1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111112:us-east-1",
+        "name": "use1-az1",
+        "native_id": "use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111112:us-east-1",
+        "name": "use1-az2",
+        "native_id": "use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111112:us-east-1",
+        "name": "use1-az3",
+        "native_id": "use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111112:us-west-2",
+        "name": "usw2-az1",
+        "native_id": "usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111112:us-west-2",
+        "name": "usw2-az2",
+        "native_id": "usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111112:us-west-2",
+        "name": "usw2-az3",
+        "native_id": "usw2-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111113:us-east-1",
+        "name": "use1-az1",
+        "native_id": "use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111113:us-east-1",
+        "name": "use1-az2",
+        "native_id": "use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111113:us-east-1",
+        "name": "use1-az3",
+        "native_id": "use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111113:us-west-2",
+        "name": "usw2-az1",
+        "native_id": "usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111113:us-west-2",
+        "name": "usw2-az2",
+        "native_id": "usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "prod:aws:111111111113:us-west-2",
+        "name": "usw2-az3",
+        "native_id": "usw2-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "stg:aws:222222222222:us-east-1",
+        "name": "use1-az1",
+        "native_id": "use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "stg:aws:222222222222:us-east-1",
+        "name": "use1-az2",
+        "native_id": "use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "stg:aws:222222222222:us-east-1",
+        "name": "use1-az3",
+        "native_id": "use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "stg:aws:222222222222:us-west-2",
+        "name": "usw2-az1",
+        "native_id": "usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "stg:aws:222222222222:us-west-2",
+        "name": "usw2-az2",
+        "native_id": "usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "stg:aws:222222222222:us-west-2",
+        "name": "usw2-az3",
+        "native_id": "usw2-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "dev:aws:333333333333:us-east-1",
+        "name": "use1-az1",
+        "native_id": "use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "dev:aws:333333333333:us-east-1",
+        "name": "use1-az2",
+        "native_id": "use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "dev:aws:333333333333:us-west-2",
+        "name": "usw2-az1",
+        "native_id": "usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "dev:aws:333333333333:us-west-2",
+        "name": "usw2-az2",
+        "native_id": "usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "int:aws:444444444444:us-east-1",
+        "name": "use1-az1",
+        "native_id": "use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "int:aws:444444444444:us-east-1",
+        "name": "use1-az2",
+        "native_id": "use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555555:us-east-1",
+        "name": "use1-az1",
+        "native_id": "use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555555:us-east-1",
+        "name": "use1-az2",
+        "native_id": "use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555555:us-east-1",
+        "name": "use1-az3",
+        "native_id": "use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555555:us-west-2",
+        "name": "usw2-az1",
+        "native_id": "usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555555:us-west-2",
+        "name": "usw2-az2",
+        "native_id": "usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555555:us-west-2",
+        "name": "usw2-az3",
+        "native_id": "usw2-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555558:us-east-1",
+        "name": "use1-az1",
+        "native_id": "use1-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555558:us-east-1",
+        "name": "use1-az2",
+        "native_id": "use1-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555558:us-east-1",
+        "name": "use1-az3",
+        "native_id": "use1-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555558:us-west-2",
+        "name": "usw2-az1",
+        "native_id": "usw2-az1"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555558:us-west-2",
+        "name": "usw2-az2",
+        "native_id": "usw2-az2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "infra:aws:555555555558:us-west-2",
+        "name": "usw2-az3",
+        "native_id": "usw2-az3"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "zone",
+      "attributes": {
+        "region_id": "local:dev:local-001:local",
+        "name": "local-az1",
+        "native_id": "local-az1"
+      }
+    }
+  }
+]

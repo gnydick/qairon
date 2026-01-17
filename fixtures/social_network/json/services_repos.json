@@ -1,0 +1,353 @@
+[
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:identity",
+        "repo_id": "git:social-user-identity"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:identity",
+        "repo_id": "ecr:identity"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:identity",
+        "repo_id": "s3:artifacts-prod"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:profile",
+        "repo_id": "git:social-user-profile"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:profile",
+        "repo_id": "ecr:profile"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:profile",
+        "repo_id": "s3:artifacts-prod"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:privacy",
+        "repo_id": "git:social-user-privacy"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:privacy",
+        "repo_id": "ecr:privacy"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:account",
+        "repo_id": "git:social-user-account"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:user:account",
+        "repo_id": "ecr:account"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:posts",
+        "repo_id": "git:social-posts"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:posts",
+        "repo_id": "ecr:posts"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:posts",
+        "repo_id": "s3:artifacts-prod"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:media",
+        "repo_id": "git:social-media"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:media",
+        "repo_id": "ecr:media"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:media",
+        "repo_id": "s3:media-uploads"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:stories",
+        "repo_id": "git:social-stories"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:stories",
+        "repo_id": "ecr:stories"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:comments",
+        "repo_id": "git:social-comments"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:content:comments",
+        "repo_id": "ecr:comments"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:feed:timeline",
+        "repo_id": "git:social-timeline"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:feed:timeline",
+        "repo_id": "ecr:timeline"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:feed:timeline",
+        "repo_id": "s3:artifacts-prod"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:feed:ranking",
+        "repo_id": "git:social-ranking"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:feed:ranking",
+        "repo_id": "ecr:ranking"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:platform:api-gateway",
+        "repo_id": "git:social-api-gateway"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:platform:api-gateway",
+        "repo_id": "ecr:api-gateway"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:platform:api-gateway",
+        "repo_id": "s3:artifacts-prod"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:platform:rate-limiter",
+        "repo_id": "git:social-rate-limiter"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:platform:rate-limiter",
+        "repo_id": "ecr:rate-limiter"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:messaging:dm",
+        "repo_id": "git:social-dm"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:messaging:dm",
+        "repo_id": "ecr:dm"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:messaging:realtime",
+        "repo_id": "git:social-realtime"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "social:messaging:realtime",
+        "repo_id": "ecr:realtime"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "infra:observability:logging",
+        "repo_id": "git:social-logging"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "infra:observability:logging",
+        "repo_id": "ecr:logging"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "infra:observability:metrics",
+        "repo_id": "git:social-metrics"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "infra:observability:metrics",
+        "repo_id": "ecr:metrics"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "services_repos",
+      "attributes": {
+        "service_id": "infra:cicd:pipelines",
+        "repo_id": "git:social-pipelines"
+      }
+    }
+  }
+]

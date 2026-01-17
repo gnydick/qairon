@@ -1,0 +1,173 @@
+[
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "eks-managed-nodes"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "eks-fargate"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "ecs-ec2"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "ecs-fargate"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "lambda"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "ec2-asg"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "ec2-spot"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "eks-gpu-nodes"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "sagemaker-endpoint"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "emr-cluster"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "redshift-cluster"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "elasticache-cluster"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "opensearch-cluster"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "rds-cluster"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "msk-cluster"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "aws",
+        "name": "neptune-cluster"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "dev",
+        "name": "docker"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "dev",
+        "name": "kind"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "fleet_type",
+      "attributes": {
+        "provider_type_id": "dev",
+        "name": "minikube"
+      }
+    }
+  }
+]

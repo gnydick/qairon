@@ -1,0 +1,20 @@
+[
+  {
+    "data": {
+      "type": "application",
+      "attributes": {
+        "id": "social",
+        "defaults": "{\"description\": \"Social Network Platform\", \"owner\": \"platform-team\", \"oncall\": \"social-platform-oncall@company.com\", \"slack\": \"#social-platform\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "application",
+      "attributes": {
+        "id": "infra",
+        "defaults": "{\"description\": \"Infrastructure and Shared Services\", \"owner\": \"infra-team\", \"oncall\": \"infra-oncall@company.com\", \"slack\": \"#infra-platform\"}"
+      }
+    }
+  }
+]

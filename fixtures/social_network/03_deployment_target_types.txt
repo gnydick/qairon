@@ -1,0 +1,9 @@
+# Deployment Target Types
+# Format: id
+# Command: deployment_target_type create {id}
+
+eks
+ecs
+lambda
+fargate
+ec2

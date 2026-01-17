@@ -18,8 +18,9 @@ class Capacity(db.Model):
     value = Column(Float, nullable=False)
     defaults = Column(Text)
 
-    type = relationship('AllocationType', back_populates='capacities')
+
     fleet = relationship('Fleet', back_populates='capacities')
+    type = relationship('AllocationType', back_populates='capacities')
 
     def __repr__(self):
         return self.id
@@ -37,4 +38,4 @@ def my_before_insert_listener(mapper, connection, capacity):
 
 
 def __update_id__(capacity):
-    capacity.id = ':'.join([capacity.relatable_type.id, capacity.fleet.id])
+    capacity.id = ':'.join([capacity.fleet_id, capacity.allocation_type_id])

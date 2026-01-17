@@ -1,0 +1,43 @@
+# Stack Configs
+# Format: stack_id	config_template_id	name	tag	config_json	defaults_json
+# Generated ID: {stack_id}:{config_template_id}:{name}:{tag}
+# Note: config_json should contain values for template placeholders
+
+# =============================================================================
+# Social Application Stack Configs
+# =============================================================================
+
+social:user	k8s-configmap	namespace-config	default	{"service_name": "user-stack", "config_data": "STACK=user\\nTEAM=user-team"}	{"owner": "user-team"}
+social:user	helm-values	helm-defaults	default	{"replicas": 3, "image_repository": "social/user", "image_tag": "latest", "cpu_limit": "1000m", "memory_limit": "2Gi"}	{"owner": "user-team"}
+
+social:social	k8s-configmap	namespace-config	default	{"service_name": "social-stack", "config_data": "STACK=social\\nTEAM=social-team"}	{"owner": "social-team"}
+
+social:content	k8s-configmap	namespace-config	default	{"service_name": "content-stack", "config_data": "STACK=content\\nTEAM=content-team"}	{"owner": "content-team"}
+social:content	helm-values	helm-defaults	default	{"replicas": 5, "image_repository": "social/content", "image_tag": "latest", "cpu_limit": "2000m", "memory_limit": "4Gi"}	{"owner": "content-team"}
+
+social:feed	k8s-configmap	namespace-config	default	{"service_name": "feed-stack", "config_data": "STACK=feed\\nTEAM=feed-team"}	{"owner": "feed-team"}
+social:feed	helm-values	helm-defaults	default	{"replicas": 5, "image_repository": "social/feed", "image_tag": "latest", "cpu_limit": "2000m", "memory_limit": "4Gi"}	{"owner": "feed-team"}
+
+social:notifications	k8s-configmap	namespace-config	default	{"service_name": "notifications-stack", "config_data": "STACK=notifications\\nTEAM=notifications-team"}	{"owner": "notifications-team"}
+
+social:search	k8s-configmap	namespace-config	default	{"service_name": "search-stack", "config_data": "STACK=search\\nTEAM=search-team"}	{"owner": "search-team"}
+
+social:messaging	k8s-configmap	namespace-config	default	{"service_name": "messaging-stack", "config_data": "STACK=messaging\\nTEAM=messaging-team"}	{"owner": "messaging-team"}
+
+social:platform	k8s-configmap	namespace-config	default	{"service_name": "platform-stack", "config_data": "STACK=platform\\nTEAM=platform-team"}	{"owner": "platform-team"}
+social:platform	helm-values	helm-defaults	default	{"replicas": 10, "image_repository": "social/platform", "image_tag": "latest", "cpu_limit": "2000m", "memory_limit": "4Gi"}	{"owner": "platform-team"}
+
+social:ads	k8s-configmap	namespace-config	default	{"service_name": "ads-stack", "config_data": "STACK=ads\\nTEAM=ads-team"}	{"owner": "ads-team"}
+
+social:analytics	k8s-configmap	namespace-config	default	{"service_name": "analytics-stack", "config_data": "STACK=analytics\\nTEAM=analytics-team"}	{"owner": "analytics-team"}
+
+# =============================================================================
+# Infrastructure Application Stack Configs
+# =============================================================================
+
+infra:observability	k8s-configmap	namespace-config	default	{"service_name": "observability-stack", "config_data": "STACK=observability\\nTEAM=platform-team"}	{"owner": "platform-team"}
+infra:observability	helm-values	helm-defaults	default	{"replicas": 3, "image_repository": "infra/observability", "image_tag": "latest", "cpu_limit": "1000m", "memory_limit": "2Gi"}	{"owner": "platform-team"}
+
+infra:cicd	k8s-configmap	namespace-config	default	{"service_name": "cicd-stack", "config_data": "STACK=cicd\\nTEAM=platform-team"}	{"owner": "platform-team"}
+
+infra:security	k8s-configmap	namespace-config	default	{"service_name": "security-stack", "config_data": "STACK=security\\nTEAM=security-team"}	{"owner": "security-team"}

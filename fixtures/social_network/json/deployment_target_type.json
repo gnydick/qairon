@@ -1,0 +1,42 @@
+[
+  {
+    "data": {
+      "type": "deployment_target_type",
+      "attributes": {
+        "id": "eks"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_target_type",
+      "attributes": {
+        "id": "ecs"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_target_type",
+      "attributes": {
+        "id": "lambda"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_target_type",
+      "attributes": {
+        "id": "fargate"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment_target_type",
+      "attributes": {
+        "id": "ec2"
+      }
+    }
+  }
+]

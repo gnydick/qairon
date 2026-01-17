@@ -1,0 +1,1355 @@
+[
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:user:identity",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:user:profile",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:user:privacy",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:user:account",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:social:connections",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"social\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:social:blocks",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"social\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:social:suggestions",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"social\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:social:contacts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"social\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:content:posts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:content:media",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:content:stories",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:content:comments",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:content:reactions",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:content:shares",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:content:hashtags",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:feed:timeline",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:feed:ranking",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:feed:fanout",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:feed:aggregation",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:notifications:push",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"notifications\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:notifications:email",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"notifications\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:notifications:sms",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"notifications\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:notifications:inapp",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"notifications\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:notifications:preferences",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"notifications\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:search:users",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"search\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:search:content",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"search\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:search:hashtags",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"search\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:search:indexer",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"search\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:discovery:trending",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"discovery\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:discovery:explore",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"discovery\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:discovery:recommendations",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"discovery\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:discovery:interests",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"discovery\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:moderation:content-review",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"moderation\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:moderation:auto-mod",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"moderation\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:moderation:reports",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"moderation\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:moderation:spam",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"moderation\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:moderation:trust-safety",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"moderation\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:ads:campaigns",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"ads\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:ads:targeting",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"ads\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:ads:bidding",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"ads\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:ads:delivery",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"ads\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:ads:ad-analytics",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"ads\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:payments:processor",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"payments\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:payments:subscriptions",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"payments\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:payments:wallet",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"payments\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:payments:payouts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"payments\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:creator:studio",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"creator\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:creator:creator-analytics",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"creator\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:creator:monetization",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"creator\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:creator:shop",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"creator\", \"priority\": \"low\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:analytics:events",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"analytics\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:analytics:warehouse",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"analytics\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:analytics:pipeline",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"analytics\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:analytics:reporting",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"analytics\", \"priority\": \"low\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:analytics:ml-features",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"analytics\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:platform:api-gateway",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:platform:rate-limiter",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:platform:feature-flags",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:platform:ab-testing",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:main",
+        "service_id": "social:platform:config",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "service_id": "social:messaging:dm",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "service_id": "social:messaging:groups",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "service_id": "social:messaging:realtime",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "service_id": "social:messaging:presence",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "service_id": "social:live:streaming",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"live\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "service_id": "social:live:live-chat",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"live\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "service_id": "social:live:gifts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"live\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-east-1:platform:eks:realtime",
+        "service_id": "social:live:vod",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"live\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:user:identity",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:user:profile",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:user:privacy",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:user:account",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:social:connections",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"social\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:social:blocks",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"social\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:content:posts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:content:media",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:content:comments",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:content:reactions",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:feed:timeline",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:feed:ranking",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:platform:api-gateway",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:main",
+        "service_id": "social:platform:rate-limiter",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime",
+        "service_id": "social:messaging:dm",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime",
+        "service_id": "social:messaging:realtime",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:us-west-2:platform:eks:realtime",
+        "service_id": "social:messaging:presence",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "service_id": "social:user:identity",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "service_id": "social:user:profile",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "service_id": "social:user:privacy",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "service_id": "social:content:posts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "service_id": "social:content:media",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "service_id": "social:feed:timeline",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "prod:aws:111111111111:eu-west-1:platform:eks:main",
+        "service_id": "social:platform:api-gateway",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "service_id": "social:user:identity",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "service_id": "social:user:profile",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "service_id": "social:social:connections",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"social\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "service_id": "social:content:posts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "service_id": "social:content:media",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "service_id": "social:feed:timeline",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:main",
+        "service_id": "social:platform:api-gateway",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:realtime",
+        "service_id": "social:messaging:dm",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "stg:aws:222222222222:us-east-1:platform:eks:realtime",
+        "service_id": "social:messaging:realtime",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"messaging\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "dev:aws:333333333333:us-east-1:platform:eks:main",
+        "service_id": "social:user:identity",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "dev:aws:333333333333:us-east-1:platform:eks:main",
+        "service_id": "social:user:profile",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "dev:aws:333333333333:us-east-1:platform:eks:main",
+        "service_id": "social:content:posts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "dev:aws:333333333333:us-east-1:platform:eks:main",
+        "service_id": "social:feed:timeline",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "dev:aws:333333333333:us-east-1:platform:eks:main",
+        "service_id": "social:platform:api-gateway",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "int:aws:444444444444:us-east-1:platform:eks:main",
+        "service_id": "social:user:identity",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "int:aws:444444444444:us-east-1:platform:eks:main",
+        "service_id": "social:user:profile",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"user\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "int:aws:444444444444:us-east-1:platform:eks:main",
+        "service_id": "social:content:posts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"content\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "int:aws:444444444444:us-east-1:platform:eks:main",
+        "service_id": "social:feed:timeline",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"feed\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "int:aws:444444444444:us-east-1:platform:eks:main",
+        "service_id": "social:platform:api-gateway",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"platform\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability",
+        "service_id": "infra:observability:logging",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"observability\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability",
+        "service_id": "infra:observability:metrics",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"observability\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability",
+        "service_id": "infra:observability:tracing",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"observability\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability",
+        "service_id": "infra:observability:alerting",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"observability\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:monitoring:eks:observability",
+        "service_id": "infra:observability:dashboards",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"observability\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners",
+        "service_id": "infra:cicd:pipelines",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"cicd\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners",
+        "service_id": "infra:cicd:artifacts",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"cicd\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners",
+        "service_id": "infra:cicd:deployments",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"cicd\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:cicd:eks:runners",
+        "service_id": "infra:cicd:testing",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"cicd\", \"priority\": \"medium\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:shared:eks:shared",
+        "service_id": "infra:security:vault",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"security\", \"priority\": \"critical\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:shared:eks:shared",
+        "service_id": "infra:security:scanner",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"security\", \"priority\": \"high\"}"
+      }
+    }
+  },
+  {
+    "data": {
+      "type": "deployment",
+      "attributes": {
+        "deployment_target_id": "infra:aws:555555555555:us-east-1:shared:eks:shared",
+        "service_id": "infra:security:compliance",
+        "tag": "default",
+        "defaults": "{\"namespace\": \"security\", \"priority\": \"high\"}"
+      }
+    }
+  }
+]

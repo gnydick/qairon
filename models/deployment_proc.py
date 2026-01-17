@@ -34,6 +34,19 @@ def my_before_insert_listener(mapper, connection, deployment_proc):
 
 
 def __update_id__(deployment_proc):
-    assert deployment_proc.deployment.service_id == deployment_proc.proc.service_id
+    # Extract service_id from proc_id (format: {service_id}:{name})
+    proc_service_id = ':'.join(deployment_proc.proc_id.rsplit(':', 1)[:-1])
+
+    # Get deployment's service_id - either from loaded relationship or query
+    if deployment_proc.deployment is not None:
+        deployment_service_id = deployment_proc.deployment.service_id
+    else:
+        # Query the deployment to get its service_id
+        from models.deployment import Deployment
+        dep = db.session.get(Deployment, deployment_proc.deployment_id)
+        deployment_service_id = dep.service_id if dep else None
+
+    assert deployment_service_id == proc_service_id, \
+        f"Proc service_id ({proc_service_id}) must match deployment service_id ({deployment_service_id})"
 
     deployment_proc.id = deployment_proc.deployment_id + ':' + deployment_proc.proc_id

@@ -1,0 +1,8 @@
+# Provider Types
+# Format: id
+# Command: provider_type create {id}
+
+aws
+gcp
+azure
+dev

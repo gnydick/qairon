@@ -1,0 +1,37 @@
+# Config Templates
+# Format: id	language_id	doc
+# Command: config_template create {id} {language_id} -d '{doc}'
+# Generated ID: {id}
+
+# Kubernetes Deployment Templates
+k8s-deployment	yaml	apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: {{ service_name }}\n  namespace: {{ namespace }}\nspec:\n  replicas: {{ replicas }}
+k8s-service	yaml	apiVersion: v1\nkind: Service\nmetadata:\n  name: {{ service_name }}\n  namespace: {{ namespace }}\nspec:\n  ports:\n  - port: {{ port }}
+k8s-hpa	yaml	apiVersion: autoscaling/v2\nkind: HorizontalPodAutoscaler\nmetadata:\n  name: {{ service_name }}\nspec:\n  minReplicas: {{ min_replicas }}\n  maxReplicas: {{ max_replicas }}
+k8s-configmap	yaml	apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: {{ service_name }}-config\ndata:\n  {{ config_data }}
+k8s-secret	yaml	apiVersion: v1\nkind: Secret\nmetadata:\n  name: {{ service_name }}-secret\ntype: Opaque
+
+# Application Config Templates
+app-config	yaml	service:\n  name: {{ service_name }}\n  port: {{ port }}\n  environment: {{ environment }}
+database-config	yaml	database:\n  host: {{ db_host }}\n  port: {{ db_port }}\n  name: {{ db_name }}\n  pool_size: {{ pool_size }}
+cache-config	yaml	cache:\n  host: {{ redis_host }}\n  port: {{ redis_port }}\n  cluster_mode: {{ cluster_mode }}
+logging-config	yaml	logging:\n  level: {{ log_level }}\n  format: {{ log_format }}\n  output: {{ log_output }}
+tracing-config	yaml	tracing:\n  enabled: {{ tracing_enabled }}\n  sampler: {{ sampler_type }}\n  endpoint: {{ collector_endpoint }}
+
+# Feature Flag Templates
+feature-flags	json	{"flags": {"{{ flag_name }}": {"enabled": {{ enabled }}, "rollout_percentage": {{ rollout }}}}}
+
+# AWS Resource Templates
+aws-sqs-config	json	{"queue_url": "{{ queue_url }}", "visibility_timeout": {{ visibility_timeout }}, "max_receive_count": {{ max_receive_count }}}
+aws-sns-config	json	{"topic_arn": "{{ topic_arn }}", "protocol": "{{ protocol }}"}
+aws-s3-config	json	{"bucket": "{{ bucket_name }}", "region": "{{ region }}", "prefix": "{{ prefix }}"}
+aws-dynamodb-config	json	{"table_name": "{{ table_name }}", "region": "{{ region }}", "read_capacity": {{ read_capacity }}, "write_capacity": {{ write_capacity }}}
+aws-elasticache-config	json	{"cluster_endpoint": "{{ endpoint }}", "port": {{ port }}, "auth_token_enabled": {{ auth_enabled }}}
+aws-rds-config	json	{"endpoint": "{{ endpoint }}", "port": {{ port }}, "database": "{{ database }}", "ssl_mode": "{{ ssl_mode }}"}
+aws-opensearch-config	json	{"endpoint": "{{ endpoint }}", "index_prefix": "{{ index_prefix }}"}
+aws-kinesis-config	json	{"stream_name": "{{ stream_name }}", "shard_count": {{ shard_count }}, "region": "{{ region }}"}
+
+# Helm Values Templates
+helm-values	yaml	replicaCount: {{ replicas }}\nimage:\n  repository: {{ image_repository }}\n  tag: {{ image_tag }}\nresources:\n  limits:\n    cpu: {{ cpu_limit }}\n    memory: {{ memory_limit }}
+
+# Environment Variables Template
+env-vars	env	SERVICE_NAME={{ service_name }}\nENVIRONMENT={{ environment }}\nLOG_LEVEL={{ log_level }}\nPORT={{ port }}

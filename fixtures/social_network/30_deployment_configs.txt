@@ -1,0 +1,49 @@
+# Deployment Configs
+# Format: deployment_id	config_template_id	name	tag	config_json	defaults_json
+# Generated ID: {deployment_id}:{config_template_id}:{name}:{tag}
+# Note: config_json should contain values for template placeholders
+
+# =============================================================================
+# PRODUCTION - us-east-1 - Identity Service Configs
+# =============================================================================
+
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	k8s-deployment	identity-deployment	default	{"service_name": "identity", "namespace": "user", "replicas": 5}	{"priority": "critical"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	k8s-service	identity-service	default	{"service_name": "identity", "namespace": "user", "port": 8080}	{"priority": "critical"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	k8s-hpa	identity-hpa	default	{"service_name": "identity", "min_replicas": 3, "max_replicas": 10}	{"priority": "high"}
+
+# =============================================================================
+# PRODUCTION - us-east-1 - Posts Service Configs
+# =============================================================================
+
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	k8s-deployment	posts-deployment	default	{"service_name": "posts", "namespace": "content", "replicas": 10}	{"priority": "critical"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	k8s-service	posts-service	default	{"service_name": "posts", "namespace": "content", "port": 8080}	{"priority": "critical"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	k8s-hpa	posts-hpa	default	{"service_name": "posts", "min_replicas": 5, "max_replicas": 20}	{"priority": "high"}
+
+# =============================================================================
+# PRODUCTION - us-east-1 - Timeline Service Configs
+# =============================================================================
+
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default	k8s-deployment	timeline-deployment	default	{"service_name": "timeline", "namespace": "feed", "replicas": 10}	{"priority": "critical"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default	k8s-service	timeline-service	default	{"service_name": "timeline", "namespace": "feed", "port": 8080}	{"priority": "critical"}
+
+# =============================================================================
+# PRODUCTION - us-east-1 - API Gateway Configs
+# =============================================================================
+
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	k8s-deployment	gateway-deployment	default	{"service_name": "api-gateway", "namespace": "platform", "replicas": 10}	{"priority": "critical"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	k8s-service	gateway-service	default	{"service_name": "api-gateway", "namespace": "platform", "port": 443}	{"priority": "critical"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	helm-values	gateway-helm	default	{"replicas": 10, "image_repository": "social/api-gateway", "image_tag": "latest", "cpu_limit": "2000m", "memory_limit": "4Gi"}	{"priority": "critical"}
+
+# =============================================================================
+# STAGING Configs
+# =============================================================================
+
+stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default	k8s-deployment	identity-deployment	default	{"service_name": "identity", "namespace": "user", "replicas": 2}	{"priority": "high"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default	k8s-deployment	gateway-deployment	default	{"service_name": "api-gateway", "namespace": "platform", "replicas": 2}	{"priority": "high"}
+
+# =============================================================================
+# DEVELOPMENT Configs
+# =============================================================================
+
+dev:aws:333333333333:us-east-1:platform:eks:main:social:user:identity:default	k8s-deployment	identity-deployment	default	{"service_name": "identity", "namespace": "user", "replicas": 1}	{"priority": "medium"}
+dev:aws:333333333333:us-east-1:platform:eks:main:social:platform:api-gateway:default	k8s-deployment	gateway-deployment	default	{"service_name": "api-gateway", "namespace": "platform", "replicas": 1}	{"priority": "medium"}

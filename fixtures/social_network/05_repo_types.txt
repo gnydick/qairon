@@ -1,0 +1,12 @@
+# Repository Types
+# Format: id
+# Command: repo_type create {id}
+
+git
+ecr
+helm
+s3
+npm
+pypi
+maven
+docker
