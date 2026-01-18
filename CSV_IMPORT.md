@@ -264,6 +264,7 @@ controller.print_import_summary(successful, failed)
 2. **No Relationship Management**: Many-to-many relationships (like service repos) must be set after import
 3. **Single Resource Type**: Each CSV file can only contain one resource type
 4. **Sequential Processing**: Resources are created one at a time (not batched)
+5. **JSON Detection**: Fields that start with `{` or `[` are automatically treated as JSON. For literal strings starting with these characters, they will be parsed as JSON (or kept as string if invalid)
 
 ## Future Enhancements
 
@@ -274,3 +275,7 @@ Potential future improvements:
 - Multi-resource-type CSV files
 - Export to CSV functionality
 - CSV validation without API calls
+- File size limits for very large CSV files
+- Configuration to specify which fields contain JSON
+- Use of Python logging module for better log control
+- Input parameter validation
