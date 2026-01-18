@@ -6,6 +6,21 @@ from typing import Dict, List, Any, Tuple
 from qairon_qcli.controllers import RestController
 
 
+class CSVImportError(Exception):
+    """Base exception for CSV import errors."""
+    pass
+
+
+class CSVFileNotFoundError(CSVImportError):
+    """Raised when CSV file is not found."""
+    pass
+
+
+class CSVParsingError(CSVImportError):
+    """Raised when CSV file cannot be parsed."""
+    pass
+
+
 class CSVImportController:
     """Controller for importing CSV data into Qairon resources."""
 
@@ -32,7 +47,7 @@ class CSVImportController:
                 reader = csv.DictReader(csvfile)
                 
                 if not reader.fieldnames:
-                    raise ValueError("CSV file is empty or has no headers")
+                    raise CSVParsingError("CSV file is empty or has no headers")
                 
                 for row_num, row in enumerate(reader, start=2):  # start=2 because row 1 is headers
                     # Skip empty rows
@@ -93,14 +108,9 @@ class CSVImportController:
                         })
                         
         except FileNotFoundError:
-            print(f"Error: CSV file not found: {csv_file_path}", file=sys.stderr)
-            sys.exit(1)
+            raise CSVFileNotFoundError(f"CSV file not found: {csv_file_path}")
         except csv.Error as e:
-            print(f"Error reading CSV file: {e}", file=sys.stderr)
-            sys.exit(1)
-        except Exception as e:
-            print(f"Unexpected error: {e}", file=sys.stderr)
-            sys.exit(1)
+            raise CSVParsingError(f"Error reading CSV file: {e}")
             
         return successful_imports, failed_imports
 
@@ -111,6 +121,7 @@ class CSVImportController:
         - Remove empty values
         - Strip whitespace
         - Parse JSON fields (if they start with { or [)
+        - Validate JSON size to prevent memory issues
         
         Args:
             row: Raw CSV row as a dictionary
@@ -119,6 +130,7 @@ class CSVImportController:
             Cleaned dictionary ready for API submission
         """
         cleaned = {}
+        max_json_size = 1024 * 1024  # 1MB limit for JSON fields
         
         for key, value in row.items():
             # Skip empty values
@@ -131,11 +143,16 @@ class CSVImportController:
             
             # Try to parse JSON values
             if value.startswith('{') or value.startswith('['):
-                try:
-                    value = json.loads(value)
-                except json.JSONDecodeError:
-                    # If JSON parsing fails, keep as string
-                    pass
+                # Check JSON size before parsing
+                if len(value) > max_json_size:
+                    # Don't parse, keep as string but log a warning
+                    print(f"Warning: JSON value for '{key}' exceeds size limit ({len(value)} bytes), treating as string", file=sys.stderr)
+                else:
+                    try:
+                        value = json.loads(value)
+                    except json.JSONDecodeError:
+                        # If JSON parsing fails, keep as string
+                        pass
             
             cleaned[key] = value
             

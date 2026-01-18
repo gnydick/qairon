@@ -1,4 +1,7 @@
+import sys
+
 from qairon_qcli.plugins.csv_import.controllers import CSVImportController
+from qairon_qcli.plugins.csv_import.controllers.csv_import import CSVImportError
 
 COMMANDS = dict(
     import_csv=[
@@ -28,9 +31,13 @@ def import_csv(resource_type, csv_file, dry_run=False, **kwargs):
     if dry_run:
         print("DRY RUN MODE - No resources will be created")
     
-    successful, failed = controller.import_from_csv(resource_type, csv_file, dry_run)
-    controller.print_import_summary(successful, failed, dry_run)
-    
-    # Exit with error code if there were failures
-    if failed:
-        exit(1)
+    try:
+        successful, failed = controller.import_from_csv(resource_type, csv_file, dry_run)
+        controller.print_import_summary(successful, failed, dry_run)
+        
+        # Exit with error code if there were failures
+        if failed:
+            sys.exit(1)
+    except CSVImportError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
