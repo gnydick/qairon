@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="qcli service get_field (children) - modernize" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="qcli deployment get_field configs (children)" type="PythonConfigurationType" factoryName="Python">
     <module name="qairon" />
+    <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
@@ -20,8 +21,9 @@
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli/qcli.py" />
-    <option name="PARAMETERS" value="service get_field withme:services:game-server-manager builds -r 2 -o plain -f id" />
+    <option name="RUN_TOOL" value="" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon_qcli/qcli.py" />
+    <option name="PARAMETERS" value="deployment get_field prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default configs" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />
