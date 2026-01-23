@@ -28,7 +28,7 @@ tests_require = ["coverage", "flake8", "pexpect", "wheel", "behave"]
 
 setup(
     name='qairon_qcli',
-    version='1.2.8',
+    version='1.2.9',
     url='https://github.com/gnydick/qairon',
     project_urls={},
     license='MIT',

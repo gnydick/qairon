@@ -72,7 +72,7 @@ def __add_set_field_parser__(rest, parsers, resource):
 
 def __add_get_field_parser__(rest, parsers, resource):
     get_field_parser = parsers.add_parser('get_field')
-    get_field_parser.add_argument('id').completer = getattr(rest, '%s_completer' % resource)
+    get_field_parser.add_argument('resource_id').completer = getattr(rest, '%s_completer' % resource)
     get_field_parser.add_argument('field')
     get_field_parser.add_argument('-f', help='output field for related object', dest='output_fields',
                                   action='append')

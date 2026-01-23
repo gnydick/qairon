@@ -8,8 +8,8 @@
       <env name="QAIRON_ENDPOINT" value="http://localhost:5002" />
       <env name="SQLALCHEMY_DATABASE_URI" value="postgresql://test_qairon:test_qairon@127.0.0.1/test_qairon" />
     </envs>
-    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
-    <option name="SDK_NAME" value="Python 3.9 (qairon-3.9.2)" />
+    <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.13.11/bin/python" />
+    <option name="SDK_NAME" value="Python 3.13 (qairon-3.13.11)" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
