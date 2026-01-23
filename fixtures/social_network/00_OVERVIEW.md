@@ -393,7 +393,161 @@ Build and deployment automation.
 
 ---
 
-## 6. Fixture File Structure
+## 6. Service Dependency Chains
+
+### 6.1 Documented Service Dependencies
+
+These are the known, documented dependencies between services. When an upstream service fails, downstream services will experience cascading failures.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           REQUEST FLOW DEPENDENCIES                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+API Gateway (platform:api-gateway)
+├── identity (user:identity) ─── All authenticated requests
+│   └── profile (user:profile)
+│
+├── timeline (feed:timeline)
+│   ├── ranking (feed:ranking)
+│   ├── posts (content:posts)
+│   │   ├── media (content:media)
+│   │   └── hashtags (content:hashtags)
+│   ├── stories (content:stories)
+│   │   └── media (content:media)
+│   ├── connections (social:connections)
+│   └── reactions (content:reactions)
+│
+├── posts (content:posts)
+│   ├── media (content:media)
+│   ├── hashtags (content:hashtags)
+│   ├── fanout (feed:fanout)
+│   │   └── connections (social:connections)
+│   └── indexer (search:indexer)
+│
+├── comments (content:comments)
+│   └── posts (content:posts)
+│
+├── reactions (content:reactions)
+│   ├── posts (content:posts)
+│   └── comments (content:comments)
+│
+├── shares (content:shares)
+│   ├── posts (content:posts)
+│   └── fanout (feed:fanout)
+│
+├── dm (messaging:dm)
+│   ├── realtime (messaging:realtime)
+│   └── presence (messaging:presence)
+│
+├── groups (messaging:groups)
+│   ├── realtime (messaging:realtime)
+│   └── presence (messaging:presence)
+│
+├── push (notifications:push)
+│   └── preferences (notifications:preferences)
+├── inapp (notifications:inapp)
+│   └── preferences (notifications:preferences)
+│
+├── search-users (search:users)
+│   └── indexer (search:indexer)
+├── search-content (search:content)
+│   └── indexer (search:indexer)
+│
+├── explore (discovery:explore)
+│   ├── trending (discovery:trending)
+│   ├── recommendations (discovery:recommendations)
+│   │   └── interests (discovery:interests)
+│   └── ranking (feed:ranking)
+│
+├── streaming (live:streaming)
+│   ├── live-chat (live:live-chat)
+│   │   └── realtime (messaging:realtime)
+│   └── gifts (live:gifts)
+│       └── wallet (payments:wallet)
+│
+├── campaigns (ads:campaigns)
+│   ├── targeting (ads:targeting)
+│   └── bidding (ads:bidding)
+│
+└── subscriptions (payments:subscriptions)
+    └── processor (payments:processor)
+```
+
+### 6.2 Dependency Matrix
+
+| Service | Direct Dependencies |
+|---------|---------------------|
+| `timeline` | ranking, posts, stories, connections, reactions |
+| `posts` | media, hashtags, fanout, indexer |
+| `comments` | posts |
+| `reactions` | posts, comments |
+| `shares` | posts, fanout |
+| `stories` | media |
+| `dm` | realtime, presence |
+| `groups` | realtime, presence |
+| `live-chat` | realtime |
+| `gifts` | wallet |
+| `fanout` | connections |
+| `explore` | trending, recommendations, ranking |
+| `recommendations` | interests |
+| `search-*` | indexer |
+| `push/inapp` | preferences |
+| `campaigns` | targeting, bidding |
+| `subscriptions` | processor |
+| `streaming` | live-chat, gifts |
+
+### 6.3 Shared Infrastructure Dependencies
+
+These dependencies are less obvious because they share infrastructure rather than direct API calls:
+
+#### Database Clusters
+| Cluster | Services |
+|---------|----------|
+| Aurora Primary | profile, privacy, account, posts, comments, shares, campaigns, subscriptions, wallet, payouts, content-review, reports, trust-safety |
+| DynamoDB | identity, blocks, contacts, stories, reactions, hashtags, timeline, dm, groups, presence, inapp, preferences, trending, interests, feature-flags, ab-testing |
+| Neptune | connections, blocks, suggestions |
+| OpenSearch | hashtags, indexer, search-*, trust-safety |
+
+#### Cache Clusters
+| Cluster | Services |
+|---------|----------|
+| Redis Session | identity, rate-limiter |
+| Redis Feed | timeline, ranking, fanout |
+| Redis Social | connections, suggestions |
+| Redis Content | posts, comments, reactions, stories |
+| Redis Messaging | dm, groups, realtime, presence |
+| Redis Ads | campaigns, targeting, bidding, delivery |
+
+#### Message Queues
+| Queue Cluster | Services |
+|---------------|----------|
+| Kinesis Feed | timeline, fanout, aggregation, trending |
+| Kinesis Analytics | events, warehouse, pipeline |
+| SQS Notifications | push, email, sms, inapp |
+| SQS Moderation | content-review, auto-mod, reports |
+
+### 6.4 Hidden Dependencies (Undocumented)
+
+These dependencies exist but are not documented in architecture diagrams. They represent:
+- Shared libraries with bugs that affect multiple services
+- Services accidentally sharing cache keys
+- Circular dependencies introduced during development
+- Database connection pool exhaustion affecting co-located services
+
+| Hidden Dependency | Affected Services | Cause |
+|-------------------|-------------------|-------|
+| Shared Auth Library | All services using JWT validation | Library version mismatch |
+| Feed Cache Collision | timeline, explore, recommendations | Overlapping cache key patterns |
+| Aurora Connection Pool | All Aurora services | Pool exhaustion under load |
+| Rate Limiter Quota | api-gateway, all downstream | Shared rate limit bucket |
+| OpenSearch Cluster | search-*, hashtags, trust-safety | Index corruption |
+| Media Processing | media, stories, studio, vod | Shared transcoding queue |
+| Neptune Timeout | connections, blocks, suggestions | Graph query complexity |
+
+---
+
+## 7. Fixture File Structure
 
 The fixture files are organized in load order to handle dependencies:
 
