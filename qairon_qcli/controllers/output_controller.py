@@ -78,7 +78,6 @@ class PrintingOutputController(AbstractOutputController):
         # Apply field filtering if specified
         if output_fields:
             rows = [_filter_fields(row, output_fields) for row in rows]
-
         if output_format == 'json':
             # Single item: output as scalar dict, multiple: output as list
             if len(rows) == 1:
@@ -87,7 +86,7 @@ class PrintingOutputController(AbstractOutputController):
                 print(json.dumps(rows))
         elif output_format == 'plain':
             for row in rows:
-                print(' '.join(str(x) for x in row.values()))
+                print(' '.join(row[x] for x in output_fields))
 
 
 class StringIOOutputController(AbstractOutputController):
