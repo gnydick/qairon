@@ -53,6 +53,35 @@ python generate_monitoring_data.py <total_events> <total_users> [--output <dir>]
 python generate_monitoring_data.py 1000000 10000 --output fixtures/test_data
 ```
 
+## Recommended Data Generation
+
+For smooth time series data with visible outliers at 10-15 second granularity per deployment:
+
+```bash
+# Generate 50M events, 50K users (~225M metrics, ~50GB)
+# Takes 20-30 minutes to generate, gives ~1 event/minute/deployment
+python fixtures/social_network/generate_monitoring_data.py 50000000 50000 --output fixtures/test_data
+
+# Start VictoriaMetrics with 2-year retention and 12 CPU cores
+docker run -d --name victoria --cpus=12 -p 8428:8428 \
+  -v vm-data-2y:/victoria-metrics-data \
+  victoriametrics/victoria-metrics -retentionPeriod=2y
+
+# Start Grafana
+docker run -d --name grafana -p 3000:3000 grafana/grafana
+
+# Import with parallel workers (takes 30-60 minutes for 225M metrics)
+python fixtures/social_network/import_to_victoriametrics.py fixtures/test_data/metrics.jsonl --workers 12
+```
+
+### Data Density Guide
+| Events | Users | Metrics | Approx Size | Granularity per Deployment |
+|--------|-------|---------|-------------|---------------------------|
+| 1M | 10K | 4.5M | ~1.5GB | ~1 per 10 minutes |
+| 10M | 20K | 45M | ~15GB | ~1 per minute |
+| 50M | 50K | 225M | ~50GB | ~1 per 10-15 seconds |
+| 100M | 100K | 450M | ~100GB | ~1 per 5-7 seconds |
+
 ## Output Files
 - `logs.jsonl` - Log entries (one JSON object per line)
 - `metrics.jsonl` - Metric entries (one JSON object per line)
