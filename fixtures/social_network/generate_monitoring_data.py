@@ -14,6 +14,8 @@ import argparse
 import json
 import random
 import uuid
+import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -827,12 +829,261 @@ class InfrastructureIncident:
     error_info: Dict
 
 
+# =============================================================================
+# PARALLEL EVENT GENERATION WORKER
+# =============================================================================
+
+def _generate_events_for_chunk(args: Tuple) -> List[dict]:
+    """
+    Worker function for parallel event generation.
+    Generates events for a chunk of (user_data, event_count) pairs.
+
+    Args is a tuple containing:
+    - worker_id: int
+    - user_chunk: List of (user_dict, event_count) pairs
+    - incidents_data: List of incident dicts (serializable form)
+    - start_time: datetime
+    - end_time: datetime
+    - base_seed: int
+    - error_codes: dict
+    - error_messages: dict
+    """
+    (worker_id, user_chunk, incidents_data, start_time, end_time,
+     base_seed, error_codes, error_messages) = args
+
+    # Create worker-local RNG with deterministic seed
+    rng = random.Random(base_seed + worker_id * 1000000)
+
+    # Reconstruct incidents from serializable form
+    incidents = [
+        InfrastructureIncident(**inc) for inc in incidents_data
+    ]
+
+    # Worker-local content pools
+    all_posts = []
+    all_stories = []
+    all_streams = []
+    all_hashtags = [f"#{word}" for word in [
+        "trending", "viral", "fyp", "lifestyle", "travel", "food", "fitness",
+        "tech", "gaming", "music", "art", "fashion", "beauty", "sports",
+        "news", "memes", "photography", "nature", "pets", "diy", "cooking"
+    ]]
+
+    def get_active_incident(service_key: str, timestamp: datetime) -> Optional[InfrastructureIncident]:
+        for incident in incidents:
+            if incident.start_time <= timestamp <= incident.end_time:
+                if service_key in incident.affected_services:
+                    return incident
+        return None
+
+    def check_hidden_dependency_failure(action, timestamp) -> Optional[Tuple[str, str, str, str]]:
+        service_key = f"{action.stack}:{action.service}"
+        incident = get_active_incident(service_key, timestamp)
+        if incident:
+            if rng.random() < incident.error_info["failure_rate"]:
+                error_code = rng.choice(incident.error_info["error_codes"])
+                return (
+                    incident.dependency_name,
+                    incident.error_info["error_type"],
+                    error_code,
+                    incident.error_info["error_message"]
+                )
+        return None
+
+    def check_dependency_failure(action, timestamp) -> Optional[Tuple[str, str, str, str]]:
+        service_key = f"{action.stack}:{action.service}"
+        if service_key in SERVICE_DEPENDENCIES:
+            for dep_service in SERVICE_DEPENDENCIES[service_key]:
+                incident = get_active_incident(dep_service, timestamp)
+                if incident:
+                    if rng.random() < incident.error_info["failure_rate"] * 10:
+                        error_code = rng.choice(incident.error_info["error_codes"])
+                        return (
+                            dep_service,
+                            incident.error_info["error_type"],
+                            error_code,
+                            f"Upstream service {dep_service} failed: {incident.error_info['error_message']}"
+                        )
+        return None
+
+    def determine_error(action, user_data, timestamp) -> Optional[Dict]:
+        hidden_failure = check_hidden_dependency_failure(action, timestamp)
+        if hidden_failure:
+            dep_name, error_type, error_code, error_message = hidden_failure
+            return {
+                "error_source": f"infrastructure:{dep_name}",
+                "error_type": error_type,
+                "error_code": error_code,
+                "error_message": error_message,
+                "upstream_request_id": None,
+            }
+
+        dep_failure = check_dependency_failure(action, timestamp)
+        if dep_failure:
+            dep_service, error_type, error_code, error_message = dep_failure
+            return {
+                "error_source": f"dependency:{dep_service}",
+                "error_type": error_type,
+                "error_code": error_code,
+                "error_message": error_message,
+                "upstream_request_id": uuid.uuid4().hex,
+            }
+
+        if rng.random() > user_data["success_rate"]:
+            if rng.random() < 0.7:
+                error_code = rng.choice(error_codes["client"])
+                error_type = "client"
+            else:
+                error_code = rng.choice(error_codes["server"])
+                error_type = "server"
+            return {
+                "error_source": "self",
+                "error_type": error_type,
+                "error_code": error_code,
+                "error_message": error_messages[error_code],
+                "upstream_request_id": None,
+            }
+        return None
+
+    def select_action_for_user(user_data) -> 'ServiceAction':
+        action_weights = user_data["action_weights"]
+        categories = list(action_weights.keys())
+        weights = [action_weights.get(c, 0) for c in categories]
+        valid = [(c, w) for c, w in zip(categories, weights) if c in ACTIONS_BY_CATEGORY and w > 0]
+        if not valid:
+            valid = [(c, 1.0) for c in ACTIONS_BY_CATEGORY.keys()]
+        categories, weights = zip(*valid)
+        category = rng.choices(categories, weights=weights)[0]
+        actions = ACTIONS_BY_CATEGORY[category]
+        action_weights_list = [a.weight for a in actions]
+        return rng.choices(actions, weights=action_weights_list)[0]
+
+    def generate_timestamp(user_data) -> datetime:
+        hourly_weights = user_data["hourly_weights"]
+        daily_weights = user_data["daily_weights"]
+        days_ago = rng.randint(0, 364)
+        date = end_time - timedelta(days=days_ago)
+        dow = date.weekday()
+        if rng.random() > daily_weights[dow] * 7:
+            preferred_dow = rng.choices(range(7), weights=daily_weights)[0]
+            days_diff = preferred_dow - dow
+            date = date + timedelta(days=days_diff)
+        hour = rng.choices(range(24), weights=hourly_weights)[0]
+        minute = rng.randint(0, 59)
+        second = rng.randint(0, 59)
+        microsecond = rng.randint(0, 999999)
+        return date.replace(hour=hour, minute=minute, second=second, microsecond=microsecond)
+
+    def select_release(action, timestamp) -> str:
+        envs = list(ENVIRONMENT_CONFIG.keys())
+        weights = [ENVIRONMENT_CONFIG[e]["weight"] for e in envs]
+        env = rng.choices(envs, weights=weights)[0]
+        regions = ENVIRONMENT_CONFIG[env]["regions"]
+        if len(regions) > 1:
+            region_weights = [0.6, 0.4] if len(regions) == 2 else [1.0]
+            region = rng.choices(regions, weights=region_weights)[0]
+        else:
+            region = regions[0]
+        days_into_year = (timestamp - start_time).days
+        year_progress = max(0, days_into_year) / 365.0
+        base_release = 50 + int(year_progress * 200)
+        service_hash = hash(f"{action.stack}:{action.service}") % 50
+        release_num = base_release + service_hash
+        return generate_release_id(env, region, action.stack, action.service, release_num)
+
+    def generate_object_id(action, user_data) -> Optional[str]:
+        if not action.has_object_id:
+            return None
+        obj_type = action.object_type
+        if obj_type == "post":
+            if action.is_write and action.action == "create_post":
+                post_id = f"post_{uuid.uuid4().hex[:16]}"
+                all_posts.append((post_id, user_data["user_id"]))
+                return post_id
+            elif all_posts:
+                return rng.choice(all_posts)[0]
+            return f"post_{uuid.uuid4().hex[:16]}"
+        elif obj_type == "story":
+            if action.is_write and action.action == "create_story":
+                story_id = f"story_{uuid.uuid4().hex[:16]}"
+                all_stories.append((story_id, user_data["user_id"]))
+                return story_id
+            elif all_stories:
+                return rng.choice(all_stories)[0]
+            return f"story_{uuid.uuid4().hex[:16]}"
+        elif obj_type == "stream":
+            if action.action == "start_stream":
+                stream_id = f"stream_{uuid.uuid4().hex[:12]}"
+                all_streams.append((stream_id, user_data["user_id"]))
+                return stream_id
+            elif all_streams:
+                return rng.choice(all_streams)[0]
+            return f"stream_{uuid.uuid4().hex[:12]}"
+        elif obj_type == "hashtag":
+            return rng.choice(all_hashtags)
+        else:
+            return f"{obj_type}_{uuid.uuid4().hex[:12]}"
+
+    def generate_target_user(action, user_data) -> Optional[str]:
+        if not action.has_target_user:
+            return None
+        following = user_data.get("following", [])
+        followers = user_data.get("followers", [])
+        if following and rng.random() < 0.6:
+            return rng.choice(following)
+        elif followers and rng.random() < 0.3:
+            return rng.choice(followers)
+        return f"user_{uuid.uuid4().hex[:12]}"
+
+    # Generate events for this chunk
+    events = []
+    for user_data, count in user_chunk:
+        for _ in range(count):
+            action = select_action_for_user(user_data)
+            timestamp = generate_timestamp(user_data)
+            request_id = uuid.uuid4().hex
+            object_id = generate_object_id(action, user_data)
+            target_user_id = generate_target_user(action, user_data)
+            release_id = select_release(action, timestamp)
+            error_info = determine_error(action, user_data, timestamp)
+            success = error_info is None
+
+            events.append({
+                "user_id": user_data["user_id"],
+                "persona_name": user_data["persona_name"],
+                "action_service": action.service,
+                "action_stack": action.stack,
+                "action_action": action.action,
+                "action_category": action.category,
+                "action_base_latency_ms": action.base_latency_ms,
+                "action_latency_stddev_ms": action.latency_stddev_ms,
+                "action_base_payload_bytes": action.base_payload_bytes,
+                "action_payload_stddev_bytes": action.payload_stddev_bytes,
+                "action_has_target_user": action.has_target_user,
+                "action_has_object_id": action.has_object_id,
+                "action_object_type": action.object_type,
+                "action_is_write": action.is_write,
+                "latency_multiplier": user_data["latency_multiplier"],
+                "timestamp": timestamp,
+                "request_id": request_id,
+                "success": success,
+                "error_info": error_info,
+                "object_id": object_id,
+                "target_user_id": target_user_id,
+                "release_id": release_id,
+            })
+
+    return events
+
+
 class MonitoringDataGenerator:
     """Generates synthetic monitoring data"""
 
-    def __init__(self, total_events: int, total_users: int, seed: int = 42):
+    def __init__(self, total_events: int, total_users: int, seed: int = 42, num_workers: int = 1):
         self.total_events = total_events
         self.total_users = total_users
+        self.seed = seed
+        self.num_workers = num_workers
         self.rng = random.Random(seed)
 
         # Time range: 1 year ending now
@@ -1357,30 +1608,48 @@ class MonitoringDataGenerator:
     def generate_log(self, action: ServiceAction, user: User,
                      timestamp: datetime, request_id: str, success: bool,
                      target_user_id: Optional[str], object_id: Optional[str],
-                     release_id: str) -> LogEntry:
+                     release_id: str, error_info: Optional[Dict] = None) -> LogEntry:
         """Generate a log entry for an event"""
         ts_str = timestamp.isoformat() + "Z"
 
         error_code = None
         error_message = None
+        error_source = None
+        error_type = None
+        upstream_request_id = None
 
         if success:
+            level = "INFO"
             if action.is_write:
                 message = f"{action.action} completed successfully"
             else:
                 message = f"{action.action} returned data"
         else:
-            # Determine error type
-            if self.rng.random() < 0.7:
-                error_code = self.rng.choice(self.error_codes["client"])
+            # Use error_info if provided (from determine_error)
+            if error_info:
+                error_code = error_info["error_code"]
+                error_message = error_info["error_message"]
+                error_source = error_info["error_source"]
+                error_type = error_info["error_type"]
+                upstream_request_id = error_info.get("upstream_request_id")
             else:
-                error_code = self.rng.choice(self.error_codes["server"])
-            error_message = self.error_messages[error_code]
+                # Fallback to random error (shouldn't happen with new flow)
+                if self.rng.random() < 0.7:
+                    error_code = self.rng.choice(self.error_codes["client"])
+                    error_type = "client"
+                else:
+                    error_code = self.rng.choice(self.error_codes["server"])
+                    error_type = "server"
+                error_message = self.error_messages[error_code]
+                error_source = "self"
+
             message = f"{action.action} failed: {error_message}"
+            # Set log level based on error type
+            level = "ERROR" if error_type in ("server", "database", "cache", "queue", "internal") else "WARN"
 
         return LogEntry(
             timestamp=ts_str,
-            level="INFO",
+            level=level,
             service=action.service,
             stack=action.stack,
             action=action.action,
@@ -1394,11 +1663,14 @@ class MonitoringDataGenerator:
             object_id=object_id,
             error_code=error_code,
             error_message=error_message,
+            error_source=error_source,
+            error_type=error_type,
+            upstream_request_id=upstream_request_id,
         )
 
     def generate_events(self):
-        """Generate all events"""
-        print(f"Generating {self.total_events} events...")
+        """Generate all events (parallel if num_workers > 1)"""
+        print(f"Generating {self.total_events} events with {self.num_workers} workers...")
 
         # Calculate events per user based on persona activity
         total_activity = sum(u.persona.activity_multiplier for u in self.users)
@@ -1420,7 +1692,13 @@ class MonitoringDataGenerator:
                 user, count = user_event_counts[idx]
                 user_event_counts[idx] = (user, count + 1)
 
-        # Generate events
+        if self.num_workers > 1:
+            return self._generate_events_parallel(user_event_counts)
+        else:
+            return self._generate_events_sequential(user_event_counts)
+
+    def _generate_events_sequential(self, user_event_counts: List[Tuple]) -> List[dict]:
+        """Generate events sequentially (original implementation)"""
         all_events = []
 
         for user, count in user_event_counts:
@@ -1429,15 +1707,11 @@ class MonitoringDataGenerator:
                 timestamp = self.generate_timestamp(user)
                 request_id = uuid.uuid4().hex
 
-                # Determine success/failure
-                success = self.rng.random() < user.persona.success_rate
-
-                # Generate contextual IDs
                 object_id = self.generate_object_id(action, user)
                 target_user_id = self.generate_target_user(action, user)
-
-                # Select release for this request
                 release_id = self.select_release(action, timestamp)
+                error_info = self.determine_error(action, user, timestamp)
+                success = error_info is None
 
                 all_events.append({
                     "user": user,
@@ -1445,15 +1719,88 @@ class MonitoringDataGenerator:
                     "timestamp": timestamp,
                     "request_id": request_id,
                     "success": success,
+                    "error_info": error_info,
                     "object_id": object_id,
                     "target_user_id": target_user_id,
                     "release_id": release_id,
                 })
 
-        # Sort by timestamp
         print("  Sorting events by timestamp...")
         all_events.sort(key=lambda e: e["timestamp"])
+        return all_events
 
+    def _generate_events_parallel(self, user_event_counts: List[Tuple]) -> List[dict]:
+        """Generate events in parallel using multiprocessing"""
+        # Serialize user data for workers (can't pickle User objects directly)
+        user_data_counts = []
+        for user, count in user_event_counts:
+            user_data = {
+                "user_id": user.user_id,
+                "persona_name": user.persona.name,
+                "activity_multiplier": user.persona.activity_multiplier,
+                "action_weights": user.persona.action_weights,
+                "hourly_weights": user.persona.hourly_weights,
+                "daily_weights": user.persona.daily_weights,
+                "success_rate": user.persona.success_rate,
+                "latency_multiplier": user.persona.latency_multiplier,
+                "following": user.following[:100] if user.following else [],  # Limit for serialization
+                "followers": user.followers[:100] if user.followers else [],
+            }
+            user_data_counts.append((user_data, count))
+
+        # Serialize incidents
+        incidents_data = [
+            {
+                "dependency_name": inc.dependency_name,
+                "start_time": inc.start_time,
+                "end_time": inc.end_time,
+                "affected_services": inc.affected_services,
+                "error_info": inc.error_info,
+            }
+            for inc in self.incidents
+        ]
+
+        # Split into chunks for workers
+        chunks = [[] for _ in range(self.num_workers)]
+        for i, item in enumerate(user_data_counts):
+            chunks[i % self.num_workers].append(item)
+
+        # Prepare worker arguments
+        worker_args = [
+            (
+                worker_id,
+                chunks[worker_id],
+                incidents_data,
+                self.start_time,
+                self.end_time,
+                self.seed,
+                self.error_codes,
+                self.error_messages,
+            )
+            for worker_id in range(self.num_workers)
+        ]
+
+        # Run workers in parallel
+        print(f"  Starting {self.num_workers} parallel workers...")
+        all_events = []
+
+        with ProcessPoolExecutor(max_workers=self.num_workers) as executor:
+            futures = {executor.submit(_generate_events_for_chunk, args): i for i, args in enumerate(worker_args)}
+            completed = 0
+            for future in as_completed(futures):
+                worker_id = futures[future]
+                try:
+                    events = future.result()
+                    all_events.extend(events)
+                    completed += 1
+                    print(f"  Worker {worker_id} completed ({completed}/{self.num_workers}), generated {len(events)} events")
+                except Exception as e:
+                    print(f"  Worker {worker_id} failed: {e}")
+                    raise
+
+        print(f"  Total events generated: {len(all_events)}")
+        print("  Sorting events by timestamp...")
+        all_events.sort(key=lambda e: e["timestamp"])
         return all_events
 
     def write_output(self, events: List[dict], base_dir: Path):
@@ -1470,6 +1817,9 @@ class MonitoringDataGenerator:
         log_count = 0
         metric_count = 0
 
+        # Check if events are from parallel (flat dict) or sequential (objects) generation
+        is_parallel_format = "action_service" in events[0] if events else False
+
         with open(logs_file, 'w', encoding='utf-8') as log_f, \
              open(metrics_file, 'w', encoding='utf-8') as metric_f:
 
@@ -1477,21 +1827,26 @@ class MonitoringDataGenerator:
                 if i % 100000 == 0:
                     print(f"  Processing event {i}/{len(events)}...")
 
-                # Generate log entry
-                log_entry = self.generate_log(
-                    event["action"], event["user"], event["timestamp"],
-                    event["request_id"], event["success"],
-                    event["target_user_id"], event["object_id"],
-                    event["release_id"]
-                )
+                if is_parallel_format:
+                    # Parallel format - flat dict with action_* fields
+                    log_entry = self._generate_log_from_flat(event)
+                    metrics = self._generate_metrics_from_flat(event)
+                else:
+                    # Sequential format - User/ServiceAction objects
+                    log_entry = self.generate_log(
+                        event["action"], event["user"], event["timestamp"],
+                        event["request_id"], event["success"],
+                        event["target_user_id"], event["object_id"],
+                        event["release_id"], event.get("error_info")
+                    )
+                    metrics = self.generate_metrics(
+                        event["action"], event["user"], event["timestamp"],
+                        event["success"], event["release_id"]
+                    )
+
                 log_f.write(json.dumps(asdict(log_entry)) + "\n")
                 log_count += 1
 
-                # Generate metrics
-                metrics = self.generate_metrics(
-                    event["action"], event["user"], event["timestamp"],
-                    event["success"], event["release_id"]
-                )
                 for metric in metrics:
                     metric_f.write(json.dumps(metric.to_dict()) + "\n")
                     metric_count += 1
@@ -1516,7 +1871,7 @@ class MonitoringDataGenerator:
 
         # Count actions by service
         for event in events:
-            service = event["action"].service
+            service = event["action_service"] if is_parallel_format else event["action"].service
             if service not in summary["actions_by_service"]:
                 summary["actions_by_service"][service] = 0
             summary["actions_by_service"][service] += 1
@@ -1524,6 +1879,152 @@ class MonitoringDataGenerator:
         with open(summary_file, 'w') as f:
             json.dump(summary, f, indent=2)
         print(f"  Wrote summary to {summary_file}")
+
+    def _generate_log_from_flat(self, event: dict) -> LogEntry:
+        """Generate log entry from flat parallel event format"""
+        ts_str = event["timestamp"].isoformat() + "Z"
+        success = event["success"]
+        error_info = event.get("error_info")
+
+        error_code = None
+        error_message = None
+        error_source = None
+        error_type = None
+        upstream_request_id = None
+
+        if success:
+            level = "INFO"
+            action_name = event["action_action"]
+            if event["action_is_write"]:
+                message = f"{action_name} completed successfully"
+            else:
+                message = f"{action_name} returned data"
+        else:
+            action_name = event["action_action"]
+            if error_info:
+                error_code = error_info["error_code"]
+                error_message = error_info["error_message"]
+                error_source = error_info["error_source"]
+                error_type = error_info["error_type"]
+                upstream_request_id = error_info.get("upstream_request_id")
+            else:
+                error_code = "500"
+                error_message = "Unknown error"
+                error_type = "server"
+                error_source = "self"
+            message = f"{action_name} failed: {error_message}"
+            level = "ERROR" if error_type in ("server", "database", "cache", "queue", "internal") else "WARN"
+
+        return LogEntry(
+            timestamp=ts_str,
+            level=level,
+            service=event["action_service"],
+            stack=event["action_stack"],
+            action=event["action_action"],
+            user_id=event["user_id"],
+            request_id=event["request_id"],
+            success=success,
+            message=message,
+            release_id=event["release_id"],
+            target_user_id=event["target_user_id"],
+            object_type=event["action_object_type"],
+            object_id=event["object_id"],
+            error_code=error_code,
+            error_message=error_message,
+            error_source=error_source,
+            error_type=error_type,
+            upstream_request_id=upstream_request_id,
+        )
+
+    def _generate_metrics_from_flat(self, event: dict) -> List[MetricEntry]:
+        """Generate metrics from flat parallel event format"""
+        metrics = []
+        epoch_ts = event["timestamp"].timestamp()
+        success = event["success"]
+
+        base_tags = {
+            "service": event["action_service"],
+            "stack": event["action_stack"],
+            "action": event["action_action"],
+            "success": "true" if success else "false",
+            "is_write": "true" if event["action_is_write"] else "false",
+            "persona": event["persona_name"],
+            "release_id": event["release_id"],
+        }
+
+        if event["action_object_type"]:
+            base_tags["object_type"] = event["action_object_type"]
+
+        # Response time
+        latency = max(1.0, self.rng.gauss(
+            event["action_base_latency_ms"] * event["latency_multiplier"],
+            event["action_latency_stddev_ms"]
+        ))
+        if not success:
+            if self.rng.random() < 0.5:
+                latency *= 0.3
+            else:
+                latency *= 3
+
+        metrics.append(MetricEntry(
+            metric="request_duration_ms",
+            ts=epoch_ts,
+            value=round(latency, 2),
+            tags=dict(base_tags),
+        ))
+
+        # Request payload size
+        request_size = max(64, int(self.rng.gauss(
+            event["action_base_payload_bytes"] * 0.1,
+            event["action_payload_stddev_bytes"] * 0.1
+        )))
+        metrics.append(MetricEntry(
+            metric="request_size_bytes",
+            ts=epoch_ts,
+            value=float(request_size),
+            tags=dict(base_tags),
+        ))
+
+        # Response payload size
+        if success:
+            response_size = max(64, int(self.rng.gauss(
+                event["action_base_payload_bytes"],
+                event["action_payload_stddev_bytes"]
+            )))
+        else:
+            response_size = self.rng.randint(128, 512)
+
+        metrics.append(MetricEntry(
+            metric="response_size_bytes",
+            ts=epoch_ts,
+            value=float(response_size),
+            tags=dict(base_tags),
+        ))
+
+        # Database query count
+        if success:
+            db_queries = self.rng.randint(1, 5) if not event["action_is_write"] else self.rng.randint(1, 3)
+        else:
+            db_queries = self.rng.randint(0, 2)
+
+        metrics.append(MetricEntry(
+            metric="db_query_count",
+            ts=epoch_ts,
+            value=float(db_queries),
+            tags=dict(base_tags),
+        ))
+
+        # Cache hit/miss (for reads)
+        if not event["action_is_write"] and success:
+            cache_hit = 1.0 if self.rng.random() < 0.7 else 0.0
+            metrics.append(MetricEntry(
+                metric="cache_hit",
+                ts=epoch_ts,
+                value=cache_hit,
+                tags=dict(base_tags),
+            ))
+
+        return metrics
 
 
 def main():
@@ -1536,6 +2037,8 @@ def main():
                         help="Output directory (default: fixtures/test_data)")
     parser.add_argument("--seed", "-s", type=int, default=42,
                         help="Random seed for reproducibility (default: 42)")
+    parser.add_argument("--workers", "-w", type=int, default=1,
+                        help="Number of parallel workers for event generation (default: 1)")
 
     args = parser.parse_args()
 
@@ -1546,15 +2049,18 @@ def main():
     print(f"Total users: {args.total_users:,}")
     print(f"Output directory: {args.output}")
     print(f"Random seed: {args.seed}")
+    print(f"Workers: {args.workers}")
     print("=" * 70)
 
     generator = MonitoringDataGenerator(
         total_events=args.total_events,
         total_users=args.total_users,
-        seed=args.seed
+        seed=args.seed,
+        num_workers=args.workers
     )
 
     generator.generate_users()
+    generator.generate_incidents()
     events = generator.generate_events()
     generator.write_output(events, Path(args.output))
 

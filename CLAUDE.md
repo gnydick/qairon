@@ -3,6 +3,10 @@
 ## Git Commits
 - Never include Claude/AI references in commit messages (no Co-Authored-By, no mentions of AI assistance)
 
+## Development Environment
+- Native hardware with 64 threads available
+- Use `--workers 32-48` for parallel operations (leave headroom for system)
+
 ---
 
 # Project Context: Qairon
@@ -19,21 +23,39 @@ All IDs are colon-delimited composites that build hierarchically:
 
 Example: `prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default:100`
 
-### ID Hierarchy
-- `provider_id`: `{env}:{provider}:{account}`
-- `region_id`: `{env}:{provider}:{account}:{region}`
-- `partition_id`: `{env}:{provider}:{account}:{region}:{partition}`
-- `target_id`: `{env}:{provider}:{account}:{region}:{partition}:{target_type}:{target}`
-- `service_id`: `{app}:{stack}:{service}` (service definition is environment-agnostic)
-- `deployment_id`: full path without release_num
-- `release_id`: full path including release_num
+### ID Hierarchy (Composite IDs)
+Infrastructure path (where code runs):
+- `provider_id`: `{environment}:{provider}:{account}`
+- `region_id`: `{environment}:{provider}:{account}:{region}`
+- `partition_id`: `{environment}:{provider}:{account}:{region}:{partition}`
+- `target_id`: `{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}`
+
+Application path (what code runs):
+- `stack_id`: `{application}:{stack}`
+- `service_id`: `{application}:{stack}:{service}`
+
+Combined:
+- `deployment_id`: full path without release (target + service)
+- `release_id`: full path including release number
 
 ### Single-Word Filter Tags
-For metrics/logs, extract these for easy filtering:
+All 12 components of the release_id are extracted as individual tags:
+
+**Infrastructure (where):**
 - `environment`: prod, stg, dev
 - `provider`: aws, gcp, azure
-- `account`: AWS account ID
+- `account`: cloud account ID
 - `region`: us-east-1, us-west-2, etc.
+- `partition`: platform, tenant isolation
+- `target_type`: eks, ecs, lambda, etc.
+- `target`: cluster/resource name
+
+**Application (what):**
+- `application`: social, payments, etc.
+- `stack`: user, content, feed, etc.
+- `service`: identity, posts, timeline, etc.
+- `tag`: deployment variant (default, canary, etc.)
+- `release`: release number
 
 ---
 
@@ -62,16 +84,16 @@ For smooth time series data with visible outliers at 10-15 second granularity pe
 # Takes 20-30 minutes to generate, gives ~1 event/minute/deployment
 python fixtures/social_network/generate_monitoring_data.py 50000000 50000 --output fixtures/test_data
 
-# Start VictoriaMetrics with 2-year retention and 12 CPU cores
-docker run -d --name victoria --cpus=12 -p 8428:8428 \
+# Start VictoriaMetrics with 2-year retention (use ~75% of available cores)
+docker run -d --name victoria --cpus=48 -p 8428:8428 \
   -v vm-data-2y:/victoria-metrics-data \
   victoriametrics/victoria-metrics -retentionPeriod=2y
 
 # Start Grafana
 docker run -d --name grafana -p 3000:3000 grafana/grafana
 
-# Import with parallel workers (takes 30-60 minutes for 225M metrics)
-python fixtures/social_network/import_to_victoriametrics.py fixtures/test_data/metrics.jsonl --workers 12
+# Import with parallel workers (use ~50-75% of threads)
+python fixtures/social_network/import_to_victoriametrics.py fixtures/test_data/metrics.jsonl --workers 32
 ```
 
 ### Data Density Guide
@@ -140,6 +162,43 @@ Two types for error propagation:
    - Discoverable through correlated failures
    - Examples: Aurora clusters, Redis clusters, Kinesis streams
 
+### Infrastructure-Aware Error Simulation
+
+The generator creates realistic correlated failures through a three-tier error system:
+
+**Error Priority (checked in order):**
+1. **Infrastructure incidents** - Hidden dependency failures (databases, caches, queues)
+2. **Dependency cascades** - Failures propagated from upstream services
+3. **Self errors** - Random errors based on persona success rate
+
+**Infrastructure Incidents:**
+- Generated at startup: 2-8 incidents per hidden dependency per year
+- Duration: 5 minutes to 4 hours each
+- Low failure rate during incident (0.1%-0.4% of requests)
+- Dependency cascades have 10x amplified failure rate
+
+**Error Source Types (`error_source` field):**
+| Value | Meaning | Example |
+|-------|---------|---------|
+| `infrastructure:<component>` | Direct infrastructure failure | `infrastructure:redis_content` |
+| `dependency:<service>` | Cascade from upstream service | `dependency:content:posts` |
+| `self` | Random error (client/server) | Client 400, Server 500 |
+
+**Log Levels:**
+- `ERROR` - Server/infrastructure errors (500, 502, 503, 504, database, cache, queue)
+- `WARN` - Client errors (400, 401, 403, 404, 422, 429)
+- `INFO` - Successful requests
+
+**Correlation Analysis:**
+Use `error_source` and `upstream_request_id` to trace failures:
+```bash
+# Find all errors from a specific infrastructure incident
+grep "infrastructure:redis_content" logs.jsonl
+
+# Find cascade effects from a service failure
+grep "dependency:content:posts" logs.jsonl
+```
+
 ### Metrics Format
 ```json
 {
@@ -183,8 +242,62 @@ Metrics generated per event:
   "object_type": "media",
   "object_id": "media_def456",
   "error_code": null,
-  "error_message": null
+  "error_message": null,
+  "error_source": null,
+  "error_type": null,
+  "upstream_request_id": null
 }
+```
+
+**Error fields (populated on failure):**
+- `error_code` - HTTP status code (400, 500, 503, etc.)
+- `error_message` - Human-readable error description
+- `error_source` - Origin of failure (`self`, `dependency:*`, `infrastructure:*`)
+- `error_type` - Category (`client`, `server`, `database`, `cache`, `queue`, `internal`)
+- `upstream_request_id` - Request ID of failed dependency call (for tracing)
+
+### Generated Anomalies
+
+**Infrastructure Incidents (root causes):**
+| Component | Description | Affected Services |
+|-----------|-------------|-------------------|
+| dynamodb_throttle | DynamoDB capacity exceeded | dm, stories, presence, timeline |
+| redis_content | Redis content cache failure | posts, media, comments, reactions |
+| aurora_primary | Aurora primary failover | identity, profile, privacy |
+| neptune_timeout | Neptune graph DB timeout | connections, suggestions, blocks |
+| media_processing | Media processing pipeline failure | media, stories |
+| redis_feed | Redis feed cache failure | timeline, ranking |
+| redis_messaging | Redis messaging cache failure | dm, groups, presence |
+| kinesis_feed | Kinesis stream backpressure | fanout, aggregation |
+| serialization_bug | Hidden serialization bug | various |
+| opensearch_cluster | OpenSearch cluster issue | search services |
+| auth_library | Auth library edge case | identity, privacy |
+
+**Dependency Cascade Errors (downstream effects):**
+| Failed Dependency | Typical Cascade Count |
+|-------------------|----------------------|
+| content:posts | High (most services depend on posts) |
+| content:hashtags | Medium |
+| content:stories | Medium |
+| feed:fanout | Medium |
+| social:connections | Medium |
+
+**Querying Anomalies in VictoriaLogs:**
+```logsql
+# All infrastructure failures
+error_source:infrastructure*
+
+# Specific infrastructure component
+error_source:infrastructure:dynamodb_throttle
+
+# All dependency cascade failures
+error_source:dependency*
+
+# Specific dependency cascade
+error_source:dependency:content:posts
+
+# Find incident time windows
+error_source:infrastructure:redis_content | stats by(_time:1h) count()
 ```
 
 ---
@@ -214,13 +327,14 @@ python import_to_victoriametrics.py metrics.jsonl --workers 12
 ## Tag Extraction
 The importer splits `release_id` into queryable tags:
 
-**Single-word tags** (for global filtering):
-- `environment`, `provider`, `account`, `region`
+**Single-word tags (12 total):**
+- Infrastructure: `environment`, `provider`, `account`, `region`, `partition`, `target_type`, `target`
+- Application: `application`, `stack`, `service`, `tag`, `release`
 
-**Composite IDs** (all include environment):
-- `provider_id`, `region_id`, `partition_id`, `target_id`
-- `service_id` (app:stack:service, environment-agnostic)
-- `deployment_id` (release_id without release_num)
+**Composite IDs (8 total):**
+- Infrastructure: `provider_id`, `region_id`, `partition_id`, `target_id`
+- Application: `stack_id`, `service_id`
+- Combined: `deployment_id`, `release_id`
 
 ## Grafana Queries
 ```promql
@@ -230,15 +344,28 @@ request_duration_ms{environment="prod"}
 # By region
 request_duration_ms{region="us-east-1"}
 
+# By application and stack
+request_duration_ms{application="social", stack="content"}
+
 # By service
 request_duration_ms{service="posts", stack="content"}
+
+# By target (specific cluster)
+request_duration_ms{target_type="eks", target="main"}
+
+# By release number
+request_duration_ms{release="100"}
 
 # Error rate by deployment
 sum(rate(request_duration_ms{success="false"}[5m])) by (deployment_id)
   / sum(rate(request_duration_ms[5m])) by (deployment_id)
 
-# P99 latency by service
-histogram_quantile(0.99, request_duration_ms{service="timeline"})
+# Error rate by stack
+sum(rate(request_duration_ms{success="false"}[5m])) by (stack_id)
+  / sum(rate(request_duration_ms[5m])) by (stack_id)
+
+# P99 latency by service_id
+histogram_quantile(0.99, request_duration_ms) by (service_id)
 ```
 
 ---
@@ -247,27 +374,45 @@ histogram_quantile(0.99, request_duration_ms{service="timeline"})
 
 ## Start Services
 ```bash
-docker run -d --name victoria --cpus=12 -p 8428:8428 \
+# VictoriaMetrics (metrics)
+docker run -d --name victoria --cpus=24 -p 8428:8428 \
   -v vm-data-2y:/victoria-metrics-data \
-  victoriametrics/victoria-metrics -retentionPeriod=2y
+  victoriametrics/victoria-metrics -retentionPeriod=2y -search.cacheTimestampOffset=8760h
 
-docker run -d --name grafana -p 3000:3000 grafana/grafana
+# VictoriaLogs (logs)
+docker run -d --name victorialogs --cpus=30 -p 9428:9428 \
+  -v vl-data-2y:/victoria-logs-data \
+  victoriametrics/victoria-logs -retentionPeriod=2y
+
+# Grafana (with VictoriaLogs plugin and persistent storage)
+docker run -d --name grafana -p 3000:3000 \
+  -v grafana-data:/var/lib/grafana \
+  -e GF_INSTALL_PLUGINS=victoriametrics-logs-datasource \
+  grafana/grafana
 ```
 
 ## Stop (preserve data)
 ```bash
-docker stop victoria grafana
+docker stop victoria victorialogs grafana
 ```
 
 ## Restart
 ```bash
-docker start victoria grafana
+docker start victoria victorialogs grafana
 ```
 
 ## Wipe and restart
 ```bash
+# Wipe VictoriaMetrics
 docker stop victoria && docker rm victoria && docker volume rm vm-data-2y
-# Then run the start command again
+
+# Wipe VictoriaLogs
+docker stop victorialogs && docker rm victorialogs && docker volume rm vl-data-2y
+
+# Wipe Grafana
+docker stop grafana && docker rm grafana && docker volume rm grafana-data
+
+# Then run the start commands again
 ```
 
 ## Grafana Setup
@@ -292,3 +437,15 @@ Tab-separated values with JSON defaults column:
 ```
 {parent_id}	{name}	{artifact_name}	{defaults_json}
 ```
+
+---
+
+# TODO
+
+## Monitoring Data Generator
+
+- [ ] **Add distributed tracing support** - Currently each event has its own random `request_id` with no linking between dependent services. To enable real tracing:
+  - Add `trace_id` field consistent across a call chain
+  - Add `parent_request_id` to link parent/child requests
+  - Generate explicit child events for dependency calls (not just the initiating request)
+  - This would enable trace visualization in Grafana/Jaeger/Tempo
