@@ -815,6 +815,141 @@ def generate_span_id(rng: random.Random) -> str:
     return ''.join(rng.choices('0123456789abcdef', k=16))
 
 
+def generate_child_spans_for_event(
+    parent_event: dict,
+    rng: random.Random,
+    incidents: List,
+    get_active_incident_func,
+    check_hidden_dep_func,
+    check_dep_failure_func,
+    select_release_func,
+    error_codes: dict,
+    error_messages: dict,
+) -> List[dict]:
+    """
+    Generate child span events for a parent event's service dependencies.
+
+    For each dependency in SERVICE_DEPENDENCIES, generates a child span event
+    with the same trace_id but a new span_id, linked via parent_span_id.
+
+    Args:
+        parent_event: The root/parent event dict
+        rng: Random number generator
+        incidents: List of infrastructure incidents
+        get_active_incident_func: Function to check active incidents
+        check_hidden_dep_func: Function to check hidden dependency failures
+        check_dep_failure_func: Function to check dependency cascade failures
+        select_release_func: Function to select a release for a service
+        error_codes: Dict of error codes by type
+        error_messages: Dict of error messages by code
+
+    Returns:
+        List of child span event dicts
+    """
+    service_key = f"{parent_event['action_stack']}:{parent_event['action_service']}"
+    dependencies = SERVICE_DEPENDENCIES.get(service_key, [])
+
+    if not dependencies:
+        return []
+
+    child_spans = []
+    parent_timestamp = parent_event['timestamp']
+
+    # Calculate parent latency for timing child spans
+    parent_latency = parent_event['action_base_latency_ms'] * parent_event['latency_multiplier']
+
+    # Distribute child spans within parent's duration
+    # Children start after parent starts and complete before parent completes
+    num_deps = len(dependencies)
+
+    for i, dep_key in enumerate(dependencies):
+        dep_stack, dep_service = dep_key.split(':')
+
+        # Child timing: stagger starts, each takes portion of parent time
+        child_start_offset_ms = (i + 1) * (parent_latency * 0.05)  # Stagger by 5% of parent latency
+        child_duration_ratio = rng.uniform(0.1, 0.3)  # Child takes 10-30% of parent duration
+        child_latency = max(1.0, parent_latency * child_duration_ratio)
+
+        # Ensure child completes before parent (with buffer)
+        max_child_end = parent_latency * 0.9  # Child must end by 90% of parent duration
+        if child_start_offset_ms + child_latency > max_child_end:
+            child_latency = max(1.0, max_child_end - child_start_offset_ms)
+
+        child_timestamp = parent_timestamp + timedelta(milliseconds=child_start_offset_ms)
+        child_span_id = generate_span_id(rng)
+        child_request_id = uuid.uuid4().hex
+
+        # Determine if child span has an error
+        # Use simplified error checking for child spans
+        child_error_info = None
+        child_success = True
+
+        # Check for infrastructure incident affecting this dependency
+        incident = get_active_incident_func(dep_key, child_timestamp)
+        if incident:
+            if rng.random() < incident.error_info["failure_rate"]:
+                error_code = rng.choice(incident.error_info["error_codes"])
+                child_error_info = {
+                    "error_source": f"infrastructure:{incident.dependency_name}",
+                    "error_type": incident.error_info["error_type"],
+                    "error_code": error_code,
+                    "error_message": incident.error_info["error_message"],
+                }
+                child_success = False
+
+        # If parent failed due to this dependency, child definitely fails
+        if not child_success or (parent_event.get('error_info') and
+            parent_event['error_info'].get('error_source', '').endswith(dep_key)):
+            if child_error_info is None:
+                # Generate a self-error for the child
+                error_type = rng.choice(["server", "client"])
+                error_code = rng.choice(error_codes.get(error_type, ["500"]))
+                child_error_info = {
+                    "error_source": "self",
+                    "error_type": error_type,
+                    "error_code": error_code,
+                    "error_message": error_messages.get(error_code, "Unknown error"),
+                }
+                child_success = False
+
+        # Select release for this dependency service
+        child_release_id = select_release_func(dep_stack, dep_service, child_timestamp)
+
+        # Create child span event
+        child_event = {
+            "user_id": parent_event["user_id"],
+            "persona_name": parent_event["persona_name"],
+            "action_service": dep_service,
+            "action_stack": dep_stack,
+            "action_action": f"handle_{parent_event['action_action']}",  # Internal handler action
+            "action_category": "internal",
+            "action_base_latency_ms": child_latency,
+            "action_latency_stddev_ms": child_latency * 0.1,
+            "action_base_payload_bytes": 1024,
+            "action_payload_stddev_bytes": 256,
+            "action_has_target_user": False,
+            "action_has_object_id": parent_event.get("action_has_object_id", False),
+            "action_object_type": parent_event.get("action_object_type"),
+            "action_is_write": parent_event.get("action_is_write", False),
+            "latency_multiplier": 1.0,  # Child spans don't get persona multiplier
+            "timestamp": child_timestamp,
+            "request_id": child_request_id,
+            "trace_id": parent_event["trace_id"],
+            "span_id": child_span_id,
+            "parent_span_id": parent_event["span_id"],
+            "success": child_success,
+            "error_info": child_error_info,
+            "object_id": parent_event.get("object_id"),
+            "target_user_id": None,
+            "release_id": child_release_id,
+            "is_child_span": True,
+        }
+
+        child_spans.append(child_event)
+
+    return child_spans
+
+
 @dataclass
 class MetricEntry:
     """A metric entry - individual measurement in standard format"""
@@ -1049,6 +1184,16 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
             return rng.choice(followers)
         return f"user_{uuid.uuid4().hex[:12]}"
 
+    def select_release_by_key(stack: str, service: str, timestamp: datetime) -> str:
+        """Wrapper for select_release that takes stack/service directly."""
+        # Create a minimal action-like object
+        class MinimalAction:
+            pass
+        action = MinimalAction()
+        action.stack = stack
+        action.service = service
+        return select_release(action, timestamp)
+
     # Generate events for this chunk
     events = []
     for user_data, count in user_chunk:
@@ -1065,7 +1210,7 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
             error_info = determine_error(action, user_data, timestamp)
             success = error_info is None
 
-            events.append({
+            root_event = {
                 "user_id": user_data["user_id"],
                 "persona_name": user_data["persona_name"],
                 "action_service": action.service,
@@ -1091,7 +1236,22 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
                 "object_id": object_id,
                 "target_user_id": target_user_id,
                 "release_id": release_id,
-            })
+            }
+            events.append(root_event)
+
+            # Generate child spans for service dependencies
+            child_spans = generate_child_spans_for_event(
+                parent_event=root_event,
+                rng=rng,
+                incidents=incidents,
+                get_active_incident_func=get_active_incident,
+                check_hidden_dep_func=check_hidden_dependency_failure,
+                check_dep_failure_func=check_dependency_failure,
+                select_release_func=select_release_by_key,
+                error_codes=error_codes,
+                error_messages=error_messages,
+            )
+            events.extend(child_spans)
 
     return events
 
@@ -1759,7 +1919,7 @@ class MonitoringDataGenerator:
                 error_info = self.determine_error(action, user, timestamp)
                 success = error_info is None
 
-                all_events.append({
+                root_event = {
                     "user": user,
                     "action": action,
                     "timestamp": timestamp,
@@ -1772,11 +1932,100 @@ class MonitoringDataGenerator:
                     "object_id": object_id,
                     "target_user_id": target_user_id,
                     "release_id": release_id,
-                })
+                }
+                all_events.append(root_event)
+
+                # Generate child spans for service dependencies
+                child_spans = self._generate_child_spans_sequential(
+                    root_event, action, user, timestamp
+                )
+                all_events.extend(child_spans)
 
         print("  Sorting events by timestamp...")
         all_events.sort(key=lambda e: e["timestamp"])
         return all_events
+
+    def _generate_child_spans_sequential(
+        self, parent_event: dict, action: 'ServiceAction', user: 'User', timestamp: datetime
+    ) -> List[dict]:
+        """Generate child span events for service dependencies (sequential format)."""
+        service_key = f"{action.stack}:{action.service}"
+        dependencies = SERVICE_DEPENDENCIES.get(service_key, [])
+
+        if not dependencies:
+            return []
+
+        child_spans = []
+        parent_latency = action.base_latency_ms * user.persona.latency_multiplier
+
+        for i, dep_key in enumerate(dependencies):
+            dep_stack, dep_service = dep_key.split(':')
+
+            # Child timing
+            child_start_offset_ms = (i + 1) * (parent_latency * 0.05)
+            child_duration_ratio = self.rng.uniform(0.1, 0.3)
+            child_latency = max(1.0, parent_latency * child_duration_ratio)
+
+            max_child_end = parent_latency * 0.9
+            if child_start_offset_ms + child_latency > max_child_end:
+                child_latency = max(1.0, max_child_end - child_start_offset_ms)
+
+            child_timestamp = timestamp + timedelta(milliseconds=child_start_offset_ms)
+            child_span_id = generate_span_id(self.rng)
+            child_request_id = uuid.uuid4().hex
+
+            # Check for errors on child span
+            child_error_info = None
+            child_success = True
+
+            incident = self.get_active_incident(dep_key, child_timestamp)
+            if incident:
+                if self.rng.random() < incident.error_info["failure_rate"]:
+                    error_code = self.rng.choice(incident.error_info["error_codes"])
+                    child_error_info = {
+                        "error_source": f"infrastructure:{incident.dependency_name}",
+                        "error_type": incident.error_info["error_type"],
+                        "error_code": error_code,
+                        "error_message": incident.error_info["error_message"],
+                    }
+                    child_success = False
+
+            # Create a child ServiceAction for the dependency
+            child_action = ServiceAction(
+                category="internal",
+                service=dep_service,
+                stack=dep_stack,
+                action=f"handle_{action.action}",
+                weight=1.0,
+                base_latency_ms=child_latency,
+                latency_stddev_ms=child_latency * 0.1,
+                base_payload_bytes=1024,
+                payload_stddev_bytes=256,
+                has_target_user=False,
+                has_object_id=action.has_object_id,
+                object_type=action.object_type,
+                is_write=action.is_write,
+            )
+
+            child_release_id = self.select_release(child_action, child_timestamp)
+
+            child_event = {
+                "user": user,
+                "action": child_action,
+                "timestamp": child_timestamp,
+                "request_id": child_request_id,
+                "trace_id": parent_event["trace_id"],
+                "span_id": child_span_id,
+                "parent_span_id": parent_event["span_id"],
+                "success": child_success,
+                "error_info": child_error_info,
+                "object_id": parent_event.get("object_id"),
+                "target_user_id": None,
+                "release_id": child_release_id,
+            }
+            child_spans.append(child_event)
+
+        return child_spans
 
     def _generate_events_parallel(self, user_event_counts: List[Tuple]) -> List[dict]:
         """Generate events in parallel using multiprocessing"""

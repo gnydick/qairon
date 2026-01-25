@@ -485,7 +485,16 @@ docker stop grafana && docker rm grafana && docker volume rm grafana-data
 ## Grafana Setup
 - URL: http://localhost:3000
 - Login: admin / admin
-- Add Prometheus data source with URL: `http://172.17.0.2:8428` (or check `docker inspect victoria --format '{{.NetworkSettings.IPAddress}}'`)
+
+**Data Sources:**
+- Prometheus (VictoriaMetrics): `http://172.17.0.2:8428`
+- VictoriaLogs: `http://172.17.0.3:9428`
+
+To verify IPs:
+```bash
+docker inspect victoria --format '{{.NetworkSettings.IPAddress}}'
+docker inspect victorialogs --format '{{.NetworkSettings.IPAddress}}'
+```
 
 ---
 
@@ -522,11 +531,13 @@ Tab-separated values with JSON defaults column:
   - `metrics.otlp.json` with resourceMetrics/scopeMetrics/metrics structure
   - Compatible with ClickStack, Jaeger, Tempo, and other OTLP receivers
 
-### Future Enhancements
+- [x] **Generate child span events** - Full distributed tracing with parent-child span relationships:
+  - For each root event, generates child spans for all `SERVICE_DEPENDENCIES`
+  - Child spans share `trace_id` with parent, have unique `span_id`, link via `parent_span_id`
+  - Timing: children start after parent, complete before parent (staggered offsets)
+  - ~2.8x event multiplier (100 root events → ~280 total events)
+  - Error propagation: infrastructure incidents affect child spans appropriately
 
-- [ ] **Generate child span events** - Currently only root spans are generated. To enable full trace visualization:
-  - Generate explicit child events for dependency calls
-  - Link child spans with parent_span_id
-  - Proper timing (child starts after parent, completes before)
+### Future Enhancements
 
 - [ ] **Streaming OTLP sender** - Send OTLP data directly to collectors without intermediate files
