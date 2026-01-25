@@ -54,6 +54,14 @@ def transform_log(log: Dict) -> Dict:
     if log.get("error_type"):
         vl_log["error_type"] = log["error_type"]
 
+    # Trace/span fields for distributed tracing
+    if log.get("trace_id"):
+        vl_log["trace_id"] = log["trace_id"]
+    if log.get("span_id"):
+        vl_log["span_id"] = log["span_id"]
+    if log.get("parent_span_id"):
+        vl_log["parent_span_id"] = log["parent_span_id"]
+
     if len(parts) >= 12:
         environment, provider, account, region, partition, target_type, target, application, stack, service, tag, release = parts[:12]
 
