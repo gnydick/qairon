@@ -789,6 +789,10 @@ class LogEntry:
     success: bool
     message: str
     release_id: str  # Full qairon release ID: {deployment_id}:{release_num}
+    # OpenTelemetry-style distributed tracing fields
+    trace_id: str  # 32 hex chars (128-bit), consistent across a call chain
+    span_id: str   # 16 hex chars (64-bit), unique per operation
+    parent_span_id: Optional[str] = None  # 16 hex chars, links to parent (null for root spans)
     # Optional fields
     target_user_id: Optional[str] = None
     object_type: Optional[str] = None
@@ -799,6 +803,16 @@ class LogEntry:
     error_source: Optional[str] = None  # "self", "dependency:<service>", "infrastructure:<component>"
     error_type: Optional[str] = None    # "client", "server", "database", "cache", "queue", "internal", "rate_limit"
     upstream_request_id: Optional[str] = None  # Request ID of the failed dependency call
+
+
+def generate_trace_id(rng: random.Random) -> str:
+    """Generate a 32 hex char (128-bit) trace ID (OpenTelemetry format)"""
+    return ''.join(rng.choices('0123456789abcdef', k=32))
+
+
+def generate_span_id(rng: random.Random) -> str:
+    """Generate a 16 hex char (64-bit) span ID (OpenTelemetry format)"""
+    return ''.join(rng.choices('0123456789abcdef', k=16))
 
 
 @dataclass
@@ -1042,6 +1056,9 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
             action = select_action_for_user(user_data)
             timestamp = generate_timestamp(user_data)
             request_id = uuid.uuid4().hex
+            # OpenTelemetry tracing - root span
+            trace_id = ''.join(rng.choices('0123456789abcdef', k=32))
+            span_id = ''.join(rng.choices('0123456789abcdef', k=16))
             object_id = generate_object_id(action, user_data)
             target_user_id = generate_target_user(action, user_data)
             release_id = select_release(action, timestamp)
@@ -1066,6 +1083,9 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
                 "latency_multiplier": user_data["latency_multiplier"],
                 "timestamp": timestamp,
                 "request_id": request_id,
+                "trace_id": trace_id,
+                "span_id": span_id,
+                "parent_span_id": None,  # Root span
                 "success": success,
                 "error_info": error_info,
                 "object_id": object_id,
@@ -1512,8 +1532,14 @@ class MonitoringDataGenerator:
             return other.user_id
 
     def generate_metrics(self, action: ServiceAction, user: User,
-                         timestamp: datetime, success: bool, release_id: str) -> List[MetricEntry]:
-        """Generate performance metrics for an event"""
+                         timestamp: datetime, success: bool, release_id: str,
+                         trace_id: str, latency_ms: float = None) -> List[MetricEntry]:
+        """Generate performance metrics for an event
+
+        Args:
+            trace_id: Used for error-biased exemplar sampling
+            latency_ms: Pre-computed latency (for determining if slow request)
+        """
         metrics = []
         epoch_ts = timestamp.timestamp()
 
@@ -1528,6 +1554,18 @@ class MonitoringDataGenerator:
             "persona": user.persona.name,
             "release_id": release_id,
         }
+
+        # Error-biased exemplar sampling:
+        # - 100% of errors get trace_id
+        # - 100% of slow requests (> 500ms) get trace_id
+        # - 1% random sample of normal requests get trace_id
+        attach_exemplar = (
+            not success  # All errors
+            or (latency_ms and latency_ms > 500)  # Slow requests
+            or self.rng.random() < 0.01  # 1% sample
+        )
+        if attach_exemplar:
+            base_tags["trace_id"] = trace_id
 
         # Add optional tags only if they have values
         if action.object_type:
@@ -1608,7 +1646,9 @@ class MonitoringDataGenerator:
     def generate_log(self, action: ServiceAction, user: User,
                      timestamp: datetime, request_id: str, success: bool,
                      target_user_id: Optional[str], object_id: Optional[str],
-                     release_id: str, error_info: Optional[Dict] = None) -> LogEntry:
+                     release_id: str, trace_id: str, span_id: str,
+                     parent_span_id: Optional[str] = None,
+                     error_info: Optional[Dict] = None) -> LogEntry:
         """Generate a log entry for an event"""
         ts_str = timestamp.isoformat() + "Z"
 
@@ -1658,6 +1698,9 @@ class MonitoringDataGenerator:
             success=success,
             message=message,
             release_id=release_id,
+            trace_id=trace_id,
+            span_id=span_id,
+            parent_span_id=parent_span_id,
             target_user_id=target_user_id,
             object_type=action.object_type,
             object_id=object_id,
@@ -1706,6 +1749,9 @@ class MonitoringDataGenerator:
                 action = self.select_action_for_user(user)
                 timestamp = self.generate_timestamp(user)
                 request_id = uuid.uuid4().hex
+                # OpenTelemetry tracing - root span
+                trace_id = generate_trace_id(self.rng)
+                span_id = generate_span_id(self.rng)
 
                 object_id = self.generate_object_id(action, user)
                 target_user_id = self.generate_target_user(action, user)
@@ -1718,6 +1764,9 @@ class MonitoringDataGenerator:
                     "action": action,
                     "timestamp": timestamp,
                     "request_id": request_id,
+                    "trace_id": trace_id,
+                    "span_id": span_id,
+                    "parent_span_id": None,  # Root span
                     "success": success,
                     "error_info": error_info,
                     "object_id": object_id,
@@ -1837,11 +1886,12 @@ class MonitoringDataGenerator:
                         event["action"], event["user"], event["timestamp"],
                         event["request_id"], event["success"],
                         event["target_user_id"], event["object_id"],
-                        event["release_id"], event.get("error_info")
+                        event["release_id"], event["trace_id"], event["span_id"],
+                        event.get("parent_span_id"), event.get("error_info")
                     )
                     metrics = self.generate_metrics(
                         event["action"], event["user"], event["timestamp"],
-                        event["success"], event["release_id"]
+                        event["success"], event["release_id"], event["trace_id"]
                     )
 
                 log_f.write(json.dumps(asdict(log_entry)) + "\n")
@@ -1926,6 +1976,9 @@ class MonitoringDataGenerator:
             success=success,
             message=message,
             release_id=event["release_id"],
+            trace_id=event["trace_id"],
+            span_id=event["span_id"],
+            parent_span_id=event.get("parent_span_id"),
             target_user_id=event["target_user_id"],
             object_type=event["action_object_type"],
             object_id=event["object_id"],
@@ -1965,6 +2018,18 @@ class MonitoringDataGenerator:
                 latency *= 0.3
             else:
                 latency *= 3
+
+        # Error-biased exemplar sampling:
+        # - 100% of errors get trace_id
+        # - 100% of slow requests (> 500ms) get trace_id
+        # - 1% random sample of normal requests get trace_id
+        attach_exemplar = (
+            not success  # All errors
+            or latency > 500  # Slow requests
+            or self.rng.random() < 0.01  # 1% sample
+        )
+        if attach_exemplar:
+            base_tags["trace_id"] = event["trace_id"]
 
         metrics.append(MetricEntry(
             metric="request_duration_ms",

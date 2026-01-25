@@ -238,6 +238,9 @@ Metrics generated per event:
   "success": true,
   "message": "get_media returned data",
   "release_id": "prod:aws:111111111111:us-west-2:platform:eks:main:social:content:media:default:113",
+  "trace_id": "0af7651916cd43dd8448eb211c80319c",
+  "span_id": "b7ad6b7169203331",
+  "parent_span_id": null,
   "target_user_id": null,
   "object_type": "media",
   "object_id": "media_def456",
@@ -248,6 +251,11 @@ Metrics generated per event:
   "upstream_request_id": null
 }
 ```
+
+**Tracing fields (OpenTelemetry format):**
+- `trace_id` - 32 hex chars identifying the entire request chain
+- `span_id` - 16 hex chars identifying this specific operation
+- `parent_span_id` - Links to parent span (null for root spans)
 
 **Error fields (populated on failure):**
 - `error_code` - HTTP status code (400, 500, 503, etc.)
@@ -444,8 +452,15 @@ Tab-separated values with JSON defaults column:
 
 ## Monitoring Data Generator
 
-- [ ] **Add distributed tracing support** - Currently each event has its own random `request_id` with no linking between dependent services. To enable real tracing:
-  - Add `trace_id` field consistent across a call chain
-  - Add `parent_request_id` to link parent/child requests
-  - Generate explicit child events for dependency calls (not just the initiating request)
-  - This would enable trace visualization in Grafana/Jaeger/Tempo
+- [x] **Add distributed tracing support** - Implemented OpenTelemetry-style tracing:
+  - `trace_id` (32 hex chars) - Consistent across a call chain
+  - `span_id` (16 hex chars) - Unique per operation
+  - `parent_span_id` - Links to parent (null for root spans)
+  - Error-biased exemplar sampling for metrics (100% errors, 100% slow, 1% random)
+
+### Future Enhancements
+
+- [ ] **Generate child span events** - Currently only root spans are generated. To enable full trace visualization:
+  - Generate explicit child events for dependency calls
+  - Link child spans with parent_span_id
+  - Proper timing (child starts after parent, completes before)
