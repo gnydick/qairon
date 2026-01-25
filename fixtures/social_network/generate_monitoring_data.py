@@ -1930,6 +1930,191 @@ class MonitoringDataGenerator:
             json.dump(summary, f, indent=2)
         print(f"  Wrote summary to {summary_file}")
 
+    def write_otlp_output(self, events: List[dict], base_dir: Path):
+        """Write logs and metrics in OpenTelemetry OTLP JSON format"""
+        base_dir.mkdir(parents=True, exist_ok=True)
+
+        logs_file = base_dir / "logs.otlp.json"
+        metrics_file = base_dir / "metrics.otlp.json"
+
+        print(f"Writing OTLP output to {base_dir}...")
+        print(f"  Logs: {logs_file}")
+        print(f"  Metrics: {metrics_file}")
+
+        is_parallel_format = "action_service" in events[0] if events else False
+
+        # Collect all log records and metric data points
+        log_records = []
+        metric_data = {}  # metric_name -> list of data points
+
+        for i, event in enumerate(events):
+            if i % 100000 == 0:
+                print(f"  Processing event {i}/{len(events)}...")
+
+            if is_parallel_format:
+                log_entry = self._generate_log_from_flat(event)
+                metrics = self._generate_metrics_from_flat(event)
+            else:
+                log_entry = self.generate_log(
+                    event["action"], event["user"], event["timestamp"],
+                    event["request_id"], event["success"],
+                    event["target_user_id"], event["object_id"],
+                    event["release_id"], event["trace_id"], event["span_id"],
+                    event.get("parent_span_id"), event.get("error_info")
+                )
+                metrics = self.generate_metrics(
+                    event["action"], event["user"], event["timestamp"],
+                    event["success"], event["release_id"], event["trace_id"]
+                )
+
+            # Convert log to OTLP format
+            log_records.append(self._log_to_otlp(log_entry))
+
+            # Convert metrics to OTLP format
+            for metric in metrics:
+                if metric.metric not in metric_data:
+                    metric_data[metric.metric] = []
+                metric_data[metric.metric].append(self._metric_to_otlp_datapoint(metric))
+
+        # Build OTLP logs structure
+        otlp_logs = {
+            "resourceLogs": [{
+                "resource": {
+                    "attributes": [
+                        {"key": "service.name", "value": {"stringValue": "social-network"}},
+                        {"key": "service.version", "value": {"stringValue": "1.0.0"}}
+                    ]
+                },
+                "scopeLogs": [{
+                    "scope": {
+                        "name": "qairon-generator",
+                        "version": "1.0.0"
+                    },
+                    "logRecords": log_records
+                }]
+            }]
+        }
+
+        # Build OTLP metrics structure
+        otlp_metrics = {
+            "resourceMetrics": [{
+                "resource": {
+                    "attributes": [
+                        {"key": "service.name", "value": {"stringValue": "social-network"}},
+                        {"key": "service.version", "value": {"stringValue": "1.0.0"}}
+                    ]
+                },
+                "scopeMetrics": [{
+                    "scope": {
+                        "name": "qairon-generator",
+                        "version": "1.0.0"
+                    },
+                    "metrics": [
+                        {
+                            "name": metric_name,
+                            "unit": "ms" if "duration" in metric_name or "latency" in metric_name else "1",
+                            "gauge": {
+                                "dataPoints": data_points
+                            }
+                        }
+                        for metric_name, data_points in metric_data.items()
+                    ]
+                }]
+            }]
+        }
+
+        # Write files
+        with open(logs_file, 'w', encoding='utf-8') as f:
+            json.dump(otlp_logs, f)
+        print(f"  Wrote {len(log_records)} log records")
+
+        with open(metrics_file, 'w', encoding='utf-8') as f:
+            json.dump(otlp_metrics, f)
+        print(f"  Wrote {sum(len(dp) for dp in metric_data.values())} metric data points")
+
+        # Write summary
+        summary_file = base_dir / "summary.json"
+        summary = {
+            "format": "otlp",
+            "total_events": len(events),
+            "total_logs": len(log_records),
+            "total_metrics": sum(len(dp) for dp in metric_data.values()),
+            "time_range": {
+                "start": self.start_time.isoformat(),
+                "end": self.end_time.isoformat(),
+            },
+        }
+        with open(summary_file, 'w') as f:
+            json.dump(summary, f, indent=2)
+        print(f"  Wrote summary to {summary_file}")
+
+    def _log_to_otlp(self, log_entry: LogEntry) -> dict:
+        """Convert LogEntry to OTLP log record format"""
+        # Parse timestamp to nanoseconds
+        ts = datetime.fromisoformat(log_entry.timestamp.replace("Z", "+00:00"))
+        time_unix_nano = str(int(ts.timestamp() * 1_000_000_000))
+
+        # Severity mapping
+        severity_map = {"DEBUG": 5, "INFO": 9, "WARN": 13, "ERROR": 17, "FATAL": 21}
+        severity_number = severity_map.get(log_entry.level, 9)
+
+        # Build attributes from all log fields
+        attributes = [
+            {"key": "service", "value": {"stringValue": log_entry.service}},
+            {"key": "stack", "value": {"stringValue": log_entry.stack}},
+            {"key": "action", "value": {"stringValue": log_entry.action}},
+            {"key": "user_id", "value": {"stringValue": log_entry.user_id}},
+            {"key": "request_id", "value": {"stringValue": log_entry.request_id}},
+            {"key": "success", "value": {"boolValue": log_entry.success}},
+            {"key": "release_id", "value": {"stringValue": log_entry.release_id}},
+        ]
+
+        # Add optional fields if present
+        if log_entry.target_user_id:
+            attributes.append({"key": "target_user_id", "value": {"stringValue": log_entry.target_user_id}})
+        if log_entry.object_type:
+            attributes.append({"key": "object_type", "value": {"stringValue": log_entry.object_type}})
+        if log_entry.object_id:
+            attributes.append({"key": "object_id", "value": {"stringValue": log_entry.object_id}})
+        if log_entry.error_code:
+            attributes.append({"key": "error_code", "value": {"stringValue": log_entry.error_code}})
+        if log_entry.error_message:
+            attributes.append({"key": "error_message", "value": {"stringValue": log_entry.error_message}})
+        if log_entry.error_source:
+            attributes.append({"key": "error_source", "value": {"stringValue": log_entry.error_source}})
+        if log_entry.error_type:
+            attributes.append({"key": "error_type", "value": {"stringValue": log_entry.error_type}})
+
+        return {
+            "timeUnixNano": time_unix_nano,
+            "observedTimeUnixNano": time_unix_nano,
+            "severityNumber": severity_number,
+            "severityText": log_entry.level,
+            "body": {"stringValue": log_entry.message},
+            "attributes": attributes,
+            "traceId": log_entry.trace_id,
+            "spanId": log_entry.span_id,
+        }
+
+    def _metric_to_otlp_datapoint(self, metric: MetricEntry) -> dict:
+        """Convert MetricEntry to OTLP metric data point format"""
+        time_unix_nano = str(int(metric.ts * 1_000_000_000))
+
+        attributes = []
+        for key, value in metric.tags.items():
+            if isinstance(value, bool):
+                attributes.append({"key": key, "value": {"boolValue": value}})
+            elif isinstance(value, (int, float)):
+                attributes.append({"key": key, "value": {"doubleValue": value}})
+            else:
+                attributes.append({"key": key, "value": {"stringValue": str(value)}})
+
+        return {
+            "timeUnixNano": time_unix_nano,
+            "asDouble": metric.value,
+            "attributes": attributes,
+        }
+
     def _generate_log_from_flat(self, event: dict) -> LogEntry:
         """Generate log entry from flat parallel event format"""
         ts_str = event["timestamp"].isoformat() + "Z"
@@ -2104,6 +2289,9 @@ def main():
                         help="Random seed for reproducibility (default: 42)")
     parser.add_argument("--workers", "-w", type=int, default=1,
                         help="Number of parallel workers for event generation (default: 1)")
+    parser.add_argument("--format", "-f", type=str, default="jsonl",
+                        choices=["jsonl", "otlp"],
+                        help="Output format: jsonl (default) or otlp (OpenTelemetry)")
 
     args = parser.parse_args()
 
@@ -2115,6 +2303,7 @@ def main():
     print(f"Output directory: {args.output}")
     print(f"Random seed: {args.seed}")
     print(f"Workers: {args.workers}")
+    print(f"Format: {args.format}")
     print("=" * 70)
 
     generator = MonitoringDataGenerator(
@@ -2127,7 +2316,11 @@ def main():
     generator.generate_users()
     generator.generate_incidents()
     events = generator.generate_events()
-    generator.write_output(events, Path(args.output))
+
+    if args.format == "otlp":
+        generator.write_otlp_output(events, Path(args.output))
+    else:
+        generator.write_output(events, Path(args.output))
 
     print("=" * 70)
     print("Done!")
