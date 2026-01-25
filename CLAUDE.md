@@ -69,10 +69,13 @@ Generates synthetic but realistic logs and metrics for a social network platform
 
 ## Usage
 ```bash
-python generate_monitoring_data.py <total_events> <total_users> [--output <dir>] [--seed <int>]
+python generate_monitoring_data.py <total_events> <total_users> [--output <dir>] [--seed <int>] [--format {jsonl,otlp}]
 
-# Example: 1M events, 10K users
+# Example: 1M events, 10K users (default JSONL format)
 python generate_monitoring_data.py 1000000 10000 --output fixtures/test_data
+
+# Example: OTLP format for ClickStack/OpenTelemetry backends
+python generate_monitoring_data.py 1000000 10000 --output fixtures/test_data --format otlp
 ```
 
 ## Recommended Data Generation
@@ -105,8 +108,15 @@ python fixtures/social_network/import_to_victoriametrics.py fixtures/test_data/m
 | 100M | 100K | 450M | ~100GB | ~1 per 5-7 seconds |
 
 ## Output Files
+
+**JSONL format (default):**
 - `logs.jsonl` - Log entries (one JSON object per line)
 - `metrics.jsonl` - Metric entries (one JSON object per line)
+- `summary.json` - Generation metadata
+
+**OTLP format (`--format otlp`):**
+- `logs.otlp.json` - OpenTelemetry OTLP JSON format (resourceLogs structure)
+- `metrics.otlp.json` - OpenTelemetry OTLP JSON format (resourceMetrics structure)
 - `summary.json` - Generation metadata
 
 ## Key Features
@@ -378,6 +388,55 @@ histogram_quantile(0.99, request_duration_ms) by (service_id)
 
 ---
 
+# ClickStack (Alternative Backend)
+
+ClickStack is a ClickHouse-based observability stack with HyperDX UI and built-in OpenTelemetry collector. Recommended for high-volume data with better query performance than VictoriaMetrics/VictoriaLogs.
+
+## Start ClickStack
+```bash
+docker run -d --name clickstack \
+  -p 8080:8080 -p 4317:4317 -p 4318:4318 \
+  -v clickstack-data:/var/lib/clickhouse \
+  docker.io/hyperdx/hyperdx-local
+```
+
+**Ports:**
+- 8080: HyperDX UI (http://localhost:8080)
+- 4317: OTLP gRPC receiver
+- 4318: OTLP HTTP receiver
+
+## Get API Key
+1. Open http://localhost:8080
+2. Create account / log in
+3. Go to Team Settings → API Keys
+4. Copy the API key
+
+## Ingest OTLP Data
+```bash
+# Generate OTLP data
+python fixtures/social_network/generate_monitoring_data.py 1000000 10000 --format otlp --output fixtures/test_data
+
+# Send logs
+curl -X POST -H "Content-Type: application/json" \
+  -H "Authorization: <API_KEY>" \
+  -d @fixtures/test_data/logs.otlp.json \
+  http://localhost:4318/v1/logs
+
+# Send metrics
+curl -X POST -H "Content-Type: application/json" \
+  -H "Authorization: <API_KEY>" \
+  -d @fixtures/test_data/metrics.otlp.json \
+  http://localhost:4318/v1/metrics
+```
+
+## Wipe and Restart
+```bash
+docker stop clickstack && docker rm clickstack && docker volume rm clickstack-data
+# Then run the start command again
+```
+
+---
+
 # Docker Management
 
 ## Start Services
@@ -458,9 +517,16 @@ Tab-separated values with JSON defaults column:
   - `parent_span_id` - Links to parent (null for root spans)
   - Error-biased exemplar sampling for metrics (100% errors, 100% slow, 1% random)
 
+- [x] **Add OTLP output format** - `--format otlp` option outputs OpenTelemetry OTLP JSON:
+  - `logs.otlp.json` with resourceLogs/scopeLogs/logRecords structure
+  - `metrics.otlp.json` with resourceMetrics/scopeMetrics/metrics structure
+  - Compatible with ClickStack, Jaeger, Tempo, and other OTLP receivers
+
 ### Future Enhancements
 
 - [ ] **Generate child span events** - Currently only root spans are generated. To enable full trace visualization:
   - Generate explicit child events for dependency calls
   - Link child spans with parent_span_id
   - Proper timing (child starts after parent, completes before)
+
+- [ ] **Streaming OTLP sender** - Send OTLP data directly to collectors without intermediate files
