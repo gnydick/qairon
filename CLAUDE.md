@@ -69,13 +69,10 @@ Generates synthetic but realistic logs and metrics for a social network platform
 
 ## Usage
 ```bash
-python generate_monitoring_data.py <total_events> <total_users> [--output <dir>] [--seed <int>] [--format {jsonl,otlp}]
+python generate_monitoring_data.py <total_events> <total_users> [--output <dir>] [--seed <int>]
 
-# Example: 1M events, 10K users (default JSONL format)
+# Example: 1M events, 10K users
 python generate_monitoring_data.py 1000000 10000 --output fixtures/test_data
-
-# Example: OTLP format for ClickStack/OpenTelemetry backends
-python generate_monitoring_data.py 1000000 10000 --output fixtures/test_data --format otlp
 ```
 
 ## Recommended Data Generation
@@ -83,40 +80,55 @@ python generate_monitoring_data.py 1000000 10000 --output fixtures/test_data --f
 For smooth time series data with visible outliers at 10-15 second granularity per deployment:
 
 ```bash
-# Generate 50M events, 50K users (~225M metrics, ~50GB)
-# Takes 20-30 minutes to generate, gives ~1 event/minute/deployment
-python fixtures/social_network/generate_monitoring_data.py 50000000 50000 --output fixtures/test_data
+# Generate 50M events, 50K users (~135M logs with child spans, ~613M metrics)
+# Takes 20-30 minutes to generate, outputs per-worker files (logs_0.jsonl, metrics_0.jsonl, etc.)
+python fixtures/social_network/generate_monitoring_data.py 50000000 50000 --output /mnt/mac_data/qairon/test_data
 
-# Start VictoriaMetrics with 2-year retention (use ~75% of available cores)
-docker run -d --name victoria --cpus=48 -p 8428:8428 \
-  -v vm-data-2y:/victoria-metrics-data \
-  victoriametrics/victoria-metrics -retentionPeriod=2y
+# Start VictoriaMetrics with 2-year retention and persistent storage
+docker run -d --name victoria --cpus=24 -p 8428:8428 \
+  -v /mnt/mac_data/qairon/victoria-metrics-data:/victoria-metrics-data:z \
+  victoriametrics/victoria-metrics -retentionPeriod=2y -search.cacheTimestampOffset=8760h
+
+# Start VictoriaLogs with 2-year retention
+docker run -d --name victorialogs --cpus=30 -p 9428:9428 \
+  -v /mnt/mac_data/qairon/victoria-logs-data:/victoria-logs-data:z \
+  victoriametrics/victoria-logs -retentionPeriod=2y
 
 # Start Grafana
-docker run -d --name grafana -p 3000:3000 grafana/grafana
+docker run -d --name grafana -p 3000:3000 \
+  -v grafana-data:/var/lib/grafana \
+  -e GF_INSTALL_PLUGINS=victoriametrics-logs-datasource \
+  grafana/grafana
 
-# Import with parallel workers (use ~50-75% of threads)
-python fixtures/social_network/import_to_victoriametrics.py fixtures/test_data/metrics.jsonl --workers 32
+# Import metrics (32 parallel processes works well, ~20k/sec)
+for f in /mnt/mac_data/qairon/test_data/metrics_*.jsonl; do
+  python fixtures/social_network/import_to_victoriametrics.py "$f" --workers 8 &
+done
+wait
+
+# Import logs (sequential import required - VictoriaLogs can't handle parallel, ~6-10k/sec)
+for f in /mnt/mac_data/qairon/test_data/logs_*.jsonl; do
+  python fixtures/social_network/import_to_victorialogs.py "$f" --workers 4
+done
 ```
 
+**Note:** Use `:z` flag on bind mounts for SELinux systems to relabel volumes for container access.
+
 ### Data Density Guide
-| Events | Users | Metrics | Approx Size | Granularity per Deployment |
-|--------|-------|---------|-------------|---------------------------|
-| 1M | 10K | 4.5M | ~1.5GB | ~1 per 10 minutes |
-| 10M | 20K | 45M | ~15GB | ~1 per minute |
-| 50M | 50K | 225M | ~50GB | ~1 per 10-15 seconds |
-| 100M | 100K | 450M | ~100GB | ~1 per 5-7 seconds |
+With child spans (~2.8x multiplier), actual output is larger than base events:
+
+| Base Events | Users | Logs (with spans) | Metrics | Raw Size | Granularity/Deployment |
+|-------------|-------|-------------------|---------|----------|------------------------|
+| 1M | 10K | ~2.8M | ~12.3M | ~6GB | ~1 per 10 minutes |
+| 10M | 20K | ~28M | ~123M | ~60GB | ~1 per minute |
+| 50M | 50K | ~135M | ~613M | ~280GB | ~1 per 10-15 seconds |
+| 100M | 100K | ~280M | ~1.2B | ~560GB | ~1 per 5-7 seconds |
 
 ## Output Files
 
-**JSONL format (default):**
-- `logs.jsonl` - Log entries (one JSON object per line)
-- `metrics.jsonl` - Metric entries (one JSON object per line)
-- `summary.json` - Generation metadata
-
-**OTLP format (`--format otlp`):**
-- `logs.otlp.json` - OpenTelemetry OTLP JSON format (resourceLogs structure)
-- `metrics.otlp.json` - OpenTelemetry OTLP JSON format (resourceMetrics structure)
+For large datasets, the generator outputs per-worker files to enable streaming without RAM constraints:
+- `logs_0.jsonl`, `logs_1.jsonl`, ... - Log entries split by worker
+- `metrics_0.jsonl`, `metrics_1.jsonl`, ... - Metric entries split by worker
 - `summary.json` - Generation metadata
 
 ## Key Features
@@ -388,67 +400,43 @@ histogram_quantile(0.99, request_duration_ms) by (service_id)
 
 ---
 
-# ClickStack (Alternative Backend)
+# VictoriaLogs Importer
 
-ClickStack is a ClickHouse-based observability stack with HyperDX UI and built-in OpenTelemetry collector. Recommended for high-volume data with better query performance than VictoriaMetrics/VictoriaLogs.
+## Location
+`fixtures/social_network/import_to_victorialogs.py`
 
-## Start ClickStack
+## Purpose
+Streaming import of logs.jsonl to VictoriaLogs with composite ID extraction. Extracts all tags from `release_id` to enable filtering by any hierarchy level.
+
+## Usage
 ```bash
-docker run -d --name clickstack \
-  -p 8080:8080 -p 4317:4317 -p 4318:4318 \
-  -v clickstack-data:/var/lib/clickhouse \
-  docker.io/hyperdx/hyperdx-local
+# Import logs (sequential - VictoriaLogs can't handle many parallel connections)
+python import_to_victorialogs.py logs.jsonl --workers 4
 ```
 
-**Ports:**
-- 8080: HyperDX UI (http://localhost:8080)
-- 4317: OTLP gRPC receiver
-- 4318: OTLP HTTP receiver
+## Performance Notes
+- **VictoriaLogs is sensitive to concurrent connections** - parallel imports cause timeouts
+- Sequential import with 4 workers achieves ~6-10k logs/sec
+- For 134M logs, expect ~4-6 hours import time
+- VictoriaMetrics (metrics) handles parallel imports well; VictoriaLogs (logs) does not
 
-## Get API Key
-1. Open http://localhost:8080
-2. Create account / log in
-3. Go to Team Settings → API Keys
-4. Copy the API key
-
-## Ingest OTLP Data
-```bash
-# Generate OTLP data
-python fixtures/social_network/generate_monitoring_data.py 1000000 10000 --format otlp --output fixtures/test_data
-
-# Send logs
-curl -X POST -H "Content-Type: application/json" \
-  -H "Authorization: <API_KEY>" \
-  -d @fixtures/test_data/logs.otlp.json \
-  http://localhost:4318/v1/logs
-
-# Send metrics
-curl -X POST -H "Content-Type: application/json" \
-  -H "Authorization: <API_KEY>" \
-  -d @fixtures/test_data/metrics.otlp.json \
-  http://localhost:4318/v1/metrics
-```
-
-## Wipe and Restart
-```bash
-docker stop clickstack && docker rm clickstack && docker volume rm clickstack-data
-# Then run the start command again
-```
+## Tag Extraction
+Same as VictoriaMetrics importer - splits `release_id` into 12 single-word tags plus 8 composite IDs.
 
 ---
 
 # Docker Management
 
-## Start Services
+## Start Services (with bind mounts for large datasets)
 ```bash
-# VictoriaMetrics (metrics)
+# VictoriaMetrics (metrics) - bind mount to large storage
 docker run -d --name victoria --cpus=24 -p 8428:8428 \
-  -v vm-data-2y:/victoria-metrics-data \
+  -v /mnt/mac_data/qairon/victoria-metrics-data:/victoria-metrics-data:z \
   victoriametrics/victoria-metrics -retentionPeriod=2y -search.cacheTimestampOffset=8760h
 
-# VictoriaLogs (logs)
+# VictoriaLogs (logs) - bind mount to large storage
 docker run -d --name victorialogs --cpus=30 -p 9428:9428 \
-  -v vl-data-2y:/victoria-logs-data \
+  -v /mnt/mac_data/qairon/victoria-logs-data:/victoria-logs-data:z \
   victoriametrics/victoria-logs -retentionPeriod=2y
 
 # Grafana (with VictoriaLogs plugin and persistent storage)
@@ -457,6 +445,8 @@ docker run -d --name grafana -p 3000:3000 \
   -e GF_INSTALL_PLUGINS=victoriametrics-logs-datasource \
   grafana/grafana
 ```
+
+**Note:** The `:z` flag is required on SELinux systems to relabel bind mounts for container access.
 
 ## Stop (preserve data)
 ```bash
@@ -470,13 +460,13 @@ docker start victoria victorialogs grafana
 
 ## Wipe and restart
 ```bash
-# Wipe VictoriaMetrics
-docker stop victoria && docker rm victoria && docker volume rm vm-data-2y
+# Wipe VictoriaMetrics (bind mount)
+docker stop victoria && docker rm victoria && rm -rf /mnt/mac_data/qairon/victoria-metrics-data/*
 
-# Wipe VictoriaLogs
-docker stop victorialogs && docker rm victorialogs && docker volume rm vl-data-2y
+# Wipe VictoriaLogs (bind mount)
+docker stop victorialogs && docker rm victorialogs && rm -rf /mnt/mac_data/qairon/victoria-logs-data/*
 
-# Wipe Grafana
+# Wipe Grafana (Docker volume)
 docker stop grafana && docker rm grafana && docker volume rm grafana-data
 
 # Then run the start commands again
@@ -526,11 +516,6 @@ Tab-separated values with JSON defaults column:
   - `parent_span_id` - Links to parent (null for root spans)
   - Error-biased exemplar sampling for metrics (100% errors, 100% slow, 1% random)
 
-- [x] **Add OTLP output format** - `--format otlp` option outputs OpenTelemetry OTLP JSON:
-  - `logs.otlp.json` with resourceLogs/scopeLogs/logRecords structure
-  - `metrics.otlp.json` with resourceMetrics/scopeMetrics/metrics structure
-  - Compatible with ClickStack, Jaeger, Tempo, and other OTLP receivers
-
 - [x] **Generate child span events** - Full distributed tracing with parent-child span relationships:
   - For each root event, generates child spans for all `SERVICE_DEPENDENCIES`
   - Child spans share `trace_id` with parent, have unique `span_id`, link via `parent_span_id`
@@ -538,6 +523,7 @@ Tab-separated values with JSON defaults column:
   - ~2.8x event multiplier (100 root events → ~280 total events)
   - Error propagation: infrastructure incidents affect child spans appropriately
 
-### Future Enhancements
-
-- [ ] **Streaming OTLP sender** - Send OTLP data directly to collectors without intermediate files
+- [x] **Streaming to disk** - Large datasets write directly to per-worker files to avoid OOM:
+  - Workers write directly to `logs_N.jsonl` and `metrics_N.jsonl`
+  - No RAM accumulation, enables 50M+ event generation
+  - Import each file separately to VictoriaMetrics/VictoriaLogs

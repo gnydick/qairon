@@ -97,7 +97,7 @@ def import_batch(url: str, batch: list) -> tuple:
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=120) as resp:
             return (len(batch), 0)
     except (urllib.error.HTTPError, urllib.error.URLError) as e:
         return (0, len(batch))

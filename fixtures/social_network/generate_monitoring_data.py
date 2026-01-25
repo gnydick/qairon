@@ -982,6 +982,409 @@ class InfrastructureIncident:
 # PARALLEL EVENT GENERATION WORKER
 # =============================================================================
 
+def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
+    """
+    Worker function for parallel event generation - STREAMING VERSION.
+    Writes events directly to temp files to avoid memory issues.
+
+    Args is a tuple containing:
+    - worker_id: int
+    - user_chunk: List of (user_dict, event_count) pairs
+    - incidents_data: List of incident dicts (serializable form)
+    - start_time: datetime
+    - end_time: datetime
+    - base_seed: int
+    - error_codes: dict
+    - error_messages: dict
+    - output_dir: str (temp directory for worker output)
+
+    Returns:
+    - (event_count, logs_file_path, metrics_file_path)
+    """
+    (worker_id, user_chunk, incidents_data, start_time, end_time,
+     base_seed, error_codes, error_messages, output_dir) = args
+
+    # Create worker-local RNG with deterministic seed
+    rng = random.Random(base_seed + worker_id * 1000000)
+
+    # Reconstruct incidents from serializable form
+    incidents = [
+        InfrastructureIncident(**inc) for inc in incidents_data
+    ]
+
+    # Worker-local content pools
+    all_posts = []
+    all_stories = []
+    all_streams = []
+    all_hashtags = [f"#{word}" for word in [
+        "trending", "viral", "fyp", "lifestyle", "travel", "food", "fitness",
+        "tech", "gaming", "music", "art", "fashion", "beauty", "sports",
+        "news", "memes", "photography", "nature", "pets", "diy", "cooking"
+    ]]
+
+    # All the helper functions (same as non-streaming version)
+    def get_active_incident(service_key: str, timestamp: datetime) -> Optional[InfrastructureIncident]:
+        for incident in incidents:
+            if incident.start_time <= timestamp <= incident.end_time:
+                if service_key in incident.affected_services:
+                    return incident
+        return None
+
+    def check_hidden_dependency_failure(action, timestamp) -> Optional[Tuple[str, str, str, str]]:
+        service_key = f"{action.stack}:{action.service}"
+        incident = get_active_incident(service_key, timestamp)
+        if incident:
+            if rng.random() < incident.error_info["failure_rate"]:
+                error_code = rng.choice(incident.error_info["error_codes"])
+                return (
+                    incident.dependency_name,
+                    incident.error_info["error_type"],
+                    error_code,
+                    incident.error_info["error_message"]
+                )
+        return None
+
+    def check_dependency_failure(action, timestamp) -> Optional[Tuple[str, str, str, str]]:
+        service_key = f"{action.stack}:{action.service}"
+        if service_key in SERVICE_DEPENDENCIES:
+            for dep_service in SERVICE_DEPENDENCIES[service_key]:
+                incident = get_active_incident(dep_service, timestamp)
+                if incident:
+                    if rng.random() < incident.error_info["failure_rate"] * 10:
+                        error_code = rng.choice(incident.error_info["error_codes"])
+                        return (
+                            dep_service,
+                            incident.error_info["error_type"],
+                            error_code,
+                            f"Upstream service {dep_service} failed: {incident.error_info['error_message']}"
+                        )
+        return None
+
+    def determine_error(action, user_data, timestamp) -> Optional[Dict]:
+        hidden_failure = check_hidden_dependency_failure(action, timestamp)
+        if hidden_failure:
+            dep_name, error_type, error_code, error_message = hidden_failure
+            return {
+                "error_source": f"infrastructure:{dep_name}",
+                "error_type": error_type,
+                "error_code": error_code,
+                "error_message": error_message,
+                "upstream_request_id": None,
+            }
+
+        dep_failure = check_dependency_failure(action, timestamp)
+        if dep_failure:
+            dep_service, error_type, error_code, error_message = dep_failure
+            return {
+                "error_source": f"dependency:{dep_service}",
+                "error_type": error_type,
+                "error_code": error_code,
+                "error_message": error_message,
+                "upstream_request_id": uuid.uuid4().hex,
+            }
+
+        if rng.random() > user_data["success_rate"]:
+            if rng.random() < 0.7:
+                error_code = rng.choice(error_codes["client"])
+                error_type = "client"
+            else:
+                error_code = rng.choice(error_codes["server"])
+                error_type = "server"
+            return {
+                "error_source": "self",
+                "error_type": error_type,
+                "error_code": error_code,
+                "error_message": error_messages[error_code],
+                "upstream_request_id": None,
+            }
+        return None
+
+    def select_action_for_user(user_data) -> 'ServiceAction':
+        action_weights = user_data["action_weights"]
+        categories = list(action_weights.keys())
+        weights = [action_weights.get(c, 0) for c in categories]
+        valid = [(c, w) for c, w in zip(categories, weights) if c in ACTIONS_BY_CATEGORY and w > 0]
+        if not valid:
+            valid = [(c, 1.0) for c in ACTIONS_BY_CATEGORY.keys()]
+        categories, weights = zip(*valid)
+        category = rng.choices(categories, weights=weights)[0]
+        actions = ACTIONS_BY_CATEGORY[category]
+        action_weights_list = [a.weight for a in actions]
+        return rng.choices(actions, weights=action_weights_list)[0]
+
+    def generate_timestamp(user_data) -> datetime:
+        hourly_weights = user_data["hourly_weights"]
+        daily_weights = user_data["daily_weights"]
+        days_ago = rng.randint(0, 364)
+        date = end_time - timedelta(days=days_ago)
+        dow = date.weekday()
+        if rng.random() > daily_weights[dow] * 7:
+            preferred_dow = rng.choices(range(7), weights=daily_weights)[0]
+            days_diff = preferred_dow - dow
+            date = date + timedelta(days=days_diff)
+        hour = rng.choices(range(24), weights=hourly_weights)[0]
+        minute = rng.randint(0, 59)
+        second = rng.randint(0, 59)
+        microsecond = rng.randint(0, 999999)
+        return date.replace(hour=hour, minute=minute, second=second, microsecond=microsecond)
+
+    def select_release(action, timestamp) -> str:
+        envs = list(ENVIRONMENT_CONFIG.keys())
+        weights = [ENVIRONMENT_CONFIG[e]["weight"] for e in envs]
+        env = rng.choices(envs, weights=weights)[0]
+        regions = ENVIRONMENT_CONFIG[env]["regions"]
+        if len(regions) > 1:
+            region_weights = [0.6, 0.4] if len(regions) == 2 else [1.0]
+            region = rng.choices(regions, weights=region_weights)[0]
+        else:
+            region = regions[0]
+        days_into_year = (timestamp - start_time).days
+        year_progress = max(0, days_into_year) / 365.0
+        base_release = 50 + int(year_progress * 200)
+        service_hash = hash(f"{action.stack}:{action.service}") % 50
+        release_num = base_release + service_hash
+        return generate_release_id(env, region, action.stack, action.service, release_num)
+
+    def generate_object_id(action, user_data) -> Optional[str]:
+        if not action.has_object_id:
+            return None
+        obj_type = action.object_type
+        if obj_type == "post":
+            if action.is_write and action.action == "create_post":
+                post_id = f"post_{uuid.uuid4().hex[:16]}"
+                all_posts.append((post_id, user_data["user_id"]))
+                return post_id
+            elif all_posts:
+                return rng.choice(all_posts)[0]
+            return f"post_{uuid.uuid4().hex[:16]}"
+        elif obj_type == "story":
+            if action.is_write and action.action == "create_story":
+                story_id = f"story_{uuid.uuid4().hex[:16]}"
+                all_stories.append((story_id, user_data["user_id"]))
+                return story_id
+            elif all_stories:
+                return rng.choice(all_stories)[0]
+            return f"story_{uuid.uuid4().hex[:16]}"
+        elif obj_type == "stream":
+            if action.action == "start_stream":
+                stream_id = f"stream_{uuid.uuid4().hex[:12]}"
+                all_streams.append((stream_id, user_data["user_id"]))
+                return stream_id
+            elif all_streams:
+                return rng.choice(all_streams)[0]
+            return f"stream_{uuid.uuid4().hex[:12]}"
+        elif obj_type == "hashtag":
+            return rng.choice(all_hashtags)
+        else:
+            return f"{obj_type}_{uuid.uuid4().hex[:12]}"
+
+    def generate_target_user(action, user_data) -> Optional[str]:
+        if not action.has_target_user:
+            return None
+        following = user_data.get("following", [])
+        followers = user_data.get("followers", [])
+        if following and rng.random() < 0.6:
+            return rng.choice(following)
+        elif followers and rng.random() < 0.3:
+            return rng.choice(followers)
+        return f"user_{uuid.uuid4().hex[:12]}"
+
+    def select_release_by_key(stack: str, service: str, timestamp: datetime) -> str:
+        class MinimalAction:
+            pass
+        action = MinimalAction()
+        action.stack = stack
+        action.service = service
+        return select_release(action, timestamp)
+
+    def event_to_log_json(event: dict) -> str:
+        """Convert event to log JSON line"""
+        timestamp = event["timestamp"]
+        ts_str = timestamp.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        success = event["success"]
+        action_name = event["action_action"]
+
+        error_code = None
+        error_message = None
+        error_source = None
+        error_type = None
+        upstream_request_id = None
+
+        if success:
+            message = f"{action_name} completed successfully" if event.get("action_is_write") else f"{action_name} returned data"
+            level = "INFO"
+        else:
+            error_info = event.get("error_info", {})
+            if error_info:
+                error_code = error_info.get("error_code")
+                error_message = error_info.get("error_message")
+                error_source = error_info.get("error_source")
+                error_type = error_info.get("error_type")
+                upstream_request_id = error_info.get("upstream_request_id")
+            else:
+                error_code = "500"
+                error_message = "Unknown error"
+                error_type = "server"
+                error_source = "self"
+            message = f"{action_name} failed: {error_message}"
+            level = "ERROR" if error_type in ("server", "database", "cache", "queue", "internal") else "WARN"
+
+        log_entry = {
+            "timestamp": ts_str,
+            "level": level,
+            "service": event["action_service"],
+            "stack": event["action_stack"],
+            "action": event["action_action"],
+            "user_id": event["user_id"],
+            "request_id": event["request_id"],
+            "success": success,
+            "message": message,
+            "release_id": event["release_id"],
+            "trace_id": event["trace_id"],
+            "span_id": event["span_id"],
+            "parent_span_id": event.get("parent_span_id"),
+            "target_user_id": event.get("target_user_id"),
+            "object_type": event.get("action_object_type"),
+            "object_id": event.get("object_id"),
+            "error_code": error_code,
+            "error_message": error_message,
+            "error_source": error_source,
+            "error_type": error_type,
+            "upstream_request_id": upstream_request_id,
+        }
+        return json.dumps(log_entry)
+
+    def event_to_metrics_json(event: dict) -> List[str]:
+        """Convert event to metric JSON lines"""
+        lines = []
+        epoch_ts = event["timestamp"].timestamp()
+        success = event["success"]
+
+        base_tags = {
+            "service": event["action_service"],
+            "stack": event["action_stack"],
+            "action": event["action_action"],
+            "success": "true" if success else "false",
+            "is_write": "true" if event.get("action_is_write") else "false",
+            "persona": event["persona_name"],
+            "release_id": event["release_id"],
+        }
+
+        if event.get("action_object_type"):
+            base_tags["object_type"] = event["action_object_type"]
+
+        # Latency
+        latency = max(1.0, rng.gauss(
+            event["action_base_latency_ms"] * event.get("latency_multiplier", 1.0),
+            event.get("action_latency_stddev_ms", 10)
+        ))
+        if not success:
+            latency *= 0.3 if rng.random() < 0.5 else 3
+
+        # Error-biased exemplar sampling
+        trace_id = event["trace_id"]
+        attach_exemplar = (not success or latency > 500 or rng.random() < 0.01)
+        tags = dict(base_tags)
+        if attach_exemplar:
+            tags["trace_id"] = trace_id
+
+        lines.append(json.dumps({"metric": "request_duration_ms", "ts": epoch_ts, "value": round(latency, 2), "tags": tags}))
+
+        # Request size
+        request_size = max(64, int(rng.gauss(event.get("action_base_payload_bytes", 1024) * 0.1, event.get("action_payload_stddev_bytes", 100) * 0.1)))
+        lines.append(json.dumps({"metric": "request_size_bytes", "ts": epoch_ts, "value": float(request_size), "tags": dict(base_tags)}))
+
+        # Response size
+        response_size = max(64, int(rng.gauss(event.get("action_base_payload_bytes", 1024), event.get("action_payload_stddev_bytes", 100)))) if success else rng.randint(128, 512)
+        lines.append(json.dumps({"metric": "response_size_bytes", "ts": epoch_ts, "value": float(response_size), "tags": dict(base_tags)}))
+
+        # DB queries
+        db_queries = rng.randint(1, 5) if success else rng.randint(0, 2)
+        lines.append(json.dumps({"metric": "db_query_count", "ts": epoch_ts, "value": float(db_queries), "tags": dict(base_tags)}))
+
+        # Cache hit (reads only)
+        if not event.get("action_is_write") and success:
+            cache_hit = 1.0 if rng.random() < 0.7 else 0.0
+            lines.append(json.dumps({"metric": "cache_hit", "ts": epoch_ts, "value": cache_hit, "tags": dict(base_tags)}))
+
+        return lines
+
+    # Open output files for this worker
+    logs_file = f"{output_dir}/logs_{worker_id}.jsonl"
+    metrics_file = f"{output_dir}/metrics_{worker_id}.jsonl"
+    event_count = 0
+
+    with open(logs_file, 'w', encoding='utf-8') as log_f, \
+         open(metrics_file, 'w', encoding='utf-8') as metric_f:
+
+        for user_data, count in user_chunk:
+            for _ in range(count):
+                action = select_action_for_user(user_data)
+                timestamp = generate_timestamp(user_data)
+                request_id = uuid.uuid4().hex
+                trace_id = ''.join(rng.choices('0123456789abcdef', k=32))
+                span_id = ''.join(rng.choices('0123456789abcdef', k=16))
+                object_id = generate_object_id(action, user_data)
+                target_user_id = generate_target_user(action, user_data)
+                release_id = select_release(action, timestamp)
+                error_info = determine_error(action, user_data, timestamp)
+                success = error_info is None
+
+                root_event = {
+                    "user_id": user_data["user_id"],
+                    "persona_name": user_data["persona_name"],
+                    "action_service": action.service,
+                    "action_stack": action.stack,
+                    "action_action": action.action,
+                    "action_category": action.category,
+                    "action_base_latency_ms": action.base_latency_ms,
+                    "action_latency_stddev_ms": action.latency_stddev_ms,
+                    "action_base_payload_bytes": action.base_payload_bytes,
+                    "action_payload_stddev_bytes": action.payload_stddev_bytes,
+                    "action_has_target_user": action.has_target_user,
+                    "action_has_object_id": action.has_object_id,
+                    "action_object_type": action.object_type,
+                    "action_is_write": action.is_write,
+                    "latency_multiplier": user_data["latency_multiplier"],
+                    "timestamp": timestamp,
+                    "request_id": request_id,
+                    "trace_id": trace_id,
+                    "span_id": span_id,
+                    "parent_span_id": None,
+                    "success": success,
+                    "error_info": error_info,
+                    "object_id": object_id,
+                    "target_user_id": target_user_id,
+                    "release_id": release_id,
+                }
+
+                # Write root event
+                log_f.write(event_to_log_json(root_event) + "\n")
+                for metric_line in event_to_metrics_json(root_event):
+                    metric_f.write(metric_line + "\n")
+                event_count += 1
+
+                # Generate and write child spans
+                child_spans = generate_child_spans_for_event(
+                    parent_event=root_event,
+                    rng=rng,
+                    incidents=incidents,
+                    get_active_incident_func=get_active_incident,
+                    check_hidden_dep_func=check_hidden_dependency_failure,
+                    check_dep_failure_func=check_dependency_failure,
+                    select_release_func=select_release_by_key,
+                    error_codes=error_codes,
+                    error_messages=error_messages,
+                )
+                for child_event in child_spans:
+                    log_f.write(event_to_log_json(child_event) + "\n")
+                    for metric_line in event_to_metrics_json(child_event):
+                        metric_f.write(metric_line + "\n")
+                    event_count += 1
+
+    return (event_count, logs_file, metrics_file)
+
+
 def _generate_events_for_chunk(args: Tuple) -> List[dict]:
     """
     Worker function for parallel event generation.
@@ -2063,7 +2466,15 @@ class MonitoringDataGenerator:
         for i, item in enumerate(user_data_counts):
             chunks[i % self.num_workers].append(item)
 
-        # Prepare worker arguments
+        # Write directly to output directory (no temp files, no concatenation)
+        import shutil
+        if not hasattr(self, '_output_path'):
+            self._output_path = Path("fixtures/test_data")
+        self._output_path.mkdir(parents=True, exist_ok=True)
+        output_dir = str(self._output_path)
+        print(f"  Writing directly to: {output_dir}")
+
+        # Prepare worker arguments - workers write directly to output dir
         worker_args = [
             (
                 worker_id,
@@ -2074,32 +2485,34 @@ class MonitoringDataGenerator:
                 self.seed,
                 self.error_codes,
                 self.error_messages,
+                output_dir,  # Workers write to per-worker files in output dir
             )
             for worker_id in range(self.num_workers)
         ]
 
-        # Run workers in parallel
-        print(f"  Starting {self.num_workers} parallel workers...")
-        all_events = []
+        # Run workers in parallel - each streams to its own file
+        print(f"  Starting {self.num_workers} parallel workers (streaming to disk)...")
+        total_events = 0
 
         with ProcessPoolExecutor(max_workers=self.num_workers) as executor:
-            futures = {executor.submit(_generate_events_for_chunk, args): i for i, args in enumerate(worker_args)}
+            futures = {executor.submit(_generate_events_for_chunk_streaming, args): i for i, args in enumerate(worker_args)}
             completed = 0
             for future in as_completed(futures):
                 worker_id = futures[future]
                 try:
-                    events = future.result()
-                    all_events.extend(events)
+                    event_count, logs_path, metrics_path = future.result()
+                    total_events += event_count
                     completed += 1
-                    print(f"  Worker {worker_id} completed ({completed}/{self.num_workers}), generated {len(events)} events")
+                    print(f"  Worker {worker_id} completed ({completed}/{self.num_workers}), generated {event_count:,} events, total: {total_events:,}")
                 except Exception as e:
                     print(f"  Worker {worker_id} failed: {e}")
                     raise
 
-        print(f"  Total events generated: {len(all_events)}")
-        print("  Sorting events by timestamp...")
-        all_events.sort(key=lambda e: e["timestamp"])
-        return all_events
+        print(f"  Total events written: {total_events:,}")
+        print(f"  Output files: {output_dir}/logs_*.jsonl, {output_dir}/metrics_*.jsonl")
+        self._streaming_complete = True
+        self._total_events_written = total_events
+        return []
 
     def write_output(self, events: List[dict], base_dir: Path):
         """Write logs and metrics to files"""
@@ -2562,11 +2975,31 @@ def main():
         num_workers=args.workers
     )
 
+    # Set output path for streaming (parallel workers write directly to disk)
+    generator._output_path = Path(args.output)
+
     generator.generate_users()
     generator.generate_incidents()
     events = generator.generate_events()
 
-    if args.format == "otlp":
+    # Check if streaming was used (parallel with > 1 worker)
+    if getattr(generator, '_streaming_complete', False):
+        # Already written to disk during generation
+        print(f"  Logs and metrics streamed to {args.output}")
+        # Write summary
+        summary_file = Path(args.output) / "summary.json"
+        summary = {
+            "total_events": generator._total_events_written,
+            "total_users": len(generator.users),
+            "time_range": {
+                "start": generator.start_time.isoformat(),
+                "end": generator.end_time.isoformat(),
+            },
+        }
+        with open(summary_file, 'w') as f:
+            json.dump(summary, f, indent=2)
+        print(f"  Wrote summary to {summary_file}")
+    elif args.format == "otlp":
         generator.write_otlp_output(events, Path(args.output))
     else:
         generator.write_output(events, Path(args.output))
