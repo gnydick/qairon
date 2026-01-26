@@ -119,10 +119,10 @@ With child spans (~2.8x multiplier), actual output is larger than base events:
 
 | Base Events | Users | Logs (with spans) | Metrics | Raw Size | Granularity/Deployment |
 |-------------|-------|-------------------|---------|----------|------------------------|
-| 1M | 10K | ~2.8M | ~12.3M | ~6GB | ~1 per 10 minutes |
-| 10M | 20K | ~28M | ~123M | ~60GB | ~1 per minute |
-| 50M | 50K | ~135M | ~613M | ~280GB | ~1 per 10-15 seconds |
-| 100M | 100K | ~280M | ~1.2B | ~560GB | ~1 per 5-7 seconds |
+| 1M          | 10K   | ~2.8M             | ~12.3M  | ~6GB     | ~1 per 10 minutes      |
+| 10M         | 20K   | ~28M              | ~123M   | ~60GB    | ~1 per minute          |
+| 50M         | 50K   | ~135M             | ~613M   | ~280GB   | ~1 per 10-15 seconds   |
+| 100M        | 100K  | ~280M             | ~1.2B   | ~560GB   | ~1 per 5-7 seconds     |
 
 ## Output Files
 
@@ -136,17 +136,17 @@ For large datasets, the generator outputs per-worker files to enable streaming w
 ### 100 User Personas
 Distributed across archetypes with distinct behavior patterns:
 
-| Category | Count | % Users | % Activity | Characteristics |
-|----------|-------|---------|------------|-----------------|
-| Influencers | 5 | ~2% | ~15% | High posting, content-focused |
-| Content Creators | 10 | ~5% | ~12% | Photo/video/writer variants |
-| Active Engagers | 15 | ~10% | ~18% | Commenters, reactors, messengers |
-| Regular Users | 25 | ~25% | ~25% | Various age group patterns |
-| Casual Browsers | 20 | ~25% | ~15% | Time-of-day variants |
-| Lurkers | 15 | ~20% | ~8% | Consumers, rarely post |
-| New Users | 5 | ~3% | ~3% | Onboarding patterns |
-| Business Accounts | 3 | ~2% | ~3% | Scheduled posting |
-| Advertisers | 2 | ~1% | ~1% | Campaign management |
+| Category          | Count | % Users | % Activity | Characteristics                  |
+|-------------------|-------|---------|------------|----------------------------------|
+| Influencers       | 5     | ~2%     | ~15%       | High posting, content-focused    |
+| Content Creators  | 10    | ~5%     | ~12%       | Photo/video/writer variants      |
+| Active Engagers   | 15    | ~10%    | ~18%       | Commenters, reactors, messengers |
+| Regular Users     | 25    | ~25%    | ~25%       | Various age group patterns       |
+| Casual Browsers   | 20    | ~25%    | ~15%       | Time-of-day variants             |
+| Lurkers           | 15    | ~20%    | ~8%        | Consumers, rarely post           |
+| New Users         | 5     | ~3%     | ~3%        | Onboarding patterns              |
+| Business Accounts | 3     | ~2%     | ~3%        | Scheduled posting                |
+| Advertisers       | 2     | ~1%     | ~1%        | Campaign management              |
 
 Each persona has:
 - `activity_multiplier` - Relative event volume
@@ -200,11 +200,12 @@ The generator creates realistic correlated failures through a three-tier error s
 - Dependency cascades have 10x amplified failure rate
 
 **Error Source Types (`error_source` field):**
-| Value | Meaning | Example |
-|-------|---------|---------|
+
+| Value                        | Meaning                       | Example                        |
+|------------------------------|-------------------------------|--------------------------------|
 | `infrastructure:<component>` | Direct infrastructure failure | `infrastructure:redis_content` |
-| `dependency:<service>` | Cascade from upstream service | `dependency:content:posts` |
-| `self` | Random error (client/server) | Client 400, Server 500 |
+| `dependency:<service>`       | Cascade from upstream service | `dependency:content:posts`     |
+| `self`                       | Random error (client/server)  | Client 400, Server 500         |
 
 **Log Levels:**
 - `ERROR` - Server/infrastructure errors (500, 502, 503, 504, database, cache, queue)
@@ -289,28 +290,30 @@ Metrics generated per event:
 ### Generated Anomalies
 
 **Infrastructure Incidents (root causes):**
-| Component | Description | Affected Services |
-|-----------|-------------|-------------------|
-| dynamodb_throttle | DynamoDB capacity exceeded | dm, stories, presence, timeline |
-| redis_content | Redis content cache failure | posts, media, comments, reactions |
-| aurora_primary | Aurora primary failover | identity, profile, privacy |
-| neptune_timeout | Neptune graph DB timeout | connections, suggestions, blocks |
-| media_processing | Media processing pipeline failure | media, stories |
-| redis_feed | Redis feed cache failure | timeline, ranking |
-| redis_messaging | Redis messaging cache failure | dm, groups, presence |
-| kinesis_feed | Kinesis stream backpressure | fanout, aggregation |
-| serialization_bug | Hidden serialization bug | various |
-| opensearch_cluster | OpenSearch cluster issue | search services |
-| auth_library | Auth library edge case | identity, privacy |
+
+| Component          | Description                       | Affected Services                 |
+|--------------------|-----------------------------------|-----------------------------------|
+| dynamodb_throttle  | DynamoDB capacity exceeded        | dm, stories, presence, timeline   |
+| redis_content      | Redis content cache failure       | posts, media, comments, reactions |
+| aurora_primary     | Aurora primary failover           | identity, profile, privacy        |
+| neptune_timeout    | Neptune graph DB timeout          | connections, suggestions, blocks  |
+| media_processing   | Media processing pipeline failure | media, stories                    |
+| redis_feed         | Redis feed cache failure          | timeline, ranking                 |
+| redis_messaging    | Redis messaging cache failure     | dm, groups, presence              |
+| kinesis_feed       | Kinesis stream backpressure       | fanout, aggregation               |
+| serialization_bug  | Hidden serialization bug          | various                           |
+| opensearch_cluster | OpenSearch cluster issue          | search services                   |
+| auth_library       | Auth library edge case            | identity, privacy                 |
 
 **Dependency Cascade Errors (downstream effects):**
-| Failed Dependency | Typical Cascade Count |
-|-------------------|----------------------|
-| content:posts | High (most services depend on posts) |
-| content:hashtags | Medium |
-| content:stories | Medium |
-| feed:fanout | Medium |
-| social:connections | Medium |
+
+| Failed Dependency  | Typical Cascade Count                |
+|--------------------|--------------------------------------|
+| content:posts      | High (most services depend on posts) |
+| content:hashtags   | Medium                               |
+| content:stories    | Medium                               |
+| feed:fanout        | Medium                               |
+| social:connections | Medium                               |
 
 **Querying Anomalies in VictoriaLogs:**
 ```logsql
@@ -425,6 +428,100 @@ Same as VictoriaMetrics importer - splits `release_id` into 12 single-word tags 
 
 ---
 
+# Grafana Tempo (Trace Backend)
+
+## Purpose
+Tempo stores distributed traces for visualization in Grafana (flamegraphs, waterfall views). VictoriaLogs stores trace fields (`trace_id`, `span_id`, `parent_span_id`) but can't visualize traces - Tempo provides the trace-specific UI.
+
+## Location
+`fixtures/social_network/export_traces_to_tempo.py`
+
+## Setup
+```bash
+# Create Tempo config
+cat > /tmp/tempo-config.yaml << 'EOF'
+server:
+  http_listen_port: 3200
+  grpc_listen_port: 9095
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+ingester:
+  max_block_duration: 5m
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /var/tempo/wal
+    local:
+      path: /var/tempo/blocks
+
+overrides:
+  max_traces_per_user: 5000000
+  ingestion_rate_limit_bytes: 50000000
+  ingestion_burst_size_bytes: 100000000
+EOF
+
+chmod 644 /tmp/tempo-config.yaml
+
+# Start Tempo (use v2.3.1 - newer versions have different config format)
+docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 \
+  -v /tmp/tempo-config.yaml:/tempo.yaml:z \
+  -v tempo-data:/var/tempo \
+  grafana/tempo:2.3.1 --config.file=/tempo.yaml
+```
+
+**Ports:**
+- 3200: Tempo HTTP API (query, health)
+- 4317: OTLP gRPC receiver
+- 4318: OTLP HTTP receiver
+
+## Export Traces from Logs
+```bash
+# Export traces from log files to Tempo
+for f in /mnt/mac_data/qairon/test_data/logs_*.jsonl; do
+  python fixtures/social_network/export_traces_to_tempo.py "$f" --batch-size 5000
+done
+```
+
+**Performance:** ~35-40k logs/sec (trace export is fast)
+
+## Grafana Tempo Data Source
+1. Add data source: Type = Tempo
+2. URL: `http://tempo:3200` (or use container IP)
+3. Save & Test
+
+## Querying Traces
+```bash
+# Search traces via API
+curl -s "http://localhost:3200/api/search?limit=10"
+
+# Get specific trace by ID
+curl -s "http://localhost:3200/api/traces/<trace_id>"
+```
+
+## Correlating Logs and Traces
+In Grafana, configure "Trace to logs" in Tempo data source settings:
+- Data source: VictoriaLogs
+- Query: `trace_id:"${__trace.traceId}"`
+
+This enables clicking from a trace span directly to the corresponding logs.
+
+---
+
 # Docker Management
 
 ## Start Services (with bind mounts for large datasets)
@@ -439,6 +536,12 @@ docker run -d --name victorialogs --cpus=30 -p 9428:9428 \
   -v /mnt/mac_data/qairon/victoria-logs-data:/victoria-logs-data:z \
   victoriametrics/victoria-logs -retentionPeriod=2y
 
+# Tempo (traces) - see "Grafana Tempo" section above for config file
+docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 \
+  -v /tmp/tempo-config.yaml:/tempo.yaml:z \
+  -v /mnt/mac_data/qairon/tempo-data:/var/tempo:z \
+  grafana/tempo:2.3.1 --config.file=/tempo.yaml
+
 # Grafana (with VictoriaLogs plugin and persistent storage)
 docker run -d --name grafana -p 3000:3000 \
   -v grafana-data:/var/lib/grafana \
@@ -450,12 +553,12 @@ docker run -d --name grafana -p 3000:3000 \
 
 ## Stop (preserve data)
 ```bash
-docker stop victoria victorialogs grafana
+docker stop victoria victorialogs tempo grafana
 ```
 
 ## Restart
 ```bash
-docker start victoria victorialogs grafana
+docker start victoria victorialogs tempo grafana
 ```
 
 ## Wipe and restart
@@ -465,6 +568,9 @@ docker stop victoria && docker rm victoria && rm -rf /mnt/mac_data/qairon/victor
 
 # Wipe VictoriaLogs (bind mount)
 docker stop victorialogs && docker rm victorialogs && rm -rf /mnt/mac_data/qairon/victoria-logs-data/*
+
+# Wipe Tempo (bind mount)
+docker stop tempo && docker rm tempo && rm -rf /mnt/mac_data/qairon/tempo-data/*
 
 # Wipe Grafana (Docker volume)
 docker stop grafana && docker rm grafana && docker volume rm grafana-data
