@@ -82,16 +82,17 @@ For smooth time series data with visible outliers at 10-15 second granularity pe
 ```bash
 # Generate 50M events, 50K users (~135M logs with child spans, ~613M metrics)
 # Takes 20-30 minutes to generate, outputs per-worker files (logs_0.jsonl, metrics_0.jsonl, etc.)
-python fixtures/social_network/generate_monitoring_data.py 50000000 50000 --output /mnt/mac_data/qairon/test_data
+python fixtures/social_network/generate_monitoring_data.py 50000000 50000 --output /opt/qairon/test_data
 
 # Start VictoriaMetrics with 2-year retention and persistent storage
 docker run -d --name victoria --cpus=24 -p 8428:8428 \
-  -v /mnt/mac_data/qairon/victoria-metrics-data:/victoria-metrics-data:z \
-  victoriametrics/victoria-metrics -retentionPeriod=2y -search.cacheTimestampOffset=8760h
+  -v /mnt/qairon/victoria-metrics-data:/victoria-metrics-data:z \
+  victoriametrics/victoria-metrics -retentionPeriod=2y -search.cacheTimestampOffset=8760h \
+  -search.maxQueryDuration=60s
 
 # Start VictoriaLogs with 2-year retention
 docker run -d --name victorialogs --cpus=30 -p 9428:9428 \
-  -v /mnt/mac_data/qairon/victoria-logs-data:/victoria-logs-data:z \
+  -v /mnt/qairon/victoria-logs-data:/victoria-logs-data:z \
   victoriametrics/victoria-logs -retentionPeriod=2y
 
 # Start Grafana
@@ -101,15 +102,14 @@ docker run -d --name grafana -p 3000:3000 \
   grafana/grafana
 
 # Import metrics (32 parallel processes works well, ~20k/sec)
-for f in /mnt/mac_data/qairon/test_data/metrics_*.jsonl; do
+for f in /opt/qairon/test_data/metrics_*.jsonl; do
   python fixtures/social_network/import_to_victoriametrics.py "$f" --workers 8 &
 done
 wait
 
-# Import logs (sequential import required - VictoriaLogs can't handle parallel, ~6-10k/sec)
-for f in /mnt/mac_data/qairon/test_data/logs_*.jsonl; do
-  python fixtures/social_network/import_to_victorialogs.py "$f" --workers 4
-done
+# Import logs (8 files in parallel, batch-size 50000)
+ls /opt/qairon/test_data/logs_*.jsonl | xargs -P 8 -I {} \
+  python fixtures/social_network/import_to_victorialogs.py {} --workers 4 --batch-size 50000
 ```
 
 **Note:** Use `:z` flag on bind mounts for SELinux systems to relabel volumes for container access.
@@ -413,15 +413,25 @@ Streaming import of logs.jsonl to VictoriaLogs with composite ID extraction. Ext
 
 ## Usage
 ```bash
-# Import logs (sequential - VictoriaLogs can't handle many parallel connections)
-python import_to_victorialogs.py logs.jsonl --workers 4
+# Import logs (8 files in parallel, batch-size 50000)
+ls /opt/qairon/test_data/logs_*.jsonl | xargs -P 8 -I {} \
+  python fixtures/social_network/import_to_victorialogs.py {} --workers 4 --batch-size 50000
 ```
 
 ## Performance Notes
-- **VictoriaLogs is sensitive to concurrent connections** - parallel imports cause timeouts
-- Sequential import with 4 workers achieves ~6-10k logs/sec
-- For 134M logs, expect ~4-6 hours import time
-- VictoriaMetrics (metrics) handles parallel imports well; VictoriaLogs (logs) does not
+- Use `xargs -P 8` to import 8 files in parallel with `--batch-size 50000`
+- Each file uses 4 workers internally
+- For 134M logs across 32 files, import completes faster with parallel file processing
+
+## Monitoring Import Errors
+```bash
+# Watch for insert errors during import
+watch -n5 'curl -s "http://localhost:9428/metrics" | grep "vl_http.*jsonline"'
+```
+
+Key metrics:
+- `vl_http_errors_total{path="/insert/jsonline"}` - Insert errors (should be 0)
+- `vl_http_requests_total{path="/insert/jsonline"}` - Total batches inserted
 
 ## Tag Extraction
 Same as VictoriaMetrics importer - splits `release_id` into 12 single-word tags plus 8 composite IDs.
@@ -471,8 +481,8 @@ storage:
 
 overrides:
   max_traces_per_user: 5000000
-  ingestion_rate_limit_bytes: 50000000
-  ingestion_burst_size_bytes: 100000000
+  ingestion_rate_limit_bytes: 500000000
+  ingestion_burst_size_bytes: 1000000000
 EOF
 
 chmod 644 /tmp/tempo-config.yaml
@@ -480,7 +490,7 @@ chmod 644 /tmp/tempo-config.yaml
 # Start Tempo (use v2.3.1 - newer versions have different config format)
 docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 \
   -v /tmp/tempo-config.yaml:/tempo.yaml:z \
-  -v tempo-data:/var/tempo \
+  -v /mnt/qairon/tempo-data:/var/tempo:z \
   grafana/tempo:2.3.1 --config.file=/tempo.yaml
 ```
 
@@ -491,13 +501,14 @@ docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 \
 
 ## Export Traces from Logs
 ```bash
-# Export traces from log files to Tempo
-for f in /mnt/mac_data/qairon/test_data/logs_*.jsonl; do
-  python fixtures/social_network/export_traces_to_tempo.py "$f" --batch-size 5000
-done
+# Export traces (4 files in parallel, batch-size 2000)
+ls /opt/qairon/test_data/logs_*.jsonl | xargs -P 4 -I {} \
+  python fixtures/social_network/export_traces_to_tempo.py {} --batch-size 2000
 ```
 
-**Performance:** ~35-40k logs/sec (trace export is fast)
+**Performance:** ~33k logs/sec per file × 4 parallel = ~132k logs/sec total
+
+**Note:** Using `-P 4` and `--batch-size 2000` prevents Tempo from getting overwhelmed. Higher parallelism causes 500 errors.
 
 ## Grafana Tempo Data Source
 1. Add data source: Type = Tempo
@@ -528,23 +539,24 @@ This enables clicking from a trace span directly to the corresponding logs.
 ```bash
 # VictoriaMetrics (metrics) - bind mount to large storage
 docker run -d --name victoria --cpus=24 -p 8428:8428 \
-  -v /mnt/mac_data/qairon/victoria-metrics-data:/victoria-metrics-data:z \
-  victoriametrics/victoria-metrics -retentionPeriod=2y -search.cacheTimestampOffset=8760h
+  -v /mnt/qairon/victoria-metrics-data:/victoria-metrics-data:z \
+  victoriametrics/victoria-metrics -retentionPeriod=2y -search.cacheTimestampOffset=8760h \
+  -search.maxQueryDuration=60s
 
 # VictoriaLogs (logs) - bind mount to large storage
 docker run -d --name victorialogs --cpus=30 -p 9428:9428 \
-  -v /mnt/mac_data/qairon/victoria-logs-data:/victoria-logs-data:z \
+  -v /mnt/qairon/victoria-logs-data:/victoria-logs-data:z \
   victoriametrics/victoria-logs -retentionPeriod=2y
 
 # Tempo (traces) - see "Grafana Tempo" section above for config file
 docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 \
   -v /tmp/tempo-config.yaml:/tempo.yaml:z \
-  -v /mnt/mac_data/qairon/tempo-data:/var/tempo:z \
+  -v /mnt/qairon/tempo-data:/var/tempo:z \
   grafana/tempo:2.3.1 --config.file=/tempo.yaml
 
 # Grafana (with VictoriaLogs plugin and persistent storage)
 docker run -d --name grafana -p 3000:3000 \
-  -v grafana-data:/var/lib/grafana \
+  -v /mnt/qairon/grafana:/var/lib/grafana:z \
   -e GF_INSTALL_PLUGINS=victoriametrics-logs-datasource \
   grafana/grafana
 ```
@@ -564,16 +576,16 @@ docker start victoria victorialogs tempo grafana
 ## Wipe and restart
 ```bash
 # Wipe VictoriaMetrics (bind mount)
-docker stop victoria && docker rm victoria && rm -rf /mnt/mac_data/qairon/victoria-metrics-data/*
+docker stop victoria && docker rm victoria && rm -rf /mnt/qairon/victoria-metrics-data/*
 
 # Wipe VictoriaLogs (bind mount)
-docker stop victorialogs && docker rm victorialogs && rm -rf /mnt/mac_data/qairon/victoria-logs-data/*
+docker stop victorialogs && docker rm victorialogs && rm -rf /mnt/qairon/victoria-logs-data/*
 
 # Wipe Tempo (bind mount)
-docker stop tempo && docker rm tempo && rm -rf /mnt/mac_data/qairon/tempo-data/*
+docker stop tempo && docker rm tempo && rm -rf /mnt/qairon/tempo-data/*
 
-# Wipe Grafana (Docker volume)
-docker stop grafana && docker rm grafana && docker volume rm grafana-data
+# Wipe Grafana (bind mount)
+docker stop grafana && docker rm grafana && rm -rf /mnt/qairon/grafana/*
 
 # Then run the start commands again
 ```
