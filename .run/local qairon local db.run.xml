@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="local qairon local db" type="Python.FlaskServer">
-    <option name="additionalOptions" value="-p 5001" />
+    <option name="additionalOptions" value="-h 0.0.0.0 -p 5001" />
     <option name="flaskDebug" value="true" />
     <module name="qairon" />
     <option name="target" value="app" />
@@ -17,7 +17,6 @@
       <env name="SQLALCHEMY_ECHO" value="True" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.pyenv/versions/qairon-3.9.2/bin/python" />
-    <option name="SDK_NAME" value="Python 3.9 (qairon-dev-3.9.2)" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
