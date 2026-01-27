@@ -26,6 +26,22 @@ def parse_timestamp(ts_str: str) -> int:
     return int(dt.timestamp() * 1_000_000_000)
 
 
+def get_composite_ids(span: Dict) -> tuple:
+    """Extract service_id, stack_id, and release_num from span data."""
+    stack = span.get('stack', 'unknown')
+    service = span.get('service', 'unknown')
+
+    # Try to get application and release_num from release_id
+    release_id = span.get('release_id', '')
+    parts = release_id.split(':')
+    application = parts[7] if len(parts) > 7 else 'social'
+    release_num = parts[11] if len(parts) > 11 else ''
+
+    stack_id = f"{application}:{stack}"
+    service_id = f"{application}:{stack}:{service}"
+    return service_id, stack_id, stack, service, release_num
+
+
 def logs_to_otlp_traces(logs: List[Dict]) -> Dict:
     """Convert grouped logs to OTLP trace format."""
     # Group by trace_id
@@ -38,14 +54,15 @@ def logs_to_otlp_traces(logs: List[Dict]) -> Dict:
     resource_spans = []
 
     for trace_id, spans in traces.items():
-        # Group spans by service
+        # Group spans by service_id (composite ID)
         by_service = defaultdict(list)
         for span in spans:
-            service_key = f"{span.get('stack', 'unknown')}:{span.get('service', 'unknown')}"
-            by_service[service_key].append(span)
+            service_id, _, _, _, _ = get_composite_ids(span)
+            by_service[service_id].append(span)
 
-        for service_key, service_spans in by_service.items():
-            stack, service = service_key.split(':')
+        for service_id, service_spans in by_service.items():
+            # Get composite IDs from first span in group
+            _, stack_id, stack, service, release_num = get_composite_ids(service_spans[0])
 
             otlp_spans = []
             for span in service_spans:
@@ -61,8 +78,9 @@ def logs_to_otlp_traces(logs: List[Dict]) -> Dict:
                     "startTimeUnixNano": str(start_time),
                     "endTimeUnixNano": str(start_time + duration_ns),
                     "attributes": [
-                        {"key": "service.name", "value": {"stringValue": service}},
-                        {"key": "stack", "value": {"stringValue": stack}},
+                        {"key": "service", "value": {"stringValue": service_id}},
+                        {"key": "stack", "value": {"stringValue": stack_id}},
+                        {"key": "release_num", "value": {"stringValue": release_num}},
                         {"key": "user_id", "value": {"stringValue": span.get("user_id", "")}},
                         {"key": "success", "value": {"boolValue": span.get("success", True)}},
                         {"key": "request_id", "value": {"stringValue": span.get("request_id", "")}},
@@ -87,8 +105,8 @@ def logs_to_otlp_traces(logs: List[Dict]) -> Dict:
             resource_spans.append({
                 "resource": {
                     "attributes": [
-                        {"key": "service.name", "value": {"stringValue": service}},
-                        {"key": "service.namespace", "value": {"stringValue": stack}},
+                        {"key": "service.name", "value": {"stringValue": service_id}},  # e.g., social:content:media
+                        {"key": "service.namespace", "value": {"stringValue": stack_id}},  # e.g., social:content
                     ]
                 },
                 "scopeSpans": [{
@@ -129,6 +147,10 @@ def main():
                         help="Number of logs to process per batch (default: 1000)")
     parser.add_argument("--limit", type=int, default=None,
                         help="Limit number of logs to process (for testing)")
+    parser.add_argument("--delay", type=float, default=0.0,
+                        help="Delay between batches in seconds (default: 0)")
+    parser.add_argument("--retry", type=int, default=3,
+                        help="Number of retries on failure (default: 3)")
     args = parser.parse_args()
 
     input_path = Path(args.input_file)
@@ -159,15 +181,29 @@ def main():
                 otlp_data = logs_to_otlp_traces(batch)
                 trace_count = len(set(log["trace_id"] for log in batch))
 
-                if send_to_tempo(args.tempo_url, otlp_data):
-                    total_traces += trace_count
-                    elapsed = time.time() - start_time
-                    rate = total_logs / elapsed if elapsed > 0 else 0
-                    print(f"  Exported {total_logs:,} logs, {total_traces:,} traces ({rate:.0f}/sec)...")
-                else:
-                    print(f"  Failed to send batch", file=sys.stderr)
+                # Retry loop
+                success = False
+                for attempt in range(args.retry):
+                    if send_to_tempo(args.tempo_url, otlp_data):
+                        success = True
+                        total_traces += trace_count
+                        elapsed = time.time() - start_time
+                        rate = total_logs / elapsed if elapsed > 0 else 0
+                        print(f"  Exported {total_logs:,} logs, {total_traces:,} traces ({rate:.0f}/sec)...")
+                        break
+                    else:
+                        if attempt < args.retry - 1:
+                            print(f"  Retry {attempt + 1}/{args.retry}...", file=sys.stderr)
+                            time.sleep(1)  # Wait before retry
+
+                if not success:
+                    print(f"  Failed to send batch after {args.retry} attempts", file=sys.stderr)
 
                 batch = []
+
+                # Rate limiting delay
+                if args.delay > 0:
+                    time.sleep(args.delay)
 
     # Send remaining batch
     if batch:
