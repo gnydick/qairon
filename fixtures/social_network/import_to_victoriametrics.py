@@ -32,29 +32,23 @@ def transform_metric(line: dict) -> dict:
         if len(parts) >= 12:
             environment, provider, account, region, partition, target_type, target, application, stack, service, tag, release = parts[:12]
 
-            # Single-word filter tags (all individual field names)
+            # Atomic fields (no hierarchy)
             metric_labels["environment"] = environment
-            metric_labels["provider"] = provider
             metric_labels["account"] = account
-            metric_labels["region"] = region
-            metric_labels["partition"] = partition
             metric_labels["target_type"] = target_type
-            metric_labels["target"] = target
             metric_labels["application"] = application
-            metric_labels["stack"] = stack
-            metric_labels["service"] = service
             metric_labels["tag"] = tag
-            metric_labels["release"] = release
 
-            # Composite IDs (all _id versions)
-            metric_labels["provider_id"] = f"{environment}:{provider}:{account}"
-            metric_labels["region_id"] = f"{environment}:{provider}:{account}:{region}"
-            metric_labels["partition_id"] = f"{environment}:{provider}:{account}:{region}:{partition}"
-            metric_labels["target_id"] = f"{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}"
-            metric_labels["stack_id"] = f"{application}:{stack}"
-            metric_labels["service_id"] = f"{application}:{stack}:{service}"
-            metric_labels["deployment_id"] = release_id.rsplit(":", 1)[0]
-            metric_labels["release_id"] = release_id
+            # Hierarchical fields using composite values (no _id suffix)
+            metric_labels["provider"] = f"{environment}:{provider}:{account}"
+            metric_labels["region"] = f"{environment}:{provider}:{account}:{region}"
+            metric_labels["partition"] = f"{environment}:{provider}:{account}:{region}:{partition}"
+            metric_labels["deployment_target"] = f"{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}"
+            metric_labels["stack"] = f"{application}:{stack}"
+            metric_labels["service"] = f"{application}:{stack}:{service}"
+            metric_labels["deployment"] = release_id.rsplit(":", 1)[0]
+            metric_labels["release"] = release_id
+            metric_labels["release_num"] = release
 
     return {
         "metric": metric_labels,

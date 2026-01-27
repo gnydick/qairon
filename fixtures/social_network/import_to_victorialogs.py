@@ -65,29 +65,23 @@ def transform_log(log: Dict) -> Dict:
     if len(parts) >= 12:
         environment, provider, account, region, partition, target_type, target, application, stack, service, tag, release = parts[:12]
 
-        # Single-word filter tags (all individual field names)
+        # Atomic fields (no hierarchy)
         vl_log["environment"] = environment
-        vl_log["provider"] = provider
         vl_log["account"] = account
-        vl_log["region"] = region
-        vl_log["partition"] = partition
         vl_log["target_type"] = target_type
-        vl_log["target"] = target
         vl_log["application"] = application
-        vl_log["stack"] = stack
-        vl_log["service"] = service
         vl_log["tag"] = tag
-        vl_log["release"] = release
 
-        # Composite IDs (all _id versions)
-        vl_log["provider_id"] = f"{environment}:{provider}:{account}"
-        vl_log["region_id"] = f"{environment}:{provider}:{account}:{region}"
-        vl_log["partition_id"] = f"{environment}:{provider}:{account}:{region}:{partition}"
-        vl_log["target_id"] = f"{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}"
-        vl_log["stack_id"] = f"{application}:{stack}"
-        vl_log["service_id"] = f"{application}:{stack}:{service}"
-        vl_log["deployment_id"] = release_id.rsplit(":", 1)[0]
-        vl_log["release_id"] = release_id
+        # Hierarchical fields using composite values (no _id suffix)
+        vl_log["provider"] = f"{environment}:{provider}:{account}"
+        vl_log["region"] = f"{environment}:{provider}:{account}:{region}"
+        vl_log["partition"] = f"{environment}:{provider}:{account}:{region}:{partition}"
+        vl_log["deployment_target"] = f"{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}"
+        vl_log["stack"] = f"{application}:{stack}"
+        vl_log["service"] = f"{application}:{stack}:{service}"
+        vl_log["deployment"] = release_id.rsplit(":", 1)[0]
+        vl_log["release"] = release_id
+        vl_log["release_num"] = release
 
     return vl_log
 
