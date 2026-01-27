@@ -447,52 +447,15 @@ Tempo stores distributed traces for visualization in Grafana (flamegraphs, water
 `fixtures/social_network/export_traces_to_tempo.py`
 
 ## Setup
+
+Tempo is configured inline in `docker-compose.yml` using docker configs.
+
 ```bash
-# Create Tempo config
-cat > /tmp/tempo-config.yaml << 'EOF'
-server:
-  http_listen_port: 3200
-  grpc_listen_port: 9095
-
-distributor:
-  receivers:
-    otlp:
-      protocols:
-        grpc:
-          endpoint: 0.0.0.0:4317
-        http:
-          endpoint: 0.0.0.0:4318
-
-ingester:
-  max_block_duration: 5m
-  lifecycler:
-    ring:
-      kvstore:
-        store: inmemory
-      replication_factor: 1
-
-storage:
-  trace:
-    backend: local
-    wal:
-      path: /var/tempo/wal
-    local:
-      path: /var/tempo/blocks
-
-overrides:
-  max_traces_per_user: 5000000
-  ingestion_rate_limit_bytes: 500000000
-  ingestion_burst_size_bytes: 1000000000
-EOF
-
-chmod 644 /tmp/tempo-config.yaml
-
-# Start Tempo (use v2.3.1 - newer versions have different config format)
-docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 \
-  -v /tmp/tempo-config.yaml:/tempo.yaml:z \
-  -v /mnt/qairon/tempo-data:/var/tempo:z \
-  grafana/tempo:2.3.1 --config.file=/tempo.yaml
+# Start Tempo (and other services)
+docker compose up -d tempo
 ```
+
+**Note:** Uses Tempo v2.10.0 with `ingestion_time_range_slack: 8760h` to support historical trace data. Earlier versions (<2.6.0) had a bug where block metadata used ingestion time instead of trace timestamps, making historical traces unqueryable.
 
 **Ports:**
 - 3200: Tempo HTTP API (query, health)
@@ -512,7 +475,7 @@ ls /opt/qairon/test_data/logs_*.jsonl | xargs -P 4 -I {} \
 
 ## Grafana Tempo Data Source
 1. Add data source: Type = Tempo
-2. URL: `http://tempo:3200` (or use container IP)
+2. URL: `http://tempo:3200`
 3. Save & Test
 
 ## Querying Traces
@@ -535,74 +498,54 @@ This enables clicking from a trace span directly to the corresponding logs.
 
 # Docker Management
 
-## Start Services (with bind mounts for large datasets)
+All services are defined in `docker-compose.yml` (Tempo config is embedded inline using docker configs).
+
+## Start All Services
 ```bash
-# VictoriaMetrics (metrics) - bind mount to large storage
-docker run -d --name victoria --cpus=24 -p 8428:8428 \
-  -v /mnt/qairon/victoria-metrics-data:/victoria-metrics-data:z \
-  victoriametrics/victoria-metrics -retentionPeriod=2y -search.cacheTimestampOffset=8760h \
-  -search.maxQueryDuration=60s
-
-# VictoriaLogs (logs) - bind mount to large storage
-docker run -d --name victorialogs --cpus=30 -p 9428:9428 \
-  -v /mnt/qairon/victoria-logs-data:/victoria-logs-data:z \
-  victoriametrics/victoria-logs -retentionPeriod=2y
-
-# Tempo (traces) - see "Grafana Tempo" section above for config file
-docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 \
-  -v /tmp/tempo-config.yaml:/tempo.yaml:z \
-  -v /mnt/qairon/tempo-data:/var/tempo:z \
-  grafana/tempo:2.3.1 --config.file=/tempo.yaml
-
-# Grafana (with VictoriaLogs plugin and persistent storage)
-docker run -d --name grafana -p 3000:3000 \
-  -v /mnt/qairon/grafana:/var/lib/grafana:z \
-  -e GF_INSTALL_PLUGINS=victoriametrics-logs-datasource \
-  grafana/grafana
+docker compose up -d
 ```
-
-**Note:** The `:z` flag is required on SELinux systems to relabel bind mounts for container access.
 
 ## Stop (preserve data)
 ```bash
-docker stop victoria victorialogs tempo grafana
+docker compose stop
 ```
 
 ## Restart
 ```bash
-docker start victoria victorialogs tempo grafana
+docker compose restart
 ```
 
-## Wipe and restart
+## View Logs
 ```bash
-# Wipe VictoriaMetrics (bind mount)
-docker stop victoria && docker rm victoria && rm -rf /mnt/qairon/victoria-metrics-data/*
-
-# Wipe VictoriaLogs (bind mount)
-docker stop victorialogs && docker rm victorialogs && rm -rf /mnt/qairon/victoria-logs-data/*
-
-# Wipe Tempo (bind mount)
-docker stop tempo && docker rm tempo && rm -rf /mnt/qairon/tempo-data/*
-
-# Wipe Grafana (bind mount)
-docker stop grafana && docker rm grafana && rm -rf /mnt/qairon/grafana/*
-
-# Then run the start commands again
+docker compose logs -f              # All services
+docker compose logs -f victoria     # Single service
 ```
+
+## Wipe and Restart
+```bash
+# Stop and remove containers
+docker compose down
+
+# Wipe data (choose which to wipe)
+rm -rf /mnt/qairon/victoria-metrics-data/*
+rm -rf /mnt/qairon/victoria-logs-data/*
+rm -rf /mnt/qairon/tempo-data/*
+rm -rf /mnt/qairon/grafana/*
+
+# Start fresh
+docker compose up -d
+```
+
+**Note:** The `:z` flag in volume mounts is required on SELinux systems to relabel bind mounts for container access.
 
 ## Grafana Setup
 - URL: http://localhost:3000
 - Login: admin / admin
 
-**Data Sources:**
-- Prometheus (VictoriaMetrics): `http://172.17.0.2:8428`
-- VictoriaLogs: `http://172.17.0.3:9428`
-
-To verify IPs:
-```bash
-docker inspect victoria --format '{{.NetworkSettings.IPAddress}}'
-docker inspect victorialogs --format '{{.NetworkSettings.IPAddress}}'
-```
+**Data Sources (use service names for internal resolution):**
+- Prometheus (VictoriaMetrics): `http://victoria:8428`
+- VictoriaLogs: `http://victorialogs:9428`
+- Tempo: `http://tempo:3200`
 
 ---
 

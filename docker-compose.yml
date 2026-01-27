@@ -1,0 +1,108 @@
+networks:
+  qairon:
+    driver: bridge
+
+configs:
+  tempo-config:
+    content: |
+      server:
+        http_listen_port: 3200
+        grpc_listen_port: 9095
+      distributor:
+        receivers:
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+              http:
+                endpoint: 0.0.0.0:4318
+      ingester:
+        max_block_duration: 5m
+        lifecycler:
+          ring:
+            kvstore:
+              store: inmemory
+            replication_factor: 1
+      storage:
+        trace:
+          backend: local
+          wal:
+            path: /var/tempo/wal
+            ingestion_time_range_slack: 8760h
+          local:
+            path: /var/tempo/blocks
+      query_frontend:
+        search:
+          max_duration: 8760h
+      overrides:
+        max_traces_per_user: 5000000
+        ingestion_rate_limit_bytes: 500000000
+        ingestion_burst_size_bytes: 1000000000
+
+services:
+  victoria:
+    image: victoriametrics/victoria-metrics:v1.134.0
+    container_name: victoria
+    networks:
+      - qairon
+    ports:
+      - "8428:8428"
+    volumes:
+      - /mnt/qairon/victoria-metrics-data:/victoria-metrics-data:z
+    command:
+      - -retentionPeriod=2y
+      - -search.cacheTimestampOffset=8760h
+      - -search.maxQueryDuration=60s
+    deploy:
+      resources:
+        limits:
+          cpus: "24"
+    restart: unless-stopped
+
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.43.1
+    container_name: victorialogs
+    networks:
+      - qairon
+    ports:
+      - "9428:9428"
+    volumes:
+      - /mnt/qairon/victoria-logs-data:/victoria-logs-data:z
+    command:
+      - -retentionPeriod=2y
+    deploy:
+      resources:
+        limits:
+          cpus: "30"
+    restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:2.10.0
+    container_name: tempo
+    networks:
+      - qairon
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      - "4318:4318"
+    configs:
+      - source: tempo-config
+        target: /tempo.yaml
+    volumes:
+      - /mnt/qairon/tempo-data:/var/tempo:z
+    command:
+      - --config.file=/tempo.yaml
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.3.1
+    container_name: grafana
+    networks:
+      - qairon
+    ports:
+      - "3000:3000"
+    volumes:
+      - /mnt/qairon/grafana:/var/lib/grafana:z
+    environment:
+      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+    restart: unless-stopped
