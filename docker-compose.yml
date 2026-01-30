@@ -70,6 +70,10 @@ services:
       - /mnt/qairon/victoria-logs-data:/victoria-logs-data:z
     command:
       - -retentionPeriod=2y
+      - -maxConcurrentInserts=240
+      - -fs.maxConcurrency=1000
+      - -inmemoryDataFlushInterval=15s
+      - -memory.allowedPercent=60
     deploy:
       resources:
         limits:

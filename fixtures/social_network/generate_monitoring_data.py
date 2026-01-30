@@ -913,7 +913,9 @@ def generate_child_spans_for_event(
                 child_success = False
 
         # Select release for this dependency service
-        child_release_id = select_release_func(dep_stack, dep_service, child_timestamp)
+        child_release_result = select_release_func(dep_stack, dep_service, child_timestamp)
+        # select_release_func returns (release_id, env, region) tuple
+        child_release_id = child_release_result[0] if isinstance(child_release_result, tuple) else child_release_result
 
         # Create child span event
         child_event = {
@@ -978,9 +980,393 @@ class InfrastructureIncident:
     error_info: Dict
 
 
+@dataclass
+class DeploymentWindow:
+    """Represents a time window during which a service is being deployed (rolling restart)."""
+    deployment_id: str
+    release_id: str
+    stack: str
+    service: str
+    env: str
+    region: str
+    start_time: datetime
+    end_time: datetime
+    throughput_factor: float    # 0.70-0.85 (15-30% req/sec reduction)
+    error_rate_boost: float     # 0.02-0.05 (2-5% extra errors)
+    latency_multiplier: float   # 1.2-1.5 (20-50% latency increase)
+
+
+class DeploymentSchedule:
+    """Manages deployment windows and release timelines from generate_fixtures.py output.
+
+    Provides:
+    - Active release lookup by (env, region, stack, service, timestamp)
+    - Active deployment window lookup for dip effects
+    - Deployment log events (start/complete)
+    - Serialization for parallel worker transport
+    """
+
+    def __init__(self, schedule_path: str, start_time: datetime, end_time: datetime, rng=None):
+        with open(schedule_path) as f:
+            data = json.load(f)
+
+        self.primary_targets = data.get("primary_deployment_targets", [])
+        self.stack_region_groups = data.get("stack_region_groups", {})
+
+        # Build per-(env, region, stack, service) sorted release timelines
+        # Each entry: (created_at_datetime, release_id, build_num)
+        self._release_timelines: Dict[Tuple[str, str, str, str], List[Tuple[datetime, str, int]]] = {}
+        # Deployment windows keyed by (stack, service, env, region)
+        self._deployment_windows: Dict[Tuple[str, str, str, str], List[DeploymentWindow]] = {}
+
+        if rng is None:
+            rng = random.Random(42)
+
+        self._build_timelines(data)
+        self._build_deployment_windows(data, rng, start_time, end_time)
+
+    def _parse_deployment_id(self, deployment_id: str) -> Optional[Dict]:
+        """Parse a deployment_id into its components.
+
+        Format: env:provider:account:region:partition:target_type:target:app:stack:service:tag
+        """
+        parts = deployment_id.split(':')
+        if len(parts) < 11:
+            return None
+        return {
+            "env": parts[0],
+            "provider": parts[1],
+            "account": parts[2],
+            "region": parts[3],
+            "partition": parts[4],
+            "target_type": parts[5],
+            "target": parts[6],
+            "app": parts[7],
+            "stack": parts[8],
+            "service": parts[9],
+            "tag": parts[10],
+            "target_id": ':'.join(parts[:7]),
+        }
+
+    def _build_timelines(self, data: Dict):
+        """Build sorted release timelines per (env, region, stack, service)."""
+        for deployment_id, dep_data in data.get("deployments", {}).items():
+            parsed = self._parse_deployment_id(deployment_id)
+            if not parsed:
+                continue
+
+            key = (parsed["env"], parsed["region"], parsed["stack"], parsed["service"])
+            if key not in self._release_timelines:
+                self._release_timelines[key] = []
+
+            for rel in dep_data.get("releases", []):
+                created_at = datetime.fromisoformat(rel["created_at"])
+                self._release_timelines[key].append(
+                    (created_at, rel["release_id"], rel["build_num"])
+                )
+
+        # Sort each timeline by created_at
+        for key in self._release_timelines:
+            self._release_timelines[key].sort(key=lambda x: x[0])
+
+    def _build_deployment_windows(self, data: Dict, rng, start_time: datetime, end_time: datetime):
+        """Build deployment windows with multi-region stagger per stack."""
+        stack_region_groups = data.get("stack_region_groups", {})
+
+        # Collect all releases grouped by (stack, service, env) with their target_ids
+        # Key: (stack, service, env) -> {target_id -> [(release_id, created_at, build_num)]}
+        releases_by_stack_service_env: Dict[Tuple[str, str, str], Dict[str, List]] = {}
+
+        for deployment_id, dep_data in data.get("deployments", {}).items():
+            parsed = self._parse_deployment_id(deployment_id)
+            if not parsed or parsed["target_id"] not in self.primary_targets:
+                continue
+
+            group_key = (parsed["stack"], parsed["service"], parsed["env"])
+            if group_key not in releases_by_stack_service_env:
+                releases_by_stack_service_env[group_key] = {}
+
+            target_id = parsed["target_id"]
+            if target_id not in releases_by_stack_service_env[group_key]:
+                releases_by_stack_service_env[group_key][target_id] = []
+
+            for rel in dep_data.get("releases", []):
+                created_at = datetime.fromisoformat(rel["created_at"])
+                if start_time <= created_at <= end_time:
+                    releases_by_stack_service_env[group_key][target_id].append(
+                        (rel["release_id"], created_at, rel["build_num"])
+                    )
+
+        # Determine region order per stack+env from stack_region_groups
+        stack_env_region_order: Dict[Tuple[str, str], List[str]] = {}
+        for stack_id, envs in stack_region_groups.items():
+            for env, targets in envs.items():
+                stack_env_region_order[(stack_id, env)] = sorted(targets)
+
+        # Build windows for each (stack, service, env)
+        for (stack, service, env), targets_releases in releases_by_stack_service_env.items():
+            stack_id = f"{data.get('deployments', {})}"  # We need the app prefix
+            # Find the app from one of the deployment IDs
+            app = None
+            for deployment_id in data.get("deployments", {}):
+                parsed = self._parse_deployment_id(deployment_id)
+                if parsed and parsed["stack"] == stack:
+                    app = parsed["app"]
+                    break
+            if not app:
+                continue
+            full_stack_id = f"{app}:{stack}"
+
+            # Get region deployment order for this stack+env
+            region_order = stack_env_region_order.get((full_stack_id, env), sorted(targets_releases.keys()))
+
+            # Collect unique build_nums across all targets for this service
+            # Use earliest created_at per build_num as the "release time"
+            build_num_times: Dict[int, datetime] = {}
+            build_num_release_ids: Dict[int, Dict[str, str]] = {}  # build_num -> {target_id -> release_id}
+
+            for target_id, releases in targets_releases.items():
+                for release_id, created_at, build_num in releases:
+                    if build_num not in build_num_times or created_at < build_num_times[build_num]:
+                        build_num_times[build_num] = created_at
+                    if build_num not in build_num_release_ids:
+                        build_num_release_ids[build_num] = {}
+                    build_num_release_ids[build_num][target_id] = release_id
+
+            # For each build_num, create staggered deployment windows across regions
+            for build_num in sorted(build_num_times.keys()):
+                base_created_at = build_num_times[build_num]
+                # CI/CD pipeline delay: 3-10 minutes
+                cicd_delay = timedelta(minutes=rng.uniform(3, 10))
+
+                for region_idx, target_id in enumerate(region_order):
+                    release_id = build_num_release_ids.get(build_num, {}).get(target_id)
+                    if not release_id:
+                        continue
+
+                    # Extract region from target_id
+                    target_parts = target_id.split(':')
+                    region = target_parts[3] if len(target_parts) > 3 else ""
+
+                    # Multi-region stagger: first region deploys after CI/CD delay,
+                    # subsequent regions wait 30-60min after previous
+                    if region_idx == 0:
+                        deploy_start = base_created_at + cicd_delay
+                    else:
+                        stagger = timedelta(minutes=rng.uniform(30, 60))
+                        deploy_start = base_created_at + cicd_delay + (stagger * region_idx)
+
+                    # Rolling restart duration: 5-15 minutes
+                    deploy_duration = timedelta(minutes=rng.uniform(5, 15))
+                    deploy_end = deploy_start + deploy_duration
+
+                    window = DeploymentWindow(
+                        deployment_id=':'.join(release_id.rsplit(':', 1)[0:1]),  # strip build_num
+                        release_id=release_id,
+                        stack=stack,
+                        service=service,
+                        env=env,
+                        region=region,
+                        start_time=deploy_start,
+                        end_time=deploy_end,
+                        throughput_factor=rng.uniform(0.70, 0.85),
+                        error_rate_boost=rng.uniform(0.02, 0.05),
+                        latency_multiplier=rng.uniform(1.2, 1.5),
+                    )
+
+                    win_key = (stack, service, env, region)
+                    if win_key not in self._deployment_windows:
+                        self._deployment_windows[win_key] = []
+                    self._deployment_windows[win_key].append(window)
+
+        # Sort windows by start_time for each key
+        for key in self._deployment_windows:
+            self._deployment_windows[key].sort(key=lambda w: w.start_time)
+
+    def get_active_release_id(self, env: str, region: str, stack: str, service: str,
+                               timestamp: datetime) -> Optional[str]:
+        """Binary search to find which release was active at a given timestamp.
+
+        Returns the release_id of the most recent release created before timestamp,
+        or None if no releases exist for this combination.
+        """
+        key = (env, region, stack, service)
+        timeline = self._release_timelines.get(key)
+        if not timeline:
+            return None
+
+        # Binary search for the latest release before timestamp
+        lo, hi = 0, len(timeline) - 1
+        result = None
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            if timeline[mid][0] <= timestamp:
+                result = timeline[mid]
+                lo = mid + 1
+            else:
+                hi = mid - 1
+
+        return result[1] if result else None
+
+    def get_active_deployment_window(self, stack: str, service: str, env: str, region: str,
+                                      timestamp: datetime) -> Optional[DeploymentWindow]:
+        """Check if timestamp falls within a deployment window for this service."""
+        key = (stack, service, env, region)
+        windows = self._deployment_windows.get(key)
+        if not windows:
+            return None
+
+        # Binary search for candidate window
+        lo, hi = 0, len(windows) - 1
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            if windows[mid].end_time < timestamp:
+                lo = mid + 1
+            elif windows[mid].start_time > timestamp:
+                hi = mid - 1
+            else:
+                return windows[mid]
+        return None
+
+    def get_deployment_log_events(self) -> List[Dict]:
+        """Returns list of deployment_start/deployment_complete log entries."""
+        events = []
+        for windows in self._deployment_windows.values():
+            for window in windows:
+                deploy_request_id = f"deploy_{uuid.uuid4().hex[:16]}"
+                base = {
+                    "service": window.service,
+                    "stack": window.stack,
+                    "user_id": "system",
+                    "success": True,
+                    "release_id": window.release_id,
+                    "object_type": "deployment",
+                    "object_id": window.deployment_id,
+                    "persona_name": "system",
+                }
+                events.append({
+                    **base,
+                    "timestamp": window.start_time,
+                    "action": "deployment_start",
+                    "request_id": deploy_request_id,
+                    "message": f"Deployment started: rolling restart for release {window.release_id}",
+                    "trace_id": ''.join(random.choices('0123456789abcdef', k=32)),
+                    "span_id": ''.join(random.choices('0123456789abcdef', k=16)),
+                })
+                events.append({
+                    **base,
+                    "timestamp": window.end_time,
+                    "action": "deployment_complete",
+                    "request_id": deploy_request_id,
+                    "message": f"Deployment complete: release {window.release_id} fully rolled out",
+                    "trace_id": ''.join(random.choices('0123456789abcdef', k=32)),
+                    "span_id": ''.join(random.choices('0123456789abcdef', k=16)),
+                })
+        events.sort(key=lambda e: e["timestamp"])
+        return events
+
+    def to_serializable(self) -> Dict:
+        """Serialize for passing to parallel workers via ProcessPoolExecutor."""
+        timelines = {}
+        for key, timeline in self._release_timelines.items():
+            str_key = '|'.join(key)
+            timelines[str_key] = [
+                (created_at.isoformat(), release_id, build_num)
+                for created_at, release_id, build_num in timeline
+            ]
+
+        windows = {}
+        for key, win_list in self._deployment_windows.items():
+            str_key = '|'.join(key)
+            windows[str_key] = [
+                {
+                    "deployment_id": w.deployment_id,
+                    "release_id": w.release_id,
+                    "stack": w.stack,
+                    "service": w.service,
+                    "env": w.env,
+                    "region": w.region,
+                    "start_time": w.start_time.isoformat(),
+                    "end_time": w.end_time.isoformat(),
+                    "throughput_factor": w.throughput_factor,
+                    "error_rate_boost": w.error_rate_boost,
+                    "latency_multiplier": w.latency_multiplier,
+                }
+                for w in win_list
+            ]
+
+        return {"timelines": timelines, "windows": windows}
+
+    @classmethod
+    def from_serializable(cls, data: Dict) -> 'DeploymentSchedule':
+        """Reconstruct from serialized form in worker process."""
+        obj = cls.__new__(cls)
+        obj.primary_targets = []
+        obj.stack_region_groups = {}
+
+        obj._release_timelines = {}
+        for str_key, timeline in data.get("timelines", {}).items():
+            key = tuple(str_key.split('|'))
+            obj._release_timelines[key] = [
+                (datetime.fromisoformat(created_at), release_id, build_num)
+                for created_at, release_id, build_num in timeline
+            ]
+
+        obj._deployment_windows = {}
+        for str_key, win_list in data.get("windows", {}).items():
+            key = tuple(str_key.split('|'))
+            obj._deployment_windows[key] = [
+                DeploymentWindow(
+                    deployment_id=w["deployment_id"],
+                    release_id=w["release_id"],
+                    stack=w["stack"],
+                    service=w["service"],
+                    env=w["env"],
+                    region=w["region"],
+                    start_time=datetime.fromisoformat(w["start_time"]),
+                    end_time=datetime.fromisoformat(w["end_time"]),
+                    throughput_factor=w["throughput_factor"],
+                    error_rate_boost=w["error_rate_boost"],
+                    latency_multiplier=w["latency_multiplier"],
+                )
+                for w in win_list
+            ]
+
+        return obj
+
+
 # =============================================================================
 # PARALLEL EVENT GENERATION WORKER
 # =============================================================================
+
+def _deployment_event_to_log_json(event: dict) -> str:
+    """Convert a deployment event dict to a log JSON line."""
+    ts_str = event["timestamp"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    log_entry = {
+        "timestamp": ts_str,
+        "level": "INFO",
+        "service": event["service"],
+        "stack": event["stack"],
+        "action": event["action"],
+        "user_id": event["user_id"],
+        "request_id": event["request_id"],
+        "success": event["success"],
+        "message": event["message"],
+        "release_id": event["release_id"],
+        "trace_id": event.get("trace_id", ""),
+        "span_id": event.get("span_id", ""),
+        "parent_span_id": None,
+        "target_user_id": None,
+        "object_type": event.get("object_type"),
+        "object_id": event.get("object_id"),
+        "error_code": None,
+        "error_message": None,
+        "error_source": None,
+        "error_type": None,
+        "upstream_request_id": None,
+    }
+    return json.dumps(log_entry)
+
 
 def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     """
@@ -997,12 +1383,13 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     - error_codes: dict
     - error_messages: dict
     - output_dir: str (temp directory for worker output)
+    - deployment_schedule_data: dict or None (serialized DeploymentSchedule)
 
     Returns:
     - (event_count, logs_file_path, metrics_file_path)
     """
     (worker_id, user_chunk, incidents_data, start_time, end_time,
-     base_seed, error_codes, error_messages, output_dir) = args
+     base_seed, error_codes, error_messages, output_dir, deployment_schedule_data) = args
 
     # Create worker-local RNG with deterministic seed
     rng = random.Random(base_seed + worker_id * 1000000)
@@ -1011,6 +1398,11 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     incidents = [
         InfrastructureIncident(**inc) for inc in incidents_data
     ]
+
+    # Reconstruct deployment schedule if provided
+    deploy_schedule = None
+    if deployment_schedule_data:
+        deploy_schedule = DeploymentSchedule.from_serializable(deployment_schedule_data)
 
     # Worker-local content pools
     all_posts = []
@@ -1060,7 +1452,7 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                         )
         return None
 
-    def determine_error(action, user_data, timestamp) -> Optional[Dict]:
+    def determine_error(action, user_data, timestamp, env=None, region=None) -> Optional[Dict]:
         hidden_failure = check_hidden_dependency_failure(action, timestamp)
         if hidden_failure:
             dep_name, error_type, error_code, error_message = hidden_failure
@@ -1082,6 +1474,20 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 "error_message": error_message,
                 "upstream_request_id": uuid.uuid4().hex,
             }
+
+        # Deployment dip errors
+        if deploy_schedule and env and region:
+            window = deploy_schedule.get_active_deployment_window(
+                action.stack, action.service, env, region, timestamp
+            )
+            if window and rng.random() < window.error_rate_boost:
+                return {
+                    "error_source": f"deployment:{window.release_id}",
+                    "error_type": "server",
+                    "error_code": rng.choice(["500", "502", "503"]),
+                    "error_message": f"Service restarting during deployment of {window.release_id}",
+                    "upstream_request_id": None,
+                }
 
         if rng.random() > user_data["success_rate"]:
             if rng.random() < 0.7:
@@ -1128,7 +1534,8 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
         microsecond = rng.randint(0, 999999)
         return date.replace(hour=hour, minute=minute, second=second, microsecond=microsecond)
 
-    def select_release(action, timestamp) -> str:
+    def select_release(action, timestamp):
+        """Returns (release_id, env, region) tuple."""
         envs = list(ENVIRONMENT_CONFIG.keys())
         weights = [ENVIRONMENT_CONFIG[e]["weight"] for e in envs]
         env = rng.choices(envs, weights=weights)[0]
@@ -1138,12 +1545,21 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
             region = rng.choices(regions, weights=region_weights)[0]
         else:
             region = regions[0]
+
+        # Try deployment schedule first
+        if deploy_schedule:
+            scheduled = deploy_schedule.get_active_release_id(
+                env, region, action.stack, action.service, timestamp
+            )
+            if scheduled:
+                return (scheduled, env, region)
+
         days_into_year = (timestamp - start_time).days
         year_progress = max(0, days_into_year) / 365.0
         base_release = 50 + int(year_progress * 200)
         service_hash = hash(f"{action.stack}:{action.service}") % 50
         release_num = base_release + service_hash
-        return generate_release_id(env, region, action.stack, action.service, release_num)
+        return (generate_release_id(env, region, action.stack, action.service, release_num), env, region)
 
     def generate_object_id(action, user_data) -> Optional[str]:
         if not action.has_object_id:
@@ -1189,7 +1605,8 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
             return rng.choice(followers)
         return f"user_{uuid.uuid4().hex[:12]}"
 
-    def select_release_by_key(stack: str, service: str, timestamp: datetime) -> str:
+    def select_release_by_key(stack: str, service: str, timestamp: datetime):
+        """Returns (release_id, env, region) tuple."""
         class MinimalAction:
             pass
         action = MinimalAction()
@@ -1317,6 +1734,13 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     with open(logs_file, 'w', encoding='utf-8') as log_f, \
          open(metrics_file, 'w', encoding='utf-8') as metric_f:
 
+        # Write deployment log events (worker 0 only)
+        if worker_id == 0 and deploy_schedule:
+            for dep_event in deploy_schedule.get_deployment_log_events():
+                dep_log = _deployment_event_to_log_json(dep_event)
+                log_f.write(dep_log + "\n")
+                event_count += 1
+
         for user_data, count in user_chunk:
             for _ in range(count):
                 action = select_action_for_user(user_data)
@@ -1326,9 +1750,27 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 span_id = ''.join(rng.choices('0123456789abcdef', k=16))
                 object_id = generate_object_id(action, user_data)
                 target_user_id = generate_target_user(action, user_data)
-                release_id = select_release(action, timestamp)
-                error_info = determine_error(action, user_data, timestamp)
+                release_id, env, region = select_release(action, timestamp)
+
+                # Throughput dip: skip events during deployment windows
+                if deploy_schedule:
+                    window = deploy_schedule.get_active_deployment_window(
+                        action.stack, action.service, env, region, timestamp
+                    )
+                    if window and rng.random() > window.throughput_factor:
+                        continue
+
+                error_info = determine_error(action, user_data, timestamp, env, region)
                 success = error_info is None
+
+                # Deployment latency multiplier
+                deployment_latency_mult = 1.0
+                if deploy_schedule:
+                    window = deploy_schedule.get_active_deployment_window(
+                        action.stack, action.service, env, region, timestamp
+                    )
+                    if window:
+                        deployment_latency_mult = window.latency_multiplier
 
                 root_event = {
                     "user_id": user_data["user_id"],
@@ -1345,7 +1787,7 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                     "action_has_object_id": action.has_object_id,
                     "action_object_type": action.object_type,
                     "action_is_write": action.is_write,
-                    "latency_multiplier": user_data["latency_multiplier"],
+                    "latency_multiplier": user_data["latency_multiplier"] * deployment_latency_mult,
                     "timestamp": timestamp,
                     "request_id": request_id,
                     "trace_id": trace_id,
@@ -1399,9 +1841,10 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
     - base_seed: int
     - error_codes: dict
     - error_messages: dict
+    - deployment_schedule_data: dict or None
     """
     (worker_id, user_chunk, incidents_data, start_time, end_time,
-     base_seed, error_codes, error_messages) = args
+     base_seed, error_codes, error_messages, deployment_schedule_data) = args
 
     # Create worker-local RNG with deterministic seed
     rng = random.Random(base_seed + worker_id * 1000000)
@@ -1410,6 +1853,11 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
     incidents = [
         InfrastructureIncident(**inc) for inc in incidents_data
     ]
+
+    # Reconstruct deployment schedule if provided
+    deploy_schedule = None
+    if deployment_schedule_data:
+        deploy_schedule = DeploymentSchedule.from_serializable(deployment_schedule_data)
 
     # Worker-local content pools
     all_posts = []
@@ -1458,7 +1906,7 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
                         )
         return None
 
-    def determine_error(action, user_data, timestamp) -> Optional[Dict]:
+    def determine_error(action, user_data, timestamp, env=None, region=None) -> Optional[Dict]:
         hidden_failure = check_hidden_dependency_failure(action, timestamp)
         if hidden_failure:
             dep_name, error_type, error_code, error_message = hidden_failure
@@ -1480,6 +1928,20 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
                 "error_message": error_message,
                 "upstream_request_id": uuid.uuid4().hex,
             }
+
+        # Deployment dip errors
+        if deploy_schedule and env and region:
+            window = deploy_schedule.get_active_deployment_window(
+                action.stack, action.service, env, region, timestamp
+            )
+            if window and rng.random() < window.error_rate_boost:
+                return {
+                    "error_source": f"deployment:{window.release_id}",
+                    "error_type": "server",
+                    "error_code": rng.choice(["500", "502", "503"]),
+                    "error_message": f"Service restarting during deployment of {window.release_id}",
+                    "upstream_request_id": None,
+                }
 
         if rng.random() > user_data["success_rate"]:
             if rng.random() < 0.7:
@@ -1526,7 +1988,8 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
         microsecond = rng.randint(0, 999999)
         return date.replace(hour=hour, minute=minute, second=second, microsecond=microsecond)
 
-    def select_release(action, timestamp) -> str:
+    def select_release(action, timestamp):
+        """Returns (release_id, env, region) tuple."""
         envs = list(ENVIRONMENT_CONFIG.keys())
         weights = [ENVIRONMENT_CONFIG[e]["weight"] for e in envs]
         env = rng.choices(envs, weights=weights)[0]
@@ -1536,12 +1999,20 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
             region = rng.choices(regions, weights=region_weights)[0]
         else:
             region = regions[0]
+
+        if deploy_schedule:
+            scheduled = deploy_schedule.get_active_release_id(
+                env, region, action.stack, action.service, timestamp
+            )
+            if scheduled:
+                return (scheduled, env, region)
+
         days_into_year = (timestamp - start_time).days
         year_progress = max(0, days_into_year) / 365.0
         base_release = 50 + int(year_progress * 200)
         service_hash = hash(f"{action.stack}:{action.service}") % 50
         release_num = base_release + service_hash
-        return generate_release_id(env, region, action.stack, action.service, release_num)
+        return (generate_release_id(env, region, action.stack, action.service, release_num), env, region)
 
     def generate_object_id(action, user_data) -> Optional[str]:
         if not action.has_object_id:
@@ -1587,9 +2058,8 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
             return rng.choice(followers)
         return f"user_{uuid.uuid4().hex[:12]}"
 
-    def select_release_by_key(stack: str, service: str, timestamp: datetime) -> str:
-        """Wrapper for select_release that takes stack/service directly."""
-        # Create a minimal action-like object
+    def select_release_by_key(stack: str, service: str, timestamp: datetime):
+        """Returns (release_id, env, region) tuple."""
         class MinimalAction:
             pass
         action = MinimalAction()
@@ -1609,9 +2079,27 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
             span_id = ''.join(rng.choices('0123456789abcdef', k=16))
             object_id = generate_object_id(action, user_data)
             target_user_id = generate_target_user(action, user_data)
-            release_id = select_release(action, timestamp)
-            error_info = determine_error(action, user_data, timestamp)
+            release_id, env, region = select_release(action, timestamp)
+
+            # Throughput dip
+            if deploy_schedule:
+                window = deploy_schedule.get_active_deployment_window(
+                    action.stack, action.service, env, region, timestamp
+                )
+                if window and rng.random() > window.throughput_factor:
+                    continue
+
+            error_info = determine_error(action, user_data, timestamp, env, region)
             success = error_info is None
+
+            # Deployment latency multiplier
+            deployment_latency_mult = 1.0
+            if deploy_schedule:
+                window = deploy_schedule.get_active_deployment_window(
+                    action.stack, action.service, env, region, timestamp
+                )
+                if window:
+                    deployment_latency_mult = window.latency_multiplier
 
             root_event = {
                 "user_id": user_data["user_id"],
@@ -1628,7 +2116,7 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
                 "action_has_object_id": action.has_object_id,
                 "action_object_type": action.object_type,
                 "action_is_write": action.is_write,
-                "latency_multiplier": user_data["latency_multiplier"],
+                "latency_multiplier": user_data["latency_multiplier"] * deployment_latency_mult,
                 "timestamp": timestamp,
                 "request_id": request_id,
                 "trace_id": trace_id,
@@ -1662,7 +2150,8 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
 class MonitoringDataGenerator:
     """Generates synthetic monitoring data"""
 
-    def __init__(self, total_events: int, total_users: int, seed: int = 42, num_workers: int = 1):
+    def __init__(self, total_events: int, total_users: int, seed: int = 42, num_workers: int = 1,
+                 deployment_schedule_path: str = None):
         self.total_events = total_events
         self.total_users = total_users
         self.seed = seed
@@ -1672,6 +2161,17 @@ class MonitoringDataGenerator:
         # Time range: 1 year ending now
         self.end_time = datetime.now()
         self.start_time = self.end_time - timedelta(days=365)
+
+        # Deployment schedule (optional, for real release_id mapping and deployment dips)
+        self.deployment_schedule: Optional[DeploymentSchedule] = None
+        if deployment_schedule_path:
+            print(f"Loading deployment schedule from {deployment_schedule_path}...")
+            self.deployment_schedule = DeploymentSchedule(
+                deployment_schedule_path, self.start_time, self.end_time, self.rng
+            )
+            window_count = sum(len(w) for w in self.deployment_schedule._deployment_windows.values())
+            timeline_count = sum(len(t) for t in self.deployment_schedule._release_timelines.values())
+            print(f"  Loaded {timeline_count} release timeline entries, {window_count} deployment windows")
 
         # Users
         self.users: List[User] = []
@@ -1851,7 +2351,8 @@ class MonitoringDataGenerator:
                 )
         return None
 
-    def determine_error(self, action: ServiceAction, user: User, timestamp: datetime) -> Optional[Dict]:
+    def determine_error(self, action: ServiceAction, user: User, timestamp: datetime,
+                        env: str = None, region: str = None) -> Optional[Dict]:
         """
         Determine if this request should fail and why.
         Returns error details dict or None for success.
@@ -1859,10 +2360,9 @@ class MonitoringDataGenerator:
         Error priority:
         1. Hidden dependency failure (infrastructure incident)
         2. Documented dependency cascade
-        3. Random service error (based on persona success rate)
+        3. Deployment dip (rolling restart errors)
+        4. Random service error (based on persona success rate)
         """
-        service_key = f"{action.stack}:{action.service}"
-
         # 1. Check hidden dependency failures first
         hidden_failure = self.check_hidden_dependency_failure(action, timestamp)
         if hidden_failure:
@@ -1884,12 +2384,25 @@ class MonitoringDataGenerator:
                 "error_type": error_type,
                 "error_code": error_code,
                 "error_message": error_message,
-                "upstream_request_id": uuid.uuid4().hex,  # The failed upstream call
+                "upstream_request_id": uuid.uuid4().hex,
             }
 
-        # 3. Random service errors based on persona success rate
+        # 3. Deployment dip errors
+        if self.deployment_schedule and env and region:
+            window = self.deployment_schedule.get_active_deployment_window(
+                action.stack, action.service, env, region, timestamp
+            )
+            if window and self.rng.random() < window.error_rate_boost:
+                return {
+                    "error_source": f"deployment:{window.release_id}",
+                    "error_type": "server",
+                    "error_code": self.rng.choice(["500", "502", "503"]),
+                    "error_message": f"Service restarting during deployment of {window.release_id}",
+                    "upstream_request_id": None,
+                }
+
+        # 4. Random service errors based on persona success rate
         if self.rng.random() > user.persona.success_rate:
-            # Determine error type
             if self.rng.random() < 0.7:
                 error_code = self.rng.choice(self.error_codes["client"])
                 error_type = "client"
@@ -1907,8 +2420,11 @@ class MonitoringDataGenerator:
 
         return None  # Success
 
-    def select_release(self, action: ServiceAction, timestamp: datetime) -> str:
-        """Select a release_id for this request based on environment weights and time"""
+    def select_release(self, action: ServiceAction, timestamp: datetime) -> Tuple[str, str, str]:
+        """Select a release_id for this request based on environment weights and time.
+
+        Returns (release_id, env, region) tuple.
+        """
         # Select environment based on weights
         envs = list(ENVIRONMENT_CONFIG.keys())
         weights = [ENVIRONMENT_CONFIG[e]["weight"] for e in envs]
@@ -1923,19 +2439,22 @@ class MonitoringDataGenerator:
         else:
             region = regions[0]
 
-        # Calculate release number based on time progression through the year
-        # Services get deployed at different cadences
-        days_into_year = (timestamp - self.start_time).days
-        year_progress = days_into_year / 365.0
+        # Try deployment schedule first
+        if self.deployment_schedule:
+            scheduled_release = self.deployment_schedule.get_active_release_id(
+                env, region, action.stack, action.service, timestamp
+            )
+            if scheduled_release:
+                return (scheduled_release, env, region)
 
-        # Base release number that grows over the year (simulating CI/CD pipeline)
-        # Different services have different deployment frequencies
-        base_release = 50 + int(year_progress * 200)  # 50-250 releases over the year
-        # Add some variance per service
+        # Fallback to synthetic release_id
+        days_into_year = (timestamp - self.start_time).days
+        year_progress = max(0, days_into_year) / 365.0
+        base_release = 50 + int(year_progress * 200)
         service_hash = hash(f"{action.stack}:{action.service}") % 50
         release_num = base_release + service_hash
 
-        return generate_release_id(env, region, action.stack, action.service, release_num)
+        return (generate_release_id(env, region, action.stack, action.service, release_num), env, region)
 
     def select_action_for_user(self, user: User) -> ServiceAction:
         """Select an action for a user based on their persona"""
@@ -2096,12 +2615,14 @@ class MonitoringDataGenerator:
 
     def generate_metrics(self, action: ServiceAction, user: User,
                          timestamp: datetime, success: bool, release_id: str,
-                         trace_id: str, latency_ms: float = None) -> List[MetricEntry]:
+                         trace_id: str, latency_ms: float = None,
+                         deployment_latency_multiplier: float = 1.0) -> List[MetricEntry]:
         """Generate performance metrics for an event
 
         Args:
             trace_id: Used for error-biased exemplar sampling
             latency_ms: Pre-computed latency (for determining if slow request)
+            deployment_latency_multiplier: Extra latency during deployments (1.0 = no effect)
         """
         metrics = []
         epoch_ts = timestamp.timestamp()
@@ -2136,7 +2657,7 @@ class MonitoringDataGenerator:
 
         # Response time
         latency = max(1.0, self.rng.gauss(
-            action.base_latency_ms * user.persona.latency_multiplier,
+            action.base_latency_ms * user.persona.latency_multiplier * deployment_latency_multiplier,
             action.latency_stddev_ms
         ))
         if not success:
@@ -2318,9 +2839,27 @@ class MonitoringDataGenerator:
 
                 object_id = self.generate_object_id(action, user)
                 target_user_id = self.generate_target_user(action, user)
-                release_id = self.select_release(action, timestamp)
-                error_info = self.determine_error(action, user, timestamp)
+                release_id, env, region = self.select_release(action, timestamp)
+
+                # Throughput dip: skip events during deployment windows
+                if self.deployment_schedule:
+                    window = self.deployment_schedule.get_active_deployment_window(
+                        action.stack, action.service, env, region, timestamp
+                    )
+                    if window and self.rng.random() > window.throughput_factor:
+                        continue
+
+                error_info = self.determine_error(action, user, timestamp, env, region)
                 success = error_info is None
+
+                # Deployment latency multiplier
+                deployment_latency_mult = 1.0
+                if self.deployment_schedule:
+                    window = self.deployment_schedule.get_active_deployment_window(
+                        action.stack, action.service, env, region, timestamp
+                    )
+                    if window:
+                        deployment_latency_mult = window.latency_multiplier
 
                 root_event = {
                     "user": user,
@@ -2335,6 +2874,7 @@ class MonitoringDataGenerator:
                     "object_id": object_id,
                     "target_user_id": target_user_id,
                     "release_id": release_id,
+                    "deployment_latency_multiplier": deployment_latency_mult,
                 }
                 all_events.append(root_event)
 
@@ -2410,7 +2950,7 @@ class MonitoringDataGenerator:
                 is_write=action.is_write,
             )
 
-            child_release_id = self.select_release(child_action, child_timestamp)
+            child_release_id, _, _ = self.select_release(child_action, child_timestamp)
 
             child_event = {
                 "user": user,
@@ -2461,6 +3001,11 @@ class MonitoringDataGenerator:
             for inc in self.incidents
         ]
 
+        # Serialize deployment schedule
+        deployment_schedule_data = None
+        if self.deployment_schedule:
+            deployment_schedule_data = self.deployment_schedule.to_serializable()
+
         # Split into chunks for workers
         chunks = [[] for _ in range(self.num_workers)]
         for i, item in enumerate(user_data_counts):
@@ -2485,7 +3030,8 @@ class MonitoringDataGenerator:
                 self.seed,
                 self.error_codes,
                 self.error_messages,
-                output_dir,  # Workers write to per-worker files in output dir
+                output_dir,
+                deployment_schedule_data,
             )
             for worker_id in range(self.num_workers)
         ]
@@ -2534,6 +3080,12 @@ class MonitoringDataGenerator:
         with open(logs_file, 'w', encoding='utf-8') as log_f, \
              open(metrics_file, 'w', encoding='utf-8') as metric_f:
 
+            # Write deployment log events first
+            if self.deployment_schedule:
+                for dep_event in self.deployment_schedule.get_deployment_log_events():
+                    log_f.write(_deployment_event_to_log_json(dep_event) + "\n")
+                    log_count += 1
+
             for i, event in enumerate(events):
                 if i % 100000 == 0:
                     print(f"  Processing event {i}/{len(events)}...")
@@ -2553,7 +3105,8 @@ class MonitoringDataGenerator:
                     )
                     metrics = self.generate_metrics(
                         event["action"], event["user"], event["timestamp"],
-                        event["success"], event["release_id"], event["trace_id"]
+                        event["success"], event["release_id"], event["trace_id"],
+                        deployment_latency_multiplier=event.get("deployment_latency_multiplier", 1.0),
                     )
 
                 log_f.write(json.dumps(asdict(log_entry)) + "\n")
@@ -2626,7 +3179,8 @@ class MonitoringDataGenerator:
                 )
                 metrics = self.generate_metrics(
                     event["action"], event["user"], event["timestamp"],
-                    event["success"], event["release_id"], event["trace_id"]
+                    event["success"], event["release_id"], event["trace_id"],
+                    deployment_latency_multiplier=event.get("deployment_latency_multiplier", 1.0),
                 )
 
             # Convert log to OTLP format
@@ -2954,6 +3508,8 @@ def main():
     parser.add_argument("--format", "-f", type=str, default="jsonl",
                         choices=["jsonl", "otlp"],
                         help="Output format: jsonl (default) or otlp (OpenTelemetry)")
+    parser.add_argument("--deployment-schedule", type=str, default=None,
+                        help="Path to deployment_schedule.json from generate_fixtures.py (optional)")
 
     args = parser.parse_args()
 
@@ -2966,13 +3522,15 @@ def main():
     print(f"Random seed: {args.seed}")
     print(f"Workers: {args.workers}")
     print(f"Format: {args.format}")
+    print(f"Deployment schedule: {args.deployment_schedule or 'None (synthetic releases)'}")
     print("=" * 70)
 
     generator = MonitoringDataGenerator(
         total_events=args.total_events,
         total_users=args.total_users,
         seed=args.seed,
-        num_workers=args.workers
+        num_workers=args.workers,
+        deployment_schedule_path=args.deployment_schedule,
     )
 
     # Set output path for streaming (parallel workers write directly to disk)

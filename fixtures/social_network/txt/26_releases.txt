@@ -7,54 +7,234 @@
 # PRODUCTION - us-east-1 - Main EKS Cluster - Current Releases
 # =============================================================================
 
-# User Stack - Identity (build 100)
+# User Stack
 prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-15T10:00:00Z", "deployed_by": "ci-system"}
 prod:aws:111111111111:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:99	99	{"deployed_at": "2024-01-10T14:30:00Z", "deployed_by": "ci-system"}
-
-# User Stack - Profile (build 85)
 prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default	social:user:profile:85	85	{"deployed_at": "2024-01-14T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:profile:default	social:user:profile:84	84	{"deployed_at": "2024-01-08T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:privacy:default	social:user:privacy:72	72	{"deployed_at": "2024-01-12T14:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:user:account:default	social:user:account:68	68	{"deployed_at": "2024-01-11T16:00:00Z", "deployed_by": "ci-system"}
 
-# Content Stack - Posts (build 234)
+# Social Graph Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:social:connections:default	social:social:connections:156	156	{"deployed_at": "2024-01-16T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:social:connections:default	social:social:connections:155	155	{"deployed_at": "2024-01-13T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:social:blocks:default	social:social:blocks:45	45	{"deployed_at": "2024-01-09T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:social:suggestions:default	social:social:suggestions:93	93	{"deployed_at": "2024-01-14T15:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:social:contacts:default	social:social:contacts:38	38	{"deployed_at": "2024-01-07T10:00:00Z", "deployed_by": "ci-system"}
+
+# Content Stack
 prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T08:00:00Z", "deployed_by": "ci-system"}
-
-# Content Stack - Media (build 178)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:233	233	{"deployed_at": "2024-01-14T08:00:00Z", "deployed_by": "ci-system"}
 prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default	social:content:media:178	178	{"deployed_at": "2024-01-15T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:media:default	social:content:media:177	177	{"deployed_at": "2024-01-12T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:stories:default	social:content:stories:112	112	{"deployed_at": "2024-01-14T13:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:comments:default	social:content:comments:145	145	{"deployed_at": "2024-01-15T14:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:reactions:default	social:content:reactions:98	98	{"deployed_at": "2024-01-13T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:shares:default	social:content:shares:67	67	{"deployed_at": "2024-01-10T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:content:hashtags:default	social:content:hashtags:54	54	{"deployed_at": "2024-01-09T14:00:00Z", "deployed_by": "ci-system"}
 
-# Feed Stack - Timeline (build 267)
+# Feed Stack
 prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T06:00:00Z", "deployed_by": "ci-system"}
-
-# Feed Stack - Ranking (build 145)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:266	266	{"deployed_at": "2024-01-14T06:00:00Z", "deployed_by": "ci-system"}
 prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:ranking:default	social:feed:ranking:145	145	{"deployed_at": "2024-01-11T08:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:fanout:default	social:feed:fanout:89	89	{"deployed_at": "2024-01-13T07:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:feed:aggregation:default	social:feed:aggregation:76	76	{"deployed_at": "2024-01-11T13:00:00Z", "deployed_by": "ci-system"}
 
-# Platform Stack - API Gateway (build 178)
+# Notifications Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:notifications:push:default	social:notifications:push:112	112	{"deployed_at": "2024-01-14T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:notifications:email:default	social:notifications:email:78	78	{"deployed_at": "2024-01-10T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:notifications:sms:default	social:notifications:sms:43	43	{"deployed_at": "2024-01-07T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:notifications:inapp:default	social:notifications:inapp:95	95	{"deployed_at": "2024-01-13T15:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:notifications:preferences:default	social:notifications:preferences:34	34	{"deployed_at": "2024-01-05T10:00:00Z", "deployed_by": "ci-system"}
+
+# Search Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:search:users:default	social:search:users:88	88	{"deployed_at": "2024-01-12T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:search:content:default	social:search:content:92	92	{"deployed_at": "2024-01-13T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:search:hashtags:default	social:search:hashtags:47	47	{"deployed_at": "2024-01-08T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:search:indexer:default	social:search:indexer:103	103	{"deployed_at": "2024-01-14T07:00:00Z", "deployed_by": "ci-system"}
+
+# Discovery Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:discovery:trending:default	social:discovery:trending:78	78	{"deployed_at": "2024-01-12T15:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:discovery:explore:default	social:discovery:explore:115	115	{"deployed_at": "2024-01-15T08:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:discovery:recommendations:default	social:discovery:recommendations:134	134	{"deployed_at": "2024-01-15T13:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:discovery:interests:default	social:discovery:interests:67	67	{"deployed_at": "2024-01-10T14:00:00Z", "deployed_by": "ci-system"}
+
+# Moderation Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:moderation:content-review:default	social:moderation:content-review:89	89	{"deployed_at": "2024-01-13T14:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:moderation:auto-mod:default	social:moderation:auto-mod:156	156	{"deployed_at": "2024-01-16T07:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:moderation:auto-mod:default	social:moderation:auto-mod:155	155	{"deployed_at": "2024-01-14T07:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:moderation:reports:default	social:moderation:reports:54	54	{"deployed_at": "2024-01-08T13:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:moderation:spam:default	social:moderation:spam:178	178	{"deployed_at": "2024-01-15T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:moderation:trust-safety:default	social:moderation:trust-safety:43	43	{"deployed_at": "2024-01-07T14:00:00Z", "deployed_by": "ci-system"}
+
+# Ads Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:ads:campaigns:default	social:ads:campaigns:123	123	{"deployed_at": "2024-01-15T07:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:ads:targeting:default	social:ads:targeting:145	145	{"deployed_at": "2024-01-15T15:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:ads:bidding:default	social:ads:bidding:189	189	{"deployed_at": "2024-01-16T05:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:ads:bidding:default	social:ads:bidding:188	188	{"deployed_at": "2024-01-14T05:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:ads:delivery:default	social:ads:delivery:167	167	{"deployed_at": "2024-01-15T16:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:ads:ad-analytics:default	social:ads:ad-analytics:98	98	{"deployed_at": "2024-01-13T13:00:00Z", "deployed_by": "ci-system"}
+
+# Payments Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:payments:processor:default	social:payments:processor:87	87	{"deployed_at": "2024-01-12T06:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:payments:subscriptions:default	social:payments:subscriptions:65	65	{"deployed_at": "2024-01-10T07:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:payments:wallet:default	social:payments:wallet:78	78	{"deployed_at": "2024-01-11T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:payments:payouts:default	social:payments:payouts:45	45	{"deployed_at": "2024-01-08T07:00:00Z", "deployed_by": "ci-system"}
+
+# Creator Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:creator:studio:default	social:creator:studio:56	56	{"deployed_at": "2024-01-09T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:creator:creator-analytics:default	social:creator:creator-analytics:67	67	{"deployed_at": "2024-01-10T15:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:creator:monetization:default	social:creator:monetization:43	43	{"deployed_at": "2024-01-07T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:creator:shop:default	social:creator:shop:34	34	{"deployed_at": "2024-01-05T14:00:00Z", "deployed_by": "ci-system"}
+
+# Analytics Stack
+prod:aws:111111111111:us-east-1:platform:eks:main:social:analytics:events:default	social:analytics:events:112	112	{"deployed_at": "2024-01-14T09:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:analytics:warehouse:default	social:analytics:warehouse:78	78	{"deployed_at": "2024-01-11T15:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:analytics:pipeline:default	social:analytics:pipeline:89	89	{"deployed_at": "2024-01-12T13:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:analytics:reporting:default	social:analytics:reporting:56	56	{"deployed_at": "2024-01-09T15:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:analytics:ml-features:default	social:analytics:ml-features:45	45	{"deployed_at": "2024-01-08T14:00:00Z", "deployed_by": "ci-system"}
+
+# Platform Stack
 prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T04:00:00Z", "deployed_by": "ci-system"}
-
-# Platform Stack - Rate Limiter (build 89)
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:177	177	{"deployed_at": "2024-01-14T04:00:00Z", "deployed_by": "ci-system"}
 prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:rate-limiter:default	social:platform:rate-limiter:89	89	{"deployed_at": "2024-01-13T06:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:feature-flags:default	social:platform:feature-flags:67	67	{"deployed_at": "2024-01-10T08:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:ab-testing:default	social:platform:ab-testing:45	45	{"deployed_at": "2024-01-08T08:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:main:social:platform:config:default	social:platform:config:56	56	{"deployed_at": "2024-01-09T11:00:00Z", "deployed_by": "ci-system"}
 
 # =============================================================================
-# PRODUCTION - us-west-2 (DR Region)
+# PRODUCTION - us-east-1 - Realtime EKS Cluster
 # =============================================================================
 
+# Messaging Stack
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default	social:messaging:dm:134	134	{"deployed_at": "2024-01-15T12:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:dm:default	social:messaging:dm:133	133	{"deployed_at": "2024-01-13T12:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:groups:default	social:messaging:groups:87	87	{"deployed_at": "2024-01-12T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default	social:messaging:realtime:201	201	{"deployed_at": "2024-01-16T03:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:realtime:default	social:messaging:realtime:200	200	{"deployed_at": "2024-01-14T03:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:messaging:presence:default	social:messaging:presence:56	56	{"deployed_at": "2024-01-09T13:00:00Z", "deployed_by": "ci-system"}
+
+# Live Stack
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:live:streaming:default	social:live:streaming:89	89	{"deployed_at": "2024-01-13T08:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:live:live-chat:default	social:live:live-chat:78	78	{"deployed_at": "2024-01-11T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:live:gifts:default	social:live:gifts:45	45	{"deployed_at": "2024-01-08T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-east-1:platform:eks:realtime:social:live:vod:default	social:live:vod:56	56	{"deployed_at": "2024-01-09T16:00:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# PRODUCTION - us-west-2 - Main EKS Cluster (DR Region)
+# =============================================================================
+
+# User Stack
 prod:aws:111111111111:us-west-2:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-15T12:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:user:profile:default	social:user:profile:85	85	{"deployed_at": "2024-01-14T13:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:user:privacy:default	social:user:privacy:72	72	{"deployed_at": "2024-01-12T16:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:user:account:default	social:user:account:68	68	{"deployed_at": "2024-01-11T18:00:00Z", "deployed_by": "ci-system"}
+
+# Social Graph Stack
+prod:aws:111111111111:us-west-2:platform:eks:main:social:social:connections:default	social:social:connections:156	156	{"deployed_at": "2024-01-16T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:social:blocks:default	social:social:blocks:45	45	{"deployed_at": "2024-01-09T12:00:00Z", "deployed_by": "ci-system"}
+
+# Content Stack
 prod:aws:111111111111:us-west-2:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:content:media:default	social:content:media:178	178	{"deployed_at": "2024-01-15T11:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:content:comments:default	social:content:comments:145	145	{"deployed_at": "2024-01-15T16:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:content:reactions:default	social:content:reactions:98	98	{"deployed_at": "2024-01-13T12:00:00Z", "deployed_by": "ci-system"}
+
+# Feed Stack
 prod:aws:111111111111:us-west-2:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T08:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:feed:ranking:default	social:feed:ranking:145	145	{"deployed_at": "2024-01-11T10:00:00Z", "deployed_by": "ci-system"}
+
+# Platform Stack
 prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T06:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:main:social:platform:rate-limiter:default	social:platform:rate-limiter:89	89	{"deployed_at": "2024-01-13T08:00:00Z", "deployed_by": "ci-system"}
 
 # =============================================================================
-# STAGING - us-east-1
+# PRODUCTION - us-west-2 - Realtime EKS Cluster
 # =============================================================================
 
-stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-16T14:00:00Z", "deployed_by": "ci-system"}
-stg:aws:222222222222:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T14:30:00Z", "deployed_by": "ci-system"}
-stg:aws:222222222222:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T15:00:00Z", "deployed_by": "ci-system"}
-stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T15:30:00Z", "deployed_by": "ci-system"}
+# Messaging Stack
+prod:aws:111111111111:us-west-2:platform:eks:realtime:social:messaging:dm:default	social:messaging:dm:134	134	{"deployed_at": "2024-01-15T14:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:realtime:social:messaging:realtime:default	social:messaging:realtime:201	201	{"deployed_at": "2024-01-16T05:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:us-west-2:platform:eks:realtime:social:messaging:presence:default	social:messaging:presence:56	56	{"deployed_at": "2024-01-09T15:00:00Z", "deployed_by": "ci-system"}
 
 # =============================================================================
-# DEVELOPMENT - us-east-1
+# PRODUCTION - eu-west-1 - Main EKS Cluster (Europe)
 # =============================================================================
 
-dev:aws:333333333333:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-16T16:00:00Z", "deployed_by": "developer"}
-dev:aws:333333333333:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T16:30:00Z", "deployed_by": "developer"}
-dev:aws:333333333333:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T17:00:00Z", "deployed_by": "developer"}
-dev:aws:333333333333:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T17:30:00Z", "deployed_by": "developer"}
+# Core Services for EU Users
+prod:aws:111111111111:eu-west-1:platform:eks:main:social:user:identity:default	social:user:identity:100	100	{"deployed_at": "2024-01-15T14:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:eu-west-1:platform:eks:main:social:user:profile:default	social:user:profile:85	85	{"deployed_at": "2024-01-14T15:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:eu-west-1:platform:eks:main:social:user:privacy:default	social:user:privacy:72	72	{"deployed_at": "2024-01-12T18:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:eu-west-1:platform:eks:main:social:content:posts:default	social:content:posts:234	234	{"deployed_at": "2024-01-16T12:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:eu-west-1:platform:eks:main:social:content:media:default	social:content:media:178	178	{"deployed_at": "2024-01-15T13:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:eu-west-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:267	267	{"deployed_at": "2024-01-16T10:00:00Z", "deployed_by": "ci-system"}
+prod:aws:111111111111:eu-west-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:178	178	{"deployed_at": "2024-01-16T08:00:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# STAGING - us-east-1 - Main EKS Cluster
+# =============================================================================
+
+# Staging runs ahead of prod - build numbers are +1 or same as prod
+stg:aws:222222222222:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:101	101	{"deployed_at": "2024-01-16T14:00:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:user:profile:default	social:user:profile:86	86	{"deployed_at": "2024-01-16T14:10:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:social:connections:default	social:social:connections:157	157	{"deployed_at": "2024-01-16T14:20:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:235	235	{"deployed_at": "2024-01-16T14:30:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:content:media:default	social:content:media:179	179	{"deployed_at": "2024-01-16T14:40:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:268	268	{"deployed_at": "2024-01-16T15:00:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:179	179	{"deployed_at": "2024-01-16T15:30:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# STAGING - us-east-1 - Realtime EKS Cluster
+# =============================================================================
+
+stg:aws:222222222222:us-east-1:platform:eks:realtime:social:messaging:dm:default	social:messaging:dm:135	135	{"deployed_at": "2024-01-16T15:00:00Z", "deployed_by": "ci-system"}
+stg:aws:222222222222:us-east-1:platform:eks:realtime:social:messaging:realtime:default	social:messaging:realtime:202	202	{"deployed_at": "2024-01-16T15:10:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# DEVELOPMENT - us-east-1 - Main EKS Cluster
+# =============================================================================
+
+# Dev runs ahead of staging - build numbers are +2 from prod
+dev:aws:333333333333:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:102	102	{"deployed_at": "2024-01-16T16:00:00Z", "deployed_by": "developer"}
+dev:aws:333333333333:us-east-1:platform:eks:main:social:user:profile:default	social:user:profile:87	87	{"deployed_at": "2024-01-16T16:10:00Z", "deployed_by": "developer"}
+dev:aws:333333333333:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:236	236	{"deployed_at": "2024-01-16T16:30:00Z", "deployed_by": "developer"}
+dev:aws:333333333333:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:269	269	{"deployed_at": "2024-01-16T17:00:00Z", "deployed_by": "developer"}
+dev:aws:333333333333:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:180	180	{"deployed_at": "2024-01-16T17:30:00Z", "deployed_by": "developer"}
+
+# =============================================================================
+# INTEGRATION - us-east-1 - Main EKS Cluster
+# =============================================================================
+
+# Integration uses same build numbers as staging
+int:aws:444444444444:us-east-1:platform:eks:main:social:user:identity:default	social:user:identity:101	101	{"deployed_at": "2024-01-16T13:00:00Z", "deployed_by": "ci-system"}
+int:aws:444444444444:us-east-1:platform:eks:main:social:user:profile:default	social:user:profile:86	86	{"deployed_at": "2024-01-16T13:10:00Z", "deployed_by": "ci-system"}
+int:aws:444444444444:us-east-1:platform:eks:main:social:content:posts:default	social:content:posts:235	235	{"deployed_at": "2024-01-16T13:30:00Z", "deployed_by": "ci-system"}
+int:aws:444444444444:us-east-1:platform:eks:main:social:feed:timeline:default	social:feed:timeline:268	268	{"deployed_at": "2024-01-16T13:45:00Z", "deployed_by": "ci-system"}
+int:aws:444444444444:us-east-1:platform:eks:main:social:platform:api-gateway:default	social:platform:api-gateway:179	179	{"deployed_at": "2024-01-16T14:00:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# INFRASTRUCTURE - Observability
+# =============================================================================
+
+infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:logging:default	infra:observability:logging:45	45	{"deployed_at": "2024-01-10T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:metrics:default	infra:observability:metrics:56	56	{"deployed_at": "2024-01-11T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:tracing:default	infra:observability:tracing:34	34	{"deployed_at": "2024-01-08T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:alerting:default	infra:observability:alerting:67	67	{"deployed_at": "2024-01-12T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:monitoring:eks:observability:infra:observability:dashboards:default	infra:observability:dashboards:23	23	{"deployed_at": "2024-01-06T10:00:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# INFRASTRUCTURE - CICD
+# =============================================================================
+
+infra:aws:555555555555:us-east-1:cicd:eks:runners:infra:cicd:pipelines:default	infra:cicd:pipelines:89	89	{"deployed_at": "2024-01-13T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:cicd:eks:runners:infra:cicd:artifacts:default	infra:cicd:artifacts:56	56	{"deployed_at": "2024-01-09T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:cicd:eks:runners:infra:cicd:deployments:default	infra:cicd:deployments:78	78	{"deployed_at": "2024-01-11T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:cicd:eks:runners:infra:cicd:testing:default	infra:cicd:testing:45	45	{"deployed_at": "2024-01-08T06:00:00Z", "deployed_by": "ci-system"}
+
+# =============================================================================
+# INFRASTRUCTURE - Security
+# =============================================================================
+
+infra:aws:555555555555:us-east-1:shared:eks:shared:infra:security:vault:default	infra:security:vault:34	34	{"deployed_at": "2024-01-07T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:shared:eks:shared:infra:security:scanner:default	infra:security:scanner:56	56	{"deployed_at": "2024-01-10T06:00:00Z", "deployed_by": "ci-system"}
+infra:aws:555555555555:us-east-1:shared:eks:shared:infra:security:compliance:default	infra:security:compliance:45	45	{"deployed_at": "2024-01-08T06:00:00Z", "deployed_by": "ci-system"}

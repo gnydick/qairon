@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """Convert TSV fixtures to JSON:API format."""
 
+import argparse
 import json
 from pathlib import Path
 
-FIXTURES_DIR = Path(__file__).parent
-JSON_DIR = FIXTURES_DIR / "json"
-JSON_DIR.mkdir(exist_ok=True)
+SCRIPT_DIR = Path(__file__).parent
 
 # Define mappings: (filename, resource_type, column_names)
 # Column names in order they appear in the TSV file
@@ -102,8 +101,21 @@ def to_jsonapi(resource_type, records):
     ]
 
 def main():
+    parser = argparse.ArgumentParser(description='Convert TSV fixtures to JSON:API format')
+    parser.add_argument('--input-dir', metavar='DIR',
+                        default=str(SCRIPT_DIR / "txt"),
+                        help='Input directory containing TSV files (default: txt/ subdir)')
+    parser.add_argument('--output-dir', metavar='DIR',
+                        default=str(SCRIPT_DIR / "json"),
+                        help='Output directory for JSON files (default: json/ subdir)')
+    args = parser.parse_args()
+
+    input_dir = Path(args.input_dir)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(exist_ok=True, parents=True)
+
     for filename, resource_type, columns in MAPPINGS:
-        filepath = FIXTURES_DIR / filename
+        filepath = input_dir / filename
         if not filepath.exists():
             print(f"Skipping {filename} (not found)")
             continue
@@ -111,7 +123,7 @@ def main():
         records = parse_tsv(filepath, columns)
         jsonapi_records = to_jsonapi(resource_type, records)
 
-        output_file = JSON_DIR / f"{resource_type}.json"
+        output_file = output_dir / f"{resource_type}.json"
         with open(output_file, 'w') as f:
             json.dump(jsonapi_records, f, indent=2)
 

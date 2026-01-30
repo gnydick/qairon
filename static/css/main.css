@@ -3,3 +3,26 @@
     max-width: unset;
 
 }
+
+/* Nested dropdowns - expand to the right */
+.dropdown-menu > li.dropdown {
+    position: relative;
+}
+
+.dropdown-menu > li.dropdown > .dropdown-menu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    margin-top: -6px;
+}
+
+.dropdown-menu > li.dropdown:hover > .dropdown-menu {
+    display: block;
+}
+
+/* Make the chevron-right more visible */
+.dropdown-menu .dropdown-toggle .glyphicon-chevron-right {
+    float: right;
+    margin-top: 4px;
+}
