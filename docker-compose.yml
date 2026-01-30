@@ -51,12 +51,21 @@ services:
       - /mnt/qairon/victoria-metrics-data:/victoria-metrics-data:z
     command:
       - -retentionPeriod=2y
+      # Read performance: cache historical data for 1 year
       - -search.cacheTimestampOffset=8760h
       - -search.maxQueryDuration=60s
+      # Read performance: parallel query handling for dashboard bursts
+      - -search.maxConcurrentRequests=32
+      - -search.maxQueueDuration=30s
+      # Read performance: fresher reads (default 30s delays results)
+      - -search.latencyOffset=5s
+      # Read performance: longer cache retention and more RAM for caches
+      - -cacheExpireDuration=1h
+      - -memory.allowedPercent=40
     deploy:
       resources:
         limits:
-          cpus: "24"
+          cpus: "32"
     restart: unless-stopped
 
   victorialogs:
@@ -70,14 +79,20 @@ services:
       - /mnt/qairon/victoria-logs-data:/victoria-logs-data:z
     command:
       - -retentionPeriod=2y
+      # Ingest performance
       - -maxConcurrentInserts=240
       - -fs.maxConcurrency=1000
       - -inmemoryDataFlushInterval=15s
-      - -memory.allowedPercent=60
+      # Read performance: parallel query handling for dashboard log panels
+      - -search.maxConcurrentRequests=32
+      - -search.maxQueryDuration=120s
+      # Read performance: longer cache retention and more RAM for caches
+      - -cacheExpireDuration=1h
+      - -memory.allowedPercent=40
     deploy:
       resources:
         limits:
-          cpus: "30"
+          cpus: "32"
     restart: unless-stopped
 
   tempo:
