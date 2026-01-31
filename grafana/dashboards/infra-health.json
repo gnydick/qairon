@@ -319,7 +319,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:infrastructure* environment:$environment error_source:~\"$component\" | stats by(_time:5m, error_source) count() as errors"
+          "expr": "environment:$environment error_source:in($component) | stats by(_time:5m, error_source) count() as errors"
         }
       ]
     },
@@ -416,7 +416,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:infrastructure* environment:$environment error_source:~\"$component\" | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50"
+          "expr": "environment:$environment error_source:in($component) | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50"
         }
       ]
     },
@@ -569,7 +569,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:infrastructure* environment:$environment error_source:~\"$component\" | sort by (_time desc) | limit 200"
+          "expr": "environment:$environment error_source:in($component) | sort by (_time desc) | limit 200"
         }
       ]
     }
@@ -615,74 +615,73 @@
         "options": [
           {
             "text": "aurora_primary",
-            "value": "aurora_primary",
+            "value": "infrastructure:aurora_primary",
             "selected": true
           },
           {
             "text": "dynamodb_throttle",
-            "value": "dynamodb_throttle",
+            "value": "infrastructure:dynamodb_throttle",
             "selected": false
           },
           {
             "text": "neptune_timeout",
-            "value": "neptune_timeout",
+            "value": "infrastructure:neptune_timeout",
             "selected": false
           },
           {
             "text": "redis_session",
-            "value": "redis_session",
+            "value": "infrastructure:redis_session",
             "selected": false
           },
           {
             "text": "redis_feed",
-            "value": "redis_feed",
+            "value": "infrastructure:redis_feed",
             "selected": false
           },
           {
             "text": "redis_content",
-            "value": "redis_content",
+            "value": "infrastructure:redis_content",
             "selected": false
           },
           {
             "text": "redis_messaging",
-            "value": "redis_messaging",
+            "value": "infrastructure:redis_messaging",
             "selected": false
           },
           {
             "text": "kinesis_feed",
-            "value": "kinesis_feed",
+            "value": "infrastructure:kinesis_feed",
             "selected": false
           },
           {
             "text": "media_processing",
-            "value": "media_processing",
+            "value": "infrastructure:media_processing",
             "selected": false
           },
           {
             "text": "opensearch_cluster",
-            "value": "opensearch_cluster",
+            "value": "infrastructure:opensearch_cluster",
             "selected": false
           },
           {
             "text": "auth_library",
-            "value": "auth_library",
+            "value": "infrastructure:auth_library",
             "selected": false
           },
           {
             "text": "serialization_bug",
-            "value": "serialization_bug",
+            "value": "infrastructure:serialization_bug",
             "selected": false
           },
           {
             "text": "rate_limiter_shared",
-            "value": "rate_limiter_shared",
+            "value": "infrastructure:rate_limiter_shared",
             "selected": false
           }
         ],
-        "query": "aurora_primary,dynamodb_throttle,neptune_timeout,redis_session,redis_feed,redis_content,redis_messaging,kinesis_feed,media_processing,opensearch_cluster,auth_library,serialization_bug,rate_limiter_shared",
+        "query": "infrastructure:aurora_primary,infrastructure:dynamodb_throttle,infrastructure:neptune_timeout,infrastructure:redis_session,infrastructure:redis_feed,infrastructure:redis_content,infrastructure:redis_messaging,infrastructure:kinesis_feed,infrastructure:media_processing,infrastructure:opensearch_cluster,infrastructure:auth_library,infrastructure:serialization_bug,infrastructure:rate_limiter_shared",
         "includeAll": true,
-        "multi": true,
-        "allValue": ".*"
+        "multi": true
       }
     ]
   },

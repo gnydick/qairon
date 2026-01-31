@@ -923,8 +923,7 @@
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "sort": 1,
-        "allValue": ".*"
+        "sort": 1
       },
       {
         "name": "stack",
@@ -942,8 +941,7 @@
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "sort": 1,
-        "allValue": ".*"
+        "sort": 1
       }
     ]
   },

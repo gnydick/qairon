@@ -116,7 +116,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(action:deployment_start OR action:deployment_complete) environment:$environment stack:~\"$stack\" service:~\"$service\" | sort by (_time desc) | limit 100"
+          "expr": "(action:deployment_start OR action:deployment_complete) environment:$environment stack:in($stack) service:in($service) | sort by (_time desc) | limit 100"
         }
       ]
     },
@@ -634,8 +634,7 @@
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "sort": 1,
-        "allValue": ".*"
+        "sort": 1
       },
       {
         "name": "stack",
@@ -653,8 +652,7 @@
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "sort": 1,
-        "allValue": ".*"
+        "sort": 1
       },
       {
         "name": "service",
@@ -672,8 +670,7 @@
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "sort": 1,
-        "allValue": ".*"
+        "sort": 1
       }
     ]
   },

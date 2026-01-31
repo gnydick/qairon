@@ -179,7 +179,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "level:ERROR environment:$environment stack:~\"$stack\" service:~\"$service\" | stats count() as total"
+          "expr": "level:ERROR environment:$environment stack:in($stack) service:in($service) | stats count() as total"
         }
       ]
     },
@@ -235,7 +235,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:infrastructure* environment:$environment stack:~\"$stack\" service:~\"$service\" | stats count() as total"
+          "expr": "error_source:infrastructure* environment:$environment stack:in($stack) service:in($service) | stats count() as total"
         }
       ]
     },
@@ -291,7 +291,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:dependency* environment:$environment stack:~\"$stack\" service:~\"$service\" | stats count() as total"
+          "expr": "error_source:dependency* environment:$environment stack:in($stack) service:in($service) | stats count() as total"
         }
       ]
     },
@@ -347,7 +347,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:self level:ERROR environment:$environment stack:~\"$stack\" service:~\"$service\" | stats count() as total"
+          "expr": "error_source:self level:ERROR environment:$environment stack:in($stack) service:in($service) | stats count() as total"
         }
       ]
     },
@@ -403,7 +403,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:self level:WARN environment:$environment stack:~\"$stack\" service:~\"$service\" | stats count() as total"
+          "expr": "error_source:self level:WARN environment:$environment stack:in($stack) service:in($service) | stats count() as total"
         }
       ]
     },
@@ -584,7 +584,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(level:ERROR OR level:WARN) environment:$environment stack:~\"$stack\" service:~\"$service\" error_source:* | extract \"<source_type>:\" from error_source | stats by(_time:5m, source_type) count() as errors"
+          "expr": "(level:ERROR OR level:WARN) environment:$environment stack:in($stack) service:in($service) error_source:* | extract \"<source_type>:\" from error_source | stats by(_time:5m, source_type) count() as errors"
         }
       ]
     },
@@ -634,7 +634,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(level:ERROR OR level:WARN) environment:$environment stack:~\"$stack\" service:~\"$service\" | stats by(error_code) count() as errors | sort by(errors) desc"
+          "expr": "(level:ERROR OR level:WARN) environment:$environment stack:in($stack) service:in($service) | stats by(error_code) count() as errors | sort by(errors) desc"
         }
       ]
     },
@@ -672,7 +672,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(level:ERROR OR level:WARN) environment:$environment stack:~\"$stack\" service:~\"$service\" | stats by(error_type) count() as errors | sort by(errors) desc"
+          "expr": "(level:ERROR OR level:WARN) environment:$environment stack:in($stack) service:in($service) | stats by(error_type) count() as errors | sort by(errors) desc"
         }
       ]
     },
@@ -702,7 +702,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(level:ERROR OR level:WARN) environment:$environment stack:~\"$stack\" service:~\"$service\" | stats by(error_message) count() as count | sort by(count) desc | limit 20"
+          "expr": "(level:ERROR OR level:WARN) environment:$environment stack:in($stack) service:in($service) | stats by(error_message) count() as count | sort by(count) desc | limit 20"
         }
       ]
     },
@@ -869,7 +869,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:dependency* environment:$environment stack:~\"$stack\" service:~\"$service\" | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50"
+          "expr": "error_source:dependency* environment:$environment stack:in($stack) service:in($service) | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50"
         }
       ]
     },
@@ -912,7 +912,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "level:ERROR environment:$environment stack:~\"$stack\" service:~\"$service\" | sort by (_time desc) | limit 200"
+          "expr": "level:ERROR environment:$environment stack:in($stack) service:in($service) | sort by (_time desc) | limit 200"
         }
       ]
     }
@@ -952,8 +952,7 @@
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "sort": 1,
-        "allValue": ".*"
+        "sort": 1
       },
       {
         "name": "stack",
@@ -971,8 +970,7 @@
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "sort": 1,
-        "allValue": ".*"
+        "sort": 1
       },
       {
         "name": "service",
@@ -990,8 +988,7 @@
         "refresh": 2,
         "includeAll": true,
         "multi": true,
-        "sort": 1,
-        "allValue": ".*"
+        "sort": 1
       }
     ]
   },
