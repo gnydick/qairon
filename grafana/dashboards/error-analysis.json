@@ -91,7 +91,10 @@
   "uid": "error-analysis",
   "title": "Error Analysis",
   "description": "Root cause investigation with error source breakdown and cascade chains",
-  "tags": ["social-platform", "sre"],
+  "tags": [
+    "social-platform",
+    "sre"
+  ],
   "style": "dark",
   "timezone": "browser",
   "editable": true,
@@ -103,7 +106,9 @@
       "icon": "external link",
       "includeVars": true,
       "keepTime": true,
-      "tags": ["social-platform"],
+      "tags": [
+        "social-platform"
+      ],
       "targetBlank": false,
       "title": "SRE Dashboards",
       "type": "dashboards"
@@ -112,7 +117,12 @@
   "panels": [
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 100,
       "title": "Error Stats",
       "type": "row"
@@ -121,23 +131,46 @@
       "id": 1,
       "title": "Total Errors",
       "type": "stat",
-      "gridPos": { "h": 3, "w": 4, "x": 0, "y": 1 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "fieldConfig": {
         "defaults": {
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 100 },
-              { "color": "red", "value": 1000 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
@@ -154,23 +187,46 @@
       "id": 2,
       "title": "Infra Errors",
       "type": "stat",
-      "gridPos": { "h": 3, "w": 4, "x": 4, "y": 1 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "fieldConfig": {
         "defaults": {
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 50 },
-              { "color": "red", "value": 500 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
@@ -187,23 +243,46 @@
       "id": 3,
       "title": "Cascade Errors",
       "type": "stat",
-      "gridPos": { "h": 3, "w": 4, "x": 8, "y": 1 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "fieldConfig": {
         "defaults": {
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 50 },
-              { "color": "red", "value": 500 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
@@ -220,23 +299,46 @@
       "id": 4,
       "title": "Server Self Errors",
       "type": "stat",
-      "gridPos": { "h": 3, "w": 4, "x": 12, "y": 1 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "fieldConfig": {
         "defaults": {
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 50 },
-              { "color": "red", "value": 500 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
@@ -253,23 +355,46 @@
       "id": 5,
       "title": "Client Errors",
       "type": "stat",
-      "gridPos": { "h": 3, "w": 4, "x": 16, "y": 1 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "fieldConfig": {
         "defaults": {
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 100 },
-              { "color": "red", "value": 1000 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto",
@@ -286,24 +411,47 @@
       "id": 6,
       "title": "Error Rate %",
       "type": "stat",
-      "gridPos": { "h": 3, "w": 4, "x": 20, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "${DS_VICTORIAMETRICS}" },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
@@ -319,7 +467,12 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 4 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
       "id": 101,
       "title": "Source Timeline",
       "type": "row"
@@ -328,40 +481,105 @@
       "id": 10,
       "title": "Errors by Source Over Time",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 5 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "fieldConfig": {
         "defaults": {
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
             "fillOpacity": 30,
-            "stacking": { "mode": "normal", "group": "A" },
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
             "showPoints": "never"
           }
         },
         "overrides": [
           {
-            "matcher": { "id": "byRegexp", "options": "/infrastructure/" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/infrastructure/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byRegexp", "options": "/dependency/" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/dependency/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byRegexp", "options": "/self/" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "yellow" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/self/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "yellow"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byRegexp", "options": "/deployment/" },
-            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "purple" } }]
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/deployment/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "purple"
+                }
+              }
+            ]
           }
         ]
       },
       "options": {
-        "tooltip": { "mode": "multi", "sort": "desc" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum", "max"] }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "sum",
+            "max"
+          ]
+        }
       },
       "targets": [
         {
@@ -372,7 +590,12 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
       "id": 102,
       "title": "Distributions",
       "type": "row"
@@ -381,12 +604,32 @@
       "id": 20,
       "title": "Error Codes",
       "type": "piechart",
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 14 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 14
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "pieType": "donut",
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["value"] }
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "value"
+          ]
+        }
       },
       "targets": [
         {
@@ -399,12 +642,32 @@
       "id": 21,
       "title": "Error Types",
       "type": "piechart",
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 14 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 14
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "pieType": "donut",
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["value"] }
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "value"
+          ]
+        }
       },
       "targets": [
         {
@@ -417,11 +680,24 @@
       "id": 22,
       "title": "Top Error Messages",
       "type": "table",
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 14 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 14
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "options": {
         "showHeader": true,
-        "sortBy": [{ "displayName": "count", "desc": true }]
+        "sortBy": [
+          {
+            "displayName": "count",
+            "desc": true
+          }
+        ]
       },
       "targets": [
         {
@@ -432,7 +708,12 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
       "id": 103,
       "title": "By Service",
       "type": "row"
@@ -441,24 +722,47 @@
       "id": 30,
       "title": "Error Rate by Service",
       "type": "bargauge",
-      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 23 },
-      "datasource": { "type": "prometheus", "uid": "${DS_VICTORIAMETRICS}" },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "horizontal",
         "displayMode": "gradient",
         "showUnfilled": true
@@ -475,23 +779,46 @@
       "id": 31,
       "title": "Error Volume by Service",
       "type": "bargauge",
-      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 23 },
-      "datasource": { "type": "prometheus", "uid": "${DS_VICTORIAMETRICS}" },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_VICTORIAMETRICS}"
+      },
       "fieldConfig": {
         "defaults": {
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 100 },
-              { "color": "red", "value": 1000 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
             ]
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "orientation": "horizontal",
         "displayMode": "gradient",
         "showUnfilled": true
@@ -506,20 +833,38 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 33 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
       "id": 104,
       "title": "Cascade Chains",
       "type": "row"
     },
     {
       "id": 40,
-      "title": "Failed Dependency → Affected Service",
+      "title": "Failed Dependency \u2192 Affected Service",
       "type": "table",
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 34 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "options": {
         "showHeader": true,
-        "sortBy": [{ "displayName": "errors", "desc": true }]
+        "sortBy": [
+          {
+            "displayName": "errors",
+            "desc": true
+          }
+        ]
       },
       "targets": [
         {
@@ -530,7 +875,12 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 44 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 44
+      },
       "id": 105,
       "title": "Error Logs",
       "type": "row"
@@ -539,8 +889,16 @@
       "id": 50,
       "title": "Error Log Stream",
       "type": "logs",
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 45 },
-      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "${DS_VICTORIALOGS}" },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 45
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
       "options": {
         "showTime": true,
         "showLabels": true,
@@ -564,9 +922,15 @@
       {
         "name": "environment",
         "type": "query",
-        "datasource": { "type": "prometheus", "uid": "${DS_VICTORIAMETRICS}" },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_VICTORIAMETRICS}"
+        },
         "query": "label_values(request_duration_ms, environment)",
-        "current": { "text": "prod", "value": "prod" },
+        "current": {
+          "text": "prod",
+          "value": "prod"
+        },
         "refresh": 2,
         "includeAll": false,
         "multi": false,
@@ -575,9 +939,16 @@
       {
         "name": "region",
         "type": "query",
-        "datasource": { "type": "prometheus", "uid": "${DS_VICTORIAMETRICS}" },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_VICTORIAMETRICS}"
+        },
         "query": "label_values(request_duration_ms{environment=\"$environment\"}, region)",
-        "current": {},
+        "current": {
+          "text": "All",
+          "value": "$__all",
+          "selected": true
+        },
         "refresh": 2,
         "includeAll": true,
         "multi": true,
@@ -587,9 +958,16 @@
       {
         "name": "stack",
         "type": "query",
-        "datasource": { "type": "prometheus", "uid": "${DS_VICTORIAMETRICS}" },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_VICTORIAMETRICS}"
+        },
         "query": "label_values(request_duration_ms{environment=\"$environment\"}, stack)",
-        "current": {},
+        "current": {
+          "text": "All",
+          "value": "$__all",
+          "selected": true
+        },
         "refresh": 2,
         "includeAll": true,
         "multi": true,
@@ -599,9 +977,16 @@
       {
         "name": "service",
         "type": "query",
-        "datasource": { "type": "prometheus", "uid": "${DS_VICTORIAMETRICS}" },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_VICTORIAMETRICS}"
+        },
         "query": "label_values(request_duration_ms{environment=\"$environment\", stack=~\"$stack\"}, service)",
-        "current": {},
+        "current": {
+          "text": "All",
+          "value": "$__all",
+          "selected": true
+        },
         "refresh": 2,
         "includeAll": true,
         "multi": true,
@@ -610,7 +995,10 @@
       }
     ]
   },
-  "time": { "from": "now-6h", "to": "now" },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
   "timepicker": {},
   "refresh": "",
   "schemaVersion": 39,
