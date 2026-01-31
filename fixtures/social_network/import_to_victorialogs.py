@@ -68,13 +68,13 @@ def transform_log(log: Dict) -> Dict:
         # Atomic fields (no hierarchy)
         vl_log["environment"] = environment
         vl_log["account"] = account
+        vl_log["region"] = region
         vl_log["target_type"] = target_type
         vl_log["application"] = application
         vl_log["tag"] = tag
 
         # Hierarchical fields using composite values (no _id suffix)
         vl_log["provider"] = f"{environment}:{provider}:{account}"
-        vl_log["region"] = f"{environment}:{provider}:{account}:{region}"
         vl_log["partition"] = f"{environment}:{provider}:{account}:{region}:{partition}"
         vl_log["deployment_target"] = f"{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}"
         vl_log["stack"] = f"{application}:{stack}"

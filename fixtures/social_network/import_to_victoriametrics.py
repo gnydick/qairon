@@ -35,13 +35,14 @@ def transform_metric(line: dict) -> dict:
             # Atomic fields (no hierarchy)
             metric_labels["environment"] = environment
             metric_labels["account"] = account
+            metric_labels["region"] = region
             metric_labels["target_type"] = target_type
             metric_labels["application"] = application
             metric_labels["tag"] = tag
 
             # Hierarchical fields using composite values (no _id suffix)
             metric_labels["provider"] = f"{environment}:{provider}:{account}"
-            metric_labels["region"] = f"{environment}:{provider}:{account}:{region}"
+
             metric_labels["partition"] = f"{environment}:{provider}:{account}:{region}:{partition}"
             metric_labels["deployment_target"] = f"{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}"
             metric_labels["stack"] = f"{application}:{stack}"
