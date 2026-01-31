@@ -101,7 +101,7 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
       },
       "options": {
         "showTime": true,
@@ -118,7 +118,11 @@
           "refId": "A",
           "expr": "(action:deployment_start OR action:deployment_complete) environment:$environment stack:in($stack) service:in($service) | sort by (_time desc) | limit 100"
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
     },
     {
       "collapsed": false,
@@ -144,7 +148,7 @@
       },
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_VICTORIAMETRICS}"
+        "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
@@ -214,7 +218,7 @@
       },
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_VICTORIAMETRICS}"
+        "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
@@ -279,7 +283,7 @@
       },
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_VICTORIAMETRICS}"
+        "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
@@ -330,7 +334,7 @@
       },
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_VICTORIAMETRICS}"
+        "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
@@ -389,7 +393,7 @@
       },
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_VICTORIAMETRICS}"
+        "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
@@ -454,7 +458,7 @@
       },
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_VICTORIAMETRICS}"
+        "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
@@ -514,7 +518,7 @@
       },
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_VICTORIAMETRICS}"
+        "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
@@ -562,7 +566,7 @@
       },
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_VICTORIAMETRICS}"
+        "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
@@ -606,7 +610,7 @@
         "type": "query",
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_VICTORIAMETRICS}"
+          "uid": "ffb8jnum7rx8ge"
         },
         "query": "label_values(request_duration_ms, environment)",
         "current": {
@@ -623,7 +627,7 @@
         "type": "query",
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_VICTORIAMETRICS}"
+          "uid": "ffb8jnum7rx8ge"
         },
         "query": "label_values(request_duration_ms{environment=\"$environment\"}, region)",
         "current": {
@@ -641,7 +645,7 @@
         "type": "query",
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_VICTORIAMETRICS}"
+          "uid": "ffb8jnum7rx8ge"
         },
         "query": "label_values(request_duration_ms{environment=\"$environment\"}, stack)",
         "current": {
@@ -659,7 +663,7 @@
         "type": "query",
         "datasource": {
           "type": "prometheus",
-          "uid": "${DS_VICTORIAMETRICS}"
+          "uid": "ffb8jnum7rx8ge"
         },
         "query": "label_values(request_duration_ms{environment=\"$environment\", stack=~\"$stack\"}, service)",
         "current": {
@@ -675,8 +679,8 @@
     ]
   },
   "time": {
-    "from": "now-30d",
-    "to": "now"
+    "from": "now-30d-4w",
+    "to": "now-4w"
   },
   "timepicker": {},
   "refresh": "",

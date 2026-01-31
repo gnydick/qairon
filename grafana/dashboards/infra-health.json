@@ -56,7 +56,7 @@
   "id": null,
   "uid": "infra-health",
   "title": "Infrastructure Health",
-  "description": "Shared infrastructure monitoring and cascade visualization",
+  "description": "Upstream error sources and cascade visualization",
   "tags": [
     "social-platform",
     "sre"
@@ -90,12 +90,12 @@
         "y": 0
       },
       "id": 100,
-      "title": "Infrastructure Stats",
+      "title": "Upstream Error Stats",
       "type": "row"
     },
     {
       "id": 1,
-      "title": "Total Infra Errors",
+      "title": "Total Upstream Errors",
       "type": "stat",
       "gridPos": {
         "h": 3,
@@ -105,7 +105,7 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
       },
       "fieldConfig": {
         "defaults": {
@@ -145,13 +145,15 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:infrastructure* environment:$environment | stats count() as total"
+          "expr": "level:ERROR error_source:* environment:$environment | stats count() as total",
+          "queryType": "stats",
+          "editorMode": "code"
         }
       ]
     },
     {
       "id": 2,
-      "title": "Total Cascade Errors",
+      "title": "Distinct Upstream Sources",
       "type": "stat",
       "gridPos": {
         "h": 3,
@@ -161,63 +163,7 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 100
-              },
-              {
-                "color": "red",
-                "value": 1000
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "textMode": "auto"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "error_source:dependency* environment:$environment | stats count() as total"
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "title": "Affected Services",
-      "type": "stat",
-      "gridPos": {
-        "h": 3,
-        "w": 8,
-        "x": 16,
-        "y": 1
-      },
-      "datasource": {
-        "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
       },
       "fieldConfig": {
         "defaults": {
@@ -257,7 +203,67 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:infrastructure* environment:$environment | stats by(service) count() | stats count() as affected_services"
+          "expr": "level:ERROR error_source:* environment:$environment | stats by(error_source) count() | stats count() as total",
+          "queryType": "stats",
+          "editorMode": "code"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Affected Services",
+      "type": "stat",
+      "gridPos": {
+        "h": 3,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 15
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "level:ERROR error_source:* environment:$environment | stats by(service) count() | stats count() as affected_services",
+          "queryType": "stats",
+          "editorMode": "code"
         }
       ]
     },
@@ -275,7 +281,7 @@
     },
     {
       "id": 10,
-      "title": "Infrastructure Errors by Component Over Time",
+      "title": "Upstream Errors Over Time",
       "type": "timeseries",
       "gridPos": {
         "h": 10,
@@ -285,7 +291,7 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
       },
       "fieldConfig": {
         "defaults": {
@@ -319,7 +325,9 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "environment:$environment error_source:in($component) | stats by(_time:5m, error_source) count() as errors"
+          "expr": "level:ERROR error_source:* environment:$environment | stats by(_time:5m, error_source) count() as errors",
+          "queryType": "statsRange",
+          "editorMode": "code"
         }
       ]
     },
@@ -332,12 +340,12 @@
         "y": 15
       },
       "id": 102,
-      "title": "Per-Component",
+      "title": "Per-Source Breakdown",
       "type": "row"
     },
     {
       "id": 20,
-      "title": "Error Count by Component",
+      "title": "Error Count by Upstream Source",
       "type": "bargauge",
       "gridPos": {
         "h": 10,
@@ -347,7 +355,7 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
       },
       "fieldConfig": {
         "defaults": {
@@ -386,13 +394,15 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:infrastructure* environment:$environment | stats by(error_source) count() as errors | sort by(errors) desc"
+          "expr": "level:ERROR error_source:* environment:$environment | stats by(error_source) count() as errors | sort by(errors) desc",
+          "queryType": "statsRange",
+          "editorMode": "code"
         }
       ]
     },
     {
       "id": 21,
-      "title": "Affected Services per Component",
+      "title": "Upstream Source \u2192 Affected Service",
       "type": "table",
       "gridPos": {
         "h": 10,
@@ -402,7 +412,11 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       },
       "options": {
         "showHeader": true,
@@ -416,7 +430,9 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "environment:$environment error_source:in($component) | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50"
+          "expr": "level:ERROR error_source:* environment:$environment | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50",
+          "queryType": "statsRange",
+          "editorMode": "code"
         }
       ]
     },
@@ -434,7 +450,7 @@
     },
     {
       "id": 30,
-      "title": "Cascade Errors Over Time",
+      "title": "Cascade Errors Over Time by Source",
       "type": "timeseries",
       "gridPos": {
         "h": 10,
@@ -444,7 +460,7 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
       },
       "fieldConfig": {
         "defaults": {
@@ -477,7 +493,9 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:dependency* environment:$environment | stats by(_time:5m, error_source) count() as errors"
+          "expr": "level:ERROR error_source:* environment:$environment | stats by(_time:5m, error_source) count() as errors",
+          "queryType": "statsRange",
+          "editorMode": "code"
         }
       ]
     },
@@ -493,7 +511,7 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
       },
       "fieldConfig": {
         "defaults": {
@@ -526,7 +544,9 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "error_source:dependency* environment:$environment | stats by(_time:5m, service) count() as errors"
+          "expr": "level:ERROR error_source:* environment:$environment | stats by(_time:5m, service) count() as errors",
+          "queryType": "statsRange",
+          "editorMode": "code"
         }
       ]
     },
@@ -544,7 +564,7 @@
     },
     {
       "id": 40,
-      "title": "Error Logs for Selected Component",
+      "title": "Upstream Error Logs",
       "type": "logs",
       "gridPos": {
         "h": 10,
@@ -554,7 +574,11 @@
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
-        "uid": "${DS_VICTORIALOGS}"
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
       },
       "options": {
         "showTime": true,
@@ -569,7 +593,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "environment:$environment error_source:in($component) | sort by (_time desc) | limit 200"
+          "expr": "level:ERROR error_source:* environment:$environment | sort by (_time desc) | limit 200"
         }
       ]
     }
@@ -603,91 +627,12 @@
         "query": "prod,stg,dev",
         "includeAll": false,
         "multi": false
-      },
-      {
-        "name": "component",
-        "type": "custom",
-        "current": {
-          "text": "All",
-          "value": "$__all",
-          "selected": true
-        },
-        "options": [
-          {
-            "text": "aurora_primary",
-            "value": "infrastructure:aurora_primary",
-            "selected": true
-          },
-          {
-            "text": "dynamodb_throttle",
-            "value": "infrastructure:dynamodb_throttle",
-            "selected": false
-          },
-          {
-            "text": "neptune_timeout",
-            "value": "infrastructure:neptune_timeout",
-            "selected": false
-          },
-          {
-            "text": "redis_session",
-            "value": "infrastructure:redis_session",
-            "selected": false
-          },
-          {
-            "text": "redis_feed",
-            "value": "infrastructure:redis_feed",
-            "selected": false
-          },
-          {
-            "text": "redis_content",
-            "value": "infrastructure:redis_content",
-            "selected": false
-          },
-          {
-            "text": "redis_messaging",
-            "value": "infrastructure:redis_messaging",
-            "selected": false
-          },
-          {
-            "text": "kinesis_feed",
-            "value": "infrastructure:kinesis_feed",
-            "selected": false
-          },
-          {
-            "text": "media_processing",
-            "value": "infrastructure:media_processing",
-            "selected": false
-          },
-          {
-            "text": "opensearch_cluster",
-            "value": "infrastructure:opensearch_cluster",
-            "selected": false
-          },
-          {
-            "text": "auth_library",
-            "value": "infrastructure:auth_library",
-            "selected": false
-          },
-          {
-            "text": "serialization_bug",
-            "value": "infrastructure:serialization_bug",
-            "selected": false
-          },
-          {
-            "text": "rate_limiter_shared",
-            "value": "infrastructure:rate_limiter_shared",
-            "selected": false
-          }
-        ],
-        "query": "infrastructure:aurora_primary,infrastructure:dynamodb_throttle,infrastructure:neptune_timeout,infrastructure:redis_session,infrastructure:redis_feed,infrastructure:redis_content,infrastructure:redis_messaging,infrastructure:kinesis_feed,infrastructure:media_processing,infrastructure:opensearch_cluster,infrastructure:auth_library,infrastructure:serialization_bug,infrastructure:rate_limiter_shared",
-        "includeAll": true,
-        "multi": true
       }
     ]
   },
   "time": {
-    "from": "now-24h",
-    "to": "now"
+    "from": "now-24h-4w",
+    "to": "now-4w"
   },
   "timepicker": {},
   "refresh": "",

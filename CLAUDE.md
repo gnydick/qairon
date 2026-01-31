@@ -7,6 +7,15 @@
 - Native hardware with 64 threads available
 - Use `--workers 32-48` for parallel operations (leave headroom for system)
 
+## Grafana Dashboards
+- **Never hand-write dashboard JSON from scratch.** Always export from Grafana after editing in the UI, then save the exported JSON. Grafana expects the full panel schema (`pluginVersion`, `mappings`, full `options`/`fieldConfig` structure) to render correctly. Minimal hand-written JSON causes panels to fail to load.
+- VictoriaLogs datasource plugin query types:
+  - `"queryType": "stats"` — single aggregate value (`/select/logsql/stats_query`). Use for **stat** and **gauge** panels that show a single number.
+  - `"queryType": "statsRange"` — time-bucketed values (`/select/logsql/stats_query_range`). Use for **time series**, **piechart**, **bar gauge**, and **table** panels.
+  - `"queryType": "instant"` — raw log query (`/select/logsql/query`). Use for **logs** and **table** panels showing raw log lines.
+  - Using the wrong query type causes stat panels to show incorrect values (e.g., `statsRange` in a stat panel shows only the last time bucket's count instead of the total).
+- Dashboard JSON files use hardcoded datasource UIDs from the local Grafana instance (e.g., `"uid": "ffb8kdooypz40e"`). These are not portable across instances.
+
 ---
 
 # Project Context: Qairon
