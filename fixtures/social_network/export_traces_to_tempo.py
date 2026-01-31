@@ -18,6 +18,7 @@ import urllib.request
 import urllib.error
 import time
 from datetime import datetime
+from qairon_ids import split_release_id
 
 
 def parse_timestamp(ts_str: str) -> int:
@@ -28,18 +29,14 @@ def parse_timestamp(ts_str: str) -> int:
 
 def get_composite_ids(span: Dict) -> tuple:
     """Extract service_id, stack_id, and release_num from span data."""
+    release_id = span.get('release_id', '')
+    if release_id:
+        ids = split_release_id(release_id)
+        return ids["service_id"], ids["stack_id"], ids["stack"], ids["service"], ids["release"]
+
     stack = span.get('stack', 'unknown')
     service = span.get('service', 'unknown')
-
-    # Try to get application and release_num from release_id
-    release_id = span.get('release_id', '')
-    parts = release_id.split(':')
-    application = parts[7] if len(parts) > 7 else 'social'
-    release_num = parts[11] if len(parts) > 11 else ''
-
-    stack_id = f"{application}:{stack}"
-    service_id = f"{application}:{stack}:{service}"
-    return service_id, stack_id, stack, service, release_num
+    return f"social:{stack}:{service}", f"social:{stack}", stack, service, ''
 
 
 def logs_to_otlp_traces(logs: List[Dict]) -> Dict:

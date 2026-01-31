@@ -18,13 +18,11 @@ from threading import Thread, Lock
 import urllib.request
 import urllib.error
 import time
+from qairon_ids import split_release_id
 
 
 def transform_log(log: Dict) -> Dict:
     """Transform our log format to VictoriaLogs format."""
-    release_id = log.get("release_id", "")
-    parts = release_id.split(":")
-
     vl_log = {
         "_time": log["timestamp"],
         "_msg": log["message"],
@@ -62,26 +60,27 @@ def transform_log(log: Dict) -> Dict:
     if log.get("parent_span_id"):
         vl_log["parent_span_id"] = log["parent_span_id"]
 
-    if len(parts) >= 12:
-        environment, provider, account, region, partition, target_type, target, application, stack, service, tag, release = parts[:12]
+    release_id = log.get("release_id", "")
+    if release_id:
+        ids = split_release_id(release_id)
 
-        # Atomic fields (no hierarchy)
-        vl_log["environment"] = environment
-        vl_log["account"] = account
-        vl_log["region"] = region
-        vl_log["target_type"] = target_type
-        vl_log["application"] = application
-        vl_log["tag"] = tag
+        # Atomic fields
+        vl_log["environment"] = ids["environment"]
+        vl_log["account"] = ids["account"]
+        vl_log["region"] = ids["region"]
+        vl_log["target_type"] = ids["target_type"]
+        vl_log["application"] = ids["application"]
+        vl_log["tag"] = ids["tag"]
 
-        # Hierarchical fields using composite values (no _id suffix)
-        vl_log["provider"] = f"{environment}:{provider}:{account}"
-        vl_log["partition"] = f"{environment}:{provider}:{account}:{region}:{partition}"
-        vl_log["deployment_target"] = f"{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}"
-        vl_log["stack"] = f"{application}:{stack}"
-        vl_log["service"] = f"{application}:{stack}:{service}"
-        vl_log["deployment"] = release_id.rsplit(":", 1)[0]
-        vl_log["release"] = release_id
-        vl_log["release_num"] = release
+        # Composite fields
+        vl_log["provider"] = ids["provider_id"]
+        vl_log["partition"] = ids["partition_id"]
+        vl_log["deployment_target"] = ids["target_id"]
+        vl_log["stack"] = ids["stack_id"]
+        vl_log["service"] = ids["service_id"]
+        vl_log["deployment"] = ids["deployment_id"]
+        vl_log["release"] = ids["release_id"]
+        vl_log["release_num"] = ids["release"]
 
     return vl_log
 

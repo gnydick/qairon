@@ -18,6 +18,7 @@ from pathlib import Path
 from queue import Queue
 from threading import Thread, Lock
 import time
+from qairon_ids import split_release_id
 
 
 def transform_metric(line: dict) -> dict:
@@ -27,29 +28,25 @@ def transform_metric(line: dict) -> dict:
 
     if "release_id" in metric_labels:
         release_id = metric_labels["release_id"]
-        parts = release_id.split(":")
+        ids = split_release_id(release_id)
 
-        if len(parts) >= 12:
-            environment, provider, account, region, partition, target_type, target, application, stack, service, tag, release = parts[:12]
+        # Atomic fields
+        metric_labels["environment"] = ids["environment"]
+        metric_labels["account"] = ids["account"]
+        metric_labels["region"] = ids["region"]
+        metric_labels["target_type"] = ids["target_type"]
+        metric_labels["application"] = ids["application"]
+        metric_labels["tag"] = ids["tag"]
 
-            # Atomic fields (no hierarchy)
-            metric_labels["environment"] = environment
-            metric_labels["account"] = account
-            metric_labels["region"] = region
-            metric_labels["target_type"] = target_type
-            metric_labels["application"] = application
-            metric_labels["tag"] = tag
-
-            # Hierarchical fields using composite values (no _id suffix)
-            metric_labels["provider"] = f"{environment}:{provider}:{account}"
-
-            metric_labels["partition"] = f"{environment}:{provider}:{account}:{region}:{partition}"
-            metric_labels["deployment_target"] = f"{environment}:{provider}:{account}:{region}:{partition}:{target_type}:{target}"
-            metric_labels["stack"] = f"{application}:{stack}"
-            metric_labels["service"] = f"{application}:{stack}:{service}"
-            metric_labels["deployment"] = release_id.rsplit(":", 1)[0]
-            metric_labels["release"] = release_id
-            metric_labels["release_num"] = release
+        # Composite fields
+        metric_labels["provider"] = ids["provider_id"]
+        metric_labels["partition"] = ids["partition_id"]
+        metric_labels["deployment_target"] = ids["target_id"]
+        metric_labels["stack"] = ids["stack_id"]
+        metric_labels["service"] = ids["service_id"]
+        metric_labels["deployment"] = ids["deployment_id"]
+        metric_labels["release"] = ids["release_id"]
+        metric_labels["release_num"] = ids["release"]
 
     return {
         "metric": metric_labels,

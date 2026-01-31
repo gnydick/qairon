@@ -20,6 +20,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
+from qairon_ids import validate_id, deployment_id_from_release_id, split_release_id
 
 
 # =============================================================================
@@ -614,124 +615,6 @@ SERVICE_DEPENDENCIES: Dict[str, List[str]] = {
     "social:suggestions": ["social:connections"],
 }
 
-# Hidden/undocumented dependencies - these represent shared infrastructure
-# that can cause correlated failures. Used for "discoverable" errors.
-HIDDEN_DEPENDENCIES: Dict[str, Dict] = {
-    # Shared database clusters
-    "aurora_primary": {
-        "services": ["user:profile", "user:privacy", "user:account", "content:posts",
-                     "content:comments", "content:shares", "ads:campaigns",
-                     "payments:subscriptions", "payments:wallet", "payments:payouts",
-                     "moderation:content-review", "moderation:reports", "moderation:trust-safety"],
-        "failure_rate": 0.001,  # 0.1% of requests during incident
-        "error_type": "database",
-        "error_codes": ["503", "504"],
-        "error_message": "Database connection pool exhausted",
-    },
-    "dynamodb_throttle": {
-        "services": ["user:identity", "social:blocks", "social:contacts", "content:stories",
-                     "content:reactions", "content:hashtags", "feed:timeline",
-                     "messaging:dm", "messaging:groups", "messaging:presence",
-                     "notifications:inapp", "notifications:preferences",
-                     "discovery:trending", "discovery:interests",
-                     "platform:feature-flags", "platform:ab-testing"],
-        "failure_rate": 0.002,
-        "error_type": "database",
-        "error_codes": ["429", "503"],
-        "error_message": "DynamoDB throughput exceeded",
-    },
-    "neptune_timeout": {
-        "services": ["social:connections", "social:blocks", "social:suggestions"],
-        "failure_rate": 0.003,
-        "error_type": "database",
-        "error_codes": ["504"],
-        "error_message": "Graph query timeout",
-    },
-    "opensearch_cluster": {
-        "services": ["content:hashtags", "search:indexer", "search:users",
-                     "search:content", "search:hashtags", "moderation:trust-safety"],
-        "failure_rate": 0.002,
-        "error_type": "search",
-        "error_codes": ["503", "504"],
-        "error_message": "OpenSearch cluster unavailable",
-    },
-    # Shared cache clusters
-    "redis_session": {
-        "services": ["user:identity", "platform:rate-limiter"],
-        "failure_rate": 0.001,
-        "error_type": "cache",
-        "error_codes": ["503"],
-        "error_message": "Redis session cluster connection failed",
-    },
-    "redis_feed": {
-        "services": ["feed:timeline", "feed:ranking", "feed:fanout"],
-        "failure_rate": 0.002,
-        "error_type": "cache",
-        "error_codes": ["503"],
-        "error_message": "Redis feed cache unavailable",
-    },
-    "redis_content": {
-        "services": ["content:posts", "content:comments", "content:reactions", "content:stories"],
-        "failure_rate": 0.001,
-        "error_type": "cache",
-        "error_codes": ["503"],
-        "error_message": "Redis content cache connection timeout",
-    },
-    "redis_messaging": {
-        "services": ["messaging:dm", "messaging:groups", "messaging:realtime", "messaging:presence"],
-        "failure_rate": 0.001,
-        "error_type": "cache",
-        "error_codes": ["503"],
-        "error_message": "Redis messaging cluster failover in progress",
-    },
-    # Shared processing queues
-    "media_processing": {
-        "services": ["content:media", "content:stories", "creator:studio", "live:vod"],
-        "failure_rate": 0.003,
-        "error_type": "queue",
-        "error_codes": ["503", "504"],
-        "error_message": "Media processing queue backlogged",
-    },
-    "kinesis_feed": {
-        "services": ["feed:timeline", "feed:fanout", "feed:aggregation", "discovery:trending"],
-        "failure_rate": 0.001,
-        "error_type": "queue",
-        "error_codes": ["503"],
-        "error_message": "Kinesis shard iterator expired",
-    },
-    # Shared libraries/common code
-    "auth_library": {
-        "services": ["user:identity", "user:profile", "user:privacy", "user:account",
-                     "content:posts", "messaging:dm", "payments:processor"],
-        "failure_rate": 0.0005,
-        "error_type": "internal",
-        "error_codes": ["500"],
-        "error_message": "JWT validation failed - library version mismatch",
-    },
-    "serialization_bug": {
-        "services": ["content:posts", "content:comments", "messaging:dm", "messaging:groups"],
-        "failure_rate": 0.0003,
-        "error_type": "internal",
-        "error_codes": ["500"],
-        "error_message": "Unexpected null in response serialization",
-    },
-    # Rate limiting
-    "rate_limiter_shared": {
-        "services": ["platform:api-gateway", "platform:rate-limiter"],
-        "failure_rate": 0.004,
-        "error_type": "rate_limit",
-        "error_codes": ["429"],
-        "error_message": "Global rate limit exceeded",
-    },
-}
-
-# Build reverse lookup: service -> hidden dependencies it's part of
-SERVICE_HIDDEN_DEPS: Dict[str, List[str]] = {}
-for dep_name, dep_info in HIDDEN_DEPENDENCIES.items():
-    for service in dep_info["services"]:
-        if service not in SERVICE_HIDDEN_DEPS:
-            SERVICE_HIDDEN_DEPS[service] = []
-        SERVICE_HIDDEN_DEPS[service].append(dep_name)
 
 
 # =============================================================================
@@ -800,7 +683,7 @@ class LogEntry:
     error_code: Optional[str] = None
     error_message: Optional[str] = None
     # Error source tracking for dependency analysis
-    error_source: Optional[str] = None  # "self", "dependency:<service>", "infrastructure:<component>"
+    error_source: Optional[str] = None  # deployment_id of the failed upstream, or None for originating errors
     error_type: Optional[str] = None    # "client", "server", "database", "cache", "queue", "internal", "rate_limit"
     upstream_request_id: Optional[str] = None  # Request ID of the failed dependency call
 
@@ -818,10 +701,6 @@ def generate_span_id(rng: random.Random) -> str:
 def generate_child_spans_for_event(
     parent_event: dict,
     rng: random.Random,
-    incidents: List,
-    get_active_incident_func,
-    check_hidden_dep_func,
-    check_dep_failure_func,
     select_release_func,
     error_codes: dict,
     error_messages: dict,
@@ -832,13 +711,13 @@ def generate_child_spans_for_event(
     For each dependency in SERVICE_DEPENDENCIES, generates a child span event
     with the same trace_id but a new span_id, linked via parent_span_id.
 
+    Error propagation follows stack trace semantics:
+    - A leaf child that fails has error_source=None (it's the originator)
+    - A parent that fails because its child failed has error_source=child's deployment_id
+
     Args:
         parent_event: The root/parent event dict
         rng: Random number generator
-        incidents: List of infrastructure incidents
-        get_active_incident_func: Function to check active incidents
-        check_hidden_dep_func: Function to check hidden dependency failures
-        check_dep_failure_func: Function to check dependency cascade failures
         select_release_func: Function to select a release for a service
         error_codes: Dict of error codes by type
         error_messages: Dict of error messages by code
@@ -858,20 +737,15 @@ def generate_child_spans_for_event(
     # Calculate parent latency for timing child spans
     parent_latency = parent_event['action_base_latency_ms'] * parent_event['latency_multiplier']
 
-    # Distribute child spans within parent's duration
-    # Children start after parent starts and complete before parent completes
-    num_deps = len(dependencies)
-
     for i, dep_key in enumerate(dependencies):
         dep_stack, dep_service = dep_key.split(':')
 
         # Child timing: stagger starts, each takes portion of parent time
-        child_start_offset_ms = (i + 1) * (parent_latency * 0.05)  # Stagger by 5% of parent latency
-        child_duration_ratio = rng.uniform(0.1, 0.3)  # Child takes 10-30% of parent duration
+        child_start_offset_ms = (i + 1) * (parent_latency * 0.05)
+        child_duration_ratio = rng.uniform(0.1, 0.3)
         child_latency = max(1.0, parent_latency * child_duration_ratio)
 
-        # Ensure child completes before parent (with buffer)
-        max_child_end = parent_latency * 0.9  # Child must end by 90% of parent duration
+        max_child_end = parent_latency * 0.9
         if child_start_offset_ms + child_latency > max_child_end:
             child_latency = max(1.0, max_child_end - child_start_offset_ms)
 
@@ -879,51 +753,38 @@ def generate_child_spans_for_event(
         child_span_id = generate_span_id(rng)
         child_request_id = uuid.uuid4().hex
 
+        # Select release for this dependency service
+        child_release_result = select_release_func(dep_stack, dep_service, child_timestamp)
+        child_release_id = child_release_result[0] if isinstance(child_release_result, tuple) else child_release_result
+
         # Determine if child span has an error
-        # Use simplified error checking for child spans
         child_error_info = None
         child_success = True
 
-        # Check for infrastructure incident affecting this dependency
-        incident = get_active_incident_func(dep_key, child_timestamp)
-        if incident:
-            if rng.random() < incident.error_info["failure_rate"]:
-                error_code = rng.choice(incident.error_info["error_codes"])
-                child_error_info = {
-                    "error_source": f"infrastructure:{incident.dependency_name}",
-                    "error_type": incident.error_info["error_type"],
-                    "error_code": error_code,
-                    "error_message": incident.error_info["error_message"],
-                }
-                child_success = False
+        # If parent failed due to this dependency (error_source is this child's deployment_id),
+        # or randomly based on error rate, the child fails as the originator (error_source=None)
+        parent_error_source = (parent_event.get('error_info') or {}).get('error_source', '')
+        child_deployment_id = deployment_id_from_release_id(child_release_id)
+        parent_blames_child = parent_error_source == child_deployment_id
 
-        # If parent failed due to this dependency, child definitely fails
-        if not child_success or (parent_event.get('error_info') and
-            parent_event['error_info'].get('error_source', '').endswith(dep_key)):
-            if child_error_info is None:
-                # Generate a self-error for the child
-                error_type = rng.choice(["server", "client"])
-                error_code = rng.choice(error_codes.get(error_type, ["500"]))
-                child_error_info = {
-                    "error_source": "self",
-                    "error_type": error_type,
-                    "error_code": error_code,
-                    "error_message": error_messages.get(error_code, "Unknown error"),
-                }
-                child_success = False
+        if parent_blames_child:
+            # Child is the originator — no error_source (leaf of the stack trace)
+            error_type = rng.choice(["server"])
+            error_code = rng.choice(error_codes.get(error_type, ["500"]))
+            child_error_info = {
+                "error_source": None,
+                "error_type": error_type,
+                "error_code": error_code,
+                "error_message": error_messages.get(error_code, "Unknown error"),
+            }
+            child_success = False
 
-        # Select release for this dependency service
-        child_release_result = select_release_func(dep_stack, dep_service, child_timestamp)
-        # select_release_func returns (release_id, env, region) tuple
-        child_release_id = child_release_result[0] if isinstance(child_release_result, tuple) else child_release_result
-
-        # Create child span event
         child_event = {
             "user_id": parent_event["user_id"],
             "persona_name": parent_event["persona_name"],
             "action_service": dep_service,
             "action_stack": dep_stack,
-            "action_action": f"handle_{parent_event['action_action']}",  # Internal handler action
+            "action_action": f"handle_{parent_event['action_action']}",
             "action_category": "internal",
             "action_base_latency_ms": child_latency,
             "action_latency_stddev_ms": child_latency * 0.1,
@@ -933,7 +794,7 @@ def generate_child_spans_for_event(
             "action_has_object_id": parent_event.get("action_has_object_id", False),
             "action_object_type": parent_event.get("action_object_type"),
             "action_is_write": parent_event.get("action_is_write", False),
-            "latency_multiplier": 1.0,  # Child spans don't get persona multiplier
+            "latency_multiplier": 1.0,
             "timestamp": child_timestamp,
             "request_id": child_request_id,
             "trace_id": parent_event["trace_id"],
@@ -971,13 +832,51 @@ class MetricEntry:
 
 
 @dataclass
-class InfrastructureIncident:
-    """Represents a time window when a hidden dependency is failing"""
-    dependency_name: str
+class ServiceIncident:
+    """A time window when a service is degraded, causing elevated error rates.
+
+    Incidents target real services from SERVICE_DEPENDENCIES. During an incident,
+    the service has an elevated failure rate, and any parent that calls it sees
+    errors with error_source = the failed child's deployment_id.
+    """
+    service_key: str        # "stack:service" — the affected service
     start_time: datetime
     end_time: datetime
-    affected_services: List[str]
-    error_info: Dict
+    failure_rate: float     # probability of failure per request during incident
+    error_codes: List[str]  # e.g. ["500", "503"]
+    error_type: str         # "server", "database", "cache", etc.
+    error_message: str      # human-readable description
+
+
+# Services that can have incidents — these are the dependency targets from
+# SERVICE_DEPENDENCIES (services that other services call). When these fail,
+# failures cascade to their callers via the trace/span tree.
+INCIDENT_ELIGIBLE_SERVICES: Dict[str, Dict] = {}
+_seen = set()
+for _deps in SERVICE_DEPENDENCIES.values():
+    for _dep in _deps:
+        if _dep not in _seen:
+            _seen.add(_dep)
+            _stack, _svc = _dep.split(':')
+            # Assign plausible error characteristics based on service type
+            if _svc in ('posts', 'media', 'comments', 'reactions', 'shares', 'stories', 'hashtags'):
+                cfg = {"failure_rate": 0.002, "error_type": "server", "error_codes": ["500", "503"], "error_message": f"{_svc} service degraded"}
+            elif _svc in ('connections', 'blocks', 'suggestions', 'contacts'):
+                cfg = {"failure_rate": 0.003, "error_type": "database", "error_codes": ["503", "504"], "error_message": f"{_svc} query timeout"}
+            elif _svc in ('timeline', 'ranking', 'fanout', 'aggregation'):
+                cfg = {"failure_rate": 0.002, "error_type": "cache", "error_codes": ["503"], "error_message": f"{_svc} cache unavailable"}
+            elif _svc in ('realtime', 'presence', 'dm', 'groups'):
+                cfg = {"failure_rate": 0.002, "error_type": "cache", "error_codes": ["503"], "error_message": f"{_svc} connection pool exhausted"}
+            elif _svc in ('processor', 'wallet', 'bidding', 'targeting'):
+                cfg = {"failure_rate": 0.001, "error_type": "server", "error_codes": ["500", "502"], "error_message": f"{_svc} upstream timeout"}
+            elif _svc in ('indexer',):
+                cfg = {"failure_rate": 0.002, "error_type": "search", "error_codes": ["503", "504"], "error_message": f"{_svc} cluster unavailable"}
+            elif _svc in ('preferences',):
+                cfg = {"failure_rate": 0.001, "error_type": "database", "error_codes": ["503"], "error_message": f"{_svc} read timeout"}
+            else:
+                cfg = {"failure_rate": 0.002, "error_type": "server", "error_codes": ["500", "503"], "error_message": f"{_svc} internal error"}
+            INCIDENT_ELIGIBLE_SERVICES[_dep] = cfg
+del _seen, _deps, _dep, _stack, _svc, cfg
 
 
 @dataclass
@@ -1376,7 +1275,6 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     Args is a tuple containing:
     - worker_id: int
     - user_chunk: List of (user_dict, event_count) pairs
-    - incidents_data: List of incident dicts (serializable form)
     - start_time: datetime
     - end_time: datetime
     - base_seed: int
@@ -1388,15 +1286,25 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     Returns:
     - (event_count, logs_file_path, metrics_file_path)
     """
-    (worker_id, user_chunk, incidents_data, start_time, end_time,
-     base_seed, error_codes, error_messages, output_dir, deployment_schedule_data) = args
+    (worker_id, user_chunk, start_time, end_time,
+     base_seed, error_codes, error_messages, output_dir, deployment_schedule_data,
+     incidents_data) = args
 
     # Create worker-local RNG with deterministic seed
     rng = random.Random(base_seed + worker_id * 1000000)
 
     # Reconstruct incidents from serializable form
     incidents = [
-        InfrastructureIncident(**inc) for inc in incidents_data
+        ServiceIncident(
+            service_key=inc["service_key"],
+            start_time=datetime.fromisoformat(inc["start_time"]),
+            end_time=datetime.fromisoformat(inc["end_time"]),
+            failure_rate=inc["failure_rate"],
+            error_codes=inc["error_codes"],
+            error_type=inc["error_type"],
+            error_message=inc["error_message"],
+        )
+        for inc in incidents_data
     ]
 
     # Reconstruct deployment schedule if provided
@@ -1414,75 +1322,53 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
         "news", "memes", "photography", "nature", "pets", "diy", "cooking"
     ]]
 
-    # All the helper functions (same as non-streaming version)
-    def get_active_incident(service_key: str, timestamp: datetime) -> Optional[InfrastructureIncident]:
+    # Helper functions
+    def get_active_incident(service_key: str, timestamp: datetime) -> Optional[ServiceIncident]:
         for incident in incidents:
             if incident.start_time <= timestamp <= incident.end_time:
-                if service_key in incident.affected_services:
+                if incident.service_key == service_key:
                     return incident
         return None
 
-    def check_hidden_dependency_failure(action, timestamp) -> Optional[Tuple[str, str, str, str]]:
-        service_key = f"{action.stack}:{action.service}"
-        incident = get_active_incident(service_key, timestamp)
-        if incident:
-            if rng.random() < incident.error_info["failure_rate"]:
-                error_code = rng.choice(incident.error_info["error_codes"])
-                return (
-                    incident.dependency_name,
-                    incident.error_info["error_type"],
-                    error_code,
-                    incident.error_info["error_message"]
-                )
-        return None
-
-    def check_dependency_failure(action, timestamp) -> Optional[Tuple[str, str, str, str]]:
-        service_key = f"{action.stack}:{action.service}"
-        if service_key in SERVICE_DEPENDENCIES:
-            for dep_service in SERVICE_DEPENDENCIES[service_key]:
-                incident = get_active_incident(dep_service, timestamp)
-                if incident:
-                    if rng.random() < incident.error_info["failure_rate"] * 10:
-                        error_code = rng.choice(incident.error_info["error_codes"])
-                        return (
-                            dep_service,
-                            incident.error_info["error_type"],
-                            error_code,
-                            f"Upstream service {dep_service} failed: {incident.error_info['error_message']}"
-                        )
-        return None
-
     def determine_error(action, user_data, timestamp, env=None, region=None) -> Optional[Dict]:
-        hidden_failure = check_hidden_dependency_failure(action, timestamp)
-        if hidden_failure:
-            dep_name, error_type, error_code, error_message = hidden_failure
+        service_key = f"{action.stack}:{action.service}"
+
+        # 1. Service incident: check if any dependency has an active incident
+        deps = SERVICE_DEPENDENCIES.get(service_key, [])
+        for dep_key in deps:
+            incident = get_active_incident(dep_key, timestamp)
+            if incident and rng.random() < incident.failure_rate:
+                dep_stack, dep_service = dep_key.split(':')
+                dep_release_result = select_release_by_key(dep_stack, dep_service, timestamp)
+                dep_release_id = dep_release_result[0] if isinstance(dep_release_result, tuple) else dep_release_result
+                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
+                return {
+                    "error_source": dep_deployment_id,
+                    "error_type": incident.error_type,
+                    "error_code": rng.choice(incident.error_codes),
+                    "error_message": f"Upstream {dep_key} failed: {incident.error_message}",
+                    "upstream_request_id": uuid.uuid4().hex,
+                }
+
+        # Also check if this service itself has an incident (originating error)
+        incident = get_active_incident(service_key, timestamp)
+        if incident and rng.random() < incident.failure_rate:
             return {
-                "error_source": f"infrastructure:{dep_name}",
-                "error_type": error_type,
-                "error_code": error_code,
-                "error_message": error_message,
+                "error_source": None,
+                "error_type": incident.error_type,
+                "error_code": rng.choice(incident.error_codes),
+                "error_message": incident.error_message,
                 "upstream_request_id": None,
             }
 
-        dep_failure = check_dependency_failure(action, timestamp)
-        if dep_failure:
-            dep_service, error_type, error_code, error_message = dep_failure
-            return {
-                "error_source": f"dependency:{dep_service}",
-                "error_type": error_type,
-                "error_code": error_code,
-                "error_message": error_message,
-                "upstream_request_id": uuid.uuid4().hex,
-            }
-
-        # Deployment dip errors
+        # 2. Deployment dip errors
         if deploy_schedule and env and region:
             window = deploy_schedule.get_active_deployment_window(
                 action.stack, action.service, env, region, timestamp
             )
             if window and rng.random() < window.error_rate_boost:
                 return {
-                    "error_source": f"deployment:{window.release_id}",
+                    "error_source": deployment_id_from_release_id(window.release_id),
                     "error_type": "server",
                     "error_code": rng.choice(["500", "502", "503"]),
                     "error_message": f"Service restarting during deployment of {window.release_id}",
@@ -1490,6 +1376,24 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 }
 
         if rng.random() > user_data["success_rate"]:
+            # 2. Dependency failure: blame a child's deployment_id
+            service_key = f"{action.stack}:{action.service}"
+            deps = SERVICE_DEPENDENCIES.get(service_key, [])
+            if deps and rng.random() < 0.4:
+                dep_key = rng.choice(deps)
+                dep_stack, dep_service = dep_key.split(':')
+                dep_release_result = select_release_by_key(dep_stack, dep_service, timestamp)
+                dep_release_id = dep_release_result[0] if isinstance(dep_release_result, tuple) else dep_release_result
+                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
+                return {
+                    "error_source": dep_deployment_id,
+                    "error_type": "server",
+                    "error_code": rng.choice(error_codes["server"]),
+                    "error_message": f"Upstream {dep_key} failed",
+                    "upstream_request_id": uuid.uuid4().hex,
+                }
+
+            # 3. Originating error (no upstream to blame)
             if rng.random() < 0.7:
                 error_code = rng.choice(error_codes["client"])
                 error_type = "client"
@@ -1497,7 +1401,7 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 error_code = rng.choice(error_codes["server"])
                 error_type = "server"
             return {
-                "error_source": "self",
+                "error_source": None,
                 "error_type": error_type,
                 "error_code": error_code,
                 "error_message": error_messages[error_code],
@@ -1642,7 +1546,7 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 error_code = "500"
                 error_message = "Unknown error"
                 error_type = "server"
-                error_source = "self"
+                error_source = None
             message = f"{action_name} failed: {error_message}"
             level = "ERROR" if error_type in ("server", "database", "cache", "queue", "internal") else "WARN"
 
@@ -1810,10 +1714,6 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 child_spans = generate_child_spans_for_event(
                     parent_event=root_event,
                     rng=rng,
-                    incidents=incidents,
-                    get_active_incident_func=get_active_incident,
-                    check_hidden_dep_func=check_hidden_dependency_failure,
-                    check_dep_failure_func=check_dependency_failure,
                     select_release_func=select_release_by_key,
                     error_codes=error_codes,
                     error_messages=error_messages,
@@ -1835,7 +1735,6 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
     Args is a tuple containing:
     - worker_id: int
     - user_chunk: List of (user_dict, event_count) pairs
-    - incidents_data: List of incident dicts (serializable form)
     - start_time: datetime
     - end_time: datetime
     - base_seed: int
@@ -1843,15 +1742,25 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
     - error_messages: dict
     - deployment_schedule_data: dict or None
     """
-    (worker_id, user_chunk, incidents_data, start_time, end_time,
-     base_seed, error_codes, error_messages, deployment_schedule_data) = args
+    (worker_id, user_chunk, start_time, end_time,
+     base_seed, error_codes, error_messages, deployment_schedule_data,
+     incidents_data) = args
 
     # Create worker-local RNG with deterministic seed
     rng = random.Random(base_seed + worker_id * 1000000)
 
     # Reconstruct incidents from serializable form
     incidents = [
-        InfrastructureIncident(**inc) for inc in incidents_data
+        ServiceIncident(
+            service_key=inc["service_key"],
+            start_time=datetime.fromisoformat(inc["start_time"]),
+            end_time=datetime.fromisoformat(inc["end_time"]),
+            failure_rate=inc["failure_rate"],
+            error_codes=inc["error_codes"],
+            error_type=inc["error_type"],
+            error_message=inc["error_message"],
+        )
+        for inc in incidents_data
     ]
 
     # Reconstruct deployment schedule if provided
@@ -1869,74 +1778,52 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
         "news", "memes", "photography", "nature", "pets", "diy", "cooking"
     ]]
 
-    def get_active_incident(service_key: str, timestamp: datetime) -> Optional[InfrastructureIncident]:
+    def get_active_incident(service_key: str, timestamp: datetime) -> Optional[ServiceIncident]:
         for incident in incidents:
             if incident.start_time <= timestamp <= incident.end_time:
-                if service_key in incident.affected_services:
+                if incident.service_key == service_key:
                     return incident
         return None
 
-    def check_hidden_dependency_failure(action, timestamp) -> Optional[Tuple[str, str, str, str]]:
-        service_key = f"{action.stack}:{action.service}"
-        incident = get_active_incident(service_key, timestamp)
-        if incident:
-            if rng.random() < incident.error_info["failure_rate"]:
-                error_code = rng.choice(incident.error_info["error_codes"])
-                return (
-                    incident.dependency_name,
-                    incident.error_info["error_type"],
-                    error_code,
-                    incident.error_info["error_message"]
-                )
-        return None
-
-    def check_dependency_failure(action, timestamp) -> Optional[Tuple[str, str, str, str]]:
-        service_key = f"{action.stack}:{action.service}"
-        if service_key in SERVICE_DEPENDENCIES:
-            for dep_service in SERVICE_DEPENDENCIES[service_key]:
-                incident = get_active_incident(dep_service, timestamp)
-                if incident:
-                    if rng.random() < incident.error_info["failure_rate"] * 10:
-                        error_code = rng.choice(incident.error_info["error_codes"])
-                        return (
-                            dep_service,
-                            incident.error_info["error_type"],
-                            error_code,
-                            f"Upstream service {dep_service} failed: {incident.error_info['error_message']}"
-                        )
-        return None
-
     def determine_error(action, user_data, timestamp, env=None, region=None) -> Optional[Dict]:
-        hidden_failure = check_hidden_dependency_failure(action, timestamp)
-        if hidden_failure:
-            dep_name, error_type, error_code, error_message = hidden_failure
+        service_key = f"{action.stack}:{action.service}"
+
+        # 1. Service incident: check if any dependency has an active incident
+        deps = SERVICE_DEPENDENCIES.get(service_key, [])
+        for dep_key in deps:
+            incident = get_active_incident(dep_key, timestamp)
+            if incident and rng.random() < incident.failure_rate:
+                dep_stack, dep_service = dep_key.split(':')
+                dep_release_result = select_release_by_key(dep_stack, dep_service, timestamp)
+                dep_release_id = dep_release_result[0] if isinstance(dep_release_result, tuple) else dep_release_result
+                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
+                return {
+                    "error_source": dep_deployment_id,
+                    "error_type": incident.error_type,
+                    "error_code": rng.choice(incident.error_codes),
+                    "error_message": f"Upstream {dep_key} failed: {incident.error_message}",
+                    "upstream_request_id": uuid.uuid4().hex,
+                }
+
+        # Also check if this service itself has an incident (originating error)
+        incident = get_active_incident(service_key, timestamp)
+        if incident and rng.random() < incident.failure_rate:
             return {
-                "error_source": f"infrastructure:{dep_name}",
-                "error_type": error_type,
-                "error_code": error_code,
-                "error_message": error_message,
+                "error_source": None,
+                "error_type": incident.error_type,
+                "error_code": rng.choice(incident.error_codes),
+                "error_message": incident.error_message,
                 "upstream_request_id": None,
             }
 
-        dep_failure = check_dependency_failure(action, timestamp)
-        if dep_failure:
-            dep_service, error_type, error_code, error_message = dep_failure
-            return {
-                "error_source": f"dependency:{dep_service}",
-                "error_type": error_type,
-                "error_code": error_code,
-                "error_message": error_message,
-                "upstream_request_id": uuid.uuid4().hex,
-            }
-
-        # Deployment dip errors
+        # 2. Deployment dip errors
         if deploy_schedule and env and region:
             window = deploy_schedule.get_active_deployment_window(
                 action.stack, action.service, env, region, timestamp
             )
             if window and rng.random() < window.error_rate_boost:
                 return {
-                    "error_source": f"deployment:{window.release_id}",
+                    "error_source": deployment_id_from_release_id(window.release_id),
                     "error_type": "server",
                     "error_code": rng.choice(["500", "502", "503"]),
                     "error_message": f"Service restarting during deployment of {window.release_id}",
@@ -1944,6 +1831,24 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
                 }
 
         if rng.random() > user_data["success_rate"]:
+            # 2. Dependency failure: blame a child's deployment_id
+            service_key = f"{action.stack}:{action.service}"
+            deps = SERVICE_DEPENDENCIES.get(service_key, [])
+            if deps and rng.random() < 0.4:
+                dep_key = rng.choice(deps)
+                dep_stack, dep_service = dep_key.split(':')
+                dep_release_result = select_release_by_key(dep_stack, dep_service, timestamp)
+                dep_release_id = dep_release_result[0] if isinstance(dep_release_result, tuple) else dep_release_result
+                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
+                return {
+                    "error_source": dep_deployment_id,
+                    "error_type": "server",
+                    "error_code": rng.choice(error_codes["server"]),
+                    "error_message": f"Upstream {dep_key} failed",
+                    "upstream_request_id": uuid.uuid4().hex,
+                }
+
+            # 3. Originating error (no upstream to blame)
             if rng.random() < 0.7:
                 error_code = rng.choice(error_codes["client"])
                 error_type = "client"
@@ -1951,7 +1856,7 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
                 error_code = rng.choice(error_codes["server"])
                 error_type = "server"
             return {
-                "error_source": "self",
+                "error_source": None,
                 "error_type": error_type,
                 "error_code": error_code,
                 "error_message": error_messages[error_code],
@@ -2134,10 +2039,6 @@ def _generate_events_for_chunk(args: Tuple) -> List[dict]:
             child_spans = generate_child_spans_for_event(
                 parent_event=root_event,
                 rng=rng,
-                incidents=incidents,
-                get_active_incident_func=get_active_incident,
-                check_hidden_dep_func=check_hidden_dependency_failure,
-                check_dep_failure_func=check_dependency_failure,
                 select_release_func=select_release_by_key,
                 error_codes=error_codes,
                 error_messages=error_messages,
@@ -2177,8 +2078,8 @@ class MonitoringDataGenerator:
         self.users: List[User] = []
         self.user_by_id: Dict[str, User] = {}
 
-        # Infrastructure incidents (time windows of hidden dependency failures)
-        self.incidents: List[InfrastructureIncident] = []
+        # Service incidents (time windows of degraded services)
+        self.incidents: List[ServiceIncident] = []
 
         # Content pools for realistic references
         self.all_posts: List[Tuple[str, str]] = []  # (post_id, author_id)
@@ -2263,146 +2164,128 @@ class MonitoringDataGenerator:
                 followed.followers.append(user.user_id)
 
     def generate_incidents(self):
-        """Generate infrastructure incidents throughout the year"""
-        print("  Generating infrastructure incidents...")
+        """Generate service incidents throughout the year.
 
-        for dep_name, dep_info in HIDDEN_DEPENDENCIES.items():
-            # Each hidden dependency has 2-8 incidents per year
+        Each eligible service (dependency targets from SERVICE_DEPENDENCIES) gets
+        2-8 incidents per year, each lasting 5 minutes to 4 hours.
+        """
+        print("  Generating service incidents...")
+
+        for service_key, cfg in INCIDENT_ELIGIBLE_SERVICES.items():
             num_incidents = self.rng.randint(2, 8)
 
             for _ in range(num_incidents):
-                # Random start time during the year
                 days_ago = self.rng.randint(1, 364)
                 hour = self.rng.randint(0, 23)
                 start = self.start_time + timedelta(days=365 - days_ago, hours=hour)
-
-                # Incidents last 5 minutes to 4 hours
                 duration_minutes = self.rng.randint(5, 240)
                 end = start + timedelta(minutes=duration_minutes)
 
-                incident = InfrastructureIncident(
-                    dependency_name=dep_name,
+                self.incidents.append(ServiceIncident(
+                    service_key=service_key,
                     start_time=start,
                     end_time=end,
-                    affected_services=dep_info["services"],
-                    error_info={
-                        "error_type": dep_info["error_type"],
-                        "error_codes": dep_info["error_codes"],
-                        "error_message": dep_info["error_message"],
-                        "failure_rate": dep_info["failure_rate"],
-                    }
-                )
-                self.incidents.append(incident)
+                    failure_rate=cfg["failure_rate"],
+                    error_codes=cfg["error_codes"],
+                    error_type=cfg["error_type"],
+                    error_message=cfg["error_message"],
+                ))
 
-        # Sort by start time
         self.incidents.sort(key=lambda x: x.start_time)
-        print(f"    Generated {len(self.incidents)} infrastructure incidents")
+        print(f"    Generated {len(self.incidents)} service incidents across {len(INCIDENT_ELIGIBLE_SERVICES)} services")
 
-    def get_active_incident(self, service_key: str, timestamp: datetime) -> Optional[InfrastructureIncident]:
-        """Check if there's an active incident affecting this service at this time"""
+    def get_active_incident(self, service_key: str, timestamp: datetime) -> Optional[ServiceIncident]:
+        """Check if there's an active incident affecting this service at this time."""
         for incident in self.incidents:
             if incident.start_time <= timestamp <= incident.end_time:
-                if service_key in incident.affected_services:
+                if incident.service_key == service_key:
                     return incident
-        return None
-
-    def check_dependency_failure(self, action: ServiceAction, timestamp: datetime) -> Optional[Tuple[str, str, str, str]]:
-        """
-        Check if a dependency of this service is failing.
-        Returns (failed_service, error_type, error_code, error_message) or None
-        """
-        service_key = f"{action.stack}:{action.service}"
-
-        # Check documented dependencies
-        if service_key in SERVICE_DEPENDENCIES:
-            for dep_service in SERVICE_DEPENDENCIES[service_key]:
-                # Check if the dependency has an active incident
-                incident = self.get_active_incident(dep_service, timestamp)
-                if incident:
-                    # During an incident, use the incident's failure rate
-                    if self.rng.random() < incident.error_info["failure_rate"] * 10:  # Amplified during cascade
-                        error_code = self.rng.choice(incident.error_info["error_codes"])
-                        return (
-                            dep_service,
-                            incident.error_info["error_type"],
-                            error_code,
-                            f"Upstream service {dep_service} failed: {incident.error_info['error_message']}"
-                        )
-        return None
-
-    def check_hidden_dependency_failure(self, action: ServiceAction, timestamp: datetime) -> Optional[Tuple[str, str, str, str]]:
-        """
-        Check if a hidden/infrastructure dependency is failing.
-        Returns (dependency_name, error_type, error_code, error_message) or None
-        """
-        service_key = f"{action.stack}:{action.service}"
-
-        # Check if this service is affected by any active incident
-        incident = self.get_active_incident(service_key, timestamp)
-        if incident:
-            # Use the incident's failure rate
-            if self.rng.random() < incident.error_info["failure_rate"]:
-                error_code = self.rng.choice(incident.error_info["error_codes"])
-                return (
-                    incident.dependency_name,
-                    incident.error_info["error_type"],
-                    error_code,
-                    incident.error_info["error_message"]
-                )
         return None
 
     def determine_error(self, action: ServiceAction, user: User, timestamp: datetime,
                         env: str = None, region: str = None) -> Optional[Dict]:
-        """
-        Determine if this request should fail and why.
-        Returns error details dict or None for success.
+        """Determine if this request should fail and why.
 
         Error priority:
-        1. Hidden dependency failure (infrastructure incident)
-        2. Documented dependency cascade
-        3. Deployment dip (rolling restart errors)
-        4. Random service error (based on persona success rate)
+        1. Service incident (elevated error rate during incident window)
+        2. Deployment dip (rolling restart errors)
+        3. Dependency failure (upstream service, error_source = child's deployment_id)
+        4. Random service error (originating error, error_source = None)
         """
-        # 1. Check hidden dependency failures first
-        hidden_failure = self.check_hidden_dependency_failure(action, timestamp)
-        if hidden_failure:
-            dep_name, error_type, error_code, error_message = hidden_failure
+        service_key = f"{action.stack}:{action.service}"
+
+        # 1. Service incident: check if any dependency has an active incident
+        deps = SERVICE_DEPENDENCIES.get(service_key, [])
+        for dep_key in deps:
+            incident = self.get_active_incident(dep_key, timestamp)
+            if incident and self.rng.random() < incident.failure_rate:
+                dep_stack, dep_service = dep_key.split(':')
+                dep_action = ServiceAction(
+                    category="internal", service=dep_service, stack=dep_stack,
+                    action="internal", weight=1.0, base_latency_ms=10,
+                    latency_stddev_ms=1, base_payload_bytes=1024,
+                    payload_stddev_bytes=256, has_target_user=False,
+                    has_object_id=False, object_type=None, is_write=False,
+                )
+                dep_release_id, _, _ = self.select_release(dep_action, timestamp)
+                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
+                return {
+                    "error_source": dep_deployment_id,
+                    "error_type": incident.error_type,
+                    "error_code": self.rng.choice(incident.error_codes),
+                    "error_message": f"Upstream {dep_key} failed: {incident.error_message}",
+                    "upstream_request_id": uuid.uuid4().hex,
+                }
+
+        # Also check if this service itself has an incident (originating error)
+        incident = self.get_active_incident(service_key, timestamp)
+        if incident and self.rng.random() < incident.failure_rate:
             return {
-                "error_source": f"infrastructure:{dep_name}",
-                "error_type": error_type,
-                "error_code": error_code,
-                "error_message": error_message,
+                "error_source": None,
+                "error_type": incident.error_type,
+                "error_code": self.rng.choice(incident.error_codes),
+                "error_message": incident.error_message,
                 "upstream_request_id": None,
             }
 
-        # 2. Check documented dependency failures
-        dep_failure = self.check_dependency_failure(action, timestamp)
-        if dep_failure:
-            dep_service, error_type, error_code, error_message = dep_failure
-            return {
-                "error_source": f"dependency:{dep_service}",
-                "error_type": error_type,
-                "error_code": error_code,
-                "error_message": error_message,
-                "upstream_request_id": uuid.uuid4().hex,
-            }
-
-        # 3. Deployment dip errors
+        # 2. Deployment dip errors
         if self.deployment_schedule and env and region:
             window = self.deployment_schedule.get_active_deployment_window(
                 action.stack, action.service, env, region, timestamp
             )
             if window and self.rng.random() < window.error_rate_boost:
                 return {
-                    "error_source": f"deployment:{window.release_id}",
+                    "error_source": deployment_id_from_release_id(window.release_id),
                     "error_type": "server",
                     "error_code": self.rng.choice(["500", "502", "503"]),
                     "error_message": f"Service restarting during deployment of {window.release_id}",
                     "upstream_request_id": None,
                 }
 
-        # 4. Random service errors based on persona success rate
+        # 3. Random errors based on persona success rate
         if self.rng.random() > user.persona.success_rate:
+            # Dependency failure: blame a child's deployment_id
+            if deps and self.rng.random() < 0.4:
+                dep_key = self.rng.choice(deps)
+                dep_stack, dep_service = dep_key.split(':')
+                dep_action = ServiceAction(
+                    category="internal", service=dep_service, stack=dep_stack,
+                    action="internal", weight=1.0, base_latency_ms=10,
+                    latency_stddev_ms=1, base_payload_bytes=1024,
+                    payload_stddev_bytes=256, has_target_user=False,
+                    has_object_id=False, object_type=None, is_write=False,
+                )
+                dep_release_id, _, _ = self.select_release(dep_action, timestamp)
+                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
+                return {
+                    "error_source": dep_deployment_id,
+                    "error_type": "server",
+                    "error_code": self.rng.choice(self.error_codes["server"]),
+                    "error_message": f"Upstream {dep_key} failed",
+                    "upstream_request_id": uuid.uuid4().hex,
+                }
+
+            # Originating error (no upstream to blame)
             if self.rng.random() < 0.7:
                 error_code = self.rng.choice(self.error_codes["client"])
                 error_type = "client"
@@ -2411,14 +2294,14 @@ class MonitoringDataGenerator:
                 error_type = "server"
 
             return {
-                "error_source": "self",
+                "error_source": None,
                 "error_type": error_type,
                 "error_code": error_code,
                 "error_message": self.error_messages[error_code],
                 "upstream_request_id": None,
             }
 
-        return None  # Success
+        return None
 
     def select_release(self, action: ServiceAction, timestamp: datetime) -> Tuple[str, str, str]:
         """Select a release_id for this request based on environment weights and time.
@@ -2765,7 +2648,7 @@ class MonitoringDataGenerator:
                     error_code = self.rng.choice(self.error_codes["server"])
                     error_type = "server"
                 error_message = self.error_messages[error_code]
-                error_source = "self"
+                error_source = None
 
             message = f"{action.action} failed: {error_message}"
             # Set log level based on error type
@@ -2917,22 +2800,6 @@ class MonitoringDataGenerator:
             child_span_id = generate_span_id(self.rng)
             child_request_id = uuid.uuid4().hex
 
-            # Check for errors on child span
-            child_error_info = None
-            child_success = True
-
-            incident = self.get_active_incident(dep_key, child_timestamp)
-            if incident:
-                if self.rng.random() < incident.error_info["failure_rate"]:
-                    error_code = self.rng.choice(incident.error_info["error_codes"])
-                    child_error_info = {
-                        "error_source": f"infrastructure:{incident.dependency_name}",
-                        "error_type": incident.error_info["error_type"],
-                        "error_code": error_code,
-                        "error_message": incident.error_info["error_message"],
-                    }
-                    child_success = False
-
             # Create a child ServiceAction for the dependency
             child_action = ServiceAction(
                 category="internal",
@@ -2951,6 +2818,21 @@ class MonitoringDataGenerator:
             )
 
             child_release_id, _, _ = self.select_release(child_action, child_timestamp)
+
+            # Check if parent blames this child
+            child_error_info = None
+            child_success = True
+            parent_error_source = (parent_event.get("error_info") or {}).get("error_source", "")
+            child_deployment_id = deployment_id_from_release_id(child_release_id)
+            if parent_error_source == child_deployment_id:
+                error_code = self.rng.choice(self.error_codes["server"])
+                child_error_info = {
+                    "error_source": None,
+                    "error_type": "server",
+                    "error_code": error_code,
+                    "error_message": self.error_messages[error_code],
+                }
+                child_success = False
 
             child_event = {
                 "user": user,
@@ -2989,22 +2871,24 @@ class MonitoringDataGenerator:
             }
             user_data_counts.append((user_data, count))
 
-        # Serialize incidents
-        incidents_data = [
-            {
-                "dependency_name": inc.dependency_name,
-                "start_time": inc.start_time,
-                "end_time": inc.end_time,
-                "affected_services": inc.affected_services,
-                "error_info": inc.error_info,
-            }
-            for inc in self.incidents
-        ]
-
         # Serialize deployment schedule
         deployment_schedule_data = None
         if self.deployment_schedule:
             deployment_schedule_data = self.deployment_schedule.to_serializable()
+
+        # Serialize incidents for workers
+        incidents_data = [
+            {
+                "service_key": inc.service_key,
+                "start_time": inc.start_time.isoformat(),
+                "end_time": inc.end_time.isoformat(),
+                "failure_rate": inc.failure_rate,
+                "error_codes": inc.error_codes,
+                "error_type": inc.error_type,
+                "error_message": inc.error_message,
+            }
+            for inc in self.incidents
+        ]
 
         # Split into chunks for workers
         chunks = [[] for _ in range(self.num_workers)]
@@ -3024,7 +2908,6 @@ class MonitoringDataGenerator:
             (
                 worker_id,
                 chunks[worker_id],
-                incidents_data,
                 self.start_time,
                 self.end_time,
                 self.seed,
@@ -3032,6 +2915,7 @@ class MonitoringDataGenerator:
                 self.error_messages,
                 output_dir,
                 deployment_schedule_data,
+                incidents_data,
             )
             for worker_id in range(self.num_workers)
         ]
@@ -3362,7 +3246,7 @@ class MonitoringDataGenerator:
                 error_code = "500"
                 error_message = "Unknown error"
                 error_type = "server"
-                error_source = "self"
+                error_source = None
             message = f"{action_name} failed: {error_message}"
             level = "ERROR" if error_type in ("server", "database", "cache", "queue", "internal") else "WARN"
 

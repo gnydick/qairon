@@ -61,11 +61,12 @@ services:
       - -search.latencyOffset=5s
       # Read performance: longer cache retention and more RAM for caches
       - -cacheExpireDuration=1h
-      - -memory.allowedPercent=40
+      - -memory.allowedPercent=80
     deploy:
       resources:
         limits:
           cpus: "32"
+          memory: 75g
     restart: unless-stopped
 
   victorialogs:
@@ -86,13 +87,13 @@ services:
       # Read performance: parallel query handling for dashboard log panels
       - -search.maxConcurrentRequests=32
       - -search.maxQueryDuration=120s
-      # Read performance: longer cache retention and more RAM for caches
-      - -cacheExpireDuration=1h
-      - -memory.allowedPercent=40
+      # Read performance: more RAM for caches
+      - -memory.allowedPercent=80
     deploy:
       resources:
         limits:
           cpus: "32"
+          memory: 75g
     restart: unless-stopped
 
   tempo:
@@ -111,6 +112,10 @@ services:
       - /mnt/qairon/tempo-data:/var/tempo:z
     command:
       - --config.file=/tempo.yaml
+    deploy:
+      resources:
+        limits:
+          memory: 75g
     restart: unless-stopped
 
   grafana:
