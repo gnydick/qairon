@@ -134,7 +134,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "avg(avg_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
+          "expr": "avg(avg_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
           "legendFormat": ""
         }
       ]
@@ -185,7 +185,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"true\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"true\"}[$__rate_interval]))",
           "legendFormat": ""
         }
       ]
@@ -243,7 +243,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(count_over_time(cache_hit{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval] == 1)) / sum(count_over_time(cache_hit{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval])) * 100",
+          "expr": "sum(count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval] == 1)) / sum(count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval])) * 100",
           "legendFormat": ""
         }
       ]
@@ -293,7 +293,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "avg(avg_over_time(request_size_bytes{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
+          "expr": "avg(avg_over_time(request_size_bytes{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
           "legendFormat": ""
         }
       ]
@@ -343,7 +343,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "avg(avg_over_time(response_size_bytes{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
+          "expr": "avg(avg_over_time(response_size_bytes{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
           "legendFormat": ""
         }
       ]
@@ -401,7 +401,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])) * 100",
+          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])) * 100",
           "legendFormat": ""
         }
       ]
@@ -461,7 +461,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (persona) (quantile_over_time(0.95, request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
+          "expr": "max by (persona) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
           "legendFormat": "{{persona}}"
         }
       ]
@@ -526,7 +526,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (persona) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum by (persona) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])) * 100",
+          "expr": "sum by (persona) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum by (persona) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])) * 100",
           "legendFormat": "{{persona}}"
         }
       ]
@@ -587,7 +587,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (persona) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])) / $__rate_interval",
+          "expr": "sum by (persona) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])) / $__rate_interval",
           "legendFormat": "{{persona}}"
         }
       ]
@@ -644,7 +644,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "avg by (persona) (avg_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
+          "expr": "avg by (persona) (avg_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
           "legendFormat": "{{persona}}"
         }
       ]
@@ -705,7 +705,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (stack) (count_over_time(cache_hit{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval] == 1)) / sum by (stack) (count_over_time(cache_hit{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval])) * 100",
+          "expr": "sum by (stack) (count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval] == 1)) / sum by (stack) (count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval])) * 100",
           "legendFormat": "{{stack}}"
         }
       ]
@@ -784,12 +784,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval])) / $__rate_interval",
+          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"false\"}[$__rate_interval])) / $__rate_interval",
           "legendFormat": "Reads"
         },
         {
           "refId": "B",
-          "expr": "sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"true\"}[$__rate_interval])) / $__rate_interval",
+          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\", is_write=\"true\"}[$__rate_interval])) / $__rate_interval",
           "legendFormat": "Writes"
         }
       ]
@@ -850,7 +850,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(15, avg by (action) (avg_over_time(request_size_bytes{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])))",
+          "expr": "topk(15, avg by (action) (avg_over_time(request_size_bytes{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])))",
           "legendFormat": "{{action}}"
         }
       ]
@@ -899,7 +899,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(15, avg by (action) (avg_over_time(response_size_bytes{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])))",
+          "expr": "topk(15, avg by (action) (avg_over_time(response_size_bytes{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval])))",
           "legendFormat": "{{action}}"
         }
       ]
@@ -968,7 +968,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "avg by (service) (avg_over_time(db_query_count{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
+          "expr": "avg by (service) (avg_over_time(db_query_count{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
           "legendFormat": "{{service}}"
         }
       ]
@@ -1018,7 +1018,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (stack) (avg_over_time(db_query_count{environment=~\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
+          "expr": "sum by (stack) (avg_over_time(db_query_count{environment=\"$environment\", region=~\"$region\", persona=~\"$persona\", stack=~\"$stack\"}[$__rate_interval]))",
           "legendFormat": "{{stack}}"
         }
       ]

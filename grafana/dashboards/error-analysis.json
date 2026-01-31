@@ -427,7 +427,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -826,7 +826,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "topk(20, sum by (service) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100)",
+          "expr": "topk(20, sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100)",
           "legendFormat": "{{service}}",
           "refId": "A"
         }
@@ -896,7 +896,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "topk(20, sum by (service) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])))",
+          "expr": "topk(20, sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])))",
           "legendFormat": "{{service}}",
           "refId": "A"
         }

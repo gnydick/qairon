@@ -196,12 +196,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
           "legendFormat": "{{service}}"
         },
         {
           "refId": "B",
-          "expr": "sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
           "legendFormat": "Overall"
         }
       ]
@@ -249,12 +249,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (service) (quantile_over_time(0.95, request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "expr": "max by (service) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
           "legendFormat": "P95 {{service}}"
         },
         {
           "refId": "B",
-          "expr": "max by (service) (quantile_over_time(0.5, request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "expr": "max by (service) (quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
           "legendFormat": "P50 {{service}}"
         }
       ]
@@ -317,7 +317,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) / $__rate_interval",
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) / $__rate_interval",
           "legendFormat": "{{service}}"
         }
       ]
@@ -364,7 +364,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "avg by (service) (avg_over_time(response_size_bytes{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "expr": "avg by (service) (avg_over_time(response_size_bytes{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
           "legendFormat": "{{service}}"
         }
       ]
@@ -441,7 +441,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (region) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (region) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
           "legendFormat": "{{region}}"
         }
       ]
@@ -489,7 +489,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (region) (quantile_over_time(0.95, request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "expr": "max by (region) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
           "legendFormat": "P95 {{region}}"
         }
       ]
@@ -549,7 +549,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (release_num) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (release_num) (count_over_time(request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
           "legendFormat": "release {{release_num}}"
         }
       ]
@@ -597,7 +597,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (release_num) (quantile_over_time(0.95, request_duration_ms{environment=~\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "expr": "max by (release_num) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
           "legendFormat": "release {{release_num}}"
         }
       ]
