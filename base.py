@@ -9,7 +9,7 @@ import logging
 
 from sqlalchemy import event
 logging.basicConfig()
-logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+logging.getLogger("sqlalchemy.engine").setLevel(logging.WARN)
 
 SQLALCHEMY_ENGINE_OPTIONS = {
     'pool_size': 32,

@@ -12,6 +12,77 @@
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
         "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "enable": true,
+        "iconColor": "#FF9830",
+        "name": "Releases",
+        "target": {
+          "refId": "releases",
+          "type": "json",
+          "format": "dataframe",
+          "source": "url",
+          "parser": "backend",
+          "url": "/release",
+          "url_options": {
+            "method": "GET",
+            "data": "",
+            "params": [
+              {
+                "key": "filter[objects]",
+                "value": "[{\"name\":\"created_at\",\"op\":\"ge\",\"val\":\"${__timeFrom:date:iso}\"},{\"name\":\"created_at\",\"op\":\"le\",\"val\":\"${__timeTo:date:iso}\"},{\"name\":\"deployment_id\",\"op\":\"in\",\"val\":${deployed_ids:json}}]"
+              }
+            ]
+          },
+          "root_selector": "data",
+          "columns": [
+            {
+              "selector": "attributes.created_at",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "id",
+              "text": "text",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.build_num",
+              "text": "title",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      {
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#5794F2",
+        "name": "Deploy Start",
+        "target": {
+          "refId": "deploy_start",
+          "expr": "action:deployment_start environment:$environment stack:in($stack) service:in($service)"
+        }
+      },
+      {
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#73BF69",
+        "name": "Deploy Complete",
+        "target": {
+          "refId": "deploy_complete",
+          "expr": "action:deployment_complete environment:$environment stack:in($stack) service:in($service)"
+        }
       }
     ]
   },
@@ -529,7 +600,8 @@
         "tooltip": {
           "hideZeros": false,
           "mode": "multi",
-          "sort": "desc"
+          "sort": "desc",
+          "maxHeight": 300
         }
       },
       "pluginVersion": "12.3.1",
@@ -606,7 +678,8 @@
         "tooltip": {
           "hideZeros": false,
           "mode": "single",
-          "sort": "none"
+          "sort": "none",
+          "maxHeight": 300
         }
       },
       "pluginVersion": "12.3.1",
@@ -670,7 +743,8 @@
         "tooltip": {
           "hideZeros": false,
           "mode": "single",
-          "sort": "none"
+          "sort": "none",
+          "maxHeight": 300
         }
       },
       "pluginVersion": "12.3.1",
@@ -788,7 +862,14 @@
               }
             ]
           },
-          "unit": "percent"
+          "unit": "percent",
+          "links": [
+            {
+              "title": "Service Detail",
+              "url": "/d/service-detail/service-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}",
+              "targetBlank": true
+            }
+          ]
         },
         "overrides": []
       },
@@ -826,13 +907,27 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "topk(20, sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100)",
+          "expr": "topk(20, sum by (service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100)",
           "legendFormat": "{{service}}",
           "refId": "A"
         }
       ],
       "title": "Error Rate by Service",
-      "type": "bargauge"
+      "type": "bargauge",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -858,7 +953,14 @@
                 "value": 1000
               }
             ]
-          }
+          },
+          "links": [
+            {
+              "title": "Service Detail",
+              "url": "/d/service-detail/service-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}",
+              "targetBlank": true
+            }
+          ]
         },
         "overrides": []
       },
@@ -896,13 +998,212 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "topk(20, sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])))",
+          "expr": "topk(20, sum by (service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])))",
           "legendFormat": "{{service}}",
           "refId": "A"
         }
       ],
       "title": "Error Volume by Service",
-      "type": "bargauge"
+      "type": "bargauge",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "percent",
+          "links": [
+            {
+              "title": "Action Detail",
+              "url": "/d/action-detail/action-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}&var-action=${__field.labels.action}",
+              "targetBlank": true
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "id": 32,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "topk(20, sum by (action, service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (action, service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100)",
+          "legendFormat": "{{action}} ({{service}})",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Rate by Action",
+      "type": "bargauge",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          },
+          "links": [
+            {
+              "title": "Action Detail",
+              "url": "/d/action-detail/action-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}&var-action=${__field.labels.action}",
+              "targetBlank": true
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 33
+      },
+      "id": 33,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "topk(20, sum by (action, service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])))",
+          "legendFormat": "{{action}} ({{service}})",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Volume by Action",
+      "type": "bargauge",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "collapsed": false,
@@ -910,7 +1211,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 43
       },
       "id": 104,
       "panels": [],
@@ -924,13 +1225,32 @@
       },
       "fieldConfig": {
         "defaults": {},
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "service"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Drill down to service",
+                    "url": "/d/service-detail/service-detail?var-environment=${environment}&var-stack=${__data.fields.stack}&var-service=${__data.fields.service}&${__url_time_range}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 44
       },
       "id": 40,
       "options": {
@@ -944,13 +1264,13 @@
       },
       "targets": [
         {
-          "expr": "level:ERROR error_source:* environment:$environment stack:in($stack) service:in($service) | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50",
+          "expr": "level:ERROR error_source:* environment:$environment stack:in($stack) service:in($service) | stats by(error_source, service, stack) count() as errors | sort by(errors) desc | limit 50",
           "refId": "A",
           "queryType": "statsRange",
           "editorMode": "code"
         }
       ],
-      "title": "Failed Dependency → Affected Service",
+      "title": "Failed Dependency \u2192 Affected Service",
       "type": "table"
     },
     {
@@ -959,7 +1279,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 44
+        "y": 54
       },
       "id": 105,
       "panels": [],
@@ -979,7 +1299,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 45
+        "y": 55
       },
       "id": 50,
       "options": {
@@ -1081,6 +1401,30 @@
         "refresh": 2,
         "sort": 1,
         "type": "query"
+      },
+      {
+        "name": "deployed_ids",
+        "type": "query",
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "query": {
+          "type": "fieldValue",
+          "field": "deployment",
+          "query": "action:deployment_start environment:$environment stack:in($stack) service:in($service)",
+          "refId": "deployed_ids"
+        },
+        "current": {
+          "text": "All",
+          "value": "$__all",
+          "selected": true
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "sort": 1,
+        "hide": 2
       }
     ]
   },

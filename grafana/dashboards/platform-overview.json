@@ -67,6 +67,81 @@
       "version": ""
     }
   ],
+  "annotations": {
+    "list": [
+      {
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "enable": true,
+        "iconColor": "#FF9830",
+        "name": "Releases",
+        "target": {
+          "refId": "releases",
+          "type": "json",
+          "format": "dataframe",
+          "source": "url",
+          "parser": "backend",
+          "url": "/release",
+          "url_options": {
+            "method": "GET",
+            "data": "",
+            "params": [
+              {
+                "key": "filter[objects]",
+                "value": "[{\"name\":\"created_at\",\"op\":\"ge\",\"val\":\"${__timeFrom:date:iso}\"},{\"name\":\"created_at\",\"op\":\"le\",\"val\":\"${__timeTo:date:iso}\"},{\"name\":\"deployment_id\",\"op\":\"in\",\"val\":${deployed_ids:json}}]"
+              }
+            ]
+          },
+          "root_selector": "data",
+          "columns": [
+            {
+              "selector": "attributes.created_at",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "id",
+              "text": "text",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.build_num",
+              "text": "title",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      {
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#5794F2",
+        "name": "Deploy Start",
+        "target": {
+          "refId": "deploy_start",
+          "expr": "action:deployment_start environment:$environment stack:in($stack)"
+        }
+      },
+      {
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#73BF69",
+        "name": "Deploy Complete",
+        "target": {
+          "refId": "deploy_complete",
+          "expr": "action:deployment_complete environment:$environment stack:in($stack)"
+        }
+      }
+    ]
+  },
   "id": null,
   "uid": "platform-overview",
   "title": "Platform Overview",
@@ -486,14 +561,22 @@
               "group": "A"
             },
             "showPoints": "never"
-          }
+          },
+          "links": [
+            {
+              "title": "User Experience",
+              "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}",
+              "targetBlank": true
+            }
+          ]
         },
         "overrides": []
       },
       "options": {
         "tooltip": {
           "mode": "multi",
-          "sort": "desc"
+          "sort": "desc",
+          "maxHeight": 300
         },
         "legend": {
           "displayMode": "table",
@@ -551,14 +634,22 @@
                 "value": 5
               }
             ]
-          }
+          },
+          "links": [
+            {
+              "title": "User Experience",
+              "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}",
+              "targetBlank": true
+            }
+          ]
         },
         "overrides": []
       },
       "options": {
         "tooltip": {
           "mode": "multi",
-          "sort": "desc"
+          "sort": "desc",
+          "maxHeight": 300
         },
         "legend": {
           "displayMode": "table",
@@ -622,7 +713,14 @@
                 "value": 5
               }
             ]
-          }
+          },
+          "links": [
+            {
+              "title": "User Experience",
+              "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}",
+              "targetBlank": true
+            }
+          ]
         },
         "overrides": []
       },
@@ -643,6 +741,20 @@
           "refId": "A",
           "expr": "sum by (stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum by (stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])) * 100",
           "legendFormat": "{{stack}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
         }
       ]
     },
@@ -710,8 +822,8 @@
                 "value": [
                   {
                     "title": "Drill down to service",
-                    "url": "d/service-detail?var-service=${__data.fields.service}&${__url_time_range}&var-environment=${environment}&var-region=${region}",
-                    "targetBlank": false
+                    "url": "/d/service-detail/service-detail?var-service=${__data.fields.service}&var-stack=${__data.fields.stack}&${__url_time_range}&var-environment=${environment}&var-region=${region}",
+                    "targetBlank": true
                   }
                 ]
               }
@@ -751,7 +863,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10, sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])) * 100)",
+          "expr": "topk(10, sum by (service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum by (service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])) * 100)",
           "legendFormat": "{{service}}",
           "format": "table",
           "instant": true
@@ -791,7 +903,14 @@
                 "value": 3000
               }
             ]
-          }
+          },
+          "links": [
+            {
+              "title": "User Experience",
+              "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}",
+              "targetBlank": true
+            }
+          ]
         },
         "overrides": []
       },
@@ -813,6 +932,20 @@
           "expr": "max by (stack) (quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval]))",
           "legendFormat": "{{stack}}"
         }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
+        }
       ]
     },
     {
@@ -822,6 +955,166 @@
         "w": 24,
         "x": 0,
         "y": 22
+      },
+      "id": 104,
+      "title": "Service Health",
+      "type": "row"
+    },
+    {
+      "id": 23,
+      "title": "Top 10 Slowest Services",
+      "type": "bargauge",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 300
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          },
+          "links": [
+            {
+              "title": "Service Detail",
+              "url": "/d/service-detail/service-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}",
+              "targetBlank": true
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, avg by (service, stack) (avg_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])))",
+          "legendFormat": "{{service}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "title": "Top 10 Highest Volume Services",
+      "type": "bargauge",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "links": [
+            {
+              "title": "Service Detail",
+              "url": "/d/service-detail/service-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}",
+              "targetBlank": true
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, sum by (service, stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])) / $__rate_interval)",
+          "legendFormat": "{{service}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 31
       },
       "id": 103,
       "title": "Infrastructure & Deployments",
@@ -835,7 +1128,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 23
+        "y": 32
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
@@ -870,7 +1163,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 23
+        "y": 32
       },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
@@ -952,6 +1245,30 @@
         "includeAll": true,
         "multi": true,
         "sort": 1
+      },
+      {
+        "name": "deployed_ids",
+        "type": "query",
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "query": {
+          "type": "fieldValue",
+          "field": "deployment",
+          "query": "action:deployment_start environment:$environment stack:in($stack)",
+          "refId": "deployed_ids"
+        },
+        "current": {
+          "text": "All",
+          "value": "$__all",
+          "selected": true
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "sort": 1,
+        "hide": 2
       }
     ]
   },

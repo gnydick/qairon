@@ -799,3 +799,124 @@ python fixtures/social_network/load_json.py
   - Optional `--txt-output` exports 36 TSV fixture files (5.3M rows)
   - Pipeline: TSV → `convert_to_json.py` → JSON:API → `load_json.py` → REST API
   - `convert_to_json.py` now accepts `--input-dir` and `--output-dir` CLI args
+
+
+
+╭───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Plan to implement                                                                                                 │
+│                                                                                                                   │
+│ Plan: Rebuild All Dashboards From Scratch                                                                         │
+│                                                                                                                   │
+│ Status                                                                                                            │
+│                                                                                                                   │
+│ The previous plan (split service-detail → service-detail + action-detail) was partially implemented but the       │
+│ hand-written JSON has structural issues (missing pluginVersion, incomplete options/fieldConfig blocks, etc.). The │
+│  user wants to start fresh and rebuild all dashboards from scratch with proper full Grafana panel schemas.        │
+│                                                                                                                   │
+│ Current State                                                                                                     │
+│                                                                                                                   │
+│ The existing dashboards in grafana/dashboards/ serve as reference for content/queries but should be rewritten:    │
+│ - error-analysis.json — exported from Grafana, has full schema (use as structural template)                       │
+│ - platform-overview.json — hand-written, minimal schema                                                           │
+│ - user-experience.json — hand-written, minimal schema                                                             │
+│ - service-detail.json — hand-written, minimal schema                                                              │
+│ - action-detail.json — hand-written (new), minimal schema                                                         │
+│ - deployment-impact.json — hand-written, minimal schema                                                           │
+│ - infra-health.json — hand-written, minimal schema                                                                │
+│                                                                                                                   │
+│ Approach                                                                                                          │
+│                                                                                                                   │
+│ 1. Use error-analysis.json as the structural template — it has full Grafana-exported panel schemas with           │
+│ pluginVersion, complete options, fieldConfig, mappings, etc.                                                      │
+│ 2. Create a new set of dashboards (grafana/dashboards-v2/ or overwrite in-place) modeled after that structure     │
+│ 3. Keep all existing dashboards as query/content reference                                                        │
+│                                                                                                                   │
+│ Dashboard Inventory & Panel Specs                                                                                 │
+│                                                                                                                   │
+│ Drill-Down Flow                                                                                                   │
+│                                                                                                                   │
+│ platform-overview (by stack)                                                                                      │
+│   → user-experience (by stack/service → topk panels show actions)                                                 │
+│       → [click action] → action-detail                                                                            │
+│       → [click service] → service-detail                                                                          │
+│   → service-detail (single service, breakdowns by action)                                                         │
+│       → [click action series/legend] → action-detail                                                              │
+│   → error-analysis (by stack/service)                                                                             │
+│       → [click action] → action-detail                                                                            │
+│       → [click service] → service-detail                                                                          │
+│                                                                                                                   │
+│ Key Rules                                                                                                         │
+│                                                                                                                   │
+│ - All rate queries: / $__rate_interval (not vector workaround)                                                    │
+│ - Single-select vars use exact match: stack="$stack", action="$action"                                            │
+│ - Multi-select vars use regex: region=~"$region", stack=~"$stack"                                                 │
+│ - VictoriaLogs single-select: stack:$stack, multi-select: stack:in($stack)                                        │
+│ - Every panel must have full schema: pluginVersion, mappings, fieldConfig.defaults.color, etc.                    │
+│                                                                                                                   │
+│ Dashboard Details                                                                                                 │
+│                                                                                                                   │
+│ 1. platform-overview                                                                                              │
+│                                                                                                                   │
+│ - Variables: environment (single), region (multi+all), stack (multi+all)                                          │
+│ - Panels: 6 stats, request rate by stack, error rate by stack, error rate bargauge, top erroring services table,  │
+│ P99 bargauge, top slowest services, top volume services, infra error logs, deployment event logs                  │
+│ - Links: stack-level → user-experience, service-level → service-detail                                            │
+│                                                                                                                   │
+│ 2. user-experience                                                                                                │
+│                                                                                                                   │
+│ - Variables: environment (single), region (multi+all), stack (multi+all), service (multi+all), action (multi+all) │
+│ - Panels: cache hit rate by service, top request/response sizes by action, avg DB queries by action, DB query     │
+│ count by service, top slowest actions, top error rate by action, request rate by service, error rate by service   │
+│ - Links: service-level → service-detail, action-level → action-detail                                             │
+│                                                                                                                   │
+│ 3. service-detail                                                                                                 │
+│                                                                                                                   │
+│ - Variables: environment (single), region (multi+all), stack (single), service (single), deployed_ids (hidden)    │
+│ - NO action variable                                                                                              │
+│ - Panels: 6 stats (service-wide), request rate by action, error rate by action, P50/P95/P99 over time, P95 by     │
+│ action, recent deployments                                                                                        │
+│ - Links: action series → action-detail                                                                            │
+│                                                                                                                   │
+│ 4. action-detail (NEW)                                                                                            │
+│                                                                                                                   │
+│ - Variables: environment (single), region (multi+all), stack (single), service (single), action (single),         │
+│ deployed_ids (hidden)                                                                                             │
+│ - Panels: 6 stats (action-scoped), request rate, error rate %, P50/P95/P99, latency distribution (band fill),     │
+│ errors by source (pie), error types over time, top error messages (table), cache hit rate over time, DB query     │
+│ count over time, request/response size over time, upstream dependency errors, recent deployments                  │
+│ - All queries use exact match action="$action" / action:$action                                                   │
+│                                                                                                                   │
+│ 5. error-analysis (already exported — keep as-is or minor link updates)                                           │
+│                                                                                                                   │
+│ - Links: action-level → action-detail, service-level → service-detail                                             │
+│                                                                                                                   │
+│ 6. deployment-impact                                                                                              │
+│                                                                                                                   │
+│ - Variables: environment (single), region (multi+all), stack (multi+all)                                          │
+│ - Panels: deployment events log, error rate with deployments, latency with deployments, request rate, response    │
+│ size, error rate by region, latency by region, error rate by release, P95 by release                              │
+│                                                                                                                   │
+│ 7. infra-health                                                                                                   │
+│                                                                                                                   │
+│ - Keep existing structure, ensure full schema                                                                     │
+│                                                                                                                   │
+│ Implementation Order                                                                                              │
+│                                                                                                                   │
+│ 1. Study error-analysis.json for full panel schema patterns                                                       │
+│ 2. Rebuild platform-overview.json                                                                                 │
+│ 3. Rebuild user-experience.json                                                                                   │
+│ 4. Rebuild service-detail.json                                                                                    │
+│ 5. Rebuild action-detail.json                                                                                     │
+│ 6. Rebuild deployment-impact.json                                                                                 │
+│ 7. Rebuild infra-health.json                                                                                      │
+│ 8. Update error-analysis.json links only (already has good schema)                                                │
+│ 9. Upload all to Grafana and verify                                                                               │
+│                                                                                                                   │
+│ Verification                                                                                                      │
+│                                                                                                                   │
+│ - Every dashboard loads without 422 errors                                                                        │
+│ - All panels render data correctly                                                                                │
+│ - All drill-down links navigate to correct dashboards with correct variable values                                │
+│ - Annotations (Releases, Deploy Start, Deploy Complete) work on all dashboards that have them                     │
+│ - No leftover action filter on service-detail                                                                     │
+│ - action-detail uses exact match everywhere

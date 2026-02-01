@@ -398,6 +398,20 @@
           "queryType": "statsRange",
           "editorMode": "code"
         }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Value",
+                "desc": true
+              }
+            ]
+          }
+        }
       ]
     },
     {
