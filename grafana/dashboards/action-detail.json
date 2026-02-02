@@ -1,88 +1,18 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_VICTORIAMETRICS",
-      "label": "VictoriaMetrics",
-      "description": "VictoriaMetrics Prometheus-compatible datasource",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    },
-    {
-      "name": "DS_VICTORIALOGS",
-      "label": "VictoriaLogs",
-      "description": "VictoriaLogs datasource",
-      "type": "datasource",
-      "pluginId": "victoriametrics-logs-datasource",
-      "pluginName": "VictoriaLogs"
-    },
-    {
-      "name": "DS_TEMPO",
-      "label": "Tempo",
-      "description": "Grafana Tempo datasource",
-      "type": "datasource",
-      "pluginId": "tempo",
-      "pluginName": "Tempo"
-    }
-  ],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "12.3.1"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "datasource",
-      "id": "victoriametrics-logs-datasource",
-      "name": "VictoriaLogs",
-      "version": "1.0.0"
-    },
-    {
-      "type": "datasource",
-      "id": "tempo",
-      "name": "Tempo",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "piechart",
-      "name": "Pie chart",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "table",
-      "name": "Table",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "logs",
-      "name": "Logs",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
       {
         "datasource": {
           "type": "yesoreyeram-infinity-datasource",
@@ -156,19 +86,11 @@
       }
     ]
   },
-  "id": null,
-  "uid": "action-detail",
-  "title": "Action Detail",
   "description": "Single-action deep dive with latency, errors, cache, payload, and DB query analysis",
-  "tags": [
-    "social-platform",
-    "sre"
-  ],
-  "style": "dark",
-  "timezone": "browser",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "id": null,
   "links": [
     {
       "asDropdown": true,
@@ -193,26 +115,18 @@
         "y": 0
       },
       "id": 100,
+      "panels": [],
       "title": "Action Stats",
       "type": "row"
     },
     {
-      "id": 1,
-      "title": "Request Rate",
-      "type": "stat",
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 0,
-        "y": 1
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -221,11 +135,24 @@
                 "value": null
               }
             ]
-          }
+          },
+          "unit": "reqps"
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "id": 1,
       "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -233,36 +160,29 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval])) / $__rate_interval",
-          "legendFormat": ""
+          "legendFormat": "",
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "Request Rate",
+      "type": "stat"
     },
     {
-      "id": 2,
-      "title": "Error Rate %",
-      "type": "stat",
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 4,
-        "y": 1
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -279,11 +199,24 @@
                 "value": 5
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "id": 2,
       "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -291,36 +224,29 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval])) * 100",
-          "legendFormat": ""
+          "legendFormat": "",
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "Error Rate %",
+      "type": "stat"
     },
     {
-      "id": 3,
-      "title": "P50 Latency",
-      "type": "stat",
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 8,
-        "y": 1
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -337,11 +263,24 @@
                 "value": 1000
               }
             ]
-          }
+          },
+          "unit": "ms"
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 3,
       "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -349,36 +288,29 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "quantile(0.5, quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": ""
+          "legendFormat": "",
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "P50 Latency",
+      "type": "stat"
     },
     {
-      "id": 4,
-      "title": "P95 Latency",
-      "type": "stat",
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 12,
-        "y": 1
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -395,11 +327,24 @@
                 "value": 2000
               }
             ]
-          }
+          },
+          "unit": "ms"
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "id": 4,
       "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -407,36 +352,29 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "quantile(0.5, quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": ""
+          "legendFormat": "",
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "P95 Latency",
+      "type": "stat"
     },
     {
-      "id": 5,
-      "title": "Cache Hit Rate",
-      "type": "stat",
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 16,
-        "y": 1
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -453,11 +391,24 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "id": 5,
       "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -465,35 +416,29 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "sum(count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval] == 1)) / sum(count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval])) * 100",
-          "legendFormat": ""
+          "legendFormat": "",
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "Cache Hit Rate",
+      "type": "stat"
     },
     {
-      "id": 6,
-      "title": "Avg DB Queries/Req",
-      "type": "stat",
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 20,
-        "y": 1
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -510,12 +455,23 @@
                 "value": 20
               }
             ]
-          },
-          "decimals": 1
+          }
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 6,
       "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -523,18 +479,20 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "avg(avg_over_time(db_query_count{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": ""
+          "legendFormat": "",
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "Avg DB Queries/Req",
+      "type": "stat"
     },
     {
       "collapsed": false,
@@ -545,77 +503,149 @@
         "y": 4
       },
       "id": 101,
+      "panels": [],
       "title": "Rate & Errors",
       "type": "row"
     },
     {
-      "id": 10,
-      "title": "Request Rate",
-      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
         "y": 5
       },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "ffb8jnum7rx8ge"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "reqps",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "fillOpacity": 20,
-            "showPoints": "never"
-          }
-        },
-        "overrides": []
-      },
+      "id": 10,
       "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
         "legend": {
+          "calcs": [],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
         }
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval])) / $__rate_interval",
-          "legendFormat": "$action"
+          "legendFormat": "$action",
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "Request Rate",
+      "type": "timeseries"
     },
     {
-      "id": 11,
-      "title": "Error Rate %",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 5
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "fillOpacity": 10,
-            "showPoints": "never"
+          "color": {
+            "mode": "palette-classic"
           },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -632,28 +662,42 @@
                 "value": 5
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "id": 11,
       "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
         "legend": {
+          "calcs": [],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
         }
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval])) * 100",
-          "legendFormat": "$action"
+          "legendFormat": "$action",
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "Error Rate %",
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -664,32 +708,69 @@
         "y": 13
       },
       "id": 102,
+      "panels": [],
       "title": "Latency",
       "type": "row"
     },
     {
-      "id": 20,
-      "title": "P50 / P95 / P99 Over Time",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 14
-      },
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "lineInterpolation": "smooth",
             "fillOpacity": 5,
-            "showPoints": "never"
-          }
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
         },
         "overrides": [
           {
@@ -739,59 +820,107 @@
           }
         ]
       },
-      "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "quantile(0.5, quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "P50"
-        },
-        {
-          "refId": "B",
-          "expr": "quantile(0.5, quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "P95"
-        },
-        {
-          "refId": "C",
-          "expr": "quantile(0.5, quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "P99"
-        }
-      ]
-    },
-    {
-      "id": 21,
-      "title": "Latency Distribution",
-      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
+        "x": 0,
         "y": 14
       },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "quantile(0.5, quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "legendFormat": "P50",
+          "refId": "A"
+        },
+        {
+          "expr": "quantile(0.5, quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "legendFormat": "P95",
+          "refId": "B"
+        },
+        {
+          "expr": "quantile(0.5, quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "legendFormat": "P99",
+          "refId": "C"
+        }
+      ],
+      "title": "P50 / P95 / P99 Over Time",
+      "type": "timeseries"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "lineInterpolation": "smooth",
             "fillOpacity": 15,
-            "showPoints": "never",
-            "fillBelowTo": "P50"
-          }
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
         },
         "overrides": [
           {
@@ -844,43 +973,52 @@
                   "mode": "fixed",
                   "fixedColor": "green"
                 }
-              },
-              {
-                "id": "custom.fillBelowTo",
-                "value": ""
               }
             ]
           }
         ]
       },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "id": 21,
       "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
         "legend": {
+          "calcs": [],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
         }
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "quantile(0.5, quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "P50"
+          "legendFormat": "P50",
+          "refId": "A"
         },
         {
-          "refId": "B",
           "expr": "quantile(0.5, quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "P95"
+          "legendFormat": "P95",
+          "refId": "B"
         },
         {
-          "refId": "C",
           "expr": "quantile(0.5, quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "P99"
+          "legendFormat": "P99",
+          "refId": "C"
         }
-      ]
+      ],
+      "title": "Latency Distribution",
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -891,24 +1029,55 @@
         "y": 22
       },
       "id": 103,
+      "panels": [],
       "title": "Error Breakdown",
       "type": "row"
     },
     {
-      "id": 30,
-      "title": "Errors by Source",
-      "type": "piechart",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 0,
         "y": 23
       },
-      "datasource": {
-        "type": "victoriametrics-logs-datasource",
-        "uid": "ffb8kdooypz40e"
-      },
+      "id": 30,
+      "links": [
+        {
+          "title": "Error Analysis",
+          "url": "/d/error-analysis/error-analysis?var-environment=${environment}&var-stack=${stack}&var-service=${service}&${__url_time_range}",
+          "targetBlank": true
+        }
+      ],
       "options": {
+        "legend": {
+          "calcs": [
+            "value"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -916,46 +1085,124 @@
           "fields": "",
           "values": false
         },
-        "pieType": "donut",
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "calcs": [
-            "value"
-          ]
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "single",
+          "sort": "none"
         }
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
+          "editorMode": "code",
           "expr": "level:ERROR stack:$stack service:$service action:$action environment:$environment error_source:* | stats by(error_source) count() as errors",
           "queryType": "statsRange",
-          "editorMode": "code"
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Error Analysis",
-              "url": "/d/error-analysis/error-analysis?var-environment=${environment}&var-stack=${stack}&var-service=${service}&${__url_time_range}",
-              "targetBlank": true
-            }
-          ]
-        },
-        "overrides": []
-      }
+      "title": "Errors by Source",
+      "type": "piechart"
     },
     {
-      "id": 31,
-      "title": "Error Types Over Time",
-      "type": "timeseries",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 8,
         "y": 23
       },
+      "id": 31,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "level:ERROR stack:$stack service:$service action:$action environment:$environment | stats by(_time:5m, error_type) count() as errors",
+          "queryType": "statsRange",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Types Over Time",
+      "type": "timeseries"
+    },
+    {
       "datasource": {
         "type": "victoriametrics-logs-datasource",
         "uid": "ffb8kdooypz40e"
@@ -963,80 +1210,60 @@
       "fieldConfig": {
         "defaults": {
           "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "fillOpacity": 20,
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
             },
-            "showPoints": "never"
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
           },
-          "links": [
-            {
-              "title": "Error Analysis",
-              "url": "/d/error-analysis/error-analysis?var-environment=${environment}&var-stack=${stack}&var-service=${service}&${__url_time_range}",
-              "targetBlank": true
-            }
-          ]
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
-      "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "level:ERROR stack:$stack service:$service action:$action environment:$environment | stats by(_time:5m, error_type) count() as errors",
-          "queryType": "statsRange",
-          "editorMode": "code"
-        }
-      ]
-    },
-    {
-      "id": 32,
-      "title": "Top Error Messages",
-      "type": "table",
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 16,
         "y": 23
       },
-      "datasource": {
-        "type": "victoriametrics-logs-datasource",
-        "uid": "ffb8kdooypz40e"
-      },
+      "id": 32,
       "options": {
+        "cellHeight": "sm",
         "showHeader": true,
         "sortBy": [
           {
-            "displayName": "count",
-            "desc": true
+            "desc": true,
+            "displayName": "count"
           }
         ]
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
+          "editorMode": "code",
           "expr": "level:ERROR stack:$stack service:$service action:$action environment:$environment | stats by(error_message) count() as count | sort by (count) desc | limit 20",
           "queryType": "statsRange",
-          "editorMode": "code"
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      }
+      "title": "Top Error Messages",
+      "type": "table"
     },
     {
       "collapsed": false,
@@ -1047,150 +1274,296 @@
         "y": 31
       },
       "id": 104,
+      "panels": [],
       "title": "Resource Usage",
       "type": "row"
     },
     {
-      "id": 40,
-      "title": "Cache Hit Rate Over Time",
-      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 0,
         "y": 32
       },
+      "id": 40,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "sum(count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval] == 1)) / sum(count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval])) * 100",
+          "legendFormat": "Cache Hit Rate",
+          "refId": "A"
+        }
+      ],
+      "title": "Cache Hit Rate Over Time",
+      "type": "timeseries"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "lineInterpolation": "smooth",
             "fillOpacity": 10,
-            "showPoints": "never"
-          }
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
         },
         "overrides": []
       },
-      "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum(count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval] == 1)) / sum(count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval])) * 100",
-          "legendFormat": "Cache Hit Rate"
-        }
-      ]
-    },
-    {
-      "id": 41,
-      "title": "DB Query Count Over Time",
-      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 8,
         "y": 32
       },
+      "id": 41,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "expr": "avg(avg_over_time(db_query_count{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "legendFormat": "Avg DB Queries",
+          "refId": "A"
+        }
+      ],
+      "title": "DB Query Count Over Time",
+      "type": "timeseries"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "ffb8jnum7rx8ge"
       },
       "fieldConfig": {
         "defaults": {
-          "decimals": 1,
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "lineInterpolation": "smooth",
             "fillOpacity": 10,
-            "showPoints": "never"
-          }
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
         },
         "overrides": []
       },
-      "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "avg(avg_over_time(db_query_count{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "Avg DB Queries"
-        }
-      ]
-    },
-    {
-      "id": 42,
-      "title": "Request / Response Size Over Time",
-      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 16,
         "y": 32
       },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "ffb8jnum7rx8ge"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "fillOpacity": 10,
-            "showPoints": "never"
-          }
-        },
-        "overrides": []
-      },
+      "id": 42,
       "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
         "legend": {
+          "calcs": [],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
         }
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
           "expr": "avg(avg_over_time(request_size_bytes{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "Request Size"
+          "legendFormat": "Request Size",
+          "refId": "A"
         },
         {
-          "refId": "B",
           "expr": "avg(avg_over_time(response_size_bytes{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
-          "legendFormat": "Response Size"
+          "legendFormat": "Response Size",
+          "refId": "B"
         }
-      ]
+      ],
+      "title": "Request / Response Size Over Time",
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -1201,212 +1574,265 @@
         "y": 40
       },
       "id": 105,
+      "panels": [],
       "title": "Dependencies & Deployments",
       "type": "row"
     },
     {
-      "id": 50,
-      "title": "Upstream Dependency Errors",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 41
-      },
       "datasource": {
         "type": "victoriametrics-logs-datasource",
         "uid": "ffb8kdooypz40e"
       },
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "fillOpacity": 20,
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
-            },
-            "showPoints": "never"
+          "color": {
+            "mode": "palette-classic"
           },
-          "links": [
-            {
-              "title": "Error Analysis",
-              "url": "/d/error-analysis/error-analysis?var-environment=${environment}&var-stack=${stack}&var-service=${service}&${__url_time_range}",
-              "targetBlank": true
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
-          ]
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
         },
         "overrides": []
       },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 41
+      },
+      "id": 50,
       "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc",
-          "maxHeight": 300
-        },
         "legend": {
+          "calcs": [
+            "sum"
+          ],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
         }
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
+          "editorMode": "code",
           "expr": "level:ERROR error_source:* stack:$stack service:$service action:$action environment:$environment | stats by(_time:5m, error_source) count() as errors",
           "queryType": "statsRange",
-          "editorMode": "code"
+          "refId": "A"
         }
-      ]
+      ],
+      "title": "Upstream Dependency Errors",
+      "type": "timeseries"
     },
     {
-      "id": 51,
-      "title": "Recent Deployments",
-      "type": "logs",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
         "y": 41
       },
-      "datasource": {
-        "type": "victoriametrics-logs-datasource",
-        "uid": "ffb8kdooypz40e"
-      },
+      "id": 51,
       "options": {
-        "showTime": true,
-        "showLabels": true,
-        "showCommonLabels": false,
-        "wrapLogMessage": true,
-        "prettifyLogMessage": false,
+        "dedupStrategy": "none",
         "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "showTime": true,
         "sortOrder": "Descending",
-        "dedupStrategy": "none"
+        "wrapLogMessage": true
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "refId": "A",
-          "expr": "(action:deployment_start OR action:deployment_complete) stack:$stack service:$service environment:$environment | sort by (_time desc) | limit 50"
+          "expr": "(action:deployment_start OR action:deployment_complete) stack:$stack service:$service environment:$environment | sort by (_time desc) | limit 50",
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      }
+      "title": "Recent Deployments",
+      "type": "logs"
     }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [
+    "social-platform",
+    "sre"
   ],
   "templating": {
     "list": [
       {
-        "name": "environment",
-        "type": "query",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "ffb8jnum7rx8ge"
-        },
-        "query": "label_values(request_duration_ms, environment)",
         "current": {
           "text": "prod",
           "value": "prod"
         },
-        "refresh": 2,
-        "includeAll": false,
-        "multi": false,
-        "sort": 1
-      },
-      {
-        "name": "region",
-        "type": "query",
         "datasource": {
           "type": "prometheus",
           "uid": "ffb8jnum7rx8ge"
         },
-        "query": "label_values(request_duration_ms{environment=\"$environment\"}, region)",
+        "includeAll": false,
+        "multi": false,
+        "name": "environment",
+        "options": [],
+        "query": "label_values(request_duration_ms, environment)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
         "current": {
           "text": "All",
           "value": "$__all",
           "selected": true
         },
-        "refresh": 2,
-        "includeAll": true,
-        "multi": true,
-        "sort": 1
-      },
-      {
-        "name": "stack",
-        "type": "query",
         "datasource": {
           "type": "prometheus",
           "uid": "ffb8jnum7rx8ge"
         },
-        "query": "label_values(request_duration_ms{environment=\"$environment\"}, stack)",
+        "includeAll": true,
+        "multi": true,
+        "name": "region",
+        "options": [],
+        "query": "label_values(request_duration_ms{environment=\"$environment\"}, region)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
         "current": {
           "text": "content",
           "value": "content"
         },
-        "refresh": 2,
-        "includeAll": false,
-        "multi": false,
-        "sort": 1
-      },
-      {
-        "name": "service",
-        "type": "query",
         "datasource": {
           "type": "prometheus",
           "uid": "ffb8jnum7rx8ge"
         },
-        "query": "label_values(request_duration_ms{environment=\"$environment\", stack=\"$stack\"}, service)",
+        "includeAll": false,
+        "multi": false,
+        "name": "stack",
+        "options": [],
+        "query": "label_values(request_duration_ms{environment=\"$environment\"}, stack)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
         "current": {
           "text": "posts",
           "value": "posts"
         },
-        "refresh": 2,
-        "includeAll": false,
-        "multi": false,
-        "sort": 1
-      },
-      {
-        "name": "action",
-        "type": "query",
         "datasource": {
           "type": "prometheus",
           "uid": "ffb8jnum7rx8ge"
         },
-        "query": "label_values(request_duration_ms{environment=\"$environment\", stack=\"$stack\", service=\"$service\"}, action)",
-        "current": {
-          "text": "",
-          "value": ""
-        },
-        "refresh": 2,
         "includeAll": false,
         "multi": false,
-        "sort": 1
+        "name": "service",
+        "options": [],
+        "query": "label_values(request_duration_ms{environment=\"$environment\", stack=\"$stack\"}, service)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
       },
       {
-        "name": "deployed_ids",
-        "type": "query",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "ffb8jnum7rx8ge"
+        },
+        "includeAll": false,
+        "multi": false,
+        "name": "action",
+        "options": [],
+        "query": "label_values(request_duration_ms{environment=\"$environment\", stack=\"$stack\", service=\"$service\"}, action)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all",
+          "selected": true
+        },
         "datasource": {
           "type": "victoriametrics-logs-datasource",
           "uid": "ffb8kdooypz40e"
         },
+        "hide": 2,
+        "includeAll": true,
+        "multi": true,
+        "name": "deployed_ids",
+        "options": [],
         "query": {
           "type": "fieldValue",
           "field": "deployment",
           "query": "action:deployment_start environment:$environment stack:$stack service:$service",
           "refId": "deployed_ids"
         },
-        "current": {
-          "text": "All",
-          "value": "$__all",
-          "selected": true
-        },
         "refresh": 2,
-        "includeAll": true,
-        "multi": true,
         "sort": 1,
-        "hide": 2
+        "type": "query"
       }
     ]
   },
@@ -1415,7 +1841,8 @@
     "to": "now-4w"
   },
   "timepicker": {},
-  "refresh": "",
-  "schemaVersion": 39,
+  "timezone": "browser",
+  "title": "Action Detail",
+  "uid": "action-detail",
   "version": 0
 }

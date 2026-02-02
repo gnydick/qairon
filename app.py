@@ -60,7 +60,7 @@ with app.app_context():
     for model_class in model_classes:
         custom_serializer = QcliSerializer(model_class, str(model_class), qclimanager, primary_key='id')
         restmanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
-                               url_prefix='/api/rest/v1', page_size=0, max_page_size=100,
+                               url_prefix='/api/rest/v1', page_size=0,
                                allow_client_generated_ids=True, allow_to_many_replacement=True,
                                exclude=getattr(model_class, 'exclude'))
         qclimanager.create_api(model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
@@ -69,7 +69,7 @@ with app.app_context():
                                exclude=getattr(model_class, 'exclude'), serializer=custom_serializer)
     for plugin_model_class in plugin_model_classes:
         restmanager.create_api(plugin_model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
-                               url_prefix='/api/rest/v1', page_size=0, max_page_size=100,
+                               url_prefix='/api/rest/v1', page_size=0,
                                allow_client_generated_ids=True, allow_to_many_replacement=True,
                                exclude=getattr(plugin_model_class, 'exclude'), collection_name=getattr(plugin_model_class, 'collection_name'))
         qclimanager.create_api(plugin_model_class, primary_key='id', methods=['GET', 'POST', 'DELETE', 'PATCH'],
