@@ -1,892 +1,867 @@
 {
-  "apiVersion": "dashboard.grafana.app/v2beta1",
-  "kind": "Dashboard",
-  "metadata": {
-    "name": "infra-health",
-    "namespace": "default",
-    "uid": "vvdwu2XpJzWKgYFq6Yg3X6VQnzX6hQLBxUgx4eGbp2YX",
-    "resourceVersion": "7",
-    "generation": 7,
-    "creationTimestamp": "2026-01-31T02:58:29Z",
-    "labels": {
-      "grafana.app/deprecatedInternalID": "24"
-    },
-    "annotations": {
-      "grafana.app/createdBy": "user:cfb8jm3t86ltsb",
-      "grafana.app/updatedBy": "user:cfb8jm3t86ltsb",
-      "grafana.app/updatedTimestamp": "2026-02-01T00:31:07Z"
+  "__inputs": [
+    {
+      "description": "VictoriaLogs datasource",
+      "label": "VictoriaLogs",
+      "name": "DS_VICTORIALOGS",
+      "pluginId": "victoriametrics-logs-datasource",
+      "pluginName": "VictoriaLogs",
+      "type": "datasource"
     }
-  },
-  "spec": {
-    "annotations": [
-      {
-        "kind": "AnnotationQuery",
-        "spec": {
-          "builtIn": true,
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "query": {
-            "datasource": {
-              "name": "-- Grafana --"
-            },
-            "group": "grafana",
-            "kind": "DataQuery",
-            "spec": {},
-            "version": "v0"
-          }
-        }
-      }
-    ],
-    "cursorSync": "Crosshair",
-    "description": "Upstream error sources and cascade visualization",
-    "editable": true,
-    "elements": {
-      "panel-1": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:* environment:$environment | stats count() as total",
-                        "queryType": "stats"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 1,
-          "links": [],
-          "title": "Total Upstream Errors",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 100
-                      },
-                      {
-                        "color": "red",
-                        "value": 1000
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-10": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:* environment:$environment | stats by(_time:5m, error_source) count() as errors",
-                        "queryType": "statsRange"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 10,
-          "links": [],
-          "title": "Upstream Errors Over Time",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 30,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "smooth",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "never",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "normal"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "sum",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "right",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-2": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:* environment:$environment | stats by(error_source) count() | stats count() as total",
-                        "queryType": "stats"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 2,
-          "links": [],
-          "title": "Distinct Upstream Sources",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 5
-                      },
-                      {
-                        "color": "red",
-                        "value": 15
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-20": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:* environment:$environment | stats by(error_source) count() as errors | sort by(errors) desc",
-                        "queryType": "statsRange"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": [
-                {
-                  "kind": "sortBy",
-                  "spec": {
-                    "id": "sortBy",
-                    "options": {
-                      "fields": {},
-                      "sort": [
-                        {
-                          "desc": true,
-                          "field": "Value"
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "description": "",
-          "id": 20,
-          "links": [],
-          "title": "Error Count by Upstream Source",
-          "vizConfig": {
-            "group": "bargauge",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 100
-                      },
-                      {
-                        "color": "red",
-                        "value": 500
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "displayMode": "gradient",
-                "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
-                  "placement": "bottom",
-                  "showLegend": false
-                },
-                "maxVizHeight": 300,
-                "minVizHeight": 16,
-                "minVizWidth": 8,
-                "namePlacement": "auto",
-                "orientation": "horizontal",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showUnfilled": true,
-                "sizing": "auto",
-                "valueMode": "color"
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-21": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:* environment:$environment | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50",
-                        "queryType": "statsRange"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 21,
-          "links": [],
-          "title": "Upstream Source → Affected Service",
-          "vizConfig": {
-            "group": "table",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "align": "auto",
-                    "cellOptions": {
-                      "type": "auto"
-                    },
-                    "footer": {
-                      "reducers": []
-                    },
-                    "inspect": false
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "cellHeight": "sm",
-                "showHeader": true,
-                "sortBy": [
-                  {
-                    "desc": true,
-                    "displayName": "errors"
-                  }
-                ]
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-3": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:* environment:$environment | stats by(service) count() | stats count() as affected_services",
-                        "queryType": "stats"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 3,
-          "links": [],
-          "title": "Affected Services",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 5
-                      },
-                      {
-                        "color": "red",
-                        "value": 15
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-30": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:* environment:$environment | stats by(_time:5m, error_source) count() as errors",
-                        "queryType": "statsRange"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 30,
-          "links": [],
-          "title": "Cascade Errors Over Time by Source",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 20,
-                    "lineInterpolation": "smooth",
-                    "showPoints": "never",
-                    "stacking": {
-                      "group": "A",
-                      "mode": "normal"
-                    }
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "sum"
-                  ],
-                  "displayMode": "table",
-                  "placement": "right"
-                },
-                "tooltip": {
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-31": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:* environment:$environment | stats by(_time:5m, service) count() as errors",
-                        "queryType": "statsRange"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 31,
-          "links": [],
-          "title": "Cascade by Affected Service",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 20,
-                    "lineInterpolation": "smooth",
-                    "showPoints": "never",
-                    "stacking": {
-                      "group": "A",
-                      "mode": "normal"
-                    }
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "sum"
-                  ],
-                  "displayMode": "table",
-                  "placement": "right"
-                },
-                "tooltip": {
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-40": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "level:ERROR error_source:* environment:$environment | sort by (_time desc) | limit 200"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 40,
-          "links": [],
-          "title": "Upstream Error Logs",
-          "vizConfig": {
-            "group": "logs",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "dedupStrategy": "none",
-                "enableLogDetails": true,
-                "prettifyLogMessage": false,
-                "showCommonLabels": false,
-                "showLabels": true,
-                "showTime": true,
-                "sortOrder": "Descending",
-                "wrapLogMessage": true
-              }
-            },
-            "version": ""
-          }
-        }
-      }
+  ],
+  "__requires": [
+    {
+      "id": "grafana",
+      "name": "Grafana",
+      "type": "grafana",
+      "version": "12.3.1"
     },
-    "layout": {
-      "kind": "GridLayout",
-      "spec": {
-        "items": []
-      }
+    {
+      "id": "victoriametrics-logs-datasource",
+      "name": "VictoriaLogs",
+      "type": "datasource",
+      "version": "1.0.0"
     },
-    "links": [
-      {
-        "asDropdown": true,
-        "icon": "external link",
-        "includeVars": true,
-        "keepTime": true,
-        "tags": [
-          "social-platform"
-        ],
-        "targetBlank": false,
-        "title": "SRE Dashboards",
-        "type": "dashboards"
-      }
-    ],
-    "liveNow": false,
-    "preload": false,
-    "tags": [
-      "social-platform",
-      "sre"
-    ],
-    "timeSettings": {
-      "autoRefresh": "",
-      "autoRefreshIntervals": [
-        "5s",
-        "10s",
-        "30s",
-        "1m",
-        "5m",
-        "15m",
-        "30m",
-        "1h",
-        "2h",
-        "1d"
-      ],
-      "fiscalYearStartMonth": 0,
-      "from": "now-6h-4w",
-      "hideTimepicker": false,
-      "timezone": "browser",
-      "to": "now-4w"
+    {
+      "id": "stat",
+      "name": "Stat",
+      "type": "panel",
+      "version": ""
     },
-    "title": "Infrastructure Health",
-    "variables": [
+    {
+      "id": "timeseries",
+      "name": "Time series",
+      "type": "panel",
+      "version": ""
+    },
+    {
+      "id": "bargauge",
+      "name": "Bar gauge",
+      "type": "panel",
+      "version": ""
+    },
+    {
+      "id": "table",
+      "name": "Table",
+      "type": "panel",
+      "version": ""
+    },
+    {
+      "id": "logs",
+      "name": "Logs",
+      "type": "panel",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
       {
-        "kind": "CustomVariable",
-        "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "prod",
-            "value": "prod"
-          },
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "environment",
-          "options": [
-            {
-              "selected": true,
-              "text": "prod",
-              "value": "prod"
-            },
-            {
-              "selected": false,
-              "text": "stg",
-              "value": "stg"
-            },
-            {
-              "selected": false,
-              "text": "dev",
-              "value": "dev"
-            }
-          ],
-          "query": "prod,stg,dev",
-          "skipUrlSync": false
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#FF9830",
+        "name": "Releases",
+        "target": {
+          "expr": "action:deployment_complete environment:$environment stack:$stack | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "releases"
+        }
+      },
+      {
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#5794F2",
+        "name": "Deploy Start",
+        "target": {
+          "expr": "action:deployment_start environment:$environment stack:$stack | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "deploy_start"
+        }
+      },
+      {
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#73BF69",
+        "name": "Deploy Complete",
+        "target": {
+          "expr": "action:deployment_complete environment:$environment stack:$stack | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "deploy_complete"
         }
       }
     ]
   },
-  "status": {}
+  "description": "Upstream error sources and cascade visualization",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "social-platform"
+      ],
+      "targetBlank": false,
+      "title": "SRE Dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 101,
+      "title": "Timeline",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "level:ERROR error_source:* environment:$environment stack:$stack service:in($service) | stats by(_time:5m, error_source) count() as errors",
+          "queryType": "statsRange",
+          "refId": "A"
+        }
+      ],
+      "title": "Upstream Errors Over Time",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 102,
+      "title": "Per-Source Breakdown",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 20,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "level:ERROR error_source:* environment:$environment stack:$stack service:in($service) | stats by(error_source) count() as errors | sort by(errors) desc",
+          "queryType": "statsRange",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Count by Upstream Source",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "Value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Service Detail",
+              "url": "/d/service-detail/service-detail?var-environment=${environment}&var-stack=${__data.fields.stack}&var-service=${__data.fields.service}&${__url_time_range}"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 21,
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "errors"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "level:ERROR error_source:* environment:$environment stack:$stack service:in($service) | stats by(error_source, service) count() as errors | sort by(errors) desc | limit 50",
+          "queryType": "statsRange",
+          "refId": "A"
+        }
+      ],
+      "title": "Upstream Source \u2192 Affected Service",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 103,
+      "title": "Cascade",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "id": 30,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "level:ERROR error_source:* environment:$environment stack:$stack service:in($service) | stats by(_time:5m, error_source) count() as errors",
+          "queryType": "statsRange",
+          "refId": "A"
+        }
+      ],
+      "title": "Cascade Errors Over Time by Source",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "id": 31,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "level:ERROR error_source:* environment:$environment stack:$stack service:in($service) | stats by(_time:5m, service) count() as errors",
+          "queryType": "statsRange",
+          "refId": "A"
+        }
+      ],
+      "title": "Cascade by Affected Service",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
+      "id": 104,
+      "title": "Deep Dive",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 40,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "expr": "level:ERROR error_source:* environment:$environment stack:$stack service:in($service) | sort by (_time desc) | limit 200",
+          "refId": "A"
+        }
+      ],
+      "title": "Upstream Error Logs",
+      "type": "logs"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": [
+    "social-platform",
+    "sre"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "multi": false,
+        "name": "environment",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "id",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "id",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/environment",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/environment",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "aws",
+          "value": "aws"
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "hide": 2,
+        "label": "Platform",
+        "name": "provider_type",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/provider_type",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "dev:aws:333333333331",
+          "value": "dev:aws:333333333331"
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "label": "Context",
+        "multi": false,
+        "name": "context",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "jq-backend",
+            "refId": "",
+            "root_selector": ".data[]|.id",
+            "source": "url",
+            "type": "json",
+            "url": "/provider",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"environment_id\",\"op\":\"eq\",\"val\":\"$environment\"}]"
+                }
+              ]
+            }
+          },
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "staticOptions": [],
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "region",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.attributes.name",
+            "source": "url",
+            "type": "json",
+            "url": "/region",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"provider_id\",\"op\":\"eq\",\"val\":\"$context\"}]"
+                }
+              ]
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/region",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              },
+              {
+                "key": "filter[objects]",
+                "value": "[{\"name\":\"provider_id\",\"op\":\"eq\",\"val\":\"$context\"}]"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "stack",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "jq-backend",
+            "refId": "",
+            "root_selector": ".data[].id",
+            "source": "url",
+            "type": "json",
+            "url": "/stack",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/stack",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": true,
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "referenceName": "services",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/service",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"stack_id\",\"op\":\"eq\",\"val\":\"$stack\"}]"
+                }
+              ]
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/service",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": true,
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "hide": 2,
+        "includeAll": true,
+        "multi": true,
+        "name": "deployed_ids",
+        "options": [],
+        "query": {
+          "field": "deployment",
+          "query": "action:deployment_start environment:$environment stack:$stack",
+          "refId": "deployed_ids",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6w",
+    "to": "now-4w"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Infrastructure Health",
+  "uid": "infra-health"
 }

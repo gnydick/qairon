@@ -1,4 +1,4 @@
-FROM python:3.9.2
+FROM python:3.13.11
 
 ENV FLASK_APP=app.py
 ENV LC_ALL=C.UTF-8
@@ -16,7 +16,7 @@ RUN apt-get update && \
     apt-get -y clean
 
 RUN useradd -m -d /opt/qairon qairon_user
-
+RUN pip install --upgrade pip
 
 
 WORKDIR /opt/qairon/qairon

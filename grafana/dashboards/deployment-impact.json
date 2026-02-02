@@ -1,1304 +1,1116 @@
 {
-  "apiVersion": "dashboard.grafana.app/v2beta1",
-  "kind": "Dashboard",
-  "metadata": {
-    "name": "deployment-impact",
-    "namespace": "default",
-    "uid": "kpODSoRH6HLFdXOFDteMxpXjQZovPQh7rSS4WruXrV8X",
-    "resourceVersion": "36",
-    "generation": 36,
-    "creationTimestamp": "2026-01-31T02:57:23Z",
-    "labels": {
-      "grafana.app/deprecatedInternalID": "22"
+  "__inputs": [
+    {
+      "description": "VictoriaMetrics Prometheus-compatible datasource",
+      "label": "VictoriaMetrics",
+      "name": "DS_VICTORIAMETRICS",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus",
+      "type": "datasource"
     },
-    "annotations": {
-      "grafana.app/createdBy": "user:cfb8jm3t86ltsb",
-      "grafana.app/updatedBy": "user:cfb8jm3t86ltsb",
-      "grafana.app/updatedTimestamp": "2026-02-01T01:13:39Z"
+    {
+      "description": "VictoriaLogs datasource",
+      "label": "VictoriaLogs",
+      "name": "DS_VICTORIALOGS",
+      "pluginId": "victoriametrics-logs-datasource",
+      "pluginName": "VictoriaLogs",
+      "type": "datasource"
     }
-  },
-  "spec": {
-    "annotations": [
-      {
-        "kind": "AnnotationQuery",
-        "spec": {
-          "builtIn": true,
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "query": {
-            "datasource": {
-              "name": "-- Grafana --"
-            },
-            "group": "grafana",
-            "kind": "DataQuery",
-            "spec": {},
-            "version": "v0"
-          }
-        }
-      },
-      {
-        "kind": "AnnotationQuery",
-        "spec": {
-          "builtIn": false,
-          "enable": true,
-          "hide": false,
-          "iconColor": "#FF9830",
-          "name": "Releases",
-          "query": {
-            "datasource": {
-              "name": "efba5wxx8ub5sa"
-            },
-            "group": "yesoreyeram-infinity-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "columns": [
-                {
-                  "selector": "attributes.created_at",
-                  "text": "time",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "id",
-                  "text": "text",
-                  "type": "string"
-                },
-                {
-                  "selector": "attributes.build_num",
-                  "text": "title",
-                  "type": "number"
-                }
-              ],
-              "format": "dataframe",
-              "parser": "backend",
-              "refId": "releases",
-              "root_selector": "data",
-              "source": "url",
-              "type": "json",
-              "url": "/release",
-              "url_options": {
-                "data": "",
-                "method": "GET",
-                "params": [
-                  {
-                    "key": "filter[objects]",
-                    "value": "[{\"name\":\"created_at\",\"op\":\"ge\",\"val\":\"${__timeFrom:date:iso}\"},{\"name\":\"created_at\",\"op\":\"le\",\"val\":\"${__timeTo:date:iso}\"},{\"name\":\"deployment_id\",\"op\":\"in\",\"val\":${deployed_ids:json}}]"
-                  }
-                ]
-              }
-            },
-            "version": "v0"
-          }
-        }
-      },
-      {
-        "kind": "AnnotationQuery",
-        "spec": {
-          "builtIn": false,
-          "enable": true,
-          "hide": false,
-          "iconColor": "#5794F2",
-          "name": "Deploy Start",
-          "query": {
-            "datasource": {
-              "name": "ffb8kdooypz40e"
-            },
-            "group": "victoriametrics-logs-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "expr": "action:deployment_start environment:$environment stack:in($stack)",
-              "refId": "deploy_start"
-            },
-            "version": "v0"
-          }
-        }
-      },
-      {
-        "kind": "AnnotationQuery",
-        "spec": {
-          "builtIn": false,
-          "enable": true,
-          "hide": false,
-          "iconColor": "#73BF69",
-          "name": "Deploy Complete",
-          "query": {
-            "datasource": {
-              "name": "ffb8kdooypz40e"
-            },
-            "group": "victoriametrics-logs-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "expr": "action:deployment_complete environment:$environment stack:in($stack)",
-              "refId": "deploy_complete"
-            },
-            "version": "v0"
-          }
-        }
-      }
-    ],
-    "cursorSync": "Crosshair",
-    "description": "Rollout tracking and impact analysis across regions and releases",
-    "editable": true,
-    "elements": {
-      "panel-1": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "(action:deployment_start OR action:deployment_complete) environment:$environment stack:in($stack) | sort by (_time desc) | limit 100"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 1,
-          "links": [],
-          "title": "Recent Deployment Events",
-          "vizConfig": {
-            "group": "logs",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "dedupStrategy": "none",
-                "enableInfiniteScrolling": false,
-                "enableLogDetails": true,
-                "prettifyLogMessage": false,
-                "showCommonLabels": false,
-                "showControls": false,
-                "showLabels": true,
-                "showTime": true,
-                "sortOrder": "Descending",
-                "wrapLogMessage": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-10": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum by (stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])) * 100",
-                        "legendFormat": "{{stack}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])) * 100",
-                        "legendFormat": "Overall"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "B"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 10,
-          "links": [],
-          "title": "Error Rate with Deployments",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 10,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "smooth",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "never",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "links": [
-                    {
-                      "targetBlank": true,
-                      "title": "User Experience",
-                      "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}"
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 1
-                      },
-                      {
-                        "color": "red",
-                        "value": 5
-                      }
-                    ]
-                  },
-                  "unit": "percent"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "maxHeight": 300,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-11": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "max by (stack) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval]))",
-                        "legendFormat": "P95 {{stack}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "max by (stack) (quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval]))",
-                        "legendFormat": "P50 {{stack}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "B"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 11,
-          "links": [],
-          "title": "Latency with Deployments",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 5,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "smooth",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "never",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "links": [
-                    {
-                      "targetBlank": true,
-                      "title": "User Experience",
-                      "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}"
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  },
-                  "unit": "ms"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "maxHeight": 300,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-20": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (stack) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__interval])) / (vector($__interval_ms) / 1000)",
-                        "legendFormat": "{{stack}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 20,
-          "links": [],
-          "title": "Request Rate",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 15,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "smooth",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "never",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "normal"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "links": [
-                    {
-                      "targetBlank": true,
-                      "title": "User Experience",
-                      "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}"
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  },
-                  "unit": "reqps"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "maxHeight": 300,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-21": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "avg by (stack) (avg_over_time(response_size_bytes{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval]))",
-                        "legendFormat": "{{stack}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 21,
-          "links": [],
-          "title": "Response Size",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 5,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "smooth",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "never",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "links": [
-                    {
-                      "targetBlank": true,
-                      "title": "User Experience",
-                      "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}"
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  },
-                  "unit": "bytes"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "maxHeight": 300,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-30": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])) * 100",
-                        "legendFormat": "{{region}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 30,
-          "links": [],
-          "title": "Error Rate by Region",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 10,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "smooth",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "never",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "links": [
-                    {
-                      "targetBlank": true,
-                      "title": "Platform Overview",
-                      "url": "/d/platform-overview/platform-overview?var-environment=${environment}&var-region=${__field.labels.region}&${__url_time_range}"
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 1
-                      },
-                      {
-                        "color": "red",
-                        "value": 5
-                      }
-                    ]
-                  },
-                  "unit": "percent"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "maxHeight": 300,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-31": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "max by (region) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval]))",
-                        "legendFormat": "P95 {{region}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 31,
-          "links": [],
-          "title": "Latency by Region",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 5,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "smooth",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "never",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "links": [
-                    {
-                      "targetBlank": true,
-                      "title": "Platform Overview",
-                      "url": "/d/platform-overview/platform-overview?var-environment=${environment}&var-region=${__field.labels.region}&${__url_time_range}"
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  },
-                  "unit": "ms"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "maxHeight": 300,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-40": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", success=\"false\"}[$__rate_interval])) / sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval])) * 100",
-                        "legendFormat": "release {{release_num}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 40,
-          "links": [],
-          "title": "Error Rate by Release",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 10,
-                    "lineInterpolation": "smooth",
-                    "showPoints": "never"
-                  },
-                  "unit": "percent"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
-                },
-                "tooltip": {
-                  "maxHeight": 300,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": ""
-          }
-        }
-      },
-      "panel-41": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "max by (release_num) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\"}[$__rate_interval]))",
-                        "legendFormat": "release {{release_num}}"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 41,
-          "links": [],
-          "title": "P95 by Release",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "custom": {
-                    "drawStyle": "line",
-                    "fillOpacity": 5,
-                    "lineInterpolation": "smooth",
-                    "showPoints": "never"
-                  },
-                  "unit": "ms"
-                },
-                "overrides": []
-              },
-              "options": {
-                "legend": {
-                  "calcs": [
-                    "mean",
-                    "max"
-                  ],
-                  "displayMode": "table",
-                  "placement": "bottom"
-                },
-                "tooltip": {
-                  "maxHeight": 300,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              }
-            },
-            "version": ""
-          }
-        }
-      }
+  ],
+  "__requires": [
+    {
+      "id": "grafana",
+      "name": "Grafana",
+      "type": "grafana",
+      "version": "12.3.1"
     },
-    "layout": {
-      "kind": "GridLayout",
-      "spec": {
-        "items": []
-      }
+    {
+      "id": "prometheus",
+      "name": "Prometheus",
+      "type": "datasource",
+      "version": "1.0.0"
     },
-    "links": [
-      {
-        "asDropdown": true,
-        "icon": "external link",
-        "includeVars": true,
-        "keepTime": true,
-        "tags": [
-          "social-platform"
-        ],
-        "targetBlank": false,
-        "title": "SRE Dashboards",
-        "type": "dashboards"
-      }
-    ],
-    "liveNow": false,
-    "preload": false,
-    "tags": [
-      "social-platform",
-      "sre"
-    ],
-    "timeSettings": {
-      "autoRefresh": "",
-      "autoRefreshIntervals": [
-        "5s",
-        "10s",
-        "30s",
-        "1m",
-        "5m",
-        "15m",
-        "30m",
-        "1h",
-        "2h",
-        "1d"
-      ],
-      "fiscalYearStartMonth": 0,
-      "from": "now-6h-4w",
-      "hideTimepicker": false,
-      "timezone": "browser",
-      "to": "now-4w"
+    {
+      "id": "victoriametrics-logs-datasource",
+      "name": "VictoriaLogs",
+      "type": "datasource",
+      "version": "1.0.0"
     },
-    "title": "Deployment Impact",
-    "variables": [
+    {
+      "id": "timeseries",
+      "name": "Time series",
+      "type": "panel",
+      "version": ""
+    },
+    {
+      "id": "logs",
+      "name": "Logs",
+      "type": "panel",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
       {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "prod",
-            "value": "prod"
-          },
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "environment",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "ffb8jnum7rx8ge"
-            },
-            "group": "prometheus",
-            "kind": "DataQuery",
-            "spec": {
-              "__legacyStringValue": "label_values(request_duration_ms, environment)"
-            },
-            "version": "v0"
-          },
-          "refresh": "onTimeRangeChanged",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#FF9830",
+        "name": "Releases",
+        "target": {
+          "expr": "action:deployment_complete environment:$environment stack:$stack service:in($service) | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "releases"
         }
       },
       {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "All",
-            "value": "$__all"
-          },
-          "hide": "dontHide",
-          "includeAll": true,
-          "multi": true,
-          "name": "region",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "ffb8jnum7rx8ge"
-            },
-            "group": "prometheus",
-            "kind": "DataQuery",
-            "spec": {
-              "__legacyStringValue": "label_values(request_duration_ms{environment=\"$environment\"}, region)"
-            },
-            "version": "v0"
-          },
-          "refresh": "onTimeRangeChanged",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#5794F2",
+        "name": "Deploy Start",
+        "target": {
+          "expr": "action:deployment_start environment:$environment stack:$stack service:in($service) | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "deploy_start"
         }
       },
       {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "All",
-            "value": "$__all"
-          },
-          "hide": "dontHide",
-          "includeAll": true,
-          "multi": true,
-          "name": "stack",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "ffb8jnum7rx8ge"
-            },
-            "group": "prometheus",
-            "kind": "DataQuery",
-            "spec": {
-              "__legacyStringValue": "label_values(request_duration_ms{environment=\"$environment\"}, stack)"
-            },
-            "version": "v0"
-          },
-          "refresh": "onTimeRangeChanged",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
-        }
-      },
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "All",
-            "value": "$__all"
-          },
-          "hide": "hideVariable",
-          "includeAll": true,
-          "multi": true,
-          "name": "deployed_ids",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "ffb8kdooypz40e"
-            },
-            "group": "victoriametrics-logs-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "field": "deployment",
-              "query": "action:deployment_start environment:$environment stack:in($stack)",
-              "refId": "deployed_ids",
-              "type": "fieldValue"
-            },
-            "version": "v0"
-          },
-          "refresh": "onTimeRangeChanged",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#73BF69",
+        "name": "Deploy Complete",
+        "target": {
+          "expr": "action:deployment_complete environment:$environment stack:$stack service:in($service) | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "deploy_complete"
         }
       }
     ]
   },
-  "status": {}
+  "description": "Rollout tracking and impact analysis across regions and releases",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "social-platform"
+      ],
+      "targetBlank": false,
+      "title": "SRE Dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 42,
+      "panels": [],
+      "title": "Context",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 43,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### Environment: $environment  |  Account: $context  |  Region: $region  |  Stack: $stack",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 32,
+        "w": 6,
+        "x": 0,
+        "y": 4
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "_time"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "(action:deployment_start OR action:deployment_complete) environment:$environment stack:$stack | sort by (_time desc) | limit 200",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "$stack Deployments",
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "replace": true,
+            "source": "labels"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {
+              "Time": true,
+              "action": true,
+              "release_num": true,
+              "service": true
+            },
+            "indexByName": {
+              "Time": 0,
+              "action": 1,
+              "release_num": 3,
+              "service": 2
+            },
+            "renameByName": {
+              "Time": "Timestamp",
+              "action": "Action",
+              "release_num": "Release #",
+              "service": "Service ID"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "User Experience",
+              "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 6,
+        "y": 4
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "legendFormat": "{{stack}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "legendFormat": "Overall",
+          "refId": "B"
+        }
+      ],
+      "title": "Error Rate with Deployments",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "User Experience",
+              "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}"
+            }
+          ],
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 15,
+        "y": 4
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max by (service) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "P95 {{stack}}",
+          "refId": "A"
+        },
+        {
+          "expr": "max by (service) (quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "P50 {{stack}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Latency with Deployments",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "User Experience",
+              "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}"
+            }
+          ],
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 6,
+        "y": 12
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__interval])) / (vector($__interval_ms) / 1000)",
+          "legendFormat": "{{stack}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Request Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "User Experience",
+              "url": "/d/user-experience/user-experience?var-environment=${environment}&var-stack=${__field.labels.stack}&${__url_time_range}"
+            }
+          ],
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 15,
+        "y": 12
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "avg by (service) (avg_over_time(response_size_bytes{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "{{stack}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Response Size",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Platform Overview",
+              "url": "/d/platform-overview/platform-overview?var-environment=${environment}&var-region=${__field.labels.region}&${__url_time_range}"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 6,
+        "y": 20
+      },
+      "id": 30,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "legendFormat": "{{region}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Rate by Region",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Platform Overview",
+              "url": "/d/platform-overview/platform-overview?var-environment=${environment}&var-region=${__field.labels.region}&${__url_time_range}"
+            }
+          ],
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 15,
+        "y": 20
+      },
+      "id": 31,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max by (region) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "P95 {{region}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Latency by Region",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 6,
+        "y": 28
+      },
+      "id": 40,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "legendFormat": "release {{release_num}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Rate by Release",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 15,
+        "y": 28
+      },
+      "id": 41,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "maxHeight": 300,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max by (release_num) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "release {{release_num}}",
+          "refId": "A"
+        }
+      ],
+      "title": "P95 by Release",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": [
+    "social-platform",
+    "sre"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "multi": false,
+        "name": "environment",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "id",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "id",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/environment",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/environment",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "aws",
+          "value": "aws"
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "hide": 2,
+        "label": "Platform",
+        "name": "provider_type",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/provider_type",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "dev:aws:333333333331",
+          "value": "dev:aws:333333333331"
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "label": "Context",
+        "multi": false,
+        "name": "context",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "jq-backend",
+            "refId": "",
+            "root_selector": ".data[]|.id",
+            "source": "url",
+            "type": "json",
+            "url": "/provider",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"environment_id\",\"op\":\"eq\",\"val\":\"$environment\"}]"
+                }
+              ]
+            }
+          },
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "staticOptions": [],
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "multi": false,
+        "name": "region",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.attributes.name",
+            "source": "url",
+            "type": "json",
+            "url": "/region",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"provider_id\",\"op\":\"eq\",\"val\":\"$context\"}]"
+                }
+              ]
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/region",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              },
+              {
+                "key": "filter[objects]",
+                "value": "[{\"name\":\"provider_id\",\"op\":\"eq\",\"val\":\"$context\"}]"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "multi": false,
+        "name": "stack",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "jq-backend",
+            "refId": "",
+            "root_selector": ".data[].id",
+            "source": "url",
+            "type": "json",
+            "url": "/stack",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/stack",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": true,
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "referenceName": "services",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/service",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"stack_id\",\"op\":\"eq\",\"val\":\"$stack\"}]"
+                }
+              ]
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/service",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": true,
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "hide": 2,
+        "includeAll": true,
+        "multi": true,
+        "name": "deployed_ids",
+        "options": [],
+        "query": {
+          "field": "deployment",
+          "query": "action:deployment_start environment:$environment stack:$stack service:$service",
+          "refId": "deployed_ids",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6w",
+    "to": "now-4w"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Deployment Impact",
+  "uid": "deployment-impact"
 }

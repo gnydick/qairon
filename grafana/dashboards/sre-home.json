@@ -1,1339 +1,1449 @@
 {
-  "apiVersion": "dashboard.grafana.app/v2beta1",
-  "kind": "Dashboard",
-  "metadata": {
-    "name": "sre-home",
-    "namespace": "default",
-    "uid": "Xb0lkaS3y3ZJLzEnB7WiBZR0SAmTayNiuA1GAEZMwIMX",
-    "resourceVersion": "18",
-    "generation": 18,
-    "creationTimestamp": "2026-02-02T02:41:13Z",
-    "labels": {
-      "grafana.app/deprecatedInternalID": "29"
-    },
-    "annotations": {
-      "grafana.app/createdBy": "user:cfb8jm3t86ltsb",
-      "grafana.app/updatedBy": "user:cfb8jm3t86ltsb",
-      "grafana.app/updatedTimestamp": "2026-02-02T05:42:22Z"
-    }
-  },
-  "spec": {
-    "annotations": [
+  "annotations": {
+    "list": [
       {
-        "kind": "AnnotationQuery",
-        "spec": {
-          "builtIn": true,
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "query": {
-            "datasource": {
-              "name": "-- Grafana --"
-            },
-            "group": "grafana",
-            "kind": "DataQuery",
-            "spec": {},
-            "version": "v0"
-          }
-        }
-      }
-    ],
-    "cursorSync": "Crosshair",
-    "description": "SRE landing page — select scope and navigate to dashboards with variables pre-filled",
-    "editable": true,
-    "elements": {
-      "panel-1": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) / $__rate_interval",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 1,
-          "links": [],
-          "title": "Request Rate",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow"
-                      },
-                      {
-                        "color": "red"
-                      }
-                    ]
-                  },
-                  "unit": "reqps"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-10": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 10,
-          "links": [],
-          "title": "",
-          "vizConfig": {
-            "group": "text",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "code": {
-                  "language": "plaintext",
-                  "showLineNumbers": false,
-                  "showMiniMap": false
-                },
-                "content": "### [Platform Overview](/d/platform-overview/platform-overview?var-environment=${environment}&var-region=${region}&var-stack=${stack}&${__url_time_range})\n\nHigh-level health across all stacks and services. Request rates, error rates, and latency by stack.\n\n**Scope:** environment, region, stack",
-                "mode": "markdown"
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-11": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 11,
-          "links": [],
-          "title": "",
-          "vizConfig": {
-            "group": "text",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "code": {
-                  "language": "plaintext",
-                  "showLineNumbers": false,
-                  "showMiniMap": false
-                },
-                "content": "### [User Experience](/d/user-experience/user-experience?var-environment=${environment}&var-region=${region}&var-stack=${stack}&var-service=${service}&var-action=${action}&${__url_time_range})\nCache hit rates, DB query counts, request/response sizes, and top slowest/error-prone actions.\n\n**Scope:** environment, region, stack, service, action",
-                "mode": "markdown"
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-12": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 12,
-          "links": [],
-          "title": "",
-          "vizConfig": {
-            "group": "text",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "code": {
-                  "language": "plaintext",
-                  "showLineNumbers": false,
-                  "showMiniMap": false
-                },
-                "content": "### [Service Detail](/d/service-detail/service-detail?var-environment=${environment}&var-region=${region}&var-stack=${stack}&var-service=${service}&${__url_time_range})\n\nDeep dive into a single service — request rate, error rate, and latency broken down by action.\n\n**Scope:** environment, region, stack (single), service (single)",
-                "mode": "markdown"
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-13": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 13,
-          "links": [],
-          "title": "",
-          "vizConfig": {
-            "group": "text",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "code": {
-                  "language": "plaintext",
-                  "showLineNumbers": false,
-                  "showMiniMap": false
-                },
-                "content": "### [Action Detail](/d/action-detail/action-detail?var-environment=${environment}&var-region=${region}&var-stack=${stack}&var-service=${service}&var-action=${action}&${__url_time_range})\n\nSingle action deep dive — latency distribution, error sources, cache hit rate, DB queries, and upstream dependency errors.\n\n**Scope:** environment, region, stack (single), service (single), action (single)",
-                "mode": "markdown"
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-14": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 14,
-          "links": [],
-          "title": "",
-          "vizConfig": {
-            "group": "text",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "code": {
-                  "language": "plaintext",
-                  "showLineNumbers": false,
-                  "showMiniMap": false
-                },
-                "content": "### [Error Analysis](/d/error-analysis/error-analysis?var-environment=${environment}&var-region=${region}&var-stack=${stack}&var-service=${service}&${__url_time_range})\n\nRoot cause investigation — error source breakdown, cascade chains, error codes/types distribution, and error log stream.\n\n**Scope:** environment, region, stack, service",
-                "mode": "markdown"
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-15": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 15,
-          "links": [],
-          "title": "",
-          "vizConfig": {
-            "group": "text",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "code": {
-                  "language": "plaintext",
-                  "showLineNumbers": false,
-                  "showMiniMap": false
-                },
-                "content": "### [Deployment Impact](/d/deployment-impact/deployment-impact?var-environment=${environment}&var-region=${region}&var-stack=${stack}&${__url_time_range})\n\nCorrelate deployments with error rate, latency, and throughput changes. Error rate and P95 by release.\n\n**Scope:** environment, region, stack",
-                "mode": "markdown"
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-16": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 16,
-          "links": [],
-          "title": "",
-          "vizConfig": {
-            "group": "text",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "code": {
-                  "language": "plaintext",
-                  "showLineNumbers": false,
-                  "showMiniMap": false
-                },
-                "content": "### [Infra Health](/d/infra-health/infra-health?var-environment=${environment}&${__url_time_range})\n\nInfrastructure incident timeline, affected services, and hidden dependency failure patterns.\n\n**Scope:** environment",
-                "mode": "markdown"
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-2": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 2,
-          "links": [],
-          "title": "Error Rate %",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 1
-                      },
-                      {
-                        "color": "red",
-                        "value": 5
-                      }
-                    ]
-                  },
-                  "unit": "percent"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-3": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "quantile(0.5, quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 3,
-          "links": [],
-          "title": "P50 Latency",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 500
-                      },
-                      {
-                        "color": "red",
-                        "value": 1000
-                      }
-                    ]
-                  },
-                  "unit": "ms"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-4": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "quantile(0.5, quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 4,
-          "links": [],
-          "title": "P95 Latency",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 800
-                      },
-                      {
-                        "color": "red",
-                        "value": 2000
-                      }
-                    ]
-                  },
-                  "unit": "ms"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-5": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8jnum7rx8ge"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "quantile(0.5, quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
-                        "legendFormat": ""
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 5,
-          "links": [],
-          "title": "P99 Latency",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 1500
-                      },
-                      {
-                        "color": "red",
-                        "value": 3000
-                      }
-                    ]
-                  },
-                  "unit": "ms"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      },
-      "panel-6": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "ffb8kdooypz40e"
-                      },
-                      "group": "victoriametrics-logs-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "level:ERROR error_source:infrastructure* environment:$environment stack:in($stack) service:in($service) | stats count() as total",
-                        "legendFormat": "",
-                        "queryType": "stats"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 6,
-          "links": [],
-          "title": "Infra Incidents",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "yellow",
-                        "value": 1
-                      },
-                      {
-                        "color": "red",
-                        "value": 10
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "12.3.1"
-          }
-        }
-      }
-    },
-    "layout": {
-      "kind": "GridLayout",
-      "spec": {
-        "items": []
-      }
-    },
-    "links": [
-      {
-        "asDropdown": true,
-        "icon": "external link",
-        "includeVars": true,
-        "keepTime": true,
-        "tags": [
-          "social-platform"
-        ],
-        "targetBlank": false,
-        "title": "SRE Dashboards",
-        "type": "dashboards"
-      }
-    ],
-    "liveNow": false,
-    "preload": false,
-    "tags": [
-      "social-platform",
-      "sre"
-    ],
-    "timeSettings": {
-      "autoRefresh": "",
-      "autoRefreshIntervals": [
-        "5s",
-        "10s",
-        "30s",
-        "1m",
-        "5m",
-        "15m",
-        "30m",
-        "1h",
-        "2h",
-        "1d"
-      ],
-      "fiscalYearStartMonth": 0,
-      "from": "now-6h-4w",
-      "hideTimepicker": false,
-      "timezone": "browser",
-      "to": "now-4w"
-    },
-    "title": "SRE Home",
-    "variables": [
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": false,
-          "current": {
-            "text": "",
-            "value": ""
-          },
-          "definition": "",
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "environment",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "efba5wxx8ub5sa"
-            },
-            "group": "yesoreyeram-infinity-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "columns": [
-                {
-                  "selector": "id",
-                  "text": "__value",
-                  "type": "string"
-                },
-                {
-                  "selector": "id",
-                  "text": "__text",
-                  "type": "string"
-                }
-              ],
-              "infinityQuery": {
-                "columns": [],
-                "data": "values\nfoo\nbar\nbaz",
-                "filters": [],
-                "format": "table",
-                "parser": "backend",
-                "refId": "",
-                "root_selector": "data.id",
-                "source": "url",
-                "type": "json",
-                "url": "/environment",
-                "url_options": {
-                  "data": "",
-                  "method": "GET"
-                }
-              },
-              "parser": "backend",
-              "queryType": "infinity",
-              "refId": "variable",
-              "root_selector": "data",
-              "source": "url",
-              "type": "json",
-              "url": "/environment",
-              "url_options": {
-                "data": "",
-                "method": "GET",
-                "params": [
-                  {
-                    "key": "page[size]",
-                    "value": "1000"
-                  }
-                ]
-              }
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#FF9830",
+        "name": "Releases",
+        "target": {
+          "expr": "action:deployment_complete environment:$environment stack:$stack | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "releases"
         }
       },
       {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": false,
-          "current": {
-            "text": "aws",
-            "value": "aws"
-          },
-          "definition": "",
-          "hide": "hideVariable",
-          "includeAll": false,
-          "label": "Platform",
-          "multi": false,
-          "name": "provider_type",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "efba5wxx8ub5sa"
-            },
-            "group": "yesoreyeram-infinity-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "infinityQuery": {
-                "columns": [],
-                "data": "values\nfoo\nbar\nbaz",
-                "filters": [],
-                "format": "table",
-                "parser": "backend",
-                "refId": "",
-                "root_selector": "data.id",
-                "source": "url",
-                "type": "json",
-                "url": "/provider_type",
-                "url_options": {
-                  "data": "",
-                  "method": "GET"
-                }
-              },
-              "queryType": "infinity",
-              "refId": "variable"
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#5794F2",
+        "name": "Deploy Start",
+        "target": {
+          "expr": "action:deployment_start environment:$environment stack:$stack | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "deploy_start"
         }
       },
       {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": false,
-          "current": {
-            "text": "dev:aws:333333333331",
-            "value": "dev:aws:333333333331"
-          },
-          "definition": "",
-          "hide": "dontHide",
-          "includeAll": true,
-          "label": "Account",
-          "multi": true,
-          "name": "account",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "efba5wxx8ub5sa"
-            },
-            "group": "yesoreyeram-infinity-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "infinityQuery": {
-                "columns": [],
-                "data": "values\nfoo\nbar\nbaz",
-                "filters": [],
-                "format": "table",
-                "parser": "jq-backend",
-                "refId": "",
-                "root_selector": ".data[]|.id",
-                "source": "url",
-                "type": "json",
-                "url": "/provider",
-                "url_options": {
-                  "data": "",
-                  "method": "GET",
-                  "params": [
-                    {
-                      "key": "filter[objects]",
-                      "value": "[{\"name\":\"environment_id\",\"op\":\"eq\",\"val\":\"$environment\"}]"
-                    }
-                  ]
-                }
-              },
-              "queryType": "infinity",
-              "refId": "variable"
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc",
-          "staticOptions": []
-        }
-      },
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": false,
-          "current": {
-            "text": "",
-            "value": ""
-          },
-          "definition": "",
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "region",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "efba5wxx8ub5sa"
-            },
-            "group": "yesoreyeram-infinity-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "columns": [
-                {
-                  "selector": "attributes.name",
-                  "text": "__value",
-                  "type": "string"
-                },
-                {
-                  "selector": "attributes.name",
-                  "text": "__text",
-                  "type": "string"
-                }
-              ],
-              "infinityQuery": {
-                "columns": [],
-                "data": "values\nfoo\nbar\nbaz",
-                "filters": [],
-                "format": "table",
-                "parser": "backend",
-                "refId": "",
-                "root_selector": "data.attributes.name",
-                "source": "url",
-                "type": "json",
-                "url": "/region",
-                "url_options": {
-                  "data": "",
-                  "method": "GET",
-                  "params": [
-                    {
-                      "key": "filter[objects]",
-                      "value": "[{\"name\":\"provider_id\",\"op\":\"in\",\"val\":${account:json}}]"
-                    }
-                  ]
-                }
-              },
-              "parser": "backend",
-              "queryType": "infinity",
-              "refId": "variable",
-              "root_selector": "data",
-              "source": "url",
-              "type": "json",
-              "url": "/region",
-              "url_options": {
-                "data": "",
-                "method": "GET",
-                "params": [
-                  {
-                    "key": "page[size]",
-                    "value": "1000"
-                  },
-                  {
-                    "key": "filter[objects]",
-                    "value": "[{\"name\":\"id\",\"op\":\"like\",\"val\":\"$environment:%\"}]"
-                  }
-                ]
-              }
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
-        }
-      },
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": false,
-          "current": {
-            "text": "",
-            "value": ""
-          },
-          "definition": "",
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "stack",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "efba5wxx8ub5sa"
-            },
-            "group": "yesoreyeram-infinity-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "columns": [
-                {
-                  "selector": "attributes.name",
-                  "text": "__value",
-                  "type": "string"
-                },
-                {
-                  "selector": "attributes.name",
-                  "text": "__text",
-                  "type": "string"
-                }
-              ],
-              "infinityQuery": {
-                "columns": [],
-                "data": "values\nfoo\nbar\nbaz",
-                "filters": [],
-                "format": "table",
-                "parser": "jq-backend",
-                "refId": "",
-                "root_selector": ".data[].id",
-                "source": "url",
-                "type": "json",
-                "url": "/stack",
-                "url_options": {
-                  "data": "",
-                  "method": "GET"
-                }
-              },
-              "parser": "backend",
-              "queryType": "infinity",
-              "refId": "variable",
-              "root_selector": "data",
-              "source": "url",
-              "type": "json",
-              "url": "/stack",
-              "url_options": {
-                "data": "",
-                "method": "GET",
-                "params": [
-                  {
-                    "key": "page[size]",
-                    "value": "1000"
-                  }
-                ]
-              }
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
-        }
-      },
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": false,
-          "current": {
-            "text": "",
-            "value": ""
-          },
-          "definition": "",
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "service",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "efba5wxx8ub5sa"
-            },
-            "group": "yesoreyeram-infinity-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "columns": [
-                {
-                  "selector": "attributes.name",
-                  "text": "__value",
-                  "type": "string"
-                },
-                {
-                  "selector": "attributes.name",
-                  "text": "__text",
-                  "type": "string"
-                }
-              ],
-              "infinityQuery": {
-                "columns": [],
-                "data": "values\nfoo\nbar\nbaz",
-                "filters": [],
-                "format": "table",
-                "parser": "backend",
-                "refId": "",
-                "referenceName": "services",
-                "root_selector": "data.id",
-                "source": "url",
-                "type": "json",
-                "url": "/service",
-                "url_options": {
-                  "data": "",
-                  "method": "GET",
-                  "params": [
-                    {
-                      "key": "filter[objects]",
-                      "value": "[{\"name\":\"stack_id\",\"op\":\"eq\",\"val\":\"$stack\"}]"
-                    }
-                  ]
-                }
-              },
-              "parser": "backend",
-              "queryType": "infinity",
-              "refId": "variable",
-              "root_selector": "data",
-              "source": "url",
-              "type": "json",
-              "url": "/service",
-              "url_options": {
-                "data": "",
-                "method": "GET",
-                "params": [
-                  {
-                    "key": "page[size]",
-                    "value": "1000"
-                  }
-                ]
-              }
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
-        }
-      },
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "",
-            "value": ""
-          },
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "action",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "ffb8jnum7rx8ge"
-            },
-            "group": "prometheus",
-            "kind": "DataQuery",
-            "spec": {
-              "__legacyStringValue": "label_values(request_duration_ms{environment=\"$environment\", stack=~\"$stack\", service=~\"$service\"}, action)"
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
-        }
-      },
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "",
-            "value": ""
-          },
-          "hide": "hideVariable",
-          "includeAll": true,
-          "multi": true,
-          "name": "deployed_ids",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "ffb8kdooypz40e"
-            },
-            "group": "victoriametrics-logs-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "field": "deployment",
-              "query": "action:deployment_start environment:$environment stack:in($stack) service:in($service)",
-              "refId": "deployed_ids",
-              "type": "fieldValue"
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "skipUrlSync": false,
-          "sort": "alphabeticalAsc"
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "enable": true,
+        "iconColor": "#73BF69",
+        "name": "Deploy Complete",
+        "target": {
+          "expr": "action:deployment_complete environment:$environment stack:$stack | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "refId": "deploy_complete"
         }
       }
     ]
   },
-  "status": {}
+  "description": "SRE landing page \u2014 select scope and navigate to dashboards with variables pre-filled",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "social-platform"
+      ],
+      "targetBlank": false,
+      "title": "SRE Dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 100,
+      "panels": [],
+      "title": "Quick Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "id": 1,
+      "maxDataPoints": 150,
+      "options": {
+        "calculate": false,
+        "cellGap": 0,
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-orange",
+          "mode": "scheme",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "Blues",
+          "steps": 64
+        },
+        "exemplars": {
+          "color": "rgba(255,0,255,0.7)"
+        },
+        "filterValues": {
+          "le": 1e-09
+        },
+        "legend": {
+          "show": true
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "showColorScale": false,
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__interval])) / ($__interval_ms / 1000)",
+          "interval": "",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Request Rate by Service",
+      "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 1
+      },
+      "id": 2,
+      "maxDataPoints": 150,
+      "options": {
+        "calculate": false,
+        "cellGap": 0,
+        "color": {
+          "exponent": 0.5,
+          "fill": "red",
+          "mode": "opacity",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "Reds",
+          "steps": 64
+        },
+        "exemplars": {
+          "color": "rgba(255,0,255,0.7)"
+        },
+        "filterValues": {
+          "le": 1e-09
+        },
+        "legend": {
+          "show": true
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "showColorScale": false,
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__interval])) * 100",
+          "interval": "",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Rate % by Service",
+      "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 17
+      },
+      "id": 3,
+      "maxDataPoints": 150,
+      "options": {
+        "calculate": false,
+        "cellGap": 0,
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-orange",
+          "mode": "scheme",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "RdYlGn",
+          "steps": 64
+        },
+        "exemplars": {
+          "color": "rgba(255,0,255,0.7)"
+        },
+        "filterValues": {
+          "le": 1e-09
+        },
+        "legend": {
+          "show": true
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "showColorScale": false,
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "avg by (service) (quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__interval]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "P50 Latency by Service",
+      "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 17
+      },
+      "id": 4,
+      "maxDataPoints": 150,
+      "options": {
+        "calculate": false,
+        "cellGap": 0,
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-orange",
+          "mode": "scheme",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "RdYlGn",
+          "steps": 64
+        },
+        "exemplars": {
+          "color": "rgba(255,0,255,0.7)"
+        },
+        "filterValues": {
+          "le": 1e-09
+        },
+        "legend": {
+          "show": true
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "showColorScale": false,
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "avg by (service) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__interval]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "P95 Latency by Service",
+      "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 17
+      },
+      "id": 5,
+      "maxDataPoints": 150,
+      "options": {
+        "calculate": false,
+        "cellGap": 0,
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-orange",
+          "mode": "scheme",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "RdYlGn",
+          "steps": 64
+        },
+        "exemplars": {
+          "color": "rgba(255,0,255,0.7)"
+        },
+        "filterValues": {
+          "le": 1e-09
+        },
+        "legend": {
+          "show": true
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "showColorScale": false,
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "avg by (service) (quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__interval]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "P99 Latency by Service",
+      "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "id": 6,
+      "maxDataPoints": 150,
+      "options": {
+        "calculate": false,
+        "cellGap": 0,
+        "color": {
+          "exponent": 0.5,
+          "fill": "red",
+          "mode": "opacity",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "Reds",
+          "steps": 64
+        },
+        "exemplars": {
+          "color": "rgba(255,0,255,0.7)"
+        },
+        "filterValues": {
+          "le": 1e-09
+        },
+        "legend": {
+          "show": true
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "showColorScale": false,
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "ffb8kdooypz40e"
+          },
+          "expr": "level:ERROR error_source:* environment:$environment stack:in($stack) service:in($service) | stats by (service) count() as errors",
+          "legendFormat": "{{service}}",
+          "queryType": "statsRange",
+          "refId": "A"
+        }
+      ],
+      "title": "Upstream Errors by Service",
+      "type": "heatmap"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
+      "id": 101,
+      "panels": [],
+      "title": "Navigate",
+      "type": "row"
+    },
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 34
+      },
+      "id": 10,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### [Platform Overview](/d/platform-overview/platform-overview?var-environment=${environment}&var-region=${region}&var-stack=${stack}&${__url_time_range})\n\nHigh-level health across all stacks and services. Request rates, error rates, and latency by stack.\n\n**Scope:** environment, region, stack",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 34
+      },
+      "id": 11,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### [User Experience](/d/user-experience/user-experience?var-environment=${environment}&var-region=${region}&var-stack=${stack}&var-service=${service}&var-action=${action}&${__url_time_range})\nCache hit rates, DB query counts, request/response sizes, and top slowest/error-prone actions.\n\n**Scope:** environment, region, stack, service, action",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 34
+      },
+      "id": 12,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### [Service Detail](/d/service-detail/service-detail?var-environment=${environment}&var-region=${region}&var-stack=${stack}&var-service=${service}&${__url_time_range})\n\nDeep dive into a single service \u2014 request rate, error rate, and latency broken down by action.\n\n**Scope:** environment, region, stack (single), service (single)",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 34
+      },
+      "id": 13,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### [Action Detail](/d/action-detail/action-detail?var-environment=${environment}&var-region=${region}&var-stack=${stack}&var-service=${service}&var-action=${action}&${__url_time_range})\n\nSingle action deep dive \u2014 latency distribution, error sources, cache hit rate, DB queries, and upstream dependency errors.\n\n**Scope:** environment, region, stack (single), service (single), action (single)",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 40
+      },
+      "id": 14,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### [Error Analysis](/d/error-analysis/error-analysis?var-environment=${environment}&var-region=${region}&var-stack=${stack}&var-service=${service}&${__url_time_range})\n\nRoot cause investigation \u2014 error source breakdown, cascade chains, error codes/types distribution, and error log stream.\n\n**Scope:** environment, region, stack, service",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 40
+      },
+      "id": 15,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### [Deployment Impact](/d/deployment-impact/deployment-impact?var-environment=${environment}&var-region=${region}&var-stack=${stack}&${__url_time_range})\n\nCorrelate deployments with error rate, latency, and throughput changes. Error rate and P95 by release.\n\n**Scope:** environment, region, stack",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 40
+      },
+      "id": 16,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "### [Infra Health](/d/infra-health/infra-health?var-environment=${environment}&${__url_time_range})\n\nInfrastructure incident timeline, affected services, and hidden dependency failure patterns.\n\n**Scope:** environment",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.3.1",
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 9
+      },
+      "id": 102,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) / ($__interval_ms / 1000)",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Request Rate by Service",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 9
+      },
+      "id": 103,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Rate % by Service",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 9
+      },
+      "id": 104,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "ffb8kdooypz40e"
+          },
+          "expr": "level:ERROR error_source:* environment:$environment stack:in($stack) service:in($service) | stats by (service) count() as errors",
+          "legendFormat": "{{service}}",
+          "queryType": "statsRange",
+          "refId": "A"
+        }
+      ],
+      "title": "Upstream Errors by Service",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 25
+      },
+      "id": 105,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "avg by (service) (quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "P50 Latency by Service",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 25
+      },
+      "id": 106,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "avg by (service) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "P95 Latency by Service",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 25
+      },
+      "id": 107,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffb8jnum7rx8ge"
+          },
+          "expr": "avg by (service) (quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=~\"$stack\", service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "P99 Latency by Service",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [
+    "social-platform",
+    "sre"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "environment",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "id",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "id",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/environment",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/environment",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "aws",
+          "value": "aws"
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "hide": 2,
+        "label": "Platform",
+        "name": "provider_type",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/provider_type",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "dev:aws:333333333331",
+          "value": "dev:aws:333333333331"
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "label": "Context",
+        "multi": false,
+        "name": "context",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "jq-backend",
+            "refId": "",
+            "root_selector": ".data[]|.id",
+            "source": "url",
+            "type": "json",
+            "url": "/provider",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"environment_id\",\"op\":\"eq\",\"val\":\"$environment\"}]"
+                }
+              ]
+            }
+          },
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "staticOptions": [],
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "region",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "root_selector": "data.attributes.name",
+            "source": "url",
+            "type": "json",
+            "url": "/region",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"provider_id\",\"op\":\"eq\",\"val\":\"$context\"}]"
+                }
+              ]
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/region",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              },
+              {
+                "key": "filter[objects]",
+                "value": "[{\"name\":\"provider_id\",\"op\":\"eq\",\"val\":\"$context\"}]"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "stack",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "jq-backend",
+            "refId": "",
+            "root_selector": ".data[].id",
+            "source": "url",
+            "type": "json",
+            "url": "/stack",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/stack",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "efba5wxx8ub5sa"
+        },
+        "definition": "",
+        "includeAll": true,
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": {
+          "columns": [
+            {
+              "selector": "attributes.name",
+              "text": "__value",
+              "type": "string"
+            },
+            {
+              "selector": "attributes.name",
+              "text": "__text",
+              "type": "string"
+            }
+          ],
+          "infinityQuery": {
+            "columns": [],
+            "data": "values\nfoo\nbar\nbaz",
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "",
+            "referenceName": "services",
+            "root_selector": "data.id",
+            "source": "url",
+            "type": "json",
+            "url": "/service",
+            "url_options": {
+              "data": "",
+              "method": "GET",
+              "params": [
+                {
+                  "key": "filter[objects]",
+                  "value": "[{\"name\":\"stack_id\",\"op\":\"eq\",\"val\":\"$stack\"}]"
+                }
+              ]
+            }
+          },
+          "parser": "backend",
+          "queryType": "infinity",
+          "refId": "variable",
+          "root_selector": "data",
+          "source": "url",
+          "type": "json",
+          "url": "/service",
+          "url_options": {
+            "data": "",
+            "method": "GET",
+            "params": [
+              {
+                "key": "page[size]",
+                "value": "1000"
+              }
+            ]
+          }
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "ffb8jnum7rx8ge"
+        },
+        "includeAll": false,
+        "name": "action",
+        "options": [],
+        "query": "label_values(request_duration_ms{environment=\"$environment\", stack=~\"$stack\", service=~\"$service\"}, action)",
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "datasource": {
+          "type": "victoriametrics-logs-datasource",
+          "uid": "ffb8kdooypz40e"
+        },
+        "hide": 2,
+        "includeAll": true,
+        "multi": true,
+        "name": "deployed_ids",
+        "options": [],
+        "query": {
+          "field": "deployment",
+          "query": "action:deployment_start environment:$environment stack:$stack service:$service",
+          "refId": "deployed_ids",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6w",
+    "to": "now-4w"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "SRE Home",
+  "uid": "sre-home",
+  "weekStart": ""
 }
