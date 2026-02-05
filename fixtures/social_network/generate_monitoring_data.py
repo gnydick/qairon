@@ -878,12 +878,17 @@ def generate_child_spans_for_event(
     select_release_func,
     error_codes: dict,
     error_messages: dict,
+    max_depth: int = 5,
+    current_depth: int = 0,
+    visited: Optional[set] = None,
 ) -> List[dict]:
     """
-    Generate child span events for a parent event's service dependencies.
+    Recursively generate child span events for a parent event's service dependencies.
 
-    For each dependency in SERVICE_DEPENDENCIES, generates a child span event
-    with the same trace_id but a new span_id, linked via parent_span_id.
+    Walks SERVICE_DEPENDENCIES to produce a full multi-level trace tree.
+    For example, a feed:timeline request generates:
+      timeline → content:posts → content:media, content:hashtags, feed:fanout, search:indexer
+      timeline → feed:ranking → discovery:interests
 
     Error propagation follows stack trace semantics:
     - A leaf child that fails has error_source=None (it's the originator)
@@ -895,17 +900,33 @@ def generate_child_spans_for_event(
         select_release_func: Function to select a release for a service
         error_codes: Dict of error codes by type
         error_messages: Dict of error messages by code
+        max_depth: Maximum recursion depth (default 5, prevents runaway recursion)
+        current_depth: Current recursion depth (internal use)
+        visited: Set of visited service_ids in this trace path (cycle detection)
 
     Returns:
-        List of child span event dicts
+        List of child span event dicts (includes all descendants)
     """
-    service_key = f"{parent_event['action_application']}:{parent_event['action_stack']}:{parent_event['action_service']}"
+    if current_depth >= max_depth:
+        return []
+
+    if visited is None:
+        visited = set()
+
+    # Use canonical field names (application/service/stack, not action_* prefixed)
+    service_key = f"{parent_event['application']}:{parent_event['stack']}:{parent_event['service']}"
+
+    # Cycle detection: skip if we've already visited this service in this path
+    if service_key in visited:
+        return []
+    visited = visited | {service_key}  # Create new set to avoid mutation across branches
+
     dependencies = SERVICE_DEPENDENCIES.get(service_key, [])
 
     if not dependencies:
         return []
 
-    child_spans = []
+    all_spans = []
     parent_timestamp = parent_event['timestamp']
 
     # Calculate parent latency for timing child spans
@@ -953,6 +974,8 @@ def generate_child_spans_for_event(
             }
             child_success = False
 
+        # Use canonical field names (application/service/stack) for consistency
+        # with root events and downstream log/metric conversion
         child_event = {
             "user_id": parent_event["user_id"],
             "persona_name": parent_event["persona_name"],
@@ -983,9 +1006,22 @@ def generate_child_spans_for_event(
             "is_child_span": True,
         }
 
-        child_spans.append(child_event)
+        all_spans.append(child_event)
 
-    return child_spans
+        # Recursively generate grandchild spans for this child's dependencies
+        grandchild_spans = generate_child_spans_for_event(
+            parent_event=child_event,
+            rng=rng,
+            select_release_func=select_release_func,
+            error_codes=error_codes,
+            error_messages=error_messages,
+            max_depth=max_depth,
+            current_depth=current_depth + 1,
+            visited=visited,
+        )
+        all_spans.extend(grandchild_spans)
+
+    return all_spans
 
 
 @dataclass
@@ -2870,16 +2906,33 @@ class MonitoringDataGenerator:
         return all_events
 
     def _generate_child_spans_sequential(
-        self, parent_event: dict, action: 'ServiceAction', user: 'User', timestamp: datetime
+        self, parent_event: dict, action: 'ServiceAction', user: 'User', timestamp: datetime,
+        max_depth: int = 5, current_depth: int = 0, visited: Optional[set] = None
     ) -> List[dict]:
-        """Generate child span events for service dependencies (sequential format)."""
+        """
+        Recursively generate child span events for service dependencies (sequential format).
+
+        Walks SERVICE_DEPENDENCIES to produce a full multi-level trace tree.
+        """
+        if current_depth >= max_depth:
+            return []
+
+        if visited is None:
+            visited = set()
+
         service_key = action.service_id
+
+        # Cycle detection
+        if service_key in visited:
+            return []
+        visited = visited | {service_key}
+
         dependencies = SERVICE_DEPENDENCIES.get(service_key, [])
 
         if not dependencies:
             return []
 
-        child_spans = []
+        all_spans = []
         parent_latency = action.base_latency_ms * user.persona.latency_multiplier
 
         for i, dep_key in enumerate(dependencies):
@@ -2947,9 +3000,21 @@ class MonitoringDataGenerator:
                 "target_user_id": None,
                 "release_id": child_release_id,
             }
-            child_spans.append(child_event)
+            all_spans.append(child_event)
 
-        return child_spans
+            # Recursively generate grandchild spans
+            grandchild_spans = self._generate_child_spans_sequential(
+                parent_event=child_event,
+                action=child_action,
+                user=user,
+                timestamp=child_timestamp,
+                max_depth=max_depth,
+                current_depth=current_depth + 1,
+                visited=visited,
+            )
+            all_spans.extend(grandchild_spans)
+
+        return all_spans
 
     def _generate_events_parallel(self, user_event_counts: List[Tuple]) -> List[dict]:
         """Generate events in parallel using multiprocessing"""
