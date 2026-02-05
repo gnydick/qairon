@@ -397,7 +397,7 @@ Build and deployment automation.
 
 ### 6.1 Documented Service Dependencies
 
-These are the known, documented dependencies between services. When an upstream service fails, downstream services will experience cascading failures.
+These are the known, documented dependencies between services. When a downstream dependency fails, the calling services will experience cascading failures.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐

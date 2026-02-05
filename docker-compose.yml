@@ -128,5 +128,6 @@ services:
     volumes:
       - /mnt/qairon/grafana:/var/lib/grafana:z
     environment:
-      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource,yesoreyeram-infinity-datasource
+      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource,yesoreyeram-infinity-datasource,netsage-sankey-panel
+      - GF_FEATURE_TOGGLES_ENABLE=serviceGraph
     restart: unless-stopped

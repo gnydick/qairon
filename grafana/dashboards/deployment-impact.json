@@ -96,6 +96,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "id": 38,
   "links": [
     {
       "asDropdown": true,
@@ -296,12 +297,12 @@
       },
       "targets": [
         {
-          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "{{stack}}",
           "refId": "A"
         },
         {
-          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum(count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "Overall",
           "refId": "B"
         }
@@ -425,7 +426,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__interval])) / (vector($__interval_ms) / 1000)",
+          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__interval]))",
           "legendFormat": "{{stack}}",
           "refId": "A"
         }
@@ -557,7 +558,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum by (region) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "{{region}}",
           "refId": "A"
         }
@@ -662,7 +663,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
+          "expr": "sum by (release_num) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "release {{release_num}}",
           "refId": "A"
         }
@@ -1112,5 +1113,6 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "Deployment Impact",
-  "uid": "deployment-impact"
+  "uid": "deployment-impact",
+  "version": 21
 }

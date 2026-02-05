@@ -100,6 +100,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "id": 39,
   "links": [
     {
       "asDropdown": true,
@@ -863,5 +864,6 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "Infrastructure Health",
-  "uid": "infra-health"
+  "uid": "infra-health",
+  "version": 8
 }

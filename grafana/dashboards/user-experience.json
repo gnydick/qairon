@@ -1,48 +1,25 @@
 {
-  "__inputs": [
-    {
-      "description": "VictoriaMetrics Prometheus-compatible datasource",
-      "label": "VictoriaMetrics",
-      "name": "DS_VICTORIAMETRICS",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus",
-      "type": "datasource"
-    }
-  ],
-  "__requires": [
-    {
-      "id": "grafana",
-      "name": "Grafana",
-      "type": "grafana",
-      "version": "12.3.1"
-    },
-    {
-      "id": "prometheus",
-      "name": "Prometheus",
-      "type": "datasource",
-      "version": "1.0.0"
-    },
-    {
-      "id": "timeseries",
-      "name": "Time series",
-      "type": "panel",
-      "version": ""
-    },
-    {
-      "id": "bargauge",
-      "name": "Bar gauge",
-      "type": "panel",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
       {
         "datasource": {
           "type": "victoriametrics-logs-datasource",
           "uid": "ffb8kdooypz40e"
         },
         "enable": true,
+        "hide": false,
         "iconColor": "#FF9830",
         "name": "Releases",
         "target": {
@@ -56,6 +33,7 @@
           "uid": "ffb8kdooypz40e"
         },
         "enable": true,
+        "hide": false,
         "iconColor": "#5794F2",
         "name": "Deploy Start",
         "target": {
@@ -69,6 +47,7 @@
           "uid": "ffb8kdooypz40e"
         },
         "enable": true,
+        "hide": false,
         "iconColor": "#73BF69",
         "name": "Deploy Complete",
         "target": {
@@ -82,6 +61,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "id": 35,
   "links": [
     {
       "asDropdown": true,
@@ -105,76 +85,8 @@
         "x": 0,
         "y": 0
       },
-      "id": 103,
-      "title": "Cache Performance",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "ffb8jnum7rx8ge"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineInterpolation": "smooth",
-            "showPoints": "never"
-          },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Service Detail",
-              "url": "/d/service-detail/service-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}"
-            }
-          ],
-          "max": 100,
-          "min": 0,
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 1
-      },
-      "id": 30,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean"
-          ],
-          "displayMode": "table",
-          "placement": "right"
-        },
-        "tooltip": {
-          "maxHeight": 300,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "expr": "sum by (service, stack) (count_over_time(cache_hit{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\", is_write=\"false\"}[$__rate_interval] == 1)) / sum by (service, stack) (count_over_time(cache_hit{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\", is_write=\"false\"}[$__rate_interval])) * 100",
-          "legendFormat": "{{service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Cache Hit Rate by Service",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 9
-      },
       "id": 104,
+      "panels": [],
       "title": "Payload",
       "type": "row"
     },
@@ -192,12 +104,13 @@
               "url": "/d/action-detail/action-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}&var-action=${__field.labels.action}"
             }
           ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "blue",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -209,11 +122,21 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 10
+        "y": 1
       },
       "id": 40,
       "options": {
         "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -222,12 +145,17 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "topk(15, avg by (action, service, stack) (avg_over_time(request_size_bytes{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval])))",
-          "legendFormat": "{{action}} ({{service}})",
+          "editorMode": "builder",
+          "expr": "topk(15, avg by(action, service, stack) (avg_over_time(request_size_bytes{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval])))",
+          "legendFormat": "{{action}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -262,12 +190,13 @@
               "url": "/d/action-detail/action-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}&var-action=${__field.labels.action}"
             }
           ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "blue",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -279,11 +208,21 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 10
+        "y": 1
       },
       "id": 41,
       "options": {
         "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -292,12 +231,17 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "topk(15, avg by (action, service, stack) (avg_over_time(response_size_bytes{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval])))",
+          "editorMode": "code",
+          "expr": "topk(15, avg by(action, service, stack) (avg_over_time(response_size_bytes{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval])))",
           "legendFormat": "{{action}} ({{service}})",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -324,9 +268,10 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 9
       },
       "id": 105,
+      "panels": [],
       "title": "DB Queries",
       "type": "row"
     },
@@ -345,12 +290,13 @@
               "url": "/d/action-detail/action-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}&var-action=${__field.labels.action}"
             }
           ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -369,11 +315,21 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 19
+        "y": 10
       },
       "id": 50,
       "options": {
         "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -382,8 +338,11 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "expr": "topk(15, avg by (action, service, stack) (avg_over_time(db_query_count{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval])))",
@@ -415,14 +374,41 @@
       },
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
           "links": [
@@ -431,7 +417,21 @@
               "title": "Service Detail",
               "url": "/d/service-detail/service-detail?var-environment=${environment}&var-stack=${__field.labels.stack}&var-service=${__field.labels.service}&${__url_time_range}"
             }
-          ]
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -439,7 +439,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 19
+        "y": 10
       },
       "id": 51,
       "options": {
@@ -448,14 +448,17 @@
             "mean"
           ],
           "displayMode": "table",
-          "placement": "right"
+          "placement": "right",
+          "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 300,
           "mode": "multi",
           "sort": "desc"
         }
       },
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "expr": "sum by (service, stack) (avg_over_time(db_query_count{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval]))",
@@ -472,7 +475,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 27
+        "y": 18
       },
       "id": 106,
       "panels": [],
@@ -480,6 +483,10 @@
       "type": "row"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffb8jnum7rx8ge"
+      },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -499,7 +506,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 28
+        "y": 19
       },
       "id": 107,
       "maxDataPoints": 150,
@@ -545,8 +552,10 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__interval])) / ($__interval_ms / 1000)",
+          "editorMode": "code",
+          "expr": "sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__interval]))",
           "legendFormat": "{{action}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -554,6 +563,10 @@
       "type": "heatmap"
     },
     {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -573,7 +586,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 28
+        "y": 19
       },
       "id": 108,
       "maxDataPoints": 150,
@@ -583,8 +596,8 @@
         "color": {
           "exponent": 0.5,
           "fill": "red",
-          "mode": "opacity",
-          "reverse": false,
+          "mode": "scheme",
+          "reverse": true,
           "scale": "exponential",
           "scheme": "Reds",
           "steps": 64
@@ -599,7 +612,7 @@
           "show": true
         },
         "rowsFrame": {
-          "layout": "auto"
+          "layout": "unknown"
         },
         "showValue": "never",
         "tooltip": {
@@ -616,15 +629,17 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "ffb8jnum7rx8ge"
+            "type": "victoriametrics-logs-datasource",
+            "uid": "ffb8kdooypz40e"
           },
-          "expr": "sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\", success=\"false\"}[$__interval])) / sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__interval])) * 100",
+          "editorMode": "code",
+          "expr": "level:ERROR environment:$environment stack:$stack service:in($service) action:in($action) | stats by (action) count() as errors",
           "legendFormat": "{{action}}",
+          "queryType": "statsRange",
           "refId": "A"
         }
       ],
-      "title": "Error Rate by Action",
+      "title": "Error Rate by Action per $__interval",
       "type": "heatmap"
     },
     {
@@ -647,7 +662,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 28
+        "y": 19
       },
       "id": 109,
       "maxDataPoints": 150,
@@ -708,18 +723,52 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
             "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           },
           "unit": "reqps"
         },
@@ -729,16 +778,18 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 36
+        "y": 27
       },
       "id": 110,
       "options": {
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
@@ -750,7 +801,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval])) / ($__interval_ms / 1000)",
+          "expr": "sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval]))",
           "legendFormat": "{{action}}",
           "refId": "A"
         }
@@ -759,26 +810,63 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "ffb8kdooypz40e"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
             "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
-            "spanNulls": false,
+            "showValues": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
-          "unit": "percent"
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -786,16 +874,20 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 36
+        "y": 27
       },
       "id": 111,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "calcs": [
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
@@ -804,11 +896,13 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "ffb8jnum7rx8ge"
+            "type": "victoriametrics-logs-datasource",
+            "uid": "ffb8kdooypz40e"
           },
-          "expr": "sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\", success=\"false\"}[$__rate_interval])) / sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", action=~\"$action\"}[$__rate_interval])) * 100",
+          "editorMode": "code",
+          "expr": "level:ERROR environment:$environment stack:$stack service:in($service) action:in($action) | stats by (action) count() as errors",
           "legendFormat": "{{action}}",
+          "queryType": "statsRange",
           "refId": "A"
         }
       ],
@@ -822,18 +916,52 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
             "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           },
           "unit": "ms"
         },
@@ -843,16 +971,18 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 36
+        "y": 27
       },
       "id": 112,
       "options": {
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
@@ -871,417 +1001,11 @@
       ],
       "title": "Avg Latency by Action",
       "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 44
-      },
-      "id": 113,
-      "panels": [],
-      "title": "Service Performance",
-      "type": "row"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "scaleDistribution": {
-              "type": "linear"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 45
-      },
-      "id": 114,
-      "maxDataPoints": 150,
-      "options": {
-        "calculate": false,
-        "cellGap": 0,
-        "color": {
-          "exponent": 0.5,
-          "fill": "dark-orange",
-          "mode": "scheme",
-          "reverse": false,
-          "scale": "exponential",
-          "scheme": "Blues",
-          "steps": 64
-        },
-        "exemplars": {
-          "color": "rgba(255,0,255,0.7)"
-        },
-        "filterValues": {
-          "le": 1e-09
-        },
-        "legend": {
-          "show": true
-        },
-        "rowsFrame": {
-          "layout": "auto"
-        },
-        "showValue": "never",
-        "tooltip": {
-          "mode": "single",
-          "showColorScale": false,
-          "yHistogram": false
-        },
-        "yAxis": {
-          "axisPlacement": "left",
-          "reverse": false
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ffb8jnum7rx8ge"
-          },
-          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__interval])) / ($__interval_ms / 1000)",
-          "legendFormat": "{{service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Request Rate by Service",
-      "type": "heatmap"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "scaleDistribution": {
-              "type": "linear"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 45
-      },
-      "id": 115,
-      "maxDataPoints": 150,
-      "options": {
-        "calculate": false,
-        "cellGap": 0,
-        "color": {
-          "exponent": 0.5,
-          "fill": "red",
-          "mode": "opacity",
-          "reverse": false,
-          "scale": "exponential",
-          "scheme": "Reds",
-          "steps": 64
-        },
-        "exemplars": {
-          "color": "rgba(255,0,255,0.7)"
-        },
-        "filterValues": {
-          "le": 1e-09
-        },
-        "legend": {
-          "show": true
-        },
-        "rowsFrame": {
-          "layout": "auto"
-        },
-        "showValue": "never",
-        "tooltip": {
-          "mode": "single",
-          "showColorScale": false,
-          "yHistogram": false
-        },
-        "yAxis": {
-          "axisPlacement": "left",
-          "reverse": false
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ffb8jnum7rx8ge"
-          },
-          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__interval])) * 100",
-          "legendFormat": "{{service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Error Rate by Service",
-      "type": "heatmap"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "scaleDistribution": {
-              "type": "linear"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 45
-      },
-      "id": 116,
-      "maxDataPoints": 150,
-      "options": {
-        "calculate": false,
-        "cellGap": 0,
-        "color": {
-          "exponent": 0.5,
-          "fill": "dark-orange",
-          "mode": "scheme",
-          "reverse": false,
-          "scale": "exponential",
-          "scheme": "RdYlGn",
-          "steps": 64
-        },
-        "exemplars": {
-          "color": "rgba(255,0,255,0.7)"
-        },
-        "filterValues": {
-          "le": 1e-09
-        },
-        "legend": {
-          "show": true
-        },
-        "rowsFrame": {
-          "layout": "auto"
-        },
-        "showValue": "never",
-        "tooltip": {
-          "mode": "single",
-          "showColorScale": false,
-          "yHistogram": false
-        },
-        "yAxis": {
-          "axisPlacement": "left",
-          "reverse": false
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ffb8jnum7rx8ge"
-          },
-          "expr": "avg by (service) (avg_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__interval]))",
-          "legendFormat": "{{service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Avg Latency by Service",
-      "type": "heatmap"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "lineInterpolation": "smooth",
-            "lineWidth": 1,
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            }
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 53
-      },
-      "id": 117,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ffb8jnum7rx8ge"
-          },
-          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) / ($__interval_ms / 1000)",
-          "legendFormat": "{{service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Request Rate by Service",
-      "type": "timeseries"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "lineInterpolation": "smooth",
-            "lineWidth": 1,
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            }
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 53
-      },
-      "id": 118,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ffb8jnum7rx8ge"
-          },
-          "expr": "sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\", success=\"false\"}[$__rate_interval])) / sum by (service) (count_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval])) * 100",
-          "legendFormat": "{{service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Error Rate by Service",
-      "type": "timeseries"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "lineInterpolation": "smooth",
-            "lineWidth": 1,
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            }
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 53
-      },
-      "id": 119,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ffb8jnum7rx8ge"
-          },
-          "expr": "avg by (service) (avg_over_time(request_duration_ms{environment=\"$environment\", region=\"$region\", stack=\"$stack\", service=~\"$service\"}[$__rate_interval]))",
-          "legendFormat": "{{service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Avg Latency by Service",
-      "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "",
-  "schemaVersion": 39,
-  "style": "dark",
+  "schemaVersion": 42,
   "tags": [
     "social-platform",
     "sre"
@@ -1290,13 +1014,16 @@
     "list": [
       {
         "allowCustomValue": false,
+        "current": {
+          "text": "prod",
+          "value": "prod"
+        },
         "datasource": {
           "type": "yesoreyeram-infinity-datasource",
           "uid": "efba5wxx8ub5sa"
         },
         "definition": "",
         "includeAll": false,
-        "multi": false,
         "name": "environment",
         "options": [],
         "query": {
@@ -1393,8 +1120,8 @@
       {
         "allowCustomValue": false,
         "current": {
-          "text": "dev:aws:333333333331",
-          "value": "dev:aws:333333333331"
+          "text": "prod:aws:111111111111",
+          "value": "prod:aws:111111111111"
         },
         "datasource": {
           "type": "yesoreyeram-infinity-datasource",
@@ -1403,7 +1130,6 @@
         "definition": "",
         "includeAll": false,
         "label": "Context",
-        "multi": false,
         "name": "context",
         "options": [],
         "query": {
@@ -1440,13 +1166,16 @@
       },
       {
         "allowCustomValue": false,
+        "current": {
+          "text": "us-west-2",
+          "value": "us-west-2"
+        },
         "datasource": {
           "type": "yesoreyeram-infinity-datasource",
           "uid": "efba5wxx8ub5sa"
         },
         "definition": "",
         "includeAll": false,
-        "multi": false,
         "name": "region",
         "options": [],
         "query": {
@@ -1512,13 +1241,16 @@
       },
       {
         "allowCustomValue": false,
+        "current": {
+          "text": "social:feed",
+          "value": "social:feed"
+        },
         "datasource": {
           "type": "yesoreyeram-infinity-datasource",
           "uid": "efba5wxx8ub5sa"
         },
         "definition": "",
         "includeAll": false,
-        "multi": false,
         "name": "stack",
         "options": [],
         "query": {
@@ -1574,6 +1306,14 @@
       },
       {
         "allowCustomValue": false,
+        "current": {
+          "text": [
+            "social:feed:fanout"
+          ],
+          "value": [
+            "social:feed:fanout"
+          ]
+        },
         "datasource": {
           "type": "yesoreyeram-infinity-datasource",
           "uid": "efba5wxx8ub5sa"
@@ -1643,6 +1383,12 @@
       },
       {
         "allowCustomValue": true,
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
         "datasource": {
           "type": "prometheus",
           "uid": "ffb8jnum7rx8ge"
@@ -1658,6 +1404,10 @@
       },
       {
         "allowCustomValue": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "victoriametrics-logs-datasource",
           "uid": "ffb8kdooypz40e"
@@ -1686,5 +1436,7 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "User Experience",
-  "uid": "user-experience"
+  "uid": "user-experience",
+  "version": 25,
+  "weekStart": ""
 }

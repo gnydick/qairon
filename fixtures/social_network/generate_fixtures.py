@@ -5,7 +5,6 @@ import os
 import sys
 import json
 import random
-import re
 import hashlib
 import argparse
 from datetime import datetime, timedelta
@@ -14,15 +13,15 @@ from collections import defaultdict
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, project_root)
 
-from sqlalchemy import insert, text
+from sqlalchemy import insert
 from base import app
 from db import db
 from models.associations import (
+    deployment_current_release,
     deps_to_zones,
     subnets_to_fleets,
     target_to_fleets,
     svcs_to_repos,
-    deployment_current_release
 )
 
 random.seed(42)
@@ -35,7 +34,16 @@ logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
 # Constants
 ENVIRONMENTS = ['prod', 'stg', 'dev', 'int', 'infra', 'local']
 PROVIDER_TYPES = ['aws', 'gcp', 'azure', 'dev']
-DEPLOYMENT_TARGET_TYPES = ['eks', 'ecs', 'lambda', 'fargate', 'ec2', 'batch', 'apprunner']
+DEPLOYMENT_TARGET_TYPES_BY_PROVIDER = {
+    'aws': ['eks', 'ecs', 'lambda', 'fargate', 'ec2', 'batch', 'apprunner'],
+    'gcp': ['gke', 'cloud-run', 'cloud-functions', 'compute-engine', 'app-engine'],
+    'azure': ['aks', 'container-apps', 'azure-functions', 'vmss', 'app-service'],
+    'dev': ['docker', 'kind', 'minikube'],
+}
+# Flat list of all deployment target types (for reference table insert)
+DEPLOYMENT_TARGET_TYPES = sorted(set(
+    dt for dts in DEPLOYMENT_TARGET_TYPES_BY_PROVIDER.values() for dt in dts
+))
 REPO_TYPES = ['git', 'ecr', 'helm', 's3', 'npm', 'pypi', 'maven', 'docker']
 LANGUAGES = ['yaml', 'json', 'toml', 'hcl', 'xml', 'properties', 'ini', 'env']
 
@@ -94,9 +102,9 @@ SERVICES = {
     'social:social': ['connections', 'blocks', 'suggestions', 'contacts', 'groups'],
     'social:content': ['posts', 'media', 'stories', 'comments', 'reactions', 'shares', 'hashtags'],
     'social:feed': ['timeline', 'ranking', 'fanout', 'aggregation', 'curation'],
-    'social:messaging': ['dm', 'group-chat', 'realtime', 'presence', 'read-receipts'],
-    'social:notifications': ['push', 'email', 'sms', 'inapp', 'notification-preferences'],
-    'social:search': ['users-search', 'content-search', 'hashtags-search', 'indexer', 'autocomplete'],
+    'social:messaging': ['dm', 'groups', 'realtime', 'presence', 'read-receipts'],
+    'social:notifications': ['push', 'email', 'sms', 'inapp', 'preferences'],
+    'social:search': ['users', 'content', 'hashtags', 'indexer', 'autocomplete'],
     'social:discovery': ['trending', 'explore', 'recommendations', 'interests', 'nearby'],
     'social:moderation': ['content-review', 'auto-mod', 'reports', 'spam', 'trust-safety'],
     'social:ads': ['campaigns', 'targeting', 'bidding', 'delivery', 'ad-analytics'],
@@ -128,11 +136,32 @@ CONFIG_TEMPLATES = {
 }
 
 PRIMARY_DEPLOYMENT_TARGETS = [
+    # PROD — 2 AWS accounts × 2 regions, 2 GCP accounts × 2 regions, 2 Azure accounts × 2 regions (12 targets)
     'prod:aws:111111111111:us-east-1:platform:eks:main',
     'prod:aws:111111111111:us-west-2:platform:eks:main',
+    'prod:aws:111111111112:us-east-1:platform:eks:main',
+    'prod:aws:111111111112:us-west-2:platform:eks:main',
+    'prod:gcp:social-prod-001:us-central1:platform:gke:main',
+    'prod:gcp:social-prod-001:southamerica-east1:platform:gke:main',
+    'prod:gcp:social-prod-002:us-central1:platform:gke:main',
+    'prod:gcp:social-prod-002:us-east4:platform:gke:main',
+    'prod:azure:prod-sub-001:eastus:platform:aks:main',
+    'prod:azure:prod-sub-001:westeurope:platform:aks:main',
+    'prod:azure:prod-sub-002:eastus:platform:aks:main',
+    'prod:azure:prod-sub-002:westus2:platform:aks:main',
+    # STG — 1 each (3 targets)
     'stg:aws:222222222221:us-east-1:platform:eks:main',
+    'stg:gcp:social-stg-001:us-central1:platform:gke:main',
+    'stg:azure:stg-sub-001:eastus:platform:aks:main',
+    # DEV — 1 each (3 targets)
     'dev:aws:333333333331:us-east-1:platform:eks:main',
+    'dev:gcp:social-dev-001:us-central1:platform:gke:main',
+    'dev:azure:dev-sub-001:eastus:platform:aks:main',
+    # INT — 1 each (3 targets)
     'int:aws:444444444441:us-east-1:platform:eks:main',
+    'int:gcp:social-int-001:us-central1:platform:gke:main',
+    'int:azure:int-sub-001:eastus:platform:aks:main',
+    # INFRA — AWS only (1 target)
     'infra:aws:555555555555:us-east-1:platform:eks:main',
 ]
 
@@ -144,17 +173,6 @@ CORE_SERVICES = [
     'social:platform:rate-limiter',
 ]
 
-HIGH_FREQUENCY_SERVICES = [
-    'social:user:identity',
-    'social:content:posts',
-    'social:feed:timeline',
-    'social:platform:api-gateway',
-    'social:messaging:dm',
-    'social:content:media',
-]
-
-BUILD_ARTIFACT_NAMES = ['docker-image', 'helm-chart', 'test-report', 'sbom', 'changelog', 'coverage-report', 'lint-report']
-RELEASE_ARTIFACT_NAMES = ['manifest', 'values', 'migration', 'rollback-plan', 'changelog', 'runbook', 'smoke-test']
 
 
 class CIDRPool:
@@ -266,8 +284,26 @@ def generate_zones(region_id, provider_type):
     return zones
 
 
-def generate(txt_output_dir=None):
+def generate(txt_output_dir=None, cloud_providers=None):
     """Generate all fixture data in dependency order."""
+    if cloud_providers is None:
+        cloud_providers = ['aws']
+
+    # Build the active provider set (requested clouds + dev for local env)
+    active_provider_types = set(cloud_providers) | {'dev'}
+
+    # Filter PROVIDERS dict to only include active provider types
+    filtered_providers = {}
+    for env, provider_list in PROVIDERS.items():
+        filtered = [(pt, acct) for pt, acct in provider_list if pt in active_provider_types]
+        if filtered:
+            filtered_providers[env] = filtered
+
+    # Filter PRIMARY_DEPLOYMENT_TARGETS to only include active providers
+    active_primary_targets = [
+        t for t in PRIMARY_DEPLOYMENT_TARGETS
+        if t.split(':')[1] in active_provider_types
+    ]
 
     cidr_pool = CIDRPool()
 
@@ -288,8 +324,6 @@ def generate(txt_output_dir=None):
     all_config_templates = []
     all_deployments = []
     all_deployment_procs = []
-    all_builds = []
-    all_releases = []
 
     # =========================================================================
     # TIER 0: Reference/Lookup Tables
@@ -332,12 +366,51 @@ def generate(txt_output_dir=None):
     # =========================================================================
     print("\nTier 1: Infrastructure...")
 
-    # Providers (5-7 per environment)
+    # Derive required infrastructure from PRIMARY_DEPLOYMENT_TARGETS
+    required_providers = set()    # provider_id strings
+    required_regions = set()      # region_id strings
+    required_partitions = set()   # partition_id strings
+    required_target_ids = {}      # partition_id -> list of canonical target_ids
+
+    for target_id in active_primary_targets:
+        parts = target_id.split(':')
+        provider_id = ':'.join(parts[:3])
+        region_id = ':'.join(parts[:4])
+        partition_id = ':'.join(parts[:5])
+        required_providers.add(provider_id)
+        required_regions.add(region_id)
+        required_partitions.add(partition_id)
+        required_target_ids.setdefault(partition_id, []).append(target_id)
+
+    # Build lookup: provider_id -> (provider_type, native_id) from PROVIDERS dict
+    provider_id_to_info = {}
+    for env, provider_list in filtered_providers.items():
+        for pt, acct in provider_list:
+            pid = f"{env}:{pt}:{acct}"
+            provider_id_to_info[pid] = (env, pt, acct)
+
+    # Providers: start with required, then add random extras
     provider_rows = []
-    for env, providers in PROVIDERS.items():
-        num_providers = random.randint(5, len(providers))
-        selected = random.sample(providers, num_providers)
-        for provider_type, native_id in selected:
+    created_provider_ids = set()
+    for provider_id in sorted(required_providers):
+        env, provider_type, native_id = provider_id_to_info[provider_id]
+        provider_rows.append({
+            'id': provider_id,
+            'environment_id': env,
+            'provider_type_id': provider_type,
+            'native_id': native_id,
+            'created_at': random_date(320, 350),
+            'defaults': '{}',
+        })
+        created_provider_ids.add(provider_id)
+        all_providers.append(provider_id)
+
+    # Add random extra providers per environment
+    for env, provider_list in filtered_providers.items():
+        remaining = [(pt, acct) for pt, acct in provider_list
+                     if f"{env}:{pt}:{acct}" not in created_provider_ids]
+        num_extras = random.randint(0, len(remaining))
+        for provider_type, native_id in random.sample(remaining, num_extras):
             provider_id = f"{env}:{provider_type}:{native_id}"
             provider_rows.append({
                 'id': provider_id,
@@ -347,18 +420,37 @@ def generate(txt_output_dir=None):
                 'created_at': random_date(320, 350),
                 'defaults': '{}',
             })
+            created_provider_ids.add(provider_id)
             all_providers.append(provider_id)
     bulk_insert('provider', provider_rows)
     print(f"  - {len(provider_rows)} providers")
 
-    # Regions (5-7 per provider)
+    # Regions: start with required, then add random extras per provider
     region_rows = []
+    created_region_ids = set()
+    # First pass: required regions
     for provider_id in all_providers:
         provider_type = provider_id.split(':')[1]
         all_region_names = REGIONS_BY_PROVIDER[provider_type]
-        num_regions = random.randint(5, len(all_region_names))
-        region_names = random.sample(all_region_names, num_regions)
-        for region_name in region_names:
+        # Required regions for this provider
+        req_regions = [rid for rid in required_regions if rid.startswith(provider_id + ':')]
+        for region_id in sorted(req_regions):
+            region_name = region_id.split(':')[-1]
+            region_rows.append({
+                'id': region_id,
+                'provider_id': provider_id,
+                'name': region_name,
+                'native_id': region_name,
+                'created_at': random_date(310, 340),
+                'defaults': '{}',
+            })
+            created_region_ids.add(region_id)
+            all_regions.append((region_id, provider_type))
+        # Random extras
+        already_selected = {rid.split(':')[-1] for rid in req_regions}
+        remaining = [r for r in all_region_names if r not in already_selected]
+        num_extras = random.randint(0, len(remaining))
+        for region_name in random.sample(remaining, num_extras):
             region_id = f"{provider_id}:{region_name}"
             region_rows.append({
                 'id': region_id,
@@ -368,6 +460,7 @@ def generate(txt_output_dir=None):
                 'created_at': random_date(310, 340),
                 'defaults': '{}',
             })
+            created_region_ids.add(region_id)
             all_regions.append((region_id, provider_type))
     bulk_insert('region', region_rows)
     print(f"  - {len(region_rows)} regions")
@@ -381,12 +474,29 @@ def generate(txt_output_dir=None):
     bulk_insert('zone', zone_rows)
     print(f"  - {len(zone_rows)} zones")
 
-    # Partitions (5-7 per region)
+    # Partitions: start with required, then add random extras per region
     partition_rows = []
+    created_partition_ids = set()
     for region_id, _ in all_regions:
-        num_partitions = random.randint(5, len(PARTITIONS))
-        selected = random.sample(PARTITIONS, num_partitions)
-        for partition_name in selected:
+        # Required partitions for this region
+        req_partitions = [pid for pid in required_partitions if pid.startswith(region_id + ':')]
+        for partition_id in sorted(req_partitions):
+            partition_name = partition_id.split(':')[-1]
+            partition_rows.append({
+                'id': partition_id,
+                'region_id': region_id,
+                'name': partition_name,
+                'native_id': f"vpc-{partition_name}",
+                'created_at': random_date(300, 330),
+                'defaults': '{}',
+            })
+            created_partition_ids.add(partition_id)
+            all_partitions.append(partition_id)
+        # Random extras
+        already_selected = {pid.split(':')[-1] for pid in req_partitions}
+        remaining = [p for p in PARTITIONS if p not in already_selected]
+        num_extras = random.randint(0, len(remaining))
+        for partition_name in random.sample(remaining, num_extras):
             partition_id = f"{region_id}:{partition_name}"
             partition_rows.append({
                 'id': partition_id,
@@ -396,6 +506,7 @@ def generate(txt_output_dir=None):
                 'created_at': random_date(300, 330),
                 'defaults': '{}',
             })
+            created_partition_ids.add(partition_id)
             all_partitions.append(partition_id)
     bulk_insert('partition', partition_rows)
     print(f"  - {len(partition_rows)} partitions")
@@ -458,16 +569,58 @@ def generate(txt_output_dir=None):
     bulk_insert('fleet_type', fleet_type_rows)
     print(f"  - {len(fleet_type_rows)} fleet_types")
 
-    # Deployment targets (5-7 per partition)
-    DT_NAMES = {'eks': 'main', 'ecs': 'services', 'lambda': 'functions',
-                'fargate': 'tasks', 'ec2': 'instances', 'batch': 'jobs', 'apprunner': 'apps'}
+    # Deployment targets: start with required, then add random extras per partition
+    DT_NAMES = {
+        # AWS
+        'eks': 'main', 'ecs': 'services', 'lambda': 'functions',
+        'fargate': 'tasks', 'ec2': 'instances', 'batch': 'jobs', 'apprunner': 'apps',
+        # GCP
+        'gke': 'main', 'cloud-run': 'services', 'cloud-functions': 'functions',
+        'compute-engine': 'instances', 'app-engine': 'apps',
+        # Azure
+        'aks': 'main', 'container-apps': 'services', 'azure-functions': 'functions',
+        'vmss': 'instances', 'app-service': 'apps',
+        # Dev
+        'docker': 'local', 'kind': 'local', 'minikube': 'local',
+    }
+
     dt_rows = []
+    dt_id_set = set()
     for partition_id in all_partitions:
-        num_dts = random.randint(5, len(DEPLOYMENT_TARGET_TYPES))
-        selected = random.sample(DEPLOYMENT_TARGET_TYPES, num_dts)
-        for dt_type in selected:
+        provider_type = partition_id.split(':')[1]
+        available_types = DEPLOYMENT_TARGET_TYPES_BY_PROVIDER.get(
+            provider_type, DEPLOYMENT_TARGET_TYPES_BY_PROVIDER['dev'])
+
+        # Required targets for this partition (stored as canonical IDs)
+        req_target_ids = required_target_ids.get(partition_id, [])
+        already_selected_types = set()
+        for dt_id in req_target_ids:
+            parts = dt_id.split(':')
+            target_type = parts[5]
+            target_name = parts[6]
+            if dt_id not in dt_id_set:
+                dt_id_set.add(dt_id)
+                dt_rows.append({
+                    'id': dt_id,
+                    'partition_id': partition_id,
+                    'deployment_target_type_id': target_type,
+                    'name': target_name,
+                    'native_id': f"{target_type}-{hashlib.md5(dt_id.encode()).hexdigest()[:8]}",
+                    'created_at': random_date(270, 300),
+                    'defaults': '{}',
+                })
+                all_deployment_targets.append(dt_id)
+                already_selected_types.add(target_type)
+
+        # Random extras from remaining types
+        remaining = [t for t in available_types if t not in already_selected_types]
+        num_extras = random.randint(0, len(remaining))
+        for dt_type in random.sample(remaining, num_extras):
             dt_name = DT_NAMES[dt_type]
             dt_id = f"{partition_id}:{dt_type}:{dt_name}"
+            if dt_id in dt_id_set:
+                continue
+            dt_id_set.add(dt_id)
             dt_rows.append({
                 'id': dt_id,
                 'partition_id': partition_id,
@@ -676,7 +829,7 @@ def generate(txt_output_dir=None):
     deployment_rows = []
     for dt_id in all_deployment_targets:
         # Determine which services to deploy
-        if dt_id in PRIMARY_DEPLOYMENT_TARGETS:
+        if dt_id in active_primary_targets:
             services_to_deploy = all_services
         else:
             services_to_deploy = CORE_SERVICES
@@ -715,253 +868,9 @@ def generate(txt_output_dir=None):
     print(f"  - {len(dp_rows)} deployment_procs")
 
     # =========================================================================
-    # TIER 5: Temporal (Builds & Releases)
+    # TIER 5: Configs (formerly Tier 7)
     # =========================================================================
-    print("\nTier 5: Builds & Releases...")
-
-    # Builds
-    build_rows = []
-    service_to_builds = defaultdict(list)
-
-    for service_id in all_services:
-        # Determine build frequency
-        if service_id in HIGH_FREQUENCY_SERVICES:
-            num_builds = 40
-        elif random.random() < 0.3:
-            num_builds = 20
-        else:
-            num_builds = 10
-
-        build_num_start = random.randint(50, 200)
-
-        for i in range(num_builds):
-            build_num = build_num_start + i
-            vcs_ref = hashlib.md5(f"{service_id}:{build_num}".encode()).hexdigest()[:7]
-            ver = re.sub(r"[^0-9a-zA-Z.-]", '-', vcs_ref)
-            build_id = f"{service_id}:{build_num}"
-
-            # Spread builds across the year
-            days_ago = 350 - (i * 350 / num_builds)
-            created_at = random_date(days_ago - 5, days_ago + 5)
-
-            build_rows.append({
-                'id': build_id,
-                'service_id': service_id,
-                'build_num': build_num,
-                'vcs_ref': vcs_ref,
-                'ver': ver,
-                'created_at': created_at,
-                'defaults': '{}',
-            })
-            all_builds.append(build_id)
-            service_to_builds[service_id].append((build_id, created_at, build_num))
-
-    bulk_insert('build', build_rows)
-    print(f"  - {len(build_rows)} builds")
-
-    # Releases
-    release_rows = []
-    deployment_to_releases = defaultdict(list)
-
-    for deployment_id in all_deployments:
-        # Extract environment and service from deployment_id
-        parts = deployment_id.split(':')
-        env = parts[0]
-        service_id = ':'.join(parts[7:10])
-
-        # Get builds for this service
-        builds = service_to_builds.get(service_id, [])
-        if not builds:
-            continue
-
-        # For primary DTs, do full promotion pipeline
-        dt_id = ':'.join(parts[:7])
-        if dt_id in PRIMARY_DEPLOYMENT_TARGETS:
-            # Promote ~70% of builds to this environment
-            for build_id, build_created_at, build_num in builds:
-                if random.random() > 0.7:
-                    continue
-
-                # Calculate promotion delay based on environment
-                if env == 'dev':
-                    delay_days = random.uniform(0, 1)
-                elif env == 'int':
-                    delay_days = random.uniform(1, 3)
-                elif env == 'stg':
-                    delay_days = random.uniform(3, 7)
-                elif env == 'prod':
-                    delay_days = random.uniform(7, 14)
-                elif env == 'infra':
-                    delay_days = random.uniform(2, 5)
-                else:
-                    delay_days = random.uniform(0, 2)
-
-                release_created_at = build_created_at + timedelta(days=delay_days)
-                release_id = f"{deployment_id}:{build_num}"
-
-                release_rows.append({
-                    'id': release_id,
-                    'build_id': build_id,
-                    'deployment_id': deployment_id,
-                    'build_num': build_num,
-                    'created_at': release_created_at,
-                    'defaults': '{}',
-                })
-                all_releases.append(release_id)
-                deployment_to_releases[deployment_id].append((release_id, release_created_at))
-        else:
-            # For non-primary DTs, just use the 5 most recent builds
-            recent_builds = sorted(builds, key=lambda x: x[1], reverse=True)[:5]
-            for build_id, build_created_at, build_num in recent_builds:
-                delay_days = random.uniform(0, 3)
-                release_created_at = build_created_at + timedelta(days=delay_days)
-                release_id = f"{deployment_id}:{build_num}"
-
-                release_rows.append({
-                    'id': release_id,
-                    'build_id': build_id,
-                    'deployment_id': deployment_id,
-                    'build_num': build_num,
-                    'created_at': release_created_at,
-                    'defaults': '{}',
-                })
-                all_releases.append(release_id)
-                deployment_to_releases[deployment_id].append((release_id, release_created_at))
-
-    # Gap-fill: ensure every deployment has at least 5 releases
-    gap_fill_rows = []
-    for deployment_id in all_deployments:
-        existing = deployment_to_releases.get(deployment_id, [])
-        if len(existing) >= 5:
-            continue
-        parts = deployment_id.split(':')
-        service_id = ':'.join(parts[7:10])
-        builds = service_to_builds.get(service_id, [])
-        if not builds:
-            continue
-        # Find builds not yet used for this deployment
-        used_build_nums = {r_id.split(':')[-1] for r_id, _ in existing}
-        available = [(bid, bca, bnum) for bid, bca, bnum in builds if str(bnum) not in used_build_nums]
-        needed = 5 - len(existing)
-        # Pick from available builds (or reuse if not enough)
-        fill_builds = available[:needed] if len(available) >= needed else available + builds[:needed - len(available)]
-        for build_id, build_created_at, build_num in fill_builds[:needed]:
-            delay_days = random.uniform(0, 3)
-            release_created_at = build_created_at + timedelta(days=delay_days)
-            release_id = f"{deployment_id}:{build_num}"
-            # Avoid duplicate release IDs
-            if any(r_id == release_id for r_id, _ in existing):
-                continue
-            gap_fill_rows.append({
-                'id': release_id,
-                'build_id': build_id,
-                'deployment_id': deployment_id,
-                'build_num': build_num,
-                'created_at': release_created_at,
-                'defaults': '{}',
-            })
-            all_releases.append(release_id)
-            deployment_to_releases[deployment_id].append((release_id, release_created_at))
-            existing.append((release_id, release_created_at))
-
-    all_release_rows = release_rows + gap_fill_rows
-    bulk_insert('release', all_release_rows)
-    print(f"  - {len(all_release_rows)} releases ({len(gap_fill_rows)} gap-filled)")
-
-    # Export deployment schedule JSON for monitoring data generator
-    print("\n  Exporting deployment schedule...")
-    _export_deployment_schedule(deployment_to_releases, all_deployments)
-
-    # =========================================================================
-    # TIER 6: Artifacts
-    # =========================================================================
-    print("\nTier 6: Artifacts...")
-
-    # Build artifacts
-    ba_rows = []
-    for build_id in all_builds:
-        service_id = ':'.join(build_id.split(':')[:-1])
-        stack_id = ':'.join(service_id.split(':')[:-1])
-
-        # Get stack repos
-        repos = stack_to_repos.get(stack_id, [])
-        git_repo = next((r for r in repos if r.startswith('git:')), None)
-        ecr_repo = next((r for r in repos if r.startswith('ecr:')), None)
-        helm_repo = next((r for r in repos if r.startswith('helm:')), None)
-        s3_repo = next((r for r in repos if r.startswith('s3:')), None)
-
-        num_ba = random.randint(5, len(BUILD_ARTIFACT_NAMES))
-        selected_ba = random.sample(BUILD_ARTIFACT_NAMES, num_ba)
-        for artifact_name in selected_ba:
-            ba_id = f"{build_id}:{artifact_name}"
-
-            # Select repos based on artifact type
-            if artifact_name == 'docker-image':
-                input_repo = git_repo
-                output_repo = ecr_repo
-            elif artifact_name == 'helm-chart':
-                input_repo = git_repo
-                output_repo = helm_repo
-            else:
-                input_repo = git_repo
-                output_repo = s3_repo
-
-            ba_rows.append({
-                'id': ba_id,
-                'build_id': build_id,
-                'input_repo_id': input_repo,
-                'output_repo_id': output_repo,
-                'name': artifact_name,
-                'upload_path': f"/builds/{build_id}/{artifact_name}",
-                'data': json.dumps({'size': random.randint(1000, 1000000)}),
-                'created_at': random_date(300, 330),
-                'defaults': '{}',
-            })
-    bulk_insert('build_artifact', ba_rows)
-    print(f"  - {len(ba_rows)} build_artifacts")
-
-    # Release artifacts
-    ra_rows = []
-    for release_id in all_releases:
-        deployment_id = ':'.join(release_id.split(':')[:-1])
-        service_id = ':'.join(deployment_id.split(':')[7:10])
-        stack_id = ':'.join(service_id.split(':')[:-1])
-
-        repos = stack_to_repos.get(stack_id, [])
-        ecr_repo = next((r for r in repos if r.startswith('ecr:')), None)
-        helm_repo = next((r for r in repos if r.startswith('helm:')), None)
-        s3_repo = next((r for r in repos if r.startswith('s3:')), None)
-
-        num_ra = random.randint(5, len(RELEASE_ARTIFACT_NAMES))
-        selected_ra = random.sample(RELEASE_ARTIFACT_NAMES, num_ra)
-        for artifact_name in selected_ra:
-            ra_id = f"{release_id}:{artifact_name}"
-
-            if artifact_name == 'manifest':
-                input_repo = ecr_repo
-            elif artifact_name == 'values':
-                input_repo = helm_repo
-            else:
-                input_repo = helm_repo
-
-            ra_rows.append({
-                'id': ra_id,
-                'release_id': release_id,
-                'input_repo_id': input_repo,
-                'output_repo_id': s3_repo,
-                'name': artifact_name,
-                'upload_path': f"/releases/{release_id}/{artifact_name}",
-                'data': json.dumps({'checksum': hashlib.md5(ra_id.encode()).hexdigest()}),
-                'created_at': random_date(290, 320),
-                'defaults': '{}',
-            })
-    bulk_insert('release_artifact', ra_rows)
-    print(f"  - {len(ra_rows)} release_artifacts")
-
-    # =========================================================================
-    # TIER 7: Configs
-    # =========================================================================
-    print("\nTier 7: Configs...")
+    print("\nTier 5: Configs...")
 
     # Deployment configs (5-7 per deployment, rotating through all templates)
     dc_rows = []
@@ -1023,9 +932,9 @@ def generate(txt_output_dir=None):
     print(f"  - {len(stc_rows)} stack_configs")
 
     # =========================================================================
-    # TIER 8: Allocations
+    # TIER 6: Allocations
     # =========================================================================
-    print("\nTier 8: Allocations...")
+    print("\nTier 6: Allocations...")
 
     alloc_rows = []
     alloc_type_usage = defaultdict(int)
@@ -1214,20 +1123,6 @@ def generate(txt_output_dir=None):
     bulk_insert('target_fleets', tf_rows)
     print(f"  - {len(tf_rows)} target_fleets links")
 
-    # deployment_current_release (latest release per deployment)
-    dcr_rows = []
-    for deployment_id in all_deployments:
-        releases = deployment_to_releases.get(deployment_id, [])
-        if releases:
-            # Get most recent release
-            latest_release = max(releases, key=lambda x: x[1])
-            dcr_rows.append({
-                'deployment_id': deployment_id,
-                'release_id': latest_release[0],
-            })
-    bulk_insert('deployment_current_release', dcr_rows)
-    print(f"  - {len(dcr_rows)} deployment_current_release links")
-
     # =========================================================================
     # EXPORT TSV FIXTURES
     # =========================================================================
@@ -1256,13 +1151,9 @@ def generate(txt_output_dir=None):
             'service_rows': service_rows,
             'proc_rows': proc_rows,
             'ct_rows': ct_rows,
-            'build_rows': build_rows,
             'deployment_rows': deployment_rows,
             'dp_rows': dp_rows,
-            'release_rows': all_release_rows,
             'alloc_rows': alloc_rows,
-            'ba_rows': ba_rows,
-            'ra_rows': ra_rows,
             'dc_rows': dc_rows,
             'sc_rows': sc_rows,
             'stc_rows': stc_rows,
@@ -1288,8 +1179,6 @@ def generate(txt_output_dir=None):
     print(f"Total config_templates: {len(all_config_templates)}")
     print(f"Total deployments: {len(all_deployments)}")
     print(f"Total deployment_procs: {len(all_deployment_procs)}")
-    print(f"Total builds: {len(all_builds)}")
-    print(f"Total releases: {len(all_releases)}")
 
 
 def _write_tsv_file(output_dir, filename, display_name, columns, rows):
@@ -1346,20 +1235,16 @@ def _export_txt_fixtures(output_dir, data):
         ("20_services.txt", "Services", ["stack_id", "name", "artifact_name", "defaults"], data['service_rows']),
         ("21_procs.txt", "Procs", ["service_id", "name", "defaults"], data['proc_rows']),
         ("22_config_templates.txt", "Config Templates", ["id", "language_id", "doc"], data['ct_rows']),
-        ("23_builds.txt", "Builds", ["service_id", "build_num", "vcs_ref", "defaults"], data['build_rows']),
-        ("24_deployments.txt", "Deployments", ["deployment_target_id", "service_id", "tag", "defaults"], data['deployment_rows']),
-        ("25_deployment_procs.txt", "Deployment Procs", ["deployment_id", "proc_id", "defaults"], data['dp_rows']),
-        ("26_releases.txt", "Releases", ["deployment_id", "build_id", "build_num", "defaults"], data['release_rows']),
-        ("27_allocations.txt", "Allocations", ["deployment_proc_id", "allocation_type_id", "watermark", "value", "defaults"], data['alloc_rows']),
-        ("28_build_artifacts.txt", "Build Artifacts", ["build_id", "input_repo_id", "output_repo_id", "name", "upload_path", "data"], data['ba_rows']),
-        ("29_release_artifacts.txt", "Release Artifacts", ["release_id", "input_repo_id", "output_repo_id", "name", "upload_path", "data"], data['ra_rows']),
-        ("30_deployment_configs.txt", "Deployment Configs", ["deployment_id", "config_template_id", "name", "tag", "config", "defaults"], data['dc_rows']),
-        ("31_service_configs.txt", "Service Configs", ["service_id", "config_template_id", "name", "tag", "config", "defaults"], data['sc_rows']),
-        ("32_stack_configs.txt", "Stack Configs", ["stack_id", "config_template_id", "name", "tag", "config", "defaults"], data['stc_rows']),
-        ("33_services_repos.txt", "Services Repos", ["service_id", "repo_id"], data['sr_rows']),
-        ("34_deployments_zones.txt", "Deployments Zones", ["deployment_id", "zone_id"], data['dz_rows']),
-        ("35_subnets_fleets.txt", "Subnets Fleets", ["subnet_id", "fleet_id"], data['sf_rows']),
-        ("36_target_fleets.txt", "Target Fleets", ["deployment_target_id", "fleet_id"], data['tf_rows']),
+        ("23_deployments.txt", "Deployments", ["deployment_target_id", "service_id", "tag", "defaults"], data['deployment_rows']),
+        ("24_deployment_procs.txt", "Deployment Procs", ["deployment_id", "proc_id", "defaults"], data['dp_rows']),
+        ("25_allocations.txt", "Allocations", ["deployment_proc_id", "allocation_type_id", "watermark", "value", "defaults"], data['alloc_rows']),
+        ("26_deployment_configs.txt", "Deployment Configs", ["deployment_id", "config_template_id", "name", "tag", "config", "defaults"], data['dc_rows']),
+        ("27_service_configs.txt", "Service Configs", ["service_id", "config_template_id", "name", "tag", "config", "defaults"], data['sc_rows']),
+        ("28_stack_configs.txt", "Stack Configs", ["stack_id", "config_template_id", "name", "tag", "config", "defaults"], data['stc_rows']),
+        ("29_services_repos.txt", "Services Repos", ["service_id", "repo_id"], data['sr_rows']),
+        ("30_deployments_zones.txt", "Deployments Zones", ["deployment_id", "zone_id"], data['dz_rows']),
+        ("31_subnets_fleets.txt", "Subnets Fleets", ["subnet_id", "fleet_id"], data['sf_rows']),
+        ("32_target_fleets.txt", "Target Fleets", ["deployment_target_id", "fleet_id"], data['tf_rows']),
     ]
 
     total_rows = 0
@@ -1372,88 +1257,77 @@ def _export_txt_fixtures(output_dir, data):
     print(f"  Output: {output_dir}")
 
 
-def _export_deployment_schedule(deployment_to_releases, all_deployments):
-    """Export deployment schedule as JSON for use by the monitoring data generator.
+def load_monitoring_fixtures(txt_dir):
+    """Load build/release/artifact fixture TSVs generated by generate_monitoring_data.py.
 
-    Groups deployments by stack and environment to enable multi-region stagger
-    coordination during monitoring data generation.
+    These fixtures have explicit created_at timestamps and must be bulk-inserted
+    directly into the database (not through the REST API which would use func.now()).
     """
-    schedule = {
-        "generated_at": NOW.isoformat(),
-        "deployments": {},
-        "primary_deployment_targets": PRIMARY_DEPLOYMENT_TARGETS,
-        "stack_region_groups": {},
-    }
+    print("\nLoading monitoring fixtures (builds, releases, artifacts)...")
 
-    # Build deployments section
-    for deployment_id in all_deployments:
-        releases = deployment_to_releases.get(deployment_id, [])
-        if not releases:
+    specs = [
+        ("33_builds.txt", "build",
+         ["id", "service_id", "build_num", "vcs_ref", "ver", "created_at", "defaults"]),
+        ("34_build_artifacts.txt", "build_artifact",
+         ["id", "build_id", "input_repo_id", "output_repo_id", "name", "upload_path", "data", "created_at"]),
+        ("35_releases.txt", "release",
+         ["id", "deployment_id", "build_id", "build_num", "created_at", "defaults"]),
+        ("36_release_artifacts.txt", "release_artifact",
+         ["id", "release_id", "input_repo_id", "output_repo_id", "name", "upload_path", "data", "created_at"]),
+        ("37_deployment_current_release.txt", "deployment_current_release",
+         ["deployment_id", "release_id"]),
+    ]
+
+    for filename, table_name, columns in specs:
+        filepath = os.path.join(txt_dir, filename)
+        if not os.path.exists(filepath):
+            print(f"  SKIP {filename} (not found)")
             continue
-        schedule["deployments"][deployment_id] = {
-            "releases": sorted([
-                {
-                    "release_id": release_id,
-                    "build_num": int(release_id.rsplit(':', 1)[1]),
-                    "created_at": created_at.isoformat(),
-                }
-                for release_id, created_at in releases
-            ], key=lambda r: r["created_at"]),
-        }
 
-    # Build stack_region_groups: group deployment targets by stack_id and env
-    # deployment_id format: env:provider:account:region:partition:target_type:target:app:stack:service:tag
-    stack_region_map = defaultdict(lambda: defaultdict(set))
-    for deployment_id in all_deployments:
-        parts = deployment_id.split(':')
-        if len(parts) < 11:
-            continue
-        env = parts[0]
-        target_id = ':'.join(parts[:7])
-        stack_id = f"{parts[7]}:{parts[8]}"
-        # Only include primary deployment targets
-        if target_id in PRIMARY_DEPLOYMENT_TARGETS:
-            stack_region_map[stack_id][env].add(target_id)
+        rows = []
+        with open(filepath) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                parts = line.split('\t')
+                row = {}
+                for i, col in enumerate(columns):
+                    val = parts[i] if i < len(parts) else ''
+                    if col == 'created_at':
+                        val = datetime.strptime(val, '%Y-%m-%dT%H:%M:%SZ')
+                    elif col == 'build_num':
+                        val = int(val)
+                    row[col] = val
+                rows.append(row)
 
-    schedule["stack_region_groups"] = {
-        stack_id: {
-            env: sorted(list(targets))
-            for env, targets in envs.items()
-            if len(targets) > 0
-        }
-        for stack_id, envs in sorted(stack_region_map.items())
-    }
-
-    output_path = os.path.join(os.path.dirname(__file__), 'deployment_schedule.json')
-    with open(output_path, 'w') as f:
-        json.dump(schedule, f, indent=2)
-    print(f"    Wrote deployment schedule to {output_path}")
-    print(f"    {len(schedule['deployments'])} deployments, {len(schedule['stack_region_groups'])} stack groups")
-
-
-def clear_all():
-    """Clear all data from the database using TRUNCATE CASCADE for speed."""
-    table_names = [t.name for t in reversed(db.metadata.sorted_tables)]
-    if table_names:
-        db.session.execute(text(f"TRUNCATE {', '.join(table_names)} CASCADE"))
-    db.session.commit()
+        bulk_insert(table_name, rows)
+        print(f"  - {len(rows)} {table_name}")
 
 
 def main():
     """Main entry point."""
+    all_cloud_providers = sorted(set(PROVIDER_TYPES) - {'dev'})
     parser = argparse.ArgumentParser(description='Generate Qairon fixture data')
     parser.add_argument('--txt-output', metavar='DIR',
                         help='Export TSV fixture files to this directory')
+    parser.add_argument('--providers', nargs='+', metavar='PROVIDER',
+                        choices=all_cloud_providers, default=['aws'],
+                        help=f'Cloud providers to include (choices: {", ".join(all_cloud_providers)}; default: aws)')
+    parser.add_argument('--monitoring-fixtures', metavar='DIR',
+                        help='Load build/release/artifact TSVs from this directory (generated by generate_monitoring_data.py)')
     args = parser.parse_args()
 
     with app.app_context():
         print("=" * 60)
         print("Qairon Fixture Generator")
         print("=" * 60)
-        print("\nClearing existing data...")
-        clear_all()
-        print("Generating fixtures...")
-        generate(txt_output_dir=args.txt_output)
+        if not args.monitoring_fixtures:
+            print(f"\nCloud providers: {', '.join(args.providers)}")
+            print("Generating fixtures...")
+            generate(txt_output_dir=args.txt_output, cloud_providers=args.providers)
+        if args.monitoring_fixtures:
+            load_monitoring_fixtures(args.monitoring_fixtures)
         db.session.commit()
         print("\n" + "=" * 60)
         print("Done!")

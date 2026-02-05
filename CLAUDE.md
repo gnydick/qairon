@@ -1,7 +1,26 @@
 # Claude Code Preferences
 
+## TODO
+- **Recursive child spans**: Child spans should recursively generate their own children by walking `SERVICE_DEPENDENCIES`. Currently only one level of downstream calls is generated per parent event. A `social:feed:timeline` trace should produce a full multi-level tree (e.g. timeline → content:posts → content:media, content:hashtags, feed:fanout → social:connections, search:indexer). Each child that has its own dependencies in `SERVICE_DEPENDENCIES` must spawn further child spans with proper `parent_span_id` linking, all sharing the same `trace_id`.
+
+## Authoritative Data — CRITICAL
+Qairon is a single-source-of-truth system. ALL data — IDs, field names, dict keys, lookup tables, constants, internal data structures — MUST use canonical, authoritative forms. No shortcuts, no abbreviations, no shorthand, no prefixed/namespaced variants of authoritative field names. If a field is called `service` in the schema, it is `service` everywhere — in event dicts, lookup keys, function parameters, comments, and output. Never invent synthetic prefixes (e.g. `action_service`) or truncated forms (e.g. `stack:service` instead of `application:stack:service`). The authoritative form is the ONLY form.
+
+## ID Handling
+- IDs must always be stored in canonical (full composite) form — never truncated, abbreviated, or partially decomposed. A `service_id` is always `application:stack:service`. A `target_id` is always `env:provider:account:region:partition:target_type:target`. Derived/concise forms are only for display purposes (e.g. dashboard labels, UI rendering).
+- Dict keys, lookup tables, and constants that represent IDs must use the canonical composite form. `SERVICE_DEPENDENCIES` keys are `service_id`s, not `stack:service` shorthand.
+
 ## Git Commits
 - Never include Claude/AI references in commit messages (no Co-Authored-By, no mentions of AI assistance)
+
+## Data Generation Rules
+- Time range: `now - 1 year` to `now + 6 months`
+- Service calls flow **downstream** (caller → dependency), not upstream. All field names, labels, comments, and error messages must use "downstream" terminology.
+- Generate full operational data across **all production contexts for all providers** — every region, every target.
+- Every action must produce enough of every applicable error type over its lifetime that trends and patterns are discernible over any 2-week window. Everything that can happen should happen frequently enough to analyze.
+- Errors and failures must reflect realistic social network failure modes — real-world cascading failures, not random noise. Think through what actually breaks and how it propagates.
+- Stochastic errors occur continuously at low rates. Partial systemic failures (infrastructure incidents, dependency cascades) happen only occasionally.
+- The generated data should look like a real geo-distributed system with regional characteristics, cross-region dependencies, and realistic latency/error profiles per region.
 
 ## Development Environment
 - Native hardware with 64 threads available
@@ -78,15 +97,10 @@ Generates synthetic but realistic logs and metrics for a social network platform
 
 ## Usage
 ```bash
-python generate_monitoring_data.py <total_events> <total_users> [--output <dir>] [--seed <int>] [--deployment-schedule <path>]
+python generate_monitoring_data.py <total_events> <total_users> [--output <dir>] [--seed <int>]
 
 # Example: 1M events, 10K users
 python generate_monitoring_data.py 1000000 10000 --output fixtures/test_data
-
-# With deployment schedule (real release IDs and deployment dips)
-python generate_monitoring_data.py 1000000 10000 \
-  --deployment-schedule fixtures/social_network/deployment_schedule.json \
-  --output fixtures/test_data
 ```
 
 ## Recommended Data Generation
@@ -94,7 +108,7 @@ python generate_monitoring_data.py 1000000 10000 \
 Full pipeline: generate fixtures → generate monitoring data → import to backends.
 
 ```bash
-# Step 1: Generate fixtures (DB + TSV files + deployment schedule)
+# Step 1: Generate fixtures (DB + TSV files)
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://qairon:qairon@localhost:5432/qairon \
   python fixtures/social_network/generate_fixtures.py \
   --txt-output /opt/qairon/fixtures/social_network/txt
@@ -106,7 +120,6 @@ python fixtures/social_network/convert_to_json.py \
 
 # Step 3: Generate 50M events, 50K users (~135M logs with child spans)
 python fixtures/social_network/generate_monitoring_data.py 50000000 50000 \
-  --deployment-schedule fixtures/social_network/deployment_schedule.json \
   --output /opt/qairon/test_data --workers 48
 
 # Step 4: Start all services
@@ -144,6 +157,7 @@ With child spans (~2.8x multiplier), actual output is larger than base events:
 For large datasets, the generator outputs per-worker files to enable streaming without RAM constraints:
 - `logs_0.jsonl`, `logs_1.jsonl`, ... - Log entries split by worker
 - `metrics_0.jsonl`, `metrics_1.jsonl`, ... - Metric entries split by worker
+- `deployment_schedule.json` - Generated releases and deployment windows
 - `summary.json` - Generation metadata
 
 ## Key Features
@@ -205,21 +219,21 @@ The generator creates realistic correlated failures through a three-tier error s
 
 **Error Priority (checked in order):**
 1. **Infrastructure incidents** - Hidden dependency failures (databases, caches, queues)
-2. **Dependency cascades** - Failures propagated from upstream services
-3. **Self errors** - Random errors based on persona success rate
+2. **Dependency cascades** - Failures propagated from downstream services
+3. **Stochastic errors** - Base rate 1-2% (scaled by persona and region)
 
 **Infrastructure Incidents:**
-- Generated at startup: 2-8 incidents per hidden dependency per year
-- Duration: 5 minutes to 4 hours each
-- Low failure rate during incident (0.1%-0.4% of requests)
-- Dependency cascades have 10x amplified failure rate
+- Generated at startup: 8-20 incidents per service per year
+- Severity tiers: minor (2-5%, 5-30min), moderate (5-15%, 30min-2hr), major (15-30%, 1-4hr)
+- ~80% region-specific, ~20% multi-region
+- Incident clustering: 30% chance of follow-up incidents (burst pattern)
 
 **Error Source Types (`error_source` field):**
 
 | Value                        | Meaning                       | Example                        |
 |------------------------------|-------------------------------|--------------------------------|
 | `infrastructure:<component>` | Direct infrastructure failure | `infrastructure:redis_content` |
-| `dependency:<service>`       | Cascade from upstream service | `dependency:content:posts`     |
+| `dependency:<service>`       | Cascade from downstream dependency | `dependency:content:posts`     |
 | `deployment:<release_id>`    | Rolling restart during deploy | `deployment:...:posts:default:152` |
 | `self`                       | Random error (client/server)  | Client 400, Server 500         |
 
@@ -229,7 +243,7 @@ The generator creates realistic correlated failures through a three-tier error s
 - `INFO` - Successful requests
 
 **Correlation Analysis:**
-Use `error_source` and `upstream_request_id` to trace failures:
+Use `error_source` and `downstream_request_id` to trace failures:
 ```bash
 # Find all errors from a specific infrastructure incident
 grep "infrastructure:redis_content" logs.jsonl
@@ -287,7 +301,7 @@ Metrics generated per event:
   "error_message": null,
   "error_source": null,
   "error_type": null,
-  "upstream_request_id": null
+  "downstream_request_id": null
 }
 ```
 
@@ -301,7 +315,7 @@ Metrics generated per event:
 - `error_message` - Human-readable error description
 - `error_source` - Origin of failure (`self`, `dependency:*`, `infrastructure:*`)
 - `error_type` - Category (`client`, `server`, `database`, `cache`, `queue`, `internal`)
-- `upstream_request_id` - Request ID of failed dependency call (for tracing)
+- `downstream_request_id` - Request ID of failed downstream dependency call (for tracing)
 
 ### Generated Anomalies
 
@@ -355,21 +369,35 @@ error_source:deployment*
 action:deployment_start OR action:deployment_complete
 ```
 
-### Deployment-Aware Monitoring (`--deployment-schedule`)
+### Deployment-Aware Monitoring
 
-When a `deployment_schedule.json` is provided (generated by `generate_fixtures.py`), the monitoring data generator:
+The monitoring data generator creates its own builds and releases internally — no external input required. Release generation runs after user creation and before incident generation.
 
-1. **Uses real release IDs** from the fixture database instead of synthetic ones
-2. **Creates deployment dip effects** during rolling restarts:
-   - **Throughput dip**: 15-30% reduction in requests/sec (events skipped)
-   - **Error rate boost**: 2-5% additional server errors (500/502/503)
-   - **Latency increase**: 20-50% higher response times
-3. **Multi-region stagger**: Same-stack services deploy to region A first, then region B after 30-60 minutes
+**Release generation:**
+- For each unique `(stack, service)` pair from `SERVICE_ACTIONS`:
+  - High-frequency services (~40 releases/year), others (10-20 releases/year)
+  - Releases spread evenly across the time range with jitter
+- For each release, deployments are created across all 16 `PRIMARY_DEPLOYMENT_TARGETS` (AWS/GCP/Azure):
+  - Environment-based promotion delay: dev (0-1 days), int (1-3), stg (3-7), prod (7-14)
+  - ~70% promotion rate per environment (random skip)
+- Multi-region stagger within each `(stack_id, env)` group:
+  - First target deploys after CI/CD delay (3-10 min)
+  - Subsequent targets deploy 30-60 min later (alphabetical by target_id)
+
+**Deployment dip effects during rolling restarts:**
+1. **Throughput dip**: 15-30% reduction in requests/sec (events skipped)
+2. **Error rate boost**: 2-5% additional server errors (500/502/503)
+3. **Latency increase**: 20-50% higher response times
 4. **Deployment log events**: `deployment_start` and `deployment_complete` actions with `user_id: "system"`
+
+**Bad deployments (~3-5%):**
+- Higher error rate boost (8-15%) and latency multiplier (1.5-2.5x)
+- Duration 15-45 min
+- Correlated with nearby infrastructure incidents when possible
 
 **Timing Model:**
 ```
-release.created_at → +3-10min CI/CD delay → deployment_start → +5-15min rolling restart → deployment_complete
+build created → +3-10min CI/CD delay → deployment_start → +5-15min rolling restart → deployment_complete
 ```
 
 **Deployment Log Event Format:**
@@ -390,18 +418,7 @@ release.created_at → +3-10min CI/CD delay → deployment_start → +5-15min ro
 }
 ```
 
-**Generating the schedule:**
-```bash
-# generate_fixtures.py automatically exports deployment_schedule.json
-SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://qairon:qairon@localhost:5432/qairon \
-  python fixtures/social_network/generate_fixtures.py \
-  --txt-output /opt/qairon/fixtures/social_network/txt
-
-# Then use it with monitoring data generation
-python fixtures/social_network/generate_monitoring_data.py 50000000 50000 \
-  --deployment-schedule fixtures/social_network/deployment_schedule.json \
-  --output /opt/qairon/test_data --workers 48
-```
+**Output:** `deployment_schedule.json` is written to the output directory for debugging and re-import.
 
 ---
 
@@ -697,7 +714,7 @@ SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://qairon:qairon@localhost:5432/qairo
 ```
 
 ## What It Generates
-Data is created in 8 tiers plus associations:
+Data is created in 7 tiers plus associations:
 
 | Tier | Tables | Typical Count |
 |------|--------|---------------|
@@ -706,20 +723,18 @@ Data is created in 8 tiers plus associations:
 | 2: Application | applications, stacks, services, procs | ~720 |
 | 3: Repos & Config | repos, config_templates | ~165 |
 | 4: Deployments | deployments, deployment_procs | ~260K |
-| 5: Temporal | builds, releases | ~184K |
-| 6: Artifacts | build_artifacts, release_artifacts | ~1.1M |
-| 7: Configs | deployment_configs, service_configs, stack_configs | ~218K |
-| 8: Allocations | allocations | ~2.7M |
-| M2M | services_repos, deployments_zones, subnets_fleets, target_fleets, deployment_current_release | ~540K |
+| 5: Configs | deployment_configs, service_configs, stack_configs | ~218K |
+| 6: Allocations | allocations | ~2.7M |
+| M2M | services_repos, deployments_zones, subnets_fleets, target_fleets | ~540K |
 
-Total: ~5.3M rows across 36 TSV files.
+Total: ~4M rows across 32 TSV files.
+
+**Note:** Builds, releases, and artifacts are generated by the monitoring data generator, not the fixture generator.
 
 ## Key Design Decisions
 - **Deterministic**: Uses `random.seed(42)` for reproducible output
 - **Bulk insert**: Batches of 5000 rows via SQLAlchemy `executemany` for performance
-- **Gap-fill**: Ensures every deployment has at least 5 releases
 - **Primary deployment targets**: 6 targets (2 prod regions, 1 each for stg/dev/int/infra) get full service deployments; all others get only core services
-- **Deployment schedule export**: Automatically writes `deployment_schedule.json` for use by the monitoring data generator
 
 ## TSV Fixture Files
 
@@ -736,16 +751,14 @@ Tab-separated values with header comments. Column order matches `convert_to_json
 value1	value2	value3
 ```
 
-### 36 Files (numbered by dependency order)
+### 32 Files (numbered by dependency order)
 01-06: Reference tables (environments, provider_types, etc.)
 07-16: Infrastructure (providers → capacities)
 17: Repos
 18-22: Application (applications → config_templates)
-23-26: Temporal (builds → releases)
-27: Allocations
-28-29: Artifacts
-30-32: Configs
-33-36: M2M associations
+23: Allocations
+24-26: Configs
+27-30: M2M associations
 
 ### Pipeline: TSV → JSON:API → REST API
 ```bash
@@ -759,164 +772,6 @@ python fixtures/social_network/load_json.py
 ```
 
 ### Data Integrity Rules
-- Every deployment must have at least 5 releases (gap-filled automatically)
 - Composite IDs are colon-delimited and build hierarchically
 - `_` prefix columns in MAPPINGS (e.g., `_artifact_name`) are written to TSV but skipped by the JSON converter
 
----
-
-# TODO
-
-## Monitoring Data Generator
-
-- [x] **Add distributed tracing support** - Implemented OpenTelemetry-style tracing:
-  - `trace_id` (32 hex chars) - Consistent across a call chain
-  - `span_id` (16 hex chars) - Unique per operation
-  - `parent_span_id` - Links to parent (null for root spans)
-  - Error-biased exemplar sampling for metrics (100% errors, 100% slow, 1% random)
-
-- [x] **Generate child span events** - Full distributed tracing with parent-child span relationships:
-  - For each root event, generates child spans for all `SERVICE_DEPENDENCIES`
-  - Child spans share `trace_id` with parent, have unique `span_id`, link via `parent_span_id`
-  - Timing: children start after parent, complete before parent (staggered offsets)
-  - ~2.8x event multiplier (100 root events → ~280 total events)
-  - Error propagation: infrastructure incidents affect child spans appropriately
-
-- [x] **Streaming to disk** - Large datasets write directly to per-worker files to avoid OOM:
-  - Workers write directly to `logs_N.jsonl` and `metrics_N.jsonl`
-  - No RAM accumulation, enables 50M+ event generation
-  - Import each file separately to VictoriaMetrics/VictoriaLogs
-
-- [x] **Deployment-aware monitoring** - Logs/metrics align with actual deployment events:
-  - `generate_fixtures.py` exports `deployment_schedule.json` with release timelines
-  - `generate_monitoring_data.py --deployment-schedule` uses real release IDs and creates deployment dips
-  - Deployment windows: throughput reduction (15-30%), error rate boost (2-5%), latency increase (20-50%)
-  - Multi-region stagger: same-stack services deploy to region A first, region B 30-60min later
-  - Deployment log events: `deployment_start` and `deployment_complete` with `user_id: "system"`
-
-- [x] **Fixture generator with TSV export** - `generate_fixtures.py` generates all Qairon entities:
-  - Bulk inserts to database (5000 rows/batch via SQLAlchemy executemany)
-  - Optional `--txt-output` exports 36 TSV fixture files (5.3M rows)
-  - Pipeline: TSV → `convert_to_json.py` → JSON:API → `load_json.py` → REST API
-  - `convert_to_json.py` now accepts `--input-dir` and `--output-dir` CLI args
-
-
-
-╭───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ Plan to implement                                                                                                 │
-│                                                                                                                   │
-│ Plan: Rebuild All Dashboards From Scratch                                                                         │
-│                                                                                                                   │
-│ Status                                                                                                            │
-│                                                                                                                   │
-│ The previous plan (split service-detail → service-detail + action-detail) was partially implemented but the       │
-│ hand-written JSON has structural issues (missing pluginVersion, incomplete options/fieldConfig blocks, etc.). The │
-│  user wants to start fresh and rebuild all dashboards from scratch with proper full Grafana panel schemas.        │
-│                                                                                                                   │
-│ Current State                                                                                                     │
-│                                                                                                                   │
-│ The existing dashboards in grafana/dashboards/ serve as reference for content/queries but should be rewritten:    │
-│ - error-analysis.json — exported from Grafana, has full schema (use as structural template)                       │
-│ - platform-overview.json — hand-written, minimal schema                                                           │
-│ - user-experience.json — hand-written, minimal schema                                                             │
-│ - service-detail.json — hand-written, minimal schema                                                              │
-│ - action-detail.json — hand-written (new), minimal schema                                                         │
-│ - deployment-impact.json — hand-written, minimal schema                                                           │
-│ - infra-health.json — hand-written, minimal schema                                                                │
-│                                                                                                                   │
-│ Approach                                                                                                          │
-│                                                                                                                   │
-│ 1. Use error-analysis.json as the structural template — it has full Grafana-exported panel schemas with           │
-│ pluginVersion, complete options, fieldConfig, mappings, etc.                                                      │
-│ 2. Create a new set of dashboards (grafana/dashboards-v2/ or overwrite in-place) modeled after that structure     │
-│ 3. Keep all existing dashboards as query/content reference                                                        │
-│                                                                                                                   │
-│ Dashboard Inventory & Panel Specs                                                                                 │
-│                                                                                                                   │
-│ Drill-Down Flow                                                                                                   │
-│                                                                                                                   │
-│ platform-overview (by stack)                                                                                      │
-│   → user-experience (by stack/service → topk panels show actions)                                                 │
-│       → [click action] → action-detail                                                                            │
-│       → [click service] → service-detail                                                                          │
-│   → service-detail (single service, breakdowns by action)                                                         │
-│       → [click action series/legend] → action-detail                                                              │
-│   → error-analysis (by stack/service)                                                                             │
-│       → [click action] → action-detail                                                                            │
-│       → [click service] → service-detail                                                                          │
-│                                                                                                                   │
-│ Key Rules                                                                                                         │
-│                                                                                                                   │
-│ - All rate queries: / $__rate_interval (not vector workaround)                                                    │
-│ - Single-select vars use exact match: stack="$stack", action="$action"                                            │
-│ - Multi-select vars use regex: region=~"$region", stack=~"$stack"                                                 │
-│ - VictoriaLogs single-select: stack:$stack, multi-select: stack:in($stack)                                        │
-│ - Every panel must have full schema: pluginVersion, mappings, fieldConfig.defaults.color, etc.                    │
-│                                                                                                                   │
-│ Dashboard Details                                                                                                 │
-│                                                                                                                   │
-│ 1. platform-overview                                                                                              │
-│                                                                                                                   │
-│ - Variables: environment (single), region (multi+all), stack (multi+all)                                          │
-│ - Panels: 6 stats, request rate by stack, error rate by stack, error rate bargauge, top erroring services table,  │
-│ P99 bargauge, top slowest services, top volume services, infra error logs, deployment event logs                  │
-│ - Links: stack-level → user-experience, service-level → service-detail                                            │
-│                                                                                                                   │
-│ 2. user-experience                                                                                                │
-│                                                                                                                   │
-│ - Variables: environment (single), region (multi+all), stack (multi+all), service (multi+all), action (multi+all) │
-│ - Panels: cache hit rate by service, top request/response sizes by action, avg DB queries by action, DB query     │
-│ count by service, top slowest actions, top error rate by action, request rate by service, error rate by service   │
-│ - Links: service-level → service-detail, action-level → action-detail                                             │
-│                                                                                                                   │
-│ 3. service-detail                                                                                                 │
-│                                                                                                                   │
-│ - Variables: environment (single), region (multi+all), stack (single), service (single), deployed_ids (hidden)    │
-│ - NO action variable                                                                                              │
-│ - Panels: 6 stats (service-wide), request rate by action, error rate by action, P50/P95/P99 over time, P95 by     │
-│ action, recent deployments                                                                                        │
-│ - Links: action series → action-detail                                                                            │
-│                                                                                                                   │
-│ 4. action-detail (NEW)                                                                                            │
-│                                                                                                                   │
-│ - Variables: environment (single), region (multi+all), stack (single), service (single), action (single),         │
-│ deployed_ids (hidden)                                                                                             │
-│ - Panels: 6 stats (action-scoped), request rate, error rate %, P50/P95/P99, latency distribution (band fill),     │
-│ errors by source (pie), error types over time, top error messages (table), cache hit rate over time, DB query     │
-│ count over time, request/response size over time, upstream dependency errors, recent deployments                  │
-│ - All queries use exact match action="$action" / action:$action                                                   │
-│                                                                                                                   │
-│ 5. error-analysis (already exported — keep as-is or minor link updates)                                           │
-│                                                                                                                   │
-│ - Links: action-level → action-detail, service-level → service-detail                                             │
-│                                                                                                                   │
-│ 6. deployment-impact                                                                                              │
-│                                                                                                                   │
-│ - Variables: environment (single), region (multi+all), stack (multi+all)                                          │
-│ - Panels: deployment events log, error rate with deployments, latency with deployments, request rate, response    │
-│ size, error rate by region, latency by region, error rate by release, P95 by release                              │
-│                                                                                                                   │
-│ 7. infra-health                                                                                                   │
-│                                                                                                                   │
-│ - Keep existing structure, ensure full schema                                                                     │
-│                                                                                                                   │
-│ Implementation Order                                                                                              │
-│                                                                                                                   │
-│ 1. Study error-analysis.json for full panel schema patterns                                                       │
-│ 2. Rebuild platform-overview.json                                                                                 │
-│ 3. Rebuild user-experience.json                                                                                   │
-│ 4. Rebuild service-detail.json                                                                                    │
-│ 5. Rebuild action-detail.json                                                                                     │
-│ 6. Rebuild deployment-impact.json                                                                                 │
-│ 7. Rebuild infra-health.json                                                                                      │
-│ 8. Update error-analysis.json links only (already has good schema)                                                │
-│ 9. Upload all to Grafana and verify                                                                               │
-│                                                                                                                   │
-│ Verification                                                                                                      │
-│                                                                                                                   │
-│ - Every dashboard loads without 422 errors                                                                        │
-│ - All panels render data correctly                                                                                │
-│ - All drill-down links navigate to correct dashboards with correct variable values                                │
-│ - Annotations (Releases, Deploy Start, Deploy Complete) work on all dashboards that have them                     │
-│ - No leftover action filter on service-detail                                                                     │
-│ - action-detail uses exact match everywhere
