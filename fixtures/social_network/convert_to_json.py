@@ -99,11 +99,11 @@ def to_jsonapi(resource_type, records):
 def main():
     parser = argparse.ArgumentParser(description='Convert TSV fixtures to JSON:API format')
     parser.add_argument('--input-dir', metavar='DIR',
-                        default=str(SCRIPT_DIR / "txt"),
-                        help='Input directory containing TSV files (default: txt/ subdir)')
+                        default='/opt/qairon/fixtures/social_network/txt',
+                        help='Input directory containing TSV files')
     parser.add_argument('--output-dir', metavar='DIR',
-                        default=str(SCRIPT_DIR / "json"),
-                        help='Output directory for JSON files (default: json/ subdir)')
+                        default='/opt/qairon/fixtures/social_network/json',
+                        help='Output directory for JSON files')
     args = parser.parse_args()
 
     input_dir = Path(args.input_dir)

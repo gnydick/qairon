@@ -22,12 +22,13 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
-from qairon_ids import validate_id, deployment_id_from_release_id, split_release_id, derive_dep_deployment_id, derive_dep_release_id
+from qairon_ids import deployment_id_from_release_id
 from qairon_model import (
     QaironModel, PRIMARY_DEPLOYMENT_TARGETS,
     ENV_WEIGHT_MAP, REGION_PROFILES, DEFAULT_REGION_PROFILE,
     HIGH_FREQUENCY_SERVICES,
 )
+from generate_bad_prod_rollouts import generate_bad_prod_rollouts
 
 
 # =============================================================================
@@ -1001,6 +1002,7 @@ def generate_child_spans_for_event(
     rng: random.Random,
     error_codes: dict,
     error_messages: dict,
+    model: 'QaironModel',
     max_depth: int = 5,
     current_depth: int = 0,
     visited: Optional[set] = None,
@@ -1009,22 +1011,19 @@ def generate_child_spans_for_event(
     Recursively generate child span events based on ACTION_DEPENDENCIES.
 
     Walks ACTION_DEPENDENCIES to produce a full multi-level trace tree where each
-    span has its own action name. For example, get_timeline generates:
-      get_timeline → rank_posts → get_interests
-      get_timeline → get_user_posts → get_media, get_reactions
+    span has its own action name. Only generates spans for deps actually deployed
+    on the parent's target (verified via model.deployments).
 
     Error propagation follows stack trace semantics:
     - A leaf child that fails has error_source=None (it's the originator)
     - A parent that fails because its child failed has error_source=child's deployment_id
-
-    Child spans inherit the parent's infrastructure context (env, provider, account,
-    region, etc.) via derive_dep_release_id — dependencies never cross context boundaries.
 
     Args:
         parent_event: The root/parent event dict (must have 'release_id')
         rng: Random number generator
         error_codes: Dict of error codes by type
         error_messages: Dict of error messages by code
+        model: QaironModel with actual deployments
         max_depth: Maximum recursion depth (default 5, prevents runaway recursion)
         current_depth: Current recursion depth (internal use)
         visited: Set of visited action_ids in this trace path (cycle detection)
@@ -1052,6 +1051,11 @@ def generate_child_spans_for_event(
     if not downstream_actions:
         return []
 
+    # Extract target_id from parent's release_id for deployment verification
+    parent_release_id = parent_event.get("release_id", "")
+    parent_parts = parent_release_id.split(':')
+    target_id = ':'.join(parent_parts[:7]) if len(parent_parts) >= 7 else None
+
     all_spans = []
     parent_timestamp = parent_event['timestamp']
 
@@ -1064,6 +1068,12 @@ def generate_child_spans_for_event(
         if len(parts) != 4:
             continue  # Skip malformed action_ids
         dep_application, dep_stack, dep_service, dep_action = parts
+
+        # Verify dependency is actually deployed on this target
+        dep_service_id = f"{dep_application}:{dep_stack}:{dep_service}"
+        dep_deployment_id = f"{target_id}:{dep_service_id}:default" if target_id else None
+        if not dep_deployment_id or dep_deployment_id not in model.deployments:
+            continue  # Not deployed on this target
 
         # Child timing: stagger starts, each takes portion of parent time
         child_start_offset_ms = (i + 1) * (parent_latency * 0.05)
@@ -1078,12 +1088,9 @@ def generate_child_spans_for_event(
         child_span_id = generate_span_id(rng)
         child_request_id = uuid.uuid4().hex
 
-        # Child inherits parent's infrastructure context — derive from parent's release_id
-        parent_release_id = parent_event.get("release_id", "")
-        parent_parts = parent_release_id.split(':')
-        # Use parent's release_num as fallback for the dependency
+        # Build child release_id from the verified deployment_id
         child_release_num = parent_parts[-1] if len(parent_parts) == 12 else "100"
-        child_release_id = derive_dep_release_id(parent_release_id, dep_stack, dep_service, child_release_num)
+        child_release_id = f"{dep_deployment_id}:{child_release_num}"
 
         # Determine if child span has an error
         child_error_info = None
@@ -1092,8 +1099,7 @@ def generate_child_spans_for_event(
         # If parent failed due to this dependency (error_source is this child's deployment_id),
         # the child fails as the originator (error_source=None)
         parent_error_source = (parent_event.get('error_info') or {}).get('error_source', '')
-        child_deployment_id = deployment_id_from_release_id(child_release_id)
-        parent_blames_child = parent_error_source == child_deployment_id
+        parent_blames_child = parent_error_source == dep_deployment_id
 
         if parent_blames_child:
             # Child is the originator — no error_source (leaf of the stack trace)
@@ -1146,6 +1152,7 @@ def generate_child_spans_for_event(
             rng=rng,
             error_codes=error_codes,
             error_messages=error_messages,
+            model=model,
             max_depth=max_depth,
             current_depth=current_depth + 1,
             visited=visited,
@@ -1305,6 +1312,9 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     for service in model.services.values():
         incidents.extend(service.incidents)
 
+    # Debt accumulator for deterministic deployment error rates
+    deployment_error_debt = {}
+
     # Worker-local content pools
     all_posts = []
     all_stories = []
@@ -1328,23 +1338,27 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     def determine_error(action, user_data, timestamp, release_id=None) -> Optional[Dict]:
         service_key = action.service_id
 
-        # Extract env and region from the release_id hierarchy
+        # Extract env, region, and target_id from the release_id hierarchy
         rid_parts = release_id.split(':') if release_id else []
         env = rid_parts[0] if len(rid_parts) >= 4 else None
         region = rid_parts[3] if len(rid_parts) >= 4 else None
+        target_id = ':'.join(rid_parts[:7]) if len(rid_parts) >= 7 else None
 
         # Apply regional error multiplier
         region_profile = model.get_region_profile(region) if region else DEFAULT_REGION_PROFILE
         regional_error_mult = region_profile["error_multiplier"]
 
+        # Walk model for deps actually deployed on this target
+        dep_service_ids = SERVICE_DEPENDENCIES.get(service_key, [])
+        deployed_deps = model.get_deployed_deps(target_id, dep_service_ids) if target_id else []
+
         # 1. Service incident: check if any dependency has an active incident
-        deps = SERVICE_DEPENDENCIES.get(service_key, [])
-        for dep_key in deps:
-            incident = get_active_incident(dep_key, timestamp, region)
+        for dep_deployment_id in deployed_deps:
+            dep_service_id = model.deployments[dep_deployment_id].service_id
+            incident = get_active_incident(dep_service_id, timestamp, region)
             if incident and rng.random() < incident.failure_rate * regional_error_mult:
-                dep_application, dep_stack, dep_service = dep_key.split(':')
                 return {
-                    "error_source": derive_dep_deployment_id(release_id, dep_stack, dep_service),
+                    "error_source": dep_deployment_id,
                     "error_type": incident.error_type,
                     "error_code": rng.choice(incident.error_codes),
                     "error_message": f"Downstream dependency failed: {incident.error_message}",
@@ -1362,30 +1376,37 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 "downstream_request_id": None,
             }
 
-        # 2. Deployment dip errors
+        # 2. Deployment dip errors (deterministic debt accumulator)
         if env and region:
             window = model.get_active_deployment_window(
                 action.stack, action.service, env, region, timestamp
             )
-            if window and rng.random() < window.error_rate_boost:
-                return {
-                    "error_source": deployment_id_from_release_id(window.release_id),
-                    "error_type": "server",
-                    "error_code": rng.choice(["500", "502", "503"]),
-                    "error_message": "Service restarting during deployment",
-                    "downstream_request_id": None,
-                }
+            if window:
+                window_key = (window.deployment_id, window.release_id)
+                # Bad deployments: initialize debt high so first event is always an error
+                initial = (1.0 - window.error_rate_boost) if window.error_rate_boost >= 0.08 else 0.0
+                debt = deployment_error_debt.get(window_key, initial)
+                debt += window.error_rate_boost
+                if debt >= 1.0:
+                    debt -= 1.0
+                    deployment_error_debt[window_key] = debt
+                    return {
+                        "error_source": deployment_id_from_release_id(window.release_id),
+                        "error_type": "server",
+                        "error_code": rng.choice(["500", "502", "503"]),
+                        "error_message": "Service restarting during deployment",
+                        "downstream_request_id": None,
+                    }
+                deployment_error_debt[window_key] = debt
 
         # 3. Stochastic errors — base rate 1-2% (scaled by persona success_rate and regional multiplier)
         stochastic_error_rate = (1.0 - user_data["success_rate"]) * regional_error_mult
         if rng.random() < stochastic_error_rate:
             # Dependency failure: blame a downstream service's deployment_id
-            deps = SERVICE_DEPENDENCIES.get(service_key, [])
-            if deps and rng.random() < 0.4:
-                dep_key = rng.choice(deps)
-                dep_application, dep_stack, dep_service = dep_key.split(':')
+            if deployed_deps and rng.random() < 0.4:
+                dep_deployment_id = rng.choice(deployed_deps)
                 return {
-                    "error_source": derive_dep_deployment_id(release_id, dep_stack, dep_service),
+                    "error_source": dep_deployment_id,
                     "error_type": "server",
                     "error_code": rng.choice(error_codes["server"]),
                     "error_message": "Downstream dependency failed",
@@ -1708,6 +1729,7 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                     rng=rng,
                     error_codes=error_codes,
                     error_messages=error_messages,
+                    model=model,
                 )
                 for child_event in child_spans:
                     log_f.write(event_to_log_json(child_event) + "\n")
@@ -1735,7 +1757,7 @@ class MonitoringDataGenerator:
 
         # Load the in-memory model from TSV fixtures
         if fixtures_dir is None:
-            fixtures_dir = str(Path(__file__).parent / "txt")
+            fixtures_dir = "/opt/qairon/fixtures/social_network/txt"
         self.model = QaironModel.from_tsv(Path(fixtures_dir), PRIMARY_DEPLOYMENT_TARGETS)
         env_config = self.model.environment_config()
         env_summary = {e: len(c["targets"]) for e, c in env_config.items()}
@@ -1746,6 +1768,9 @@ class MonitoringDataGenerator:
         # Users
         self.users: List[User] = []
         self.user_by_id: Dict[str, User] = {}
+
+        # Debt accumulator for deterministic deployment error rates
+        self.deployment_error_debt: Dict[Tuple[str, str], float] = {}
 
         # Content pools for realistic references
         self.all_posts: List[Tuple[str, str]] = []  # (post_id, author_id)
@@ -1835,6 +1860,9 @@ class MonitoringDataGenerator:
         Creates Build/Release/Artifact entities on model.services and model.deployments,
         plus release timelines and deployment windows on each deployment.
 
+        Build numbers are globally monotonic (like a CI/CD job counter) — each build
+        gets a unique number that increases chronologically across all services.
+
         Timing model (CRITICAL):
             build.created_at → build_artifact(+0-59s) → release(+env_promotion_delay)
             → release_artifact(+0-59s) → deployment_start(+3-10min) → deployment_complete(+5-15min)
@@ -1867,13 +1895,14 @@ class MonitoringDataGenerator:
         }
 
         total_days = (self.end_time - self.start_time).days
-        timeline_count = 0
-        window_count = 0
-        bad_deploy_count = 0
+
+        # ── Phase 1: Collect all build timestamps across all services ──
+        # Each slot: (created_at, service_id, application, stack, service, local_index)
+        build_slots = []
+        service_build_counts: Dict[str, int] = {}
 
         for application, stack, service in sorted(service_pairs):
             service_id = f"{application}:{stack}:{service}"
-            app_stack_slug = f"{application}-{stack}"
             model_service = self.model.services.get(service_id)
             if not model_service:
                 continue
@@ -1886,22 +1915,48 @@ class MonitoringDataGenerator:
             else:
                 num_builds = self.rng.randint(10, 15)
 
-            build_num_start = self.rng.randint(50, 200)
+            service_build_counts[service_id] = num_builds
 
-            # Generate builds spread across the time range
-            builds = []
             for i in range(num_builds):
-                build_num = build_num_start + i
-                # Spread evenly with jitter
                 base_day = int(i * total_days / num_builds)
                 jitter = self.rng.randint(-3, 3)
                 day_offset = max(0, min(total_days - 1, base_day + jitter))
                 build_created_at = self.start_time + timedelta(days=day_offset,
                                                                 hours=self.rng.randint(8, 18),
                                                                 minutes=self.rng.randint(0, 59))
+                build_slots.append((build_created_at, service_id, application, stack, service, i))
+
+        # ── Phase 2: Sort chronologically, assign globally monotonic build numbers ──
+        build_slots.sort(key=lambda x: x[0])
+        global_start = self.rng.randint(500, 1000)
+        # Map (service_id, local_index) -> (global_build_num, created_at)
+        build_num_map: Dict[tuple, tuple] = {}
+        for offset, (created_at, service_id, _app, _stack, _svc, local_idx) in enumerate(build_slots):
+            build_num_map[(service_id, local_idx)] = (global_start + offset, created_at)
+
+        print(f"    Global build numbers: {global_start} to {global_start + len(build_slots) - 1} "
+              f"({len(build_slots)} builds across {len(service_build_counts)} services)")
+
+        # ── Phase 3: Create entities using assigned numbers ──
+        timeline_count = 0
+        window_count = 0
+        bad_deploy_count = 0
+
+        for application, stack, service in sorted(service_pairs):
+            service_id = f"{application}:{stack}:{service}"
+            app_stack_slug = f"{application}-{stack}"
+            model_service = self.model.services.get(service_id)
+            if not model_service:
+                continue
+
+            num_builds = service_build_counts.get(service_id, 0)
+
+            # Create Build + BuildArtifact entities with globally assigned numbers
+            builds = []
+            for i in range(num_builds):
+                build_num, build_created_at = build_num_map[(service_id, i)]
                 builds.append((build_num, build_created_at))
 
-                # Create Build entity on model
                 build_id = f"{service_id}:{build_num}"
                 vcs_ref = hashlib.md5(f"{service_id}:{build_num}".encode()).hexdigest()[:7]
                 ver = re.sub(r"[^0-9a-zA-Z.-]", '-', vcs_ref)
@@ -1966,8 +2021,6 @@ class MonitoringDataGenerator:
                         release_id = f"{deployment_id}:{build_num}"
                         build_id = f"{service_id}:{build_num}"
 
-                        # FIX: release created_at = base_release_time (build + env promotion delay)
-                        # Previously used random(1min, 2days) which was disconnected from timing model
                         release_created_at = base_release_time
 
                         # Create Release entity on model deployment
@@ -2195,28 +2248,32 @@ class MonitoringDataGenerator:
         2. Deployment dip (rolling restart errors)
         3. Stochastic errors (1-2% base rate, scaled by persona and region)
 
-        Uses the parent's release_id to derive dependency deployment_ids —
-        dependencies always inherit the caller's infrastructure context.
+        Walks the model's actual deployments to find deps on this target —
+        never constructs deployment_ids that might not exist.
         """
         service_key = action.service_id
 
-        # Extract env and region from the release_id hierarchy
+        # Extract env, region, and target_id from the release_id hierarchy
         rid_parts = release_id.split(':') if release_id else []
         env = rid_parts[0] if len(rid_parts) >= 4 else None
         region = rid_parts[3] if len(rid_parts) >= 4 else None
+        target_id = ':'.join(rid_parts[:7]) if len(rid_parts) >= 7 else None
 
         # Apply regional error multiplier
         region_profile = self.model.get_region_profile(region) if region else DEFAULT_REGION_PROFILE
         regional_error_mult = region_profile["error_multiplier"]
 
+        # Walk model for deps actually deployed on this target
+        dep_service_ids = SERVICE_DEPENDENCIES.get(service_key, [])
+        deployed_deps = self.model.get_deployed_deps(target_id, dep_service_ids) if target_id else []
+
         # 1. Service incident: check if any dependency has an active incident
-        deps = SERVICE_DEPENDENCIES.get(service_key, [])
-        for dep_key in deps:
-            incident = self.get_active_incident(dep_key, timestamp, region)
+        for dep_deployment_id in deployed_deps:
+            dep_service_id = self.model.deployments[dep_deployment_id].service_id
+            incident = self.get_active_incident(dep_service_id, timestamp, region)
             if incident and self.rng.random() < incident.failure_rate * regional_error_mult:
-                dep_application, dep_stack, dep_service = dep_key.split(':')
                 return {
-                    "error_source": derive_dep_deployment_id(release_id, dep_stack, dep_service),
+                    "error_source": dep_deployment_id,
                     "error_type": incident.error_type,
                     "error_code": self.rng.choice(incident.error_codes),
                     "error_message": f"Downstream dependency failed: {incident.error_message}",
@@ -2234,29 +2291,37 @@ class MonitoringDataGenerator:
                 "downstream_request_id": None,
             }
 
-        # 2. Deployment dip errors
+        # 2. Deployment dip errors (deterministic debt accumulator)
         if env and region:
             window = self.model.get_active_deployment_window(
                 action.stack, action.service, env, region, timestamp
             )
-            if window and self.rng.random() < window.error_rate_boost:
-                return {
-                    "error_source": deployment_id_from_release_id(window.release_id),
-                    "error_type": "server",
-                    "error_code": self.rng.choice(["500", "502", "503"]),
-                    "error_message": "Service restarting during deployment",
-                    "downstream_request_id": None,
-                }
+            if window:
+                window_key = (window.deployment_id, window.release_id)
+                # Bad deployments: initialize debt high so first event is always an error
+                initial = (1.0 - window.error_rate_boost) if window.error_rate_boost >= 0.08 else 0.0
+                debt = self.deployment_error_debt.get(window_key, initial)
+                debt += window.error_rate_boost
+                if debt >= 1.0:
+                    debt -= 1.0
+                    self.deployment_error_debt[window_key] = debt
+                    return {
+                        "error_source": deployment_id_from_release_id(window.release_id),
+                        "error_type": "server",
+                        "error_code": self.rng.choice(["500", "502", "503"]),
+                        "error_message": "Service restarting during deployment",
+                        "downstream_request_id": None,
+                    }
+                self.deployment_error_debt[window_key] = debt
 
         # 3. Stochastic errors — base rate 1-2% (scaled by persona success_rate and regional multiplier)
         stochastic_error_rate = (1.0 - user.persona.success_rate) * regional_error_mult
         if self.rng.random() < stochastic_error_rate:
             # Dependency failure: blame a downstream service's deployment_id
-            if deps and self.rng.random() < 0.4:
-                dep_key = self.rng.choice(deps)
-                dep_application, dep_stack, dep_service = dep_key.split(':')
+            if deployed_deps and self.rng.random() < 0.4:
+                dep_deployment_id = self.rng.choice(deployed_deps)
                 return {
-                    "error_source": derive_dep_deployment_id(release_id, dep_stack, dep_service),
+                    "error_source": dep_deployment_id,
                     "error_type": "server",
                     "error_code": self.rng.choice(self.error_codes["server"]),
                     "error_message": "Downstream dependency failed",
@@ -2756,7 +2821,8 @@ class MonitoringDataGenerator:
         Recursively generate child span events based on ACTION_DEPENDENCIES (sequential format).
 
         Walks ACTION_DEPENDENCIES to produce a full multi-level trace tree where each
-        span has its own action name.
+        span has its own action name. Only generates spans for deps actually deployed
+        on the parent's target (verified via model.deployments).
         """
         if current_depth >= max_depth:
             return []
@@ -2778,6 +2844,11 @@ class MonitoringDataGenerator:
         if not downstream_actions:
             return []
 
+        # Extract target_id from parent's release_id for deployment verification
+        parent_release_id = parent_event["release_id"]
+        parent_parts = parent_release_id.split(':')
+        target_id = ':'.join(parent_parts[:7]) if len(parent_parts) >= 7 else None
+
         all_spans = []
         parent_latency = action.base_latency_ms * user.persona.latency_multiplier
 
@@ -2787,6 +2858,12 @@ class MonitoringDataGenerator:
             if len(parts) != 4:
                 continue
             dep_application, dep_stack, dep_service, dep_action = parts
+
+            # Verify dependency is actually deployed on this target
+            dep_service_id = f"{dep_application}:{dep_stack}:{dep_service}"
+            dep_deployment_id = f"{target_id}:{dep_service_id}:default" if target_id else None
+            if not dep_deployment_id or dep_deployment_id not in self.model.deployments:
+                continue  # Not deployed on this target
 
             # Child timing
             child_start_offset_ms = (i + 1) * (parent_latency * 0.05)
@@ -2819,17 +2896,15 @@ class MonitoringDataGenerator:
                 is_write=action.is_write,
             )
 
-            # Child inherits parent's infrastructure context — derive from parent's release_id
-            parent_release_id = parent_event["release_id"]
-            parent_release_num = parent_release_id.split(':')[-1]
-            child_release_id = derive_dep_release_id(parent_release_id, dep_stack, dep_service, parent_release_num)
+            # Build child release_id from the verified deployment_id
+            child_release_num = parent_parts[-1] if len(parent_parts) == 12 else "100"
+            child_release_id = f"{dep_deployment_id}:{child_release_num}"
 
             # Check if parent blames this child
             child_error_info = None
             child_success = True
             parent_error_source = (parent_event.get("error_info") or {}).get("error_source", "")
-            child_deployment_id = deployment_id_from_release_id(child_release_id)
-            if parent_error_source == child_deployment_id:
+            if parent_error_source == dep_deployment_id:
                 error_code = self.rng.choice(self.error_codes["server"])
                 child_error_info = {
                     "error_source": None,
@@ -3432,6 +3507,14 @@ def main():
     with open(schedule_file, 'w') as f:
         json.dump(schedule_data, f, indent=2)
     print(f"  Wrote deployment schedule to {schedule_file}")
+
+    # Generate bad_prod_rollouts.md from deployment schedule
+    rollouts_output = output_path / "bad_prod_rollouts.md"
+    count = generate_bad_prod_rollouts(schedule_file, rollouts_output)
+    # Also write to source tree for reference
+    source_rollouts = Path(__file__).parent / "bad_prod_rollouts.md"
+    generate_bad_prod_rollouts(schedule_file, source_rollouts)
+    print(f"  Wrote {count} bad prod rollouts to {rollouts_output} and {source_rollouts}")
 
     # Write incidents to output directory
     incidents_file = output_path / "incidents.json"

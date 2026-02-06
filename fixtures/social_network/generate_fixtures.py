@@ -1294,6 +1294,7 @@ def main():
     all_cloud_providers = sorted(set(PROVIDER_TYPES) - {'dev'})
     parser = argparse.ArgumentParser(description='Generate Qairon fixture data')
     parser.add_argument('--txt-output', metavar='DIR',
+                        default='/opt/qairon/fixtures/social_network/txt',
                         help='Export TSV fixture files to this directory')
     parser.add_argument('--providers', nargs='+', metavar='PROVIDER',
                         choices=all_cloud_providers, default=['aws'],

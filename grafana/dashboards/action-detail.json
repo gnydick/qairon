@@ -23,7 +23,7 @@
         "iconColor": "#FF9830",
         "name": "Releases",
         "target": {
-          "expr": "action:deployment_complete environment:$environment stack:$stack service:$service | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "expr": "action:deployment_complete provider:$context environment:$environment stack:$stack service:$service | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
           "refId": "releases"
         }
       },
@@ -37,7 +37,7 @@
         "iconColor": "#5794F2",
         "name": "Deploy Start",
         "target": {
-          "expr": "action:deployment_start environment:$environment stack:$stack service:$service | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "expr": "action:deployment_start provider:$context environment:$environment stack:$stack service:$service | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
           "refId": "deploy_start"
         }
       },
@@ -51,7 +51,7 @@
         "iconColor": "#73BF69",
         "name": "Deploy Complete",
         "target": {
-          "expr": "action:deployment_complete environment:$environment stack:$stack service:$service | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "expr": "action:deployment_complete provider:$context environment:$environment stack:$stack service:$service | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
           "refId": "deploy_complete"
         }
       }
@@ -175,7 +175,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "sum by (action) (count_over_time(request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "{{action}}",
           "refId": "A"
         }
@@ -268,7 +268,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum by (action) (count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", success=\"false\"}[$__rate_interval]))",
+          "expr": "sum by (action) (count_over_time(request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "{{action}}",
           "refId": "A"
         }
@@ -361,7 +361,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "avg by (action) (quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg by (action) (quantile_over_time(0.5, request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "{{action}}",
           "refId": "A"
         }
@@ -454,7 +454,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "avg by (action) (quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg by (action) (quantile_over_time(0.95, request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "{{action}}",
           "refId": "A"
         }
@@ -547,7 +547,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum by (action) (count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval])) / sum by (action) (count_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval])) * 100",
+          "expr": "sum by (action) (count_over_time(cache_hit{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval])) / sum by (action) (count_over_time(cache_hit{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval])) * 100",
           "legendFormat": "{{action}}",
           "refId": "A"
         }
@@ -639,7 +639,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "avg by (action) (avg_over_time(db_query_count{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg by (action) (avg_over_time(db_query_count{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "{{action}}",
           "refId": "A"
         }
@@ -746,7 +746,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "$action",
           "refId": "A"
         }
@@ -844,7 +844,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "sum(count_over_time(request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", success=\"false\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "$action",
           "refId": "A"
         }
@@ -997,17 +997,17 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "avg(quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(quantile_over_time(0.5, request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "P50",
           "refId": "A"
         },
         {
-          "expr": "avg(quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(quantile_over_time(0.95, request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "P95",
           "refId": "B"
         },
         {
-          "expr": "avg(quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(quantile_over_time(0.99, request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "P99",
           "refId": "C"
         }
@@ -1155,17 +1155,17 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "avg(quantile_over_time(0.5, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(quantile_over_time(0.5, request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "P50",
           "refId": "A"
         },
         {
-          "expr": "avg(quantile_over_time(0.95, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(quantile_over_time(0.95, request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "P95",
           "refId": "B"
         },
         {
-          "expr": "avg(quantile_over_time(0.99, request_duration_ms{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(quantile_over_time(0.99, request_duration_ms{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "P99",
           "refId": "C"
         }
@@ -1240,7 +1240,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "level:ERROR stack:$stack service:$service action:$action environment:$environment error_source:* | extract \"<_>:<_>:<_>:<_>:<_>:<_>:<_>:<_>:<es_stack>:<es_service>:<_>\" from error_source | format \"<es_stack>:<es_service>\" as source | stats by(source) count() as errors | format \"<source> (<errors>)\" as source | format \"$action\" as action | stats by(source, action) sum(errors) as errors",
+          "expr": "level:ERROR stack:$stack service:$service action:$action provider:$context environment:$environment error_source:* | extract \"<_>:<_>:<_>:<_>:<_>:<_>:<_>:<_>:<es_stack>:<es_service>:<_>\" from error_source | format \"<es_stack>:<es_service>\" as source | stats by(source) count() as errors | format \"<source> (<errors>)\" as source | format \"$action\" as action | stats by(source, action) sum(errors) as errors",
           "queryType": "stats",
           "refId": "A"
         }
@@ -1362,7 +1362,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "level:ERROR stack:$stack service:$service action:$action environment:$environment | stats by(_time:5m, error_type) count() as errors",
+          "expr": "level:ERROR stack:$stack service:$service action:$action provider:$context environment:$environment | stats by(_time:5m, error_type) count() as errors",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -1425,7 +1425,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "level:ERROR stack:$stack service:$service action:$action environment:$environment | extract \"<_>:<_>:<_>:<_>:<_>:<_>:<_>:<_>:<es_stack>:<es_service>:<_>\" from error_source | format \"<es_stack>:<es_service>\" as source | stats by(error_message, source) count() as count | sort by (count) desc | limit 20",
+          "expr": "level:ERROR stack:$stack service:$service action:$action provider:$context environment:$environment | extract \"<_>:<_>:<_>:<_>:<_>:<_>:<_>:<_>:<es_stack>:<es_service>:<_>\" from error_source | format \"<es_stack>:<es_service>\" as source | stats by(error_message, source) count() as count | sort by (count) desc | limit 20",
           "queryType": "stats",
           "refId": "A"
         }
@@ -1560,7 +1560,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "sum(sum_over_time(cache_hit{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval]))",
+          "expr": "sum(sum_over_time(cache_hit{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\", is_write=\"false\"}[$__rate_interval]))",
           "legendFormat": "Cache Hit Rate",
           "refId": "A"
         }
@@ -1654,7 +1654,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "avg(avg_over_time(db_query_count{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(avg_over_time(db_query_count{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "Avg DB Queries",
           "refId": "A"
         }
@@ -1748,12 +1748,12 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "avg(avg_over_time(request_size_bytes{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(avg_over_time(request_size_bytes{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "Request Size",
           "refId": "A"
         },
         {
-          "expr": "avg(avg_over_time(response_size_bytes{environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
+          "expr": "avg(avg_over_time(response_size_bytes{provider=\"$context\", environment=\"$environment\", region=~\"$region\", stack=\"$stack\", service=\"$service\", action=\"$action\"}[$__rate_interval]))",
           "legendFormat": "Response Size",
           "refId": "B"
         }
@@ -1863,7 +1863,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "level:ERROR error_source:* stack:$stack service:$service action:$action environment:$environment | stats by(_time:5m, error_source) count() as errors",
+          "expr": "level:ERROR error_source:* stack:$stack service:$service action:$action provider:$context environment:$environment | stats by(_time:5m, error_source) count() as errors",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -1898,7 +1898,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "(action:deployment_start OR action:deployment_complete) stack:$stack service:$service environment:$environment | sort by (_time desc) | limit 50",
+          "expr": "(action:deployment_start OR action:deployment_complete) stack:$stack service:$service provider:$context environment:$environment | sort by (_time desc) | limit 50",
           "refId": "A"
         }
       ],
@@ -2273,7 +2273,7 @@
         "includeAll": false,
         "name": "action",
         "options": [],
-        "query": "label_values(request_duration_ms{environment=\"$environment\", stack=\"$stack\", service=\"$service\"}, action)",
+        "query": "label_values(request_duration_ms{provider=\"$context\", environment=\"$environment\", stack=\"$stack\", service=\"$service\"}, action)",
         "refresh": 1,
         "sort": 1,
         "type": "query"
@@ -2291,7 +2291,7 @@
         "options": [],
         "query": {
           "field": "deployment",
-          "query": "action:deployment_start environment:$environment stack:$stack service:$service",
+          "query": "action:deployment_start provider:$context environment:$environment stack:$stack service:$service",
           "refId": "deployed_ids",
           "type": "fieldValue"
         },
@@ -2309,6 +2309,6 @@
   "timezone": "browser",
   "title": "Action Detail",
   "uid": "action-detail",
-  "version": 36,
+  "version": 39,
   "weekStart": ""
 }

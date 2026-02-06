@@ -8,7 +8,7 @@ import requests
 from pathlib import Path
 
 API_URL = os.getenv("QAIRON_ENDPOINT", "http://127.0.0.1:5001") + "/api/rest/v1"
-JSON_DIR = Path(__file__).parent / "json"
+JSON_DIR = Path("/opt/qairon/fixtures/social_network/json")
 
 RESOURCES = [
     "environment",

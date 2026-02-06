@@ -10,7 +10,7 @@
         "iconColor": "#FF9830",
         "name": "Releases",
         "target": {
-          "expr": "action:deployment_complete environment:$environment | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "expr": "action:deployment_complete provider:$context environment:$environment | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
           "refId": "releases"
         }
       },
@@ -23,7 +23,7 @@
         "iconColor": "#5794F2",
         "name": "Deploy Start",
         "target": {
-          "expr": "action:deployment_start environment:$environment | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "expr": "action:deployment_start provider:$context environment:$environment | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
           "refId": "deploy_start"
         }
       },
@@ -36,7 +36,7 @@
         "iconColor": "#73BF69",
         "name": "Deploy Complete",
         "target": {
-          "expr": "action:deployment_complete environment:$environment | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
+          "expr": "action:deployment_complete provider:$context environment:$environment | format \"<service> r<release_num>\" as _msg | fields _time, _msg",
           "refId": "deploy_complete"
         }
       }
@@ -130,7 +130,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"content\", service=\"posts\", action=~\"create_post\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"content\", service=\"posts\", action=~\"create_post\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -193,7 +193,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"content\", service=\"media\", action=~\"upload_image|upload_video\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"content\", service=\"media\", action=~\"upload_image|upload_video\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -256,7 +256,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"social\", service=\"connections\", action=~\"follow_user\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"social\", service=\"connections\", action=~\"follow_user\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -319,7 +319,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"social\", service=\"connections\", action=~\"unfollow_user\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"social\", service=\"connections\", action=~\"unfollow_user\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -382,7 +382,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"content\", service=\"reactions\", action=~\"add_reaction\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"content\", service=\"reactions\", action=~\"add_reaction\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -445,7 +445,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"content\", service=\"comments\", action=~\"add_comment\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"content\", service=\"comments\", action=~\"add_comment\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -516,7 +516,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"content\", service=\"posts\", action=~\"create_post\", success=\"false\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"content\", service=\"posts\", action=~\"create_post\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -587,7 +587,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"content\", service=\"media\", action=~\"upload_image|upload_video\", success=\"false\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"content\", service=\"media\", action=~\"upload_image|upload_video\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -658,7 +658,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"social\", service=\"connections\", action=~\"follow_user\", success=\"false\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"social\", service=\"connections\", action=~\"follow_user\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -729,7 +729,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"social\", service=\"connections\", action=~\"unfollow_user\", success=\"false\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"social\", service=\"connections\", action=~\"unfollow_user\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -800,7 +800,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"content\", service=\"reactions\", action=~\"add_reaction\", success=\"false\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"content\", service=\"reactions\", action=~\"add_reaction\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -871,7 +871,7 @@
             "type": "prometheus",
             "uid": "ffb8jnum7rx8ge"
           },
-          "expr": "sum(count_over_time(request_duration_ms{provider_id=\"$context\", stack=\"content\", service=\"comments\", action=~\"add_comment\", success=\"false\"}[$__rate_interval]))",
+          "expr": "sum(count_over_time(request_duration_ms{provider=\"$context\", stack=\"content\", service=\"comments\", action=~\"add_comment\", success=\"false\"}[$__rate_interval]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -1201,6 +1201,6 @@
   "timezone": "browser",
   "title": "SRE Home",
   "uid": "sre-home",
-  "version": 21,
+  "version": 24,
   "weekStart": ""
 }

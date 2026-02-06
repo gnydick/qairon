@@ -423,6 +423,23 @@ class QaironModel:
             config[env]["targets"].append(target_info)
         return config
 
+    def get_deployed_deps(self, target_id: str, dep_service_ids: List[str]) -> List[str]:
+        """Return deployment_ids of dependencies that are actually deployed on this target.
+
+        Args:
+            target_id: The 7-component target_id (infra context).
+            dep_service_ids: List of service_ids from SERVICE_DEPENDENCIES.
+
+        Returns:
+            List of deployment_ids that exist in the model's deployments dict.
+        """
+        result = []
+        for dep_service_id in dep_service_ids:
+            dep_deployment_id = f"{target_id}:{dep_service_id}:default"
+            if dep_deployment_id in self.deployments:
+                result.append(dep_deployment_id)
+        return result
+
     def get_region_profile(self, region: str) -> dict:
         """Get latency/error profile for a region."""
         return self.region_profiles.get(region, self.default_region_profile)
