@@ -22,7 +22,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
-from qairon_ids import validate_id, deployment_id_from_release_id, split_release_id
+from qairon_ids import validate_id, deployment_id_from_release_id, split_release_id, derive_dep_deployment_id, derive_dep_release_id
 
 
 # =============================================================================
@@ -1156,7 +1156,6 @@ def generate_span_id(rng: random.Random) -> str:
 def generate_child_spans_for_event(
     parent_event: dict,
     rng: random.Random,
-    select_release_func,
     error_codes: dict,
     error_messages: dict,
     max_depth: int = 5,
@@ -1175,10 +1174,12 @@ def generate_child_spans_for_event(
     - A leaf child that fails has error_source=None (it's the originator)
     - A parent that fails because its child failed has error_source=child's deployment_id
 
+    Child spans inherit the parent's infrastructure context (env, provider, account,
+    region, etc.) via derive_dep_release_id — dependencies never cross context boundaries.
+
     Args:
-        parent_event: The root/parent event dict
+        parent_event: The root/parent event dict (must have 'release_id')
         rng: Random number generator
-        select_release_func: Function to select a release for a service
         error_codes: Dict of error codes by type
         error_messages: Dict of error messages by code
         max_depth: Maximum recursion depth (default 5, prevents runaway recursion)
@@ -1234,9 +1235,12 @@ def generate_child_spans_for_event(
         child_span_id = generate_span_id(rng)
         child_request_id = uuid.uuid4().hex
 
-        # Select release for this dependency service
-        child_release_result = select_release_func(dep_stack, dep_service, child_timestamp)
-        child_release_id = child_release_result[0] if isinstance(child_release_result, tuple) else child_release_result
+        # Child inherits parent's infrastructure context — derive from parent's release_id
+        parent_release_id = parent_event.get("release_id", "")
+        parent_parts = parent_release_id.split(':')
+        # Use parent's release_num as fallback for the dependency
+        child_release_num = parent_parts[-1] if len(parent_parts) == 12 else "100"
+        child_release_id = derive_dep_release_id(parent_release_id, dep_stack, dep_service, child_release_num)
 
         # Determine if child span has an error
         child_error_info = None
@@ -1297,7 +1301,6 @@ def generate_child_spans_for_event(
         grandchild_spans = generate_child_spans_for_event(
             parent_event=child_event,
             rng=rng,
-            select_release_func=select_release_func,
             error_codes=error_codes,
             error_messages=error_messages,
             max_depth=max_depth,
@@ -1681,8 +1684,13 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                         return incident
         return None
 
-    def determine_error(action, user_data, timestamp, env=None, region=None) -> Optional[Dict]:
+    def determine_error(action, user_data, timestamp, release_id=None) -> Optional[Dict]:
         service_key = action.service_id
+
+        # Extract env and region from the release_id hierarchy
+        rid_parts = release_id.split(':') if release_id else []
+        env = rid_parts[0] if len(rid_parts) >= 4 else None
+        region = rid_parts[3] if len(rid_parts) >= 4 else None
 
         # Apply regional error multiplier
         region_profile = get_region_profile(region) if region else DEFAULT_REGION_PROFILE
@@ -1694,11 +1702,8 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
             incident = get_active_incident(dep_key, timestamp, region)
             if incident and rng.random() < incident.failure_rate * regional_error_mult:
                 dep_application, dep_stack, dep_service = dep_key.split(':')
-                dep_release_result = select_release_by_key(dep_stack, dep_service, timestamp)
-                dep_release_id = dep_release_result[0] if isinstance(dep_release_result, tuple) else dep_release_result
-                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
                 return {
-                    "error_source": dep_deployment_id,
+                    "error_source": derive_dep_deployment_id(release_id, dep_stack, dep_service),
                     "error_type": incident.error_type,
                     "error_code": rng.choice(incident.error_codes),
                     "error_message": f"Downstream dependency failed: {incident.error_message}",
@@ -1738,11 +1743,8 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
             if deps and rng.random() < 0.4:
                 dep_key = rng.choice(deps)
                 dep_application, dep_stack, dep_service = dep_key.split(':')
-                dep_release_result = select_release_by_key(dep_stack, dep_service, timestamp)
-                dep_release_id = dep_release_result[0] if isinstance(dep_release_result, tuple) else dep_release_result
-                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
                 return {
-                    "error_source": dep_deployment_id,
+                    "error_source": derive_dep_deployment_id(release_id, dep_stack, dep_service),
                     "error_type": "server",
                     "error_code": rng.choice(error_codes["server"]),
                     "error_message": "Downstream dependency failed",
@@ -1864,15 +1866,6 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
         elif followers and rng.random() < 0.3:
             return rng.choice(followers)
         return f"user_{uuid.uuid4().hex[:12]}"
-
-    def select_release_by_key(stack: str, service: str, timestamp: datetime):
-        """Returns (release_id, env, region, target_info) tuple."""
-        class MinimalAction:
-            pass
-        action = MinimalAction()
-        action.stack = stack
-        action.service = service
-        return select_release(action, timestamp)
 
     def event_to_log_json(event: dict) -> str:
         """Convert event to log JSON line"""
@@ -2020,7 +2013,7 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                     if window and rng.random() > window.throughput_factor:
                         continue
 
-                error_info = determine_error(action, user_data, timestamp, env, region)
+                error_info = determine_error(action, user_data, timestamp, release_id)
                 success = error_info is None
 
                 # Regional latency multiplier
@@ -2075,7 +2068,6 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 child_spans = generate_child_spans_for_event(
                     parent_event=root_event,
                     rng=rng,
-                    select_release_func=select_release_by_key,
                     error_codes=error_codes,
                     error_messages=error_messages,
                 )
@@ -2617,15 +2609,23 @@ class MonitoringDataGenerator:
         return None
 
     def determine_error(self, action: ServiceAction, user: User, timestamp: datetime,
-                        env: str = None, region: str = None) -> Optional[Dict]:
+                        release_id: str = None) -> Optional[Dict]:
         """Determine if this request should fail and why.
 
         Error priority:
         1. Service incident (elevated error rate during incident window)
         2. Deployment dip (rolling restart errors)
         3. Stochastic errors (1-2% base rate, scaled by persona and region)
+
+        Uses the parent's release_id to derive dependency deployment_ids —
+        dependencies always inherit the caller's infrastructure context.
         """
         service_key = action.service_id
+
+        # Extract env and region from the release_id hierarchy
+        rid_parts = release_id.split(':') if release_id else []
+        env = rid_parts[0] if len(rid_parts) >= 4 else None
+        region = rid_parts[3] if len(rid_parts) >= 4 else None
 
         # Apply regional error multiplier
         region_profile = get_region_profile(region) if region else DEFAULT_REGION_PROFILE
@@ -2637,17 +2637,8 @@ class MonitoringDataGenerator:
             incident = self.get_active_incident(dep_key, timestamp, region)
             if incident and self.rng.random() < incident.failure_rate * regional_error_mult:
                 dep_application, dep_stack, dep_service = dep_key.split(':')
-                dep_action = ServiceAction(
-                    category="internal", service=dep_service, stack=dep_stack,
-                    action="internal", weight=1.0, base_latency_ms=10,
-                    latency_stddev_ms=1, base_payload_bytes=1024,
-                    payload_stddev_bytes=256, has_target_user=False,
-                    has_object_id=False, object_type=None, is_write=False,
-                )
-                dep_release_id, _, _, _ = self.select_release(dep_action, timestamp)
-                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
                 return {
-                    "error_source": dep_deployment_id,
+                    "error_source": derive_dep_deployment_id(release_id, dep_stack, dep_service),
                     "error_type": incident.error_type,
                     "error_code": self.rng.choice(incident.error_codes),
                     "error_message": f"Downstream dependency failed: {incident.error_message}",
@@ -2686,17 +2677,8 @@ class MonitoringDataGenerator:
             if deps and self.rng.random() < 0.4:
                 dep_key = self.rng.choice(deps)
                 dep_application, dep_stack, dep_service = dep_key.split(':')
-                dep_action = ServiceAction(
-                    category="internal", service=dep_service, stack=dep_stack,
-                    action="internal", weight=1.0, base_latency_ms=10,
-                    latency_stddev_ms=1, base_payload_bytes=1024,
-                    payload_stddev_bytes=256, has_target_user=False,
-                    has_object_id=False, object_type=None, is_write=False,
-                )
-                dep_release_id, _, _, _ = self.select_release(dep_action, timestamp)
-                dep_deployment_id = deployment_id_from_release_id(dep_release_id)
                 return {
-                    "error_source": dep_deployment_id,
+                    "error_source": derive_dep_deployment_id(release_id, dep_stack, dep_service),
                     "error_type": "server",
                     "error_code": self.rng.choice(self.error_codes["server"]),
                     "error_message": "Downstream dependency failed",
@@ -3147,7 +3129,7 @@ class MonitoringDataGenerator:
                     if window and self.rng.random() > window.throughput_factor:
                         continue
 
-                error_info = self.determine_error(action, user, timestamp, env, region)
+                error_info = self.determine_error(action, user, timestamp, release_id)
                 success = error_info is None
 
                 # Regional latency multiplier
@@ -3261,7 +3243,10 @@ class MonitoringDataGenerator:
                 is_write=action.is_write,
             )
 
-            child_release_id, _, _, _ = self.select_release(child_action, child_timestamp)
+            # Child inherits parent's infrastructure context — derive from parent's release_id
+            parent_release_id = parent_event["release_id"]
+            parent_release_num = parent_release_id.split(':')[-1]
+            child_release_id = derive_dep_release_id(parent_release_id, dep_stack, dep_service, parent_release_num)
 
             # Check if parent blames this child
             child_error_info = None

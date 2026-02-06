@@ -105,3 +105,33 @@ def deployment_id_from_release_id(release_id: str) -> str:
     """Extract deployment_id (first 11 fields) from a release_id."""
     validate_id(release_id, "release_id")
     return ":".join(release_id.split(":")[:11])
+
+
+def target_id_from_release_id(release_id: str) -> str:
+    """Extract target_id (first 7 fields) from a release_id."""
+    validate_id(release_id, "release_id")
+    return ":".join(release_id.split(":")[:7])
+
+
+def derive_dep_deployment_id(parent_release_id: str, dep_stack: str, dep_service: str) -> str:
+    """Derive a dependency's deployment_id from the parent's release_id.
+
+    The dependency inherits the parent's infrastructure context
+    (env:provider:account:region:partition:target_type:target).
+    Only the service path changes.
+    """
+    parts = parent_release_id.split(":")
+    target_id = ":".join(parts[:7])
+    application = parts[7]
+    return f"{target_id}:{application}:{dep_stack}:{dep_service}:default"
+
+
+def derive_dep_release_id(parent_release_id: str, dep_stack: str, dep_service: str,
+                           release_num: int) -> str:
+    """Derive a dependency's release_id from the parent's release_id.
+
+    The dependency inherits the parent's infrastructure context.
+    Only the service path and release number change.
+    """
+    dep_deployment_id = derive_dep_deployment_id(parent_release_id, dep_stack, dep_service)
+    return f"{dep_deployment_id}:{release_num}"
