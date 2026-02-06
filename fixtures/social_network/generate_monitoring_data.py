@@ -566,64 +566,345 @@ for action in SERVICE_ACTIONS:
 
 
 # =============================================================================
-# SERVICE DEPENDENCIES
+# ACTION DEPENDENCIES
 # =============================================================================
 
-# Documented dependencies: service_id -> list of downstream service_ids it depends on
-SERVICE_DEPENDENCIES: Dict[str, List[str]] = {
-    # Feed stack
-    "social:feed:timeline": ["social:feed:ranking", "social:content:posts", "social:content:stories", "social:social:connections", "social:content:reactions"],
-    "social:feed:ranking": ["social:discovery:interests"],
-    "social:feed:fanout": ["social:social:connections"],
-    "social:feed:aggregation": ["social:feed:fanout"],
+# Maps action_id (service_id:action) to list of downstream action_ids
+# Each entry represents: when this action runs, it calls these downstream actions
+ACTION_DEPENDENCIES: Dict[str, List[str]] = {
+    # =========================================================================
+    # FEED CONSUMPTION (read paths)
+    # =========================================================================
 
-    # Content stack
-    "social:content:posts": ["social:content:media", "social:content:hashtags", "social:feed:fanout", "social:search:indexer"],
-    "social:content:comments": ["social:content:posts"],
-    "social:content:reactions": ["social:content:posts", "social:content:comments"],
-    "social:content:shares": ["social:content:posts", "social:feed:fanout"],
-    "social:content:stories": ["social:content:media"],
+    # Timeline - the main feed experience (depth: 4)
+    "social:feed:timeline:get_timeline": [
+        "social:feed:ranking:rank_posts",
+        "social:content:posts:get_user_posts",
+        "social:content:stories:get_stories_feed",
+        "social:social:connections:get_following",
+    ],
+    "social:feed:timeline:refresh_timeline": [
+        "social:feed:ranking:rank_posts",
+        "social:content:posts:get_user_posts",
+    ],
+    "social:feed:timeline:get_timeline_page": [
+        "social:content:posts:get_user_posts",
+        "social:content:reactions:get_reactions",
+    ],
+    "social:feed:ranking:rank_posts": [
+        "social:discovery:interests:get_interests",
+    ],
+    "social:content:posts:get_user_posts": [
+        "social:content:media:get_media",
+        "social:content:reactions:get_reactions",
+    ],
+    "social:content:posts:get_post": [
+        "social:content:media:get_media",
+        "social:content:reactions:get_reactions",
+        "social:content:comments:get_comments",
+    ],
+    "social:content:stories:get_stories_feed": [
+        "social:content:media:get_media",
+        "social:social:connections:get_following",
+    ],
+    "social:content:stories:view_story": [
+        "social:content:media:get_media",
+    ],
+    "social:content:comments:get_comments": [
+        "social:content:reactions:get_reactions",
+    ],
 
-    # Messaging stack
-    "social:messaging:dm": ["social:messaging:realtime", "social:messaging:presence"],
-    "social:messaging:groups": ["social:messaging:realtime", "social:messaging:presence"],
+    # =========================================================================
+    # CONTENT CREATION (write paths)
+    # =========================================================================
 
-    # Notifications stack
-    "social:notifications:push": ["social:notifications:preferences"],
-    "social:notifications:inapp": ["social:notifications:preferences"],
-    "social:notifications:email": ["social:notifications:preferences"],
-    "social:notifications:sms": ["social:notifications:preferences"],
+    # Create post - full write path (depth: 4)
+    "social:content:posts:create_post": [
+        "social:content:media:upload_image",
+        "social:content:hashtags:get_trending_hashtags",
+        "social:feed:fanout:fanout_post",
+        "social:notifications:push:notify_followers",
+    ],
+    "social:content:posts:edit_post": [
+        "social:content:media:get_media",
+    ],
+    "social:content:media:upload_image": [
+        "social:moderation:content-review:scan_media",
+    ],
+    "social:content:media:upload_video": [
+        "social:moderation:content-review:scan_media",
+    ],
+    "social:feed:fanout:fanout_post": [
+        "social:social:connections:get_followers",
+    ],
+    "social:notifications:push:notify_followers": [
+        "social:notifications:preferences:get_notification_prefs",
+        "social:social:connections:get_followers",
+    ],
 
-    # Search stack
-    "social:search:users": ["social:search:indexer"],
-    "social:search:content": ["social:search:indexer"],
-    "social:search:hashtags": ["social:search:indexer"],
+    # Stories (depth: 3)
+    "social:content:stories:create_story": [
+        "social:content:media:upload_image",
+        "social:notifications:push:notify_followers",
+    ],
+    "social:content:stories:react_to_story": [
+        "social:notifications:push:send_notification",
+    ],
+    "social:notifications:push:send_notification": [
+        "social:notifications:preferences:get_notification_prefs",
+    ],
 
-    # Discovery stack
-    "social:discovery:explore": ["social:discovery:trending", "social:discovery:recommendations", "social:feed:ranking"],
-    "social:discovery:recommendations": ["social:discovery:interests"],
+    # Comments and reactions (depth: 2-3)
+    "social:content:comments:add_comment": [
+        "social:content:posts:get_post",
+        "social:notifications:push:send_notification",
+    ],
+    "social:content:reactions:add_reaction": [
+        "social:notifications:push:send_notification",
+    ],
+    "social:content:shares:share_post": [
+        "social:content:posts:get_post",
+        "social:feed:fanout:fanout_post",
+    ],
 
-    # Live stack
-    "social:live:streaming": ["social:live:live-chat", "social:live:gifts"],
-    "social:live:live-chat": ["social:messaging:realtime"],
-    "social:live:gifts": ["social:payments:wallet"],
+    # =========================================================================
+    # SOCIAL GRAPH
+    # =========================================================================
 
-    # Ads stack
-    "social:ads:campaigns": ["social:ads:targeting", "social:ads:bidding"],
-    "social:ads:delivery": ["social:ads:campaigns", "social:ads:bidding"],
+    # Following/followers (depth: 2-3)
+    "social:social:connections:follow_user": [
+        "social:notifications:push:send_notification",
+        "social:social:blocks:check_blocked",
+    ],
+    "social:social:connections:get_followers": [
+        "social:user:privacy:get_privacy_settings",
+    ],
+    "social:social:connections:get_following": [
+        "social:user:privacy:get_privacy_settings",
+    ],
+    "social:social:connections:get_mutual_friends": [
+        "social:social:connections:get_followers",
+        "social:social:connections:get_following",
+    ],
 
-    # Payments stack
-    "social:payments:subscriptions": ["social:payments:processor"],
-    "social:payments:payouts": ["social:payments:processor", "social:payments:wallet"],
+    # Suggestions (depth: 3)
+    "social:social:suggestions:get_friend_suggestions": [
+        "social:social:connections:get_following",
+        "social:discovery:interests:get_interests",
+    ],
 
-    # Creator stack
-    "social:creator:monetization": ["social:payments:wallet", "social:creator:creator-analytics"],
-    "social:creator:shop": ["social:payments:processor"],
+    # Profile views (depth: 2)
+    "social:user:profile:get_profile": [
+        "social:user:privacy:get_privacy_settings",
+        "social:social:connections:get_mutual_friends",
+    ],
 
-    # Social stack
-    "social:social:suggestions": ["social:social:connections"],
+    # =========================================================================
+    # MESSAGING
+    # =========================================================================
+
+    # DMs (depth: 3)
+    "social:messaging:dm:send_message": [
+        "social:messaging:realtime:publish_message",
+        "social:notifications:push:send_notification",
+    ],
+    "social:messaging:dm:get_messages": [
+        "social:messaging:presence:get_presence",
+    ],
+    "social:messaging:dm:get_conversations": [
+        "social:messaging:presence:get_presence",
+    ],
+    "social:messaging:realtime:publish_message": [
+        "social:messaging:presence:get_presence",
+    ],
+
+    # Groups (depth: 3)
+    "social:messaging:groups:send_group_message": [
+        "social:messaging:realtime:publish_message",
+    ],
+    "social:messaging:groups:create_group": [
+        "social:messaging:realtime:create_channel",
+    ],
+    "social:messaging:groups:add_group_member": [
+        "social:notifications:push:send_notification",
+    ],
+
+    # =========================================================================
+    # SEARCH & DISCOVERY
+    # =========================================================================
+
+    # Search (depth: 2)
+    "social:search:users:search_users": [
+        "social:user:privacy:get_privacy_settings",
+    ],
+    "social:search:content:search_posts": [
+        "social:content:media:get_media",
+    ],
+
+    # Discovery (depth: 3)
+    "social:discovery:explore:get_explore": [
+        "social:discovery:trending:get_trending",
+        "social:discovery:recommendations:get_recommendations",
+        "social:content:posts:get_user_posts",
+    ],
+    "social:discovery:recommendations:get_recommendations": [
+        "social:discovery:interests:get_interests",
+        "social:social:connections:get_following",
+    ],
+    "social:discovery:trending:get_trending": [
+        "social:content:hashtags:get_trending_hashtags",
+    ],
+    "social:content:hashtags:get_hashtag_posts": [
+        "social:content:posts:get_user_posts",
+    ],
+
+    # =========================================================================
+    # LIVE STREAMING
+    # =========================================================================
+
+    # Start stream (depth: 4)
+    "social:live:streaming:start_stream": [
+        "social:live:live-chat:create_room",
+        "social:live:gifts:enable_gifts",
+        "social:notifications:push:notify_followers",
+    ],
+    "social:live:streaming:get_stream": [
+        "social:live:live-chat:get_chat_messages",
+        "social:live:gifts:get_gifts",
+    ],
+    "social:live:streaming:get_live_streams": [
+        "social:social:connections:get_following",
+    ],
+    "social:live:live-chat:create_room": [
+        "social:messaging:realtime:create_channel",
+    ],
+    "social:live:live-chat:send_chat_message": [
+        "social:messaging:realtime:publish_message",
+    ],
+    "social:live:gifts:send_gift": [
+        "social:payments:wallet:get_balance",
+        "social:notifications:push:send_notification",
+    ],
+    "social:live:gifts:enable_gifts": [
+        "social:payments:wallet:get_balance",
+    ],
+
+    # =========================================================================
+    # PAYMENTS & SUBSCRIPTIONS
+    # =========================================================================
+
+    # Subscriptions (depth: 2)
+    "social:payments:subscriptions:subscribe": [
+        "social:payments:processor:charge",
+        "social:notifications:push:send_notification",
+    ],
+    "social:payments:wallet:add_funds": [
+        "social:payments:processor:charge",
+    ],
+
+    # =========================================================================
+    # CREATOR TOOLS
+    # =========================================================================
+
+    # Creator studio (depth: 3)
+    "social:creator:studio:upload_content": [
+        "social:content:media:upload_video",
+        "social:moderation:content-review:scan_media",
+    ],
+    "social:creator:creator-analytics:get_analytics": [
+        "social:content:posts:get_user_posts",
+    ],
+    "social:creator:creator-analytics:get_post_insights": [
+        "social:content:reactions:get_reactions",
+        "social:content:comments:get_comments",
+    ],
+    "social:creator:monetization:get_earnings": [
+        "social:payments:wallet:get_balance",
+    ],
+    "social:creator:shop:create_product": [
+        "social:content:media:upload_image",
+    ],
+
+    # =========================================================================
+    # ADS
+    # =========================================================================
+
+    # Campaign management (depth: 2)
+    "social:ads:campaigns:create_campaign": [
+        "social:ads:targeting:get_audiences",
+    ],
+    "social:ads:campaigns:get_campaigns": [
+        "social:ads:ad-analytics:get_campaign_metrics",
+    ],
+    "social:ads:ad-analytics:get_campaign_metrics": [
+        "social:content:reactions:get_reactions",
+    ],
+
+    # =========================================================================
+    # USER ACTIONS
+    # =========================================================================
+
+    # Login flow (depth: 2)
+    "social:user:identity:login": [
+        "social:user:account:get_account_status",
+    ],
+    "social:user:identity:oauth_authorize": [
+        "social:user:account:get_account_status",
+        "social:user:privacy:get_privacy_settings",
+    ],
+
+    # Account management
+    "social:user:profile:update_profile": [
+        "social:search:indexer:index_user",
+    ],
+    "social:user:profile:update_avatar": [
+        "social:content:media:upload_image",
+    ],
+
+    # Contacts
+    "social:social:contacts:sync_contacts": [
+        "social:social:suggestions:get_friend_suggestions",
+    ],
+    "social:social:contacts:find_contacts": [
+        "social:search:users:search_users",
+    ],
+
+    # =========================================================================
+    # MODERATION (user-initiated)
+    # =========================================================================
+
+    "social:moderation:reports:report_content": [
+        "social:content:posts:get_post",
+    ],
+    "social:moderation:reports:report_user": [
+        "social:user:profile:get_profile",
+    ],
 }
 
+# Build reverse lookup: service_id -> list of action_ids for that service
+ACTIONS_BY_SERVICE_ID: Dict[str, List[str]] = {}
+for action_id in ACTION_DEPENDENCIES.keys():
+    parts = action_id.rsplit(":", 1)
+    if len(parts) == 2:
+        service_id = parts[0]
+        ACTIONS_BY_SERVICE_ID.setdefault(service_id, []).append(action_id)
+
+# Derive SERVICE_DEPENDENCIES from ACTION_DEPENDENCIES for backwards compatibility
+# Maps service_id -> set of downstream service_ids (used for incident generation)
+SERVICE_DEPENDENCIES: Dict[str, List[str]] = {}
+for action_id, downstream_actions in ACTION_DEPENDENCIES.items():
+    # Extract service_id from action_id (first 3 parts)
+    parts = action_id.split(":")
+    if len(parts) == 4:
+        service_id = ":".join(parts[:3])
+        if service_id not in SERVICE_DEPENDENCIES:
+            SERVICE_DEPENDENCIES[service_id] = []
+        for downstream in downstream_actions:
+            down_parts = downstream.split(":")
+            if len(down_parts) == 4:
+                down_service_id = ":".join(down_parts[:3])
+                if down_service_id not in SERVICE_DEPENDENCIES[service_id]:
+                    SERVICE_DEPENDENCIES[service_id].append(down_service_id)
 
 
 # =============================================================================
@@ -883,12 +1164,12 @@ def generate_child_spans_for_event(
     visited: Optional[set] = None,
 ) -> List[dict]:
     """
-    Recursively generate child span events for a parent event's service dependencies.
+    Recursively generate child span events based on ACTION_DEPENDENCIES.
 
-    Walks SERVICE_DEPENDENCIES to produce a full multi-level trace tree.
-    For example, a feed:timeline request generates:
-      timeline → content:posts → content:media, content:hashtags, feed:fanout, search:indexer
-      timeline → feed:ranking → discovery:interests
+    Walks ACTION_DEPENDENCIES to produce a full multi-level trace tree where each
+    span has its own action name. For example, get_timeline generates:
+      get_timeline → rank_posts → get_interests
+      get_timeline → get_user_posts → get_media, get_reactions
 
     Error propagation follows stack trace semantics:
     - A leaf child that fails has error_source=None (it's the originator)
@@ -902,7 +1183,7 @@ def generate_child_spans_for_event(
         error_messages: Dict of error messages by code
         max_depth: Maximum recursion depth (default 5, prevents runaway recursion)
         current_depth: Current recursion depth (internal use)
-        visited: Set of visited service_ids in this trace path (cycle detection)
+        visited: Set of visited action_ids in this trace path (cycle detection)
 
     Returns:
         List of child span event dicts (includes all descendants)
@@ -913,17 +1194,18 @@ def generate_child_spans_for_event(
     if visited is None:
         visited = set()
 
-    # Use canonical field names (application/service/stack, not action_* prefixed)
-    service_key = f"{parent_event['application']}:{parent_event['stack']}:{parent_event['service']}"
+    # Build action_id: service_id:action = application:stack:service:action
+    action_id = f"{parent_event['application']}:{parent_event['stack']}:{parent_event['service']}:{parent_event['action_action']}"
 
-    # Cycle detection: skip if we've already visited this service in this path
-    if service_key in visited:
+    # Cycle detection: skip if we've already visited this action in this path
+    if action_id in visited:
         return []
-    visited = visited | {service_key}  # Create new set to avoid mutation across branches
+    visited = visited | {action_id}  # Create new set to avoid mutation across branches
 
-    dependencies = SERVICE_DEPENDENCIES.get(service_key, [])
+    # Look up downstream actions for this action
+    downstream_actions = ACTION_DEPENDENCIES.get(action_id, [])
 
-    if not dependencies:
+    if not downstream_actions:
         return []
 
     all_spans = []
@@ -932,8 +1214,12 @@ def generate_child_spans_for_event(
     # Calculate parent latency for timing child spans
     parent_latency = parent_event['action_base_latency_ms'] * parent_event['latency_multiplier']
 
-    for i, dep_service_id in enumerate(dependencies):
-        dep_application, dep_stack, dep_service = dep_service_id.split(':')
+    for i, downstream_action_id in enumerate(downstream_actions):
+        # Parse downstream action_id: application:stack:service:action
+        parts = downstream_action_id.split(':')
+        if len(parts) != 4:
+            continue  # Skip malformed action_ids
+        dep_application, dep_stack, dep_service, dep_action = parts
 
         # Child timing: stagger starts, each takes portion of parent time
         child_start_offset_ms = (i + 1) * (parent_latency * 0.05)
@@ -957,7 +1243,7 @@ def generate_child_spans_for_event(
         child_success = True
 
         # If parent failed due to this dependency (error_source is this child's deployment_id),
-        # or randomly based on error rate, the child fails as the originator (error_source=None)
+        # the child fails as the originator (error_source=None)
         parent_error_source = (parent_event.get('error_info') or {}).get('error_source', '')
         child_deployment_id = deployment_id_from_release_id(child_release_id)
         parent_blames_child = parent_error_source == child_deployment_id
@@ -974,15 +1260,14 @@ def generate_child_spans_for_event(
             }
             child_success = False
 
-        # Use canonical field names (application/service/stack) for consistency
-        # with root events and downstream log/metric conversion
+        # Each child span uses its own action name from ACTION_DEPENDENCIES
         child_event = {
             "user_id": parent_event["user_id"],
             "persona_name": parent_event["persona_name"],
             "application": dep_application,
             "service": dep_service,
             "stack": dep_stack,
-            "action_action": f"handle_{parent_event['action_action']}",
+            "action_action": dep_action,
             "action_category": "internal",
             "action_base_latency_ms": child_latency,
             "action_latency_stddev_ms": child_latency * 0.1,
@@ -2910,9 +3195,10 @@ class MonitoringDataGenerator:
         max_depth: int = 5, current_depth: int = 0, visited: Optional[set] = None
     ) -> List[dict]:
         """
-        Recursively generate child span events for service dependencies (sequential format).
+        Recursively generate child span events based on ACTION_DEPENDENCIES (sequential format).
 
-        Walks SERVICE_DEPENDENCIES to produce a full multi-level trace tree.
+        Walks ACTION_DEPENDENCIES to produce a full multi-level trace tree where each
+        span has its own action name.
         """
         if current_depth >= max_depth:
             return []
@@ -2920,23 +3206,29 @@ class MonitoringDataGenerator:
         if visited is None:
             visited = set()
 
-        service_key = action.service_id
+        # Build action_id: service_id:action
+        action_id = f"{action.service_id}:{action.action}"
 
         # Cycle detection
-        if service_key in visited:
+        if action_id in visited:
             return []
-        visited = visited | {service_key}
+        visited = visited | {action_id}
 
-        dependencies = SERVICE_DEPENDENCIES.get(service_key, [])
+        # Look up downstream actions
+        downstream_actions = ACTION_DEPENDENCIES.get(action_id, [])
 
-        if not dependencies:
+        if not downstream_actions:
             return []
 
         all_spans = []
         parent_latency = action.base_latency_ms * user.persona.latency_multiplier
 
-        for i, dep_key in enumerate(dependencies):
-            dep_application, dep_stack, dep_service = dep_key.split(':')
+        for i, downstream_action_id in enumerate(downstream_actions):
+            # Parse downstream action_id: application:stack:service:action
+            parts = downstream_action_id.split(':')
+            if len(parts) != 4:
+                continue
+            dep_application, dep_stack, dep_service, dep_action = parts
 
             # Child timing
             child_start_offset_ms = (i + 1) * (parent_latency * 0.05)
@@ -2951,12 +3243,12 @@ class MonitoringDataGenerator:
             child_span_id = generate_span_id(self.rng)
             child_request_id = uuid.uuid4().hex
 
-            # Create a child ServiceAction for the dependency
+            # Create a child ServiceAction for the dependency with its own action name
             child_action = ServiceAction(
                 category="internal",
                 service=dep_service,
                 stack=dep_stack,
-                action=f"handle_{action.action}",
+                action=dep_action,
                 application=dep_application,
                 weight=1.0,
                 base_latency_ms=child_latency,
@@ -3600,6 +3892,25 @@ def main():
     with open(schedule_file, 'w') as f:
         json.dump(schedule_data, f, indent=2)
     print(f"  Wrote deployment schedule to {schedule_file}")
+
+    # Write incidents to output directory
+    incidents_file = output_path / "incidents.json"
+    incidents_export = [
+        {
+            "service_key": inc.service_key,
+            "start_time": inc.start_time.isoformat(),
+            "end_time": inc.end_time.isoformat(),
+            "failure_rate": inc.failure_rate,
+            "error_codes": inc.error_codes,
+            "error_type": inc.error_type,
+            "error_message": inc.error_message,
+            "region_scope": inc.region_scope,
+        }
+        for inc in generator.incidents
+    ]
+    with open(incidents_file, 'w') as f:
+        json.dump(incidents_export, f, indent=2)
+    print(f"  Wrote {len(incidents_export)} incidents to {incidents_file}")
 
     # Check if streaming was used (parallel with > 1 worker)
     if getattr(generator, '_streaming_complete', False):
