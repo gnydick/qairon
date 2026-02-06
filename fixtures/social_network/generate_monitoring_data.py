@@ -23,6 +23,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 from qairon_ids import validate_id, deployment_id_from_release_id, split_release_id, derive_dep_deployment_id, derive_dep_release_id
+from qairon_model import (
+    QaironModel, PRIMARY_DEPLOYMENT_TARGETS,
+    ENV_WEIGHT_MAP, REGION_PROFILES, DEFAULT_REGION_PROFILE,
+    HIGH_FREQUENCY_SERVICES,
+)
 
 
 # =============================================================================
@@ -911,183 +916,21 @@ for action_id, downstream_actions in ACTION_DEPENDENCIES.items():
 # DEPLOYMENTS AND RELEASES
 # =============================================================================
 
-# Default environment config (fallback when no deployment schedule is provided)
-DEFAULT_ENVIRONMENT_CONFIG = {
-    "prod": {"targets": [{"provider": "aws", "account": "111111111111", "region": "us-east-1",
-                           "partition": "platform", "target_type": "eks", "target": "main"},
-                          {"provider": "aws", "account": "111111111111", "region": "us-west-2",
-                           "partition": "platform", "target_type": "eks", "target": "main"}],
-             "weight": 0.85},
-    "stg": {"targets": [{"provider": "aws", "account": "222222222222", "region": "us-east-1",
-                          "partition": "platform", "target_type": "eks", "target": "main"}],
-            "weight": 0.10},
-    "dev": {"targets": [{"provider": "aws", "account": "333333333333", "region": "us-east-1",
-                          "partition": "platform", "target_type": "eks", "target": "main"}],
-            "weight": 0.05},
-}
-
-# Primary deployment targets — the main clusters where all services run
-PRIMARY_DEPLOYMENT_TARGETS = [
-    # PROD — 2 AWS accounts × 2 regions, 2 GCP accounts × 2 regions, 2 Azure accounts × 2 regions (12 targets)
-    'prod:aws:111111111111:us-east-1:platform:eks:main',
-    'prod:aws:111111111111:us-west-2:platform:eks:main',
-    'prod:aws:111111111112:us-east-1:platform:eks:main',
-    'prod:aws:111111111112:us-west-2:platform:eks:main',
-    'prod:gcp:social-prod-001:us-central1:platform:gke:main',
-    'prod:gcp:social-prod-001:southamerica-east1:platform:gke:main',
-    'prod:gcp:social-prod-002:us-central1:platform:gke:main',
-    'prod:gcp:social-prod-002:us-east4:platform:gke:main',
-    'prod:azure:prod-sub-001:eastus:platform:aks:main',
-    'prod:azure:prod-sub-001:westeurope:platform:aks:main',
-    'prod:azure:prod-sub-002:eastus:platform:aks:main',
-    'prod:azure:prod-sub-002:westus2:platform:aks:main',
-    # STG — 1 each (3 targets)
-    'stg:aws:222222222221:us-east-1:platform:eks:main',
-    'stg:gcp:social-stg-001:us-central1:platform:gke:main',
-    'stg:azure:stg-sub-001:eastus:platform:aks:main',
-    # DEV — 1 each (3 targets)
-    'dev:aws:333333333331:us-east-1:platform:eks:main',
-    'dev:gcp:social-dev-001:us-central1:platform:gke:main',
-    'dev:azure:dev-sub-001:eastus:platform:aks:main',
-    # INT — 1 each (3 targets)
-    'int:aws:444444444441:us-east-1:platform:eks:main',
-    'int:gcp:social-int-001:us-central1:platform:gke:main',
-    'int:azure:int-sub-001:eastus:platform:aks:main',
-    # INFRA — AWS only (1 target)
-    'infra:aws:555555555555:us-east-1:platform:eks:main',
-]
-
-HIGH_FREQUENCY_SERVICES = [
-    'social:user:identity',
-    'social:content:posts',
-    'social:feed:timeline',
-    'social:platform:api-gateway',
-    'social:messaging:dm',
-    'social:content:media',
-]
-
 BUILD_ARTIFACT_NAMES = ['docker-image', 'helm-chart', 'test-report', 'sbom', 'changelog', 'coverage-report', 'lint-report']
 RELEASE_ARTIFACT_NAMES = ['manifest', 'values', 'migration', 'rollback-plan', 'changelog', 'runbook', 'smoke-test']
-
-# Environment traffic weight by env type
-ENV_WEIGHT_MAP = {
-    "prod": 0.85,
-    "stg": 0.10,
-    "dev": 0.03,
-    "int": 0.015,
-    "infra": 0.005,
-}
-
-# Regional latency/error characteristics for geo-distributed simulation
-REGION_PROFILES = {
-    # AWS US regions (baseline)
-    "us-east-1": {"latency_multiplier": 1.0, "error_multiplier": 1.0},
-    "us-west-2": {"latency_multiplier": 1.1, "error_multiplier": 1.0},
-    # AWS EU regions
-    "eu-west-1": {"latency_multiplier": 1.3, "error_multiplier": 1.05},
-    "eu-central-1": {"latency_multiplier": 1.35, "error_multiplier": 1.05},
-    # AWS AP regions
-    "ap-southeast-1": {"latency_multiplier": 1.5, "error_multiplier": 1.1},
-    "ap-northeast-1": {"latency_multiplier": 1.45, "error_multiplier": 1.08},
-    # AWS CA region
-    "ca-central-1": {"latency_multiplier": 1.15, "error_multiplier": 1.02},
-    # GCP US regions
-    "us-central1": {"latency_multiplier": 1.05, "error_multiplier": 1.0},
-    "us-east4": {"latency_multiplier": 1.0, "error_multiplier": 1.0},
-    # GCP EU regions
-    "europe-west1": {"latency_multiplier": 1.3, "error_multiplier": 1.05},
-    "europe-west4": {"latency_multiplier": 1.32, "error_multiplier": 1.05},
-    # GCP Asia regions
-    "asia-southeast1": {"latency_multiplier": 1.5, "error_multiplier": 1.1},
-    "asia-east1": {"latency_multiplier": 1.48, "error_multiplier": 1.09},
-    # GCP South America
-    "southamerica-east1": {"latency_multiplier": 1.6, "error_multiplier": 1.12},
-    # Azure regions
-    "eastus": {"latency_multiplier": 1.0, "error_multiplier": 1.0},
-    "westus2": {"latency_multiplier": 1.1, "error_multiplier": 1.0},
-    "northeurope": {"latency_multiplier": 1.3, "error_multiplier": 1.05},
-    "westeurope": {"latency_multiplier": 1.3, "error_multiplier": 1.05},
-    "southeastasia": {"latency_multiplier": 1.5, "error_multiplier": 1.1},
-    "japaneast": {"latency_multiplier": 1.45, "error_multiplier": 1.08},
-    "canadacentral": {"latency_multiplier": 1.15, "error_multiplier": 1.02},
-}
-
-# Default profile for unlisted regions
-DEFAULT_REGION_PROFILE = {"latency_multiplier": 1.2, "error_multiplier": 1.05}
-
-
-def get_region_profile(region: str) -> dict:
-    """Get latency/error profile for a region."""
-    return REGION_PROFILES.get(region, DEFAULT_REGION_PROFILE)
-
-
-def build_environment_config_from_schedule(primary_targets: List[str]) -> Dict:
-    """Build ENVIRONMENT_CONFIG from deployment schedule primary_deployment_targets.
-
-    Each primary target is a target_id like:
-        prod:aws:111111111111:us-east-1:platform:eks:main
-
-    Groups by env, extracts provider/account/region/partition/target_type/target.
-    Distributes traffic weight across envs and equally across regions within each env.
-    """
-    env_targets: Dict[str, List[Dict]] = {}
-
-    for target_id in primary_targets:
-        parts = target_id.split(':')
-        if len(parts) < 7:
-            continue
-        env = parts[0]
-        target_info = {
-            "provider": parts[1],
-            "account": parts[2],
-            "region": parts[3],
-            "partition": parts[4],
-            "target_type": parts[5],
-            "target": parts[6],
-        }
-        if env not in env_targets:
-            env_targets[env] = []
-        env_targets[env].append(target_info)
-
-    config = {}
-    for env, targets in env_targets.items():
-        config[env] = {
-            "targets": targets,
-            "weight": ENV_WEIGHT_MAP.get(env, 0.01),
-        }
-
-    return config
-
-
-# Active ENVIRONMENT_CONFIG — set dynamically from deployment schedule or defaults
-ENVIRONMENT_CONFIG = dict(DEFAULT_ENVIRONMENT_CONFIG)
 
 
 def generate_release_id(env: str, region: str, stack: str, service: str, release_num: int,
                         target_info: Optional[Dict] = None) -> str:
     """Generate a release ID in qairon format: {deployment_id}:{release_num}
 
-    release_num is the CI/CD pipeline's sequential build number for this release.
-    Uses actual provider/account/partition/target_type/target from target_info when available.
+    target_info is required — contains provider/account/partition/target_type/target.
     """
-    if target_info:
-        provider = target_info["provider"]
-        account = target_info["account"]
-        partition = target_info["partition"]
-        target_type = target_info["target_type"]
-        target = target_info["target"]
-    else:
-        # Fallback for when no target context is available
-        env_config = ENVIRONMENT_CONFIG.get(env, {})
-        targets = env_config.get("targets", [])
-        # Find a target matching this region
-        matching = [t for t in targets if t["region"] == region]
-        if matching:
-            t = matching[0]
-            provider, account, partition, target_type, target = (
-                t["provider"], t["account"], t["partition"], t["target_type"], t["target"])
-        else:
-            provider, account, partition, target_type, target = "aws", "111111111111", "platform", "eks", "main"
+    provider = target_info["provider"]
+    account = target_info["account"]
+    partition = target_info["partition"]
+    target_type = target_info["target_type"]
+    target = target_info["target"]
 
     deployment_id = f"{env}:{provider}:{account}:{region}:{partition}:{target_type}:{target}:social:{stack}:{service}:default"
     return f"{deployment_id}:{release_num}"
@@ -1395,191 +1238,6 @@ class DeploymentWindow:
     latency_multiplier: float   # 1.2-1.5 (20-50% latency increase)
 
 
-class DeploymentSchedule:
-    """Manages deployment windows and release timelines.
-
-    Provides:
-    - Active release lookup by (env, region, stack, service, timestamp)
-    - Active deployment window lookup for dip effects
-    - Deployment log events (start/complete)
-    - Serialization for parallel worker transport
-    """
-
-    def __init__(self):
-        self.primary_targets = []
-        self.stack_region_groups = {}
-        # Build per-(env, region, stack, service) sorted release timelines
-        # Each entry: (created_at_datetime, release_id, build_num)
-        self._release_timelines: Dict[Tuple[str, str, str, str], List[Tuple[datetime, str, int]]] = {}
-        # Deployment windows keyed by (stack, service, env, region)
-        self._deployment_windows: Dict[Tuple[str, str, str, str], List[DeploymentWindow]] = {}
-
-    @classmethod
-    def from_generated_data(cls, release_timelines, deployment_windows, primary_targets):
-        """Construct from internally generated release data.
-
-        Args:
-            release_timelines: Dict[(env, region, stack, service)] -> [(created_at, release_id, build_num)]
-            deployment_windows: Dict[(stack, service, env, region)] -> [DeploymentWindow]
-            primary_targets: List of target_id strings
-        """
-        obj = cls()
-        obj.primary_targets = primary_targets
-        obj._release_timelines = release_timelines
-        obj._deployment_windows = deployment_windows
-        return obj
-
-    def get_active_release_id(self, env: str, region: str, stack: str, service: str,
-                               timestamp: datetime) -> Optional[str]:
-        """Binary search to find which release was active at a given timestamp.
-
-        Returns the release_id of the most recent release created before timestamp,
-        or None if no releases exist for this combination.
-        """
-        key = (env, region, stack, service)
-        timeline = self._release_timelines.get(key)
-        if not timeline:
-            return None
-
-        # Binary search for the latest release before timestamp
-        lo, hi = 0, len(timeline) - 1
-        result = None
-        while lo <= hi:
-            mid = (lo + hi) // 2
-            if timeline[mid][0] <= timestamp:
-                result = timeline[mid]
-                lo = mid + 1
-            else:
-                hi = mid - 1
-
-        return result[1] if result else None
-
-    def get_active_deployment_window(self, stack: str, service: str, env: str, region: str,
-                                      timestamp: datetime) -> Optional[DeploymentWindow]:
-        """Check if timestamp falls within a deployment window for this service."""
-        key = (stack, service, env, region)
-        windows = self._deployment_windows.get(key)
-        if not windows:
-            return None
-
-        # Binary search for candidate window
-        lo, hi = 0, len(windows) - 1
-        while lo <= hi:
-            mid = (lo + hi) // 2
-            if windows[mid].end_time < timestamp:
-                lo = mid + 1
-            elif windows[mid].start_time > timestamp:
-                hi = mid - 1
-            else:
-                return windows[mid]
-        return None
-
-    def get_deployment_log_events(self) -> List[Dict]:
-        """Returns list of deployment_start/deployment_complete log entries."""
-        events = []
-        for windows in self._deployment_windows.values():
-            for window in windows:
-                deploy_request_id = f"deploy_{uuid.uuid4().hex[:16]}"
-                base = {
-                    "service": window.service,
-                    "stack": window.stack,
-                    "user_id": "system",
-                    "success": True,
-                    "release_id": window.release_id,
-                    "object_type": "deployment",
-                    "object_id": window.deployment_id,
-                    "persona_name": "system",
-                }
-                events.append({
-                    **base,
-                    "timestamp": window.start_time,
-                    "action": "deployment_start",
-                    "request_id": deploy_request_id,
-                    "message": f"Deployment started: rolling restart for release {window.release_id}",
-                    "trace_id": ''.join(random.choices('0123456789abcdef', k=32)),
-                    "span_id": ''.join(random.choices('0123456789abcdef', k=16)),
-                })
-                events.append({
-                    **base,
-                    "timestamp": window.end_time,
-                    "action": "deployment_complete",
-                    "request_id": deploy_request_id,
-                    "message": f"Deployment complete: release {window.release_id} fully rolled out",
-                    "trace_id": ''.join(random.choices('0123456789abcdef', k=32)),
-                    "span_id": ''.join(random.choices('0123456789abcdef', k=16)),
-                })
-        events.sort(key=lambda e: e["timestamp"])
-        return events
-
-    def to_serializable(self) -> Dict:
-        """Serialize for passing to parallel workers via ProcessPoolExecutor."""
-        timelines = {}
-        for key, timeline in self._release_timelines.items():
-            str_key = '|'.join(key)
-            timelines[str_key] = [
-                (created_at.isoformat(), release_id, build_num)
-                for created_at, release_id, build_num in timeline
-            ]
-
-        windows = {}
-        for key, win_list in self._deployment_windows.items():
-            str_key = '|'.join(key)
-            windows[str_key] = [
-                {
-                    "deployment_id": w.deployment_id,
-                    "release_id": w.release_id,
-                    "stack": w.stack,
-                    "service": w.service,
-                    "env": w.env,
-                    "region": w.region,
-                    "start_time": w.start_time.isoformat(),
-                    "end_time": w.end_time.isoformat(),
-                    "throughput_factor": w.throughput_factor,
-                    "error_rate_boost": w.error_rate_boost,
-                    "latency_multiplier": w.latency_multiplier,
-                }
-                for w in win_list
-            ]
-
-        return {"timelines": timelines, "windows": windows}
-
-    @classmethod
-    def from_serializable(cls, data: Dict) -> 'DeploymentSchedule':
-        """Reconstruct from serialized form in worker process."""
-        timelines = {}
-        for str_key, timeline in data.get("timelines", {}).items():
-            key = tuple(str_key.split('|'))
-            timelines[key] = [
-                (datetime.fromisoformat(created_at), release_id, build_num)
-                for created_at, release_id, build_num in timeline
-            ]
-
-        windows = {}
-        for str_key, win_list in data.get("windows", {}).items():
-            key = tuple(str_key.split('|'))
-            windows[key] = [
-                DeploymentWindow(
-                    deployment_id=w["deployment_id"],
-                    release_id=w["release_id"],
-                    stack=w["stack"],
-                    service=w["service"],
-                    env=w["env"],
-                    region=w["region"],
-                    start_time=datetime.fromisoformat(w["start_time"]),
-                    end_time=datetime.fromisoformat(w["end_time"]),
-                    throughput_factor=w["throughput_factor"],
-                    error_rate_boost=w["error_rate_boost"],
-                    latency_multiplier=w["latency_multiplier"],
-                )
-                for w in win_list
-            ]
-
-        return cls.from_generated_data(
-            timelines, windows,
-            data.get("primary_deployment_targets", [])
-        )
-
-
 # =============================================================================
 # PARALLEL EVENT GENERATION WORKER
 # =============================================================================
@@ -1627,42 +1285,25 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
     - error_codes: dict
     - error_messages: dict
     - output_dir: str (temp directory for worker output)
-    - deployment_schedule_data: dict or None (serialized DeploymentSchedule)
-    - incidents_data: list of serialized ServiceIncident dicts
-    - env_config_data: dict (serialized ENVIRONMENT_CONFIG)
+    - model_data: dict (serialized QaironModel)
 
     Returns:
     - (event_count, logs_file_path, metrics_file_path)
     """
     (worker_id, user_chunk, start_time, end_time,
-     base_seed, error_codes, error_messages, output_dir, deployment_schedule_data,
-     incidents_data, env_config_data) = args
+     base_seed, error_codes, error_messages, output_dir, model_data) = args
 
     # Create worker-local RNG with deterministic seed
     rng = random.Random(base_seed + worker_id * 1000000)
 
-    # Reconstruct incidents from serializable form
-    incidents = [
-        ServiceIncident(
-            service_key=inc["service_key"],
-            start_time=datetime.fromisoformat(inc["start_time"]),
-            end_time=datetime.fromisoformat(inc["end_time"]),
-            failure_rate=inc["failure_rate"],
-            error_codes=inc["error_codes"],
-            error_type=inc["error_type"],
-            error_message=inc["error_message"],
-            region_scope=inc.get("region_scope"),
-        )
-        for inc in incidents_data
-    ]
+    # Reconstruct model from serializable form
+    model = QaironModel.from_serializable(model_data)
+    env_config = model.environment_config()
 
-    # Reconstruct environment config from serializable form
-    env_config = env_config_data if env_config_data else dict(DEFAULT_ENVIRONMENT_CONFIG)
-
-    # Reconstruct deployment schedule if provided
-    deploy_schedule = None
-    if deployment_schedule_data:
-        deploy_schedule = DeploymentSchedule.from_serializable(deployment_schedule_data)
+    # Collect incidents from model for linear scanning
+    incidents = []
+    for service in model.services.values():
+        incidents.extend(service.incidents)
 
     # Worker-local content pools
     all_posts = []
@@ -1693,7 +1334,7 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
         region = rid_parts[3] if len(rid_parts) >= 4 else None
 
         # Apply regional error multiplier
-        region_profile = get_region_profile(region) if region else DEFAULT_REGION_PROFILE
+        region_profile = model.get_region_profile(region) if region else DEFAULT_REGION_PROFILE
         regional_error_mult = region_profile["error_multiplier"]
 
         # 1. Service incident: check if any dependency has an active incident
@@ -1722,8 +1363,8 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
             }
 
         # 2. Deployment dip errors
-        if deploy_schedule and env and region:
-            window = deploy_schedule.get_active_deployment_window(
+        if env and region:
+            window = model.get_active_deployment_window(
                 action.stack, action.service, env, region, timestamp
             )
             if window and rng.random() < window.error_rate_boost:
@@ -1807,13 +1448,12 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
         target_info = rng.choice(targets)
         region = target_info["region"]
 
-        # Try deployment schedule first
-        if deploy_schedule:
-            scheduled = deploy_schedule.get_active_release_id(
-                env, region, action.stack, action.service, timestamp
-            )
-            if scheduled:
-                return (scheduled, env, region, target_info)
+        # Try model release timeline first
+        scheduled = model.get_active_release_id(
+            env, region, action.stack, action.service, timestamp
+        )
+        if scheduled:
+            return (scheduled, env, region, target_info)
 
         total_days = (end_time - start_time).days
         days_into_range = (timestamp - start_time).days
@@ -1988,8 +1628,8 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
          open(metrics_file, 'w', encoding='utf-8') as metric_f:
 
         # Write deployment log events (worker 0 only)
-        if worker_id == 0 and deploy_schedule:
-            for dep_event in deploy_schedule.get_deployment_log_events():
+        if worker_id == 0:
+            for dep_event in model.get_deployment_log_events():
                 dep_log = _deployment_event_to_log_json(dep_event)
                 log_f.write(dep_log + "\n")
                 event_count += 1
@@ -2006,28 +1646,26 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
                 release_id, env, region, target_info = select_release(action, timestamp)
 
                 # Throughput dip: skip events during deployment windows
-                if deploy_schedule:
-                    window = deploy_schedule.get_active_deployment_window(
-                        action.stack, action.service, env, region, timestamp
-                    )
-                    if window and rng.random() > window.throughput_factor:
-                        continue
+                window = model.get_active_deployment_window(
+                    action.stack, action.service, env, region, timestamp
+                )
+                if window and rng.random() > window.throughput_factor:
+                    continue
 
                 error_info = determine_error(action, user_data, timestamp, release_id)
                 success = error_info is None
 
                 # Regional latency multiplier
-                region_profile = get_region_profile(region)
+                region_profile = model.get_region_profile(region)
                 regional_latency_mult = region_profile["latency_multiplier"]
 
                 # Deployment latency multiplier
                 deployment_latency_mult = 1.0
-                if deploy_schedule:
-                    window = deploy_schedule.get_active_deployment_window(
-                        action.stack, action.service, env, region, timestamp
-                    )
-                    if window:
-                        deployment_latency_mult = window.latency_multiplier
+                window = model.get_active_deployment_window(
+                    action.stack, action.service, env, region, timestamp
+                )
+                if window:
+                    deployment_latency_mult = window.latency_multiplier
 
                 root_event = {
                     "user_id": user_data["user_id"],
@@ -2083,7 +1721,8 @@ def _generate_events_for_chunk_streaming(args: Tuple) -> Tuple[int, str, str]:
 class MonitoringDataGenerator:
     """Generates synthetic monitoring data"""
 
-    def __init__(self, total_events: int, total_users: int, seed: int = 42, num_workers: int = 1):
+    def __init__(self, total_events: int, total_users: int, seed: int = 42, num_workers: int = 1,
+                 fixtures_dir: str = None):
         self.total_events = total_events
         self.total_users = total_users
         self.seed = seed
@@ -2094,21 +1733,19 @@ class MonitoringDataGenerator:
         self.end_time = datetime.now() + timedelta(days=183)
         self.start_time = self.end_time - timedelta(days=548)
 
-        # Deployment schedule — populated by generate_releases()
-        self.deployment_schedule: Optional[DeploymentSchedule] = None
-
-        # Derive ENVIRONMENT_CONFIG from PRIMARY_DEPLOYMENT_TARGETS
-        global ENVIRONMENT_CONFIG
-        ENVIRONMENT_CONFIG = build_environment_config_from_schedule(PRIMARY_DEPLOYMENT_TARGETS)
-        env_summary = {e: len(c["targets"]) for e, c in ENVIRONMENT_CONFIG.items()}
-        print(f"  Derived ENVIRONMENT_CONFIG from primary targets: {env_summary}")
+        # Load the in-memory model from TSV fixtures
+        if fixtures_dir is None:
+            fixtures_dir = str(Path(__file__).parent / "txt")
+        self.model = QaironModel.from_tsv(Path(fixtures_dir), PRIMARY_DEPLOYMENT_TARGETS)
+        env_config = self.model.environment_config()
+        env_summary = {e: len(c["targets"]) for e, c in env_config.items()}
+        print(f"  Loaded QaironModel: {len(self.model.deployment_targets)} targets, "
+              f"{len(self.model.services)} services, {len(self.model.deployments)} deployments")
+        print(f"  Environment config from primary targets: {env_summary}")
 
         # Users
         self.users: List[User] = []
         self.user_by_id: Dict[str, User] = {}
-
-        # Service incidents (time windows of degraded services)
-        self.incidents: List[ServiceIncident] = []
 
         # Content pools for realistic references
         self.all_posts: List[Tuple[str, str]] = []  # (post_id, author_id)
@@ -2193,11 +1830,17 @@ class MonitoringDataGenerator:
                 followed.followers.append(user.user_id)
 
     def generate_releases(self):
-        """Generate builds and releases for all services across all primary deployment targets.
+        """Generate builds and releases for all services, populating the model.
 
-        Creates release timelines and deployment windows internally, replacing the
-        external deployment_schedule.json dependency.
+        Creates Build/Release/Artifact entities on model.services and model.deployments,
+        plus release timelines and deployment windows on each deployment.
+
+        Timing model (CRITICAL):
+            build.created_at → build_artifact(+0-59s) → release(+env_promotion_delay)
+            → release_artifact(+0-59s) → deployment_start(+3-10min) → deployment_complete(+5-15min)
         """
+        from qairon_model import Build, BuildArtifact, Release, ReleaseArtifact
+
         print("  Generating releases...")
 
         # Collect unique (application, stack, service) tuples from SERVICE_ACTIONS
@@ -2205,23 +1848,14 @@ class MonitoringDataGenerator:
         for action in SERVICE_ACTIONS:
             service_pairs.add((action.application, action.stack, action.service))
 
-        # Parse primary targets into structured form, grouped by env
-        targets_by_env: Dict[str, List[Dict]] = {}
-        for target_id in PRIMARY_DEPLOYMENT_TARGETS:
-            parts = target_id.split(':')
-            env = parts[0]
-            target_info = {
-                "target_id": target_id,
-                "provider": parts[1],
-                "account": parts[2],
-                "region": parts[3],
-                "partition": parts[4],
-                "target_type": parts[5],
-                "target": parts[6],
-            }
+        # Group primary targets by env, using model targets
+        targets_by_env: Dict[str, List] = {}
+        for target_id in self.model.primary_targets:
+            target = self.model.deployment_targets[target_id]
+            env = target.environment
             if env not in targets_by_env:
                 targets_by_env[env] = []
-            targets_by_env[env].append(target_info)
+            targets_by_env[env].append(target)
 
         # Environment promotion delays (days)
         env_delays = {
@@ -2232,26 +1866,20 @@ class MonitoringDataGenerator:
             "infra": (2, 5),
         }
 
-        # Build release timelines and deployment windows
-        release_timelines: Dict[Tuple[str, str, str, str], List[Tuple[datetime, str, int]]] = {}
-        deployment_windows: Dict[Tuple[str, str, str, str], List[DeploymentWindow]] = {}
-
-        # Fixture record collectors
-        self.build_records = []
-        self.build_artifact_records = []
-        self.release_records = []
-        self.release_artifact_records = []
-        # Track latest release per deployment_id for deployment_current_release
-        latest_release_by_deployment: Dict[str, Tuple[datetime, str]] = {}  # deployment_id -> (created_at, release_id)
-
         total_days = (self.end_time - self.start_time).days
+        timeline_count = 0
+        window_count = 0
+        bad_deploy_count = 0
 
         for application, stack, service in sorted(service_pairs):
             service_id = f"{application}:{stack}:{service}"
             app_stack_slug = f"{application}-{stack}"
+            model_service = self.model.services.get(service_id)
+            if not model_service:
+                continue
 
             # Determine release cadence
-            if service_id in HIGH_FREQUENCY_SERVICES:
+            if model_service.high_frequency:
                 num_builds = 40
             elif self.rng.random() < 0.3:
                 num_builds = 20
@@ -2273,21 +1901,17 @@ class MonitoringDataGenerator:
                                                                 minutes=self.rng.randint(0, 59))
                 builds.append((build_num, build_created_at))
 
-                # Collect build fixture record
+                # Create Build entity on model
                 build_id = f"{service_id}:{build_num}"
                 vcs_ref = hashlib.md5(f"{service_id}:{build_num}".encode()).hexdigest()[:7]
                 ver = re.sub(r"[^0-9a-zA-Z.-]", '-', vcs_ref)
-                self.build_records.append({
-                    "id": build_id,
-                    "service_id": service_id,
-                    "build_num": build_num,
-                    "vcs_ref": vcs_ref,
-                    "ver": ver,
-                    "created_at": build_created_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "defaults": "{}",
-                })
+                build = Build(
+                    id=build_id, service_id=service_id, build_num=build_num,
+                    vcs_ref=vcs_ref, ver=ver, created_at=build_created_at,
+                )
+                model_service.builds.append(build)
 
-                # Collect build artifact records (5-7 per build)
+                # Build artifacts: created_at = build + 0-59s
                 num_artifacts = self.rng.randint(5, 7)
                 selected_artifacts = self.rng.sample(BUILD_ARTIFACT_NAMES, num_artifacts)
                 for artifact_name in selected_artifacts:
@@ -2304,23 +1928,19 @@ class MonitoringDataGenerator:
                         input_repo_id = f"git:{app_stack_slug}"
                         output_repo_id = f"s3:{app_stack_slug}"
                         upload_path = f"artifacts/{service}/{build_num}/{artifact_name}"
-                    self.build_artifact_records.append({
-                        "id": f"{build_id}:{artifact_name}",
-                        "build_id": build_id,
-                        "input_repo_id": input_repo_id,
-                        "output_repo_id": output_repo_id,
-                        "name": artifact_name,
-                        "upload_path": upload_path,
-                        "data": "{}",
-                        "created_at": artifact_created_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    })
+                    build.artifacts.append(BuildArtifact(
+                        id=f"{build_id}:{artifact_name}", build_id=build_id,
+                        name=artifact_name, input_repo_id=input_repo_id,
+                        output_repo_id=output_repo_id, upload_path=upload_path,
+                        created_at=artifact_created_at,
+                    ))
 
             # For each env, promote ~70% of builds to each target
             for env, targets in targets_by_env.items():
                 delay_min, delay_max = env_delays.get(env, (0, 2))
 
                 # Sort targets deterministically for stagger order
-                sorted_targets = sorted(targets, key=lambda t: t["target_id"])
+                sorted_targets = sorted(targets, key=lambda t: t.id)
 
                 for build_num, build_created_at in builds:
                     # ~70% of builds get promoted to each environment
@@ -2337,31 +1957,32 @@ class MonitoringDataGenerator:
                     # Determine if this is a "bad" deployment (~3-5%)
                     is_bad_deploy = self.rng.random() < 0.04
 
-                    for target_idx, target_info in enumerate(sorted_targets):
-                        region = target_info["region"]
-                        target_id = target_info["target_id"]
+                    for target_idx, target in enumerate(sorted_targets):
+                        target_id = target.id
+                        region = target.region
 
                         # Build release_id
                         deployment_id = f"{target_id}:social:{stack}:{service}:default"
                         release_id = f"{deployment_id}:{build_num}"
                         build_id = f"{service_id}:{build_num}"
 
-                        # Release created_at: 1 min to 2 days after build
-                        release_created_at = build_created_at + timedelta(
-                            seconds=self.rng.uniform(60, 2 * 24 * 3600)
+                        # FIX: release created_at = base_release_time (build + env promotion delay)
+                        # Previously used random(1min, 2days) which was disconnected from timing model
+                        release_created_at = base_release_time
+
+                        # Create Release entity on model deployment
+                        deployment = self.model.deployments.get(deployment_id)
+                        if not deployment:
+                            continue
+
+                        release = Release(
+                            id=release_id, deployment_id=deployment_id,
+                            build_id=build_id, build_num=build_num,
+                            created_at=release_created_at,
                         )
+                        deployment.releases.append(release)
 
-                        # Collect release fixture record
-                        self.release_records.append({
-                            "id": release_id,
-                            "deployment_id": deployment_id,
-                            "build_id": build_id,
-                            "build_num": build_num,
-                            "created_at": release_created_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                            "defaults": "{}",
-                        })
-
-                        # Collect release artifact records (5-7 per release)
+                        # Release artifacts: created_at = release + 0-59s
                         num_rel_artifacts = self.rng.randint(5, 7)
                         selected_rel_artifacts = self.rng.sample(RELEASE_ARTIFACT_NAMES, num_rel_artifacts)
                         for artifact_name in selected_rel_artifacts:
@@ -2378,29 +1999,22 @@ class MonitoringDataGenerator:
                                 input_repo_id = f"helm:{app_stack_slug}"
                                 output_repo_id = f"s3:{app_stack_slug}"
                                 upload_path = f"releases/{deployment_id}/{build_num}/{artifact_name}"
-                            self.release_artifact_records.append({
-                                "id": f"{release_id}:{artifact_name}",
-                                "release_id": release_id,
-                                "input_repo_id": input_repo_id,
-                                "output_repo_id": output_repo_id,
-                                "name": artifact_name,
-                                "upload_path": upload_path,
-                                "data": "{}",
-                                "created_at": artifact_created_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                            })
+                            release.artifacts.append(ReleaseArtifact(
+                                id=f"{release_id}:{artifact_name}", release_id=release_id,
+                                name=artifact_name, input_repo_id=input_repo_id,
+                                output_repo_id=output_repo_id, upload_path=upload_path,
+                                created_at=artifact_created_at,
+                            ))
 
-                        # Track latest release per deployment
-                        prev = latest_release_by_deployment.get(deployment_id)
-                        if prev is None or release_created_at > prev[0]:
-                            latest_release_by_deployment[deployment_id] = (release_created_at, release_id)
+                        # Update current release (latest wins)
+                        if deployment.current_release is None or release_created_at > deployment.current_release.created_at:
+                            deployment.current_release = release
 
-                        # Add to release timeline
-                        timeline_key = (env, region, stack, service)
-                        if timeline_key not in release_timelines:
-                            release_timelines[timeline_key] = []
-                        release_timelines[timeline_key].append(
+                        # Add to release timeline on deployment
+                        deployment.release_timeline.append(
                             (base_release_time, release_id, build_num)
                         )
+                        timeline_count += 1
 
                         # Multi-region stagger for deployment windows
                         if target_idx == 0:
@@ -2415,6 +2029,7 @@ class MonitoringDataGenerator:
                             throughput_factor = self.rng.uniform(0.60, 0.75)
                             error_rate_boost = self.rng.uniform(0.08, 0.15)
                             latency_multiplier = self.rng.uniform(1.5, 2.5)
+                            bad_deploy_count += 1
                         else:
                             deploy_duration = timedelta(minutes=self.rng.uniform(5, 15))
                             throughput_factor = self.rng.uniform(0.70, 0.85)
@@ -2436,81 +2051,31 @@ class MonitoringDataGenerator:
                             error_rate_boost=error_rate_boost,
                             latency_multiplier=latency_multiplier,
                         )
+                        deployment.deployment_windows.append(window)
+                        window_count += 1
 
-                        win_key = (stack, service, env, region)
-                        if win_key not in deployment_windows:
-                            deployment_windows[win_key] = []
-                        deployment_windows[win_key].append(window)
+        # Sort all timelines and windows on deployments
+        for dep in self.model.deployments.values():
+            if dep.release_timeline:
+                dep.release_timeline.sort(key=lambda x: x[0])
+            if dep.deployment_windows:
+                dep.deployment_windows.sort(key=lambda w: w.start_time)
 
-        # Build deployment_current_release from tracked latest releases
-        self.deployment_current_release = [
-            {"deployment_id": dep_id, "release_id": rel_id}
-            for dep_id, (_, rel_id) in sorted(latest_release_by_deployment.items())
-        ]
+        # Count fixture records
+        build_count = sum(len(s.builds) for s in self.model.services.values())
+        build_artifact_count = sum(len(a) for s in self.model.services.values() for b in s.builds for a in [b.artifacts])
+        release_count = sum(len(d.releases) for d in self.model.deployments.values())
+        release_artifact_count = sum(len(r.artifacts) for d in self.model.deployments.values() for r in d.releases)
+        current_release_count = sum(1 for d in self.model.deployments.values() if d.current_release)
 
-        # Sort all timelines and windows
-        for key in release_timelines:
-            release_timelines[key].sort(key=lambda x: x[0])
-        for key in deployment_windows:
-            deployment_windows[key].sort(key=lambda w: w.start_time)
-
-        # Create DeploymentSchedule
-        self.deployment_schedule = DeploymentSchedule.from_generated_data(
-            release_timelines, deployment_windows, PRIMARY_DEPLOYMENT_TARGETS
-        )
-
-        window_count = sum(len(w) for w in deployment_windows.values())
-        timeline_count = sum(len(t) for t in release_timelines.values())
-        bad_deploy_count = sum(
-            1 for wins in deployment_windows.values()
-            for w in wins if w.error_rate_boost >= 0.08
-        )
         print(f"    Generated {timeline_count} release timeline entries, {window_count} deployment windows")
         print(f"    Bad deployments: {bad_deploy_count}")
-        print(f"    Fixture records: {len(self.build_records)} builds, {len(self.build_artifact_records)} build artifacts, "
-              f"{len(self.release_records)} releases, {len(self.release_artifact_records)} release artifacts, "
-              f"{len(self.deployment_current_release)} deployment current releases")
-
-    def write_fixture_tsvs(self, output_dir: Path):
-        """Write build/release/artifact fixture TSV files to the output directory.
-
-        Uses numbered filenames matching the generate_fixtures.py scheme (continuing
-        from 32) so they can be loaded by the same bulk_insert pipeline.
-        """
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        def write_tsv(filename, table_name, columns, records):
-            filepath = output_dir / filename
-            with open(filepath, 'w') as f:
-                f.write(f"# {table_name}\n")
-                f.write(f"# Format: {chr(9).join(columns)}\n")
-                f.write("# Generated by generate_monitoring_data.py\n\n")
-                for rec in records:
-                    f.write('\t'.join(str(rec[col]) for col in columns) + '\n')
-            print(f"    Wrote {len(records)} records to {filepath}")
-
-        write_tsv("33_builds.txt", "Builds",
-                  ["id", "service_id", "build_num", "vcs_ref", "ver", "created_at", "defaults"],
-                  self.build_records)
-
-        write_tsv("34_build_artifacts.txt", "Build Artifacts",
-                  ["id", "build_id", "input_repo_id", "output_repo_id", "name", "upload_path", "data", "created_at"],
-                  self.build_artifact_records)
-
-        write_tsv("35_releases.txt", "Releases",
-                  ["id", "deployment_id", "build_id", "build_num", "created_at", "defaults"],
-                  self.release_records)
-
-        write_tsv("36_release_artifacts.txt", "Release Artifacts",
-                  ["id", "release_id", "input_repo_id", "output_repo_id", "name", "upload_path", "data", "created_at"],
-                  self.release_artifact_records)
-
-        write_tsv("37_deployment_current_release.txt", "Deployment Current Release",
-                  ["deployment_id", "release_id"],
-                  self.deployment_current_release)
+        print(f"    Fixture records: {build_count} builds, {build_artifact_count} build artifacts, "
+              f"{release_count} releases, {release_artifact_count} release artifacts, "
+              f"{current_release_count} deployment current releases")
 
     def generate_incidents(self):
-        """Generate service incidents throughout the time range.
+        """Generate service incidents throughout the time range, populating model.
 
         Each eligible service gets 8-20 incidents per year with severity tiers:
         - Minor (60%): 2-5% failure rate, 5-30 minutes
@@ -2523,9 +2088,21 @@ class MonitoringDataGenerator:
         print("  Generating service incidents...")
         total_days = (self.end_time - self.start_time).days
 
+        # Collect all regions from model primary targets
+        all_regions = list(set(
+            self.model.deployment_targets[tid].region
+            for tid in self.model.primary_targets
+        ))
+
+        total_incidents = 0
         for service_key, cfg in INCIDENT_ELIGIBLE_SERVICES.items():
             num_incidents = self.rng.randint(8, 20)
             min_rate, max_rate = cfg["failure_rate_range"]
+
+            # Get or create model service for this incident target
+            model_service = self.model.services.get(service_key)
+            if not model_service:
+                continue
 
             i = 0
             while i < num_incidents:
@@ -2554,16 +2131,10 @@ class MonitoringDataGenerator:
 
                 # Region scoping: ~80% region-specific, ~20% multi-region
                 region_scope = None  # None = all regions
-                if self.rng.random() < 0.80:
-                    # Pick a random region from the environment config
-                    all_regions = []
-                    for env_cfg in ENVIRONMENT_CONFIG.values():
-                        for t in env_cfg.get("targets", []):
-                            all_regions.append(t["region"])
-                    if all_regions:
-                        region_scope = self.rng.choice(all_regions)
+                if self.rng.random() < 0.80 and all_regions:
+                    region_scope = self.rng.choice(all_regions)
 
-                self.incidents.append(ServiceIncident(
+                model_service.incidents.append(ServiceIncident(
                     service_key=service_key,
                     start_time=start,
                     end_time=end,
@@ -2573,6 +2144,7 @@ class MonitoringDataGenerator:
                     error_message=cfg["error_message"],
                     region_scope=region_scope,
                 ))
+                total_incidents += 1
                 i += 1
 
                 # Incident clustering: 30% chance of a follow-up incident (burst)
@@ -2584,7 +2156,7 @@ class MonitoringDataGenerator:
                     followup_end = followup_start + timedelta(minutes=followup_duration)
                     followup_rate = failure_rate * self.rng.uniform(0.3, 0.7)  # Usually less severe
 
-                    self.incidents.append(ServiceIncident(
+                    model_service.incidents.append(ServiceIncident(
                         service_key=service_key,
                         start_time=followup_start,
                         end_time=followup_end,
@@ -2594,14 +2166,20 @@ class MonitoringDataGenerator:
                         error_message=cfg["error_message"],
                         region_scope=region_scope,
                     ))
+                    total_incidents += 1
                     i += 1
 
-        self.incidents.sort(key=lambda x: x.start_time)
-        print(f"    Generated {len(self.incidents)} service incidents across {len(INCIDENT_ELIGIBLE_SERVICES)} services")
+            # Sort incidents per service
+            model_service.incidents.sort(key=lambda x: x.start_time)
+
+        print(f"    Generated {total_incidents} service incidents across {len(INCIDENT_ELIGIBLE_SERVICES)} services")
 
     def get_active_incident(self, service_key: str, timestamp: datetime, region: str = None) -> Optional[ServiceIncident]:
         """Check if there's an active incident affecting this service at this time."""
-        for incident in self.incidents:
+        model_service = self.model.services.get(service_key)
+        if not model_service:
+            return None
+        for incident in model_service.incidents:
             if incident.start_time <= timestamp <= incident.end_time:
                 if incident.service_key == service_key:
                     if incident.region_scope is None or incident.region_scope == region:
@@ -2628,7 +2206,7 @@ class MonitoringDataGenerator:
         region = rid_parts[3] if len(rid_parts) >= 4 else None
 
         # Apply regional error multiplier
-        region_profile = get_region_profile(region) if region else DEFAULT_REGION_PROFILE
+        region_profile = self.model.get_region_profile(region) if region else DEFAULT_REGION_PROFILE
         regional_error_mult = region_profile["error_multiplier"]
 
         # 1. Service incident: check if any dependency has an active incident
@@ -2657,8 +2235,8 @@ class MonitoringDataGenerator:
             }
 
         # 2. Deployment dip errors
-        if self.deployment_schedule and env and region:
-            window = self.deployment_schedule.get_active_deployment_window(
+        if env and region:
+            window = self.model.get_active_deployment_window(
                 action.stack, action.service, env, region, timestamp
             )
             if window and self.rng.random() < window.error_rate_boost:
@@ -2709,22 +2287,22 @@ class MonitoringDataGenerator:
         Returns (release_id, env, region, target_info) tuple.
         """
         # Select environment based on weights
-        envs = list(ENVIRONMENT_CONFIG.keys())
-        weights = [ENVIRONMENT_CONFIG[e]["weight"] for e in envs]
+        env_config = self.model.environment_config()
+        envs = list(env_config.keys())
+        weights = [env_config[e]["weight"] for e in envs]
         env = self.rng.choices(envs, weights=weights)[0]
 
         # Select target (and thus region) from available targets
-        targets = ENVIRONMENT_CONFIG[env]["targets"]
+        targets = env_config[env]["targets"]
         target_info = self.rng.choice(targets)
         region = target_info["region"]
 
-        # Try deployment schedule first
-        if self.deployment_schedule:
-            scheduled_release = self.deployment_schedule.get_active_release_id(
-                env, region, action.stack, action.service, timestamp
-            )
-            if scheduled_release:
-                return (scheduled_release, env, region, target_info)
+        # Try model release timeline first
+        scheduled_release = self.model.get_active_release_id(
+            env, region, action.stack, action.service, timestamp
+        )
+        if scheduled_release:
+            return (scheduled_release, env, region, target_info)
 
         # Fallback to synthetic release_id
         total_days = (self.end_time - self.start_time).days
@@ -3122,28 +2700,26 @@ class MonitoringDataGenerator:
                 release_id, env, region, target_info = self.select_release(action, timestamp)
 
                 # Throughput dip: skip events during deployment windows
-                if self.deployment_schedule:
-                    window = self.deployment_schedule.get_active_deployment_window(
-                        action.stack, action.service, env, region, timestamp
-                    )
-                    if window and self.rng.random() > window.throughput_factor:
-                        continue
+                window = self.model.get_active_deployment_window(
+                    action.stack, action.service, env, region, timestamp
+                )
+                if window and self.rng.random() > window.throughput_factor:
+                    continue
 
                 error_info = self.determine_error(action, user, timestamp, release_id)
                 success = error_info is None
 
                 # Regional latency multiplier
-                region_profile = get_region_profile(region)
+                region_profile = self.model.get_region_profile(region)
                 regional_latency_mult = region_profile["latency_multiplier"]
 
                 # Deployment latency multiplier
                 deployment_latency_mult = 1.0
-                if self.deployment_schedule:
-                    window = self.deployment_schedule.get_active_deployment_window(
-                        action.stack, action.service, env, region, timestamp
-                    )
-                    if window:
-                        deployment_latency_mult = window.latency_multiplier
+                window = self.model.get_active_deployment_window(
+                    action.stack, action.service, env, region, timestamp
+                )
+                if window:
+                    deployment_latency_mult = window.latency_multiplier
 
                 root_event = {
                     "user": user,
@@ -3312,25 +2888,8 @@ class MonitoringDataGenerator:
             }
             user_data_counts.append((user_data, count))
 
-        # Serialize deployment schedule
-        deployment_schedule_data = None
-        if self.deployment_schedule:
-            deployment_schedule_data = self.deployment_schedule.to_serializable()
-
-        # Serialize incidents for workers
-        incidents_data = [
-            {
-                "service_key": inc.service_key,
-                "start_time": inc.start_time.isoformat(),
-                "end_time": inc.end_time.isoformat(),
-                "failure_rate": inc.failure_rate,
-                "error_codes": inc.error_codes,
-                "error_type": inc.error_type,
-                "error_message": inc.error_message,
-                "region_scope": inc.region_scope,
-            }
-            for inc in self.incidents
-        ]
+        # Serialize model for workers (contains timelines, windows, incidents, env_config)
+        model_data = self.model.to_serializable()
 
         # Split into chunks for workers
         chunks = [[] for _ in range(self.num_workers)]
@@ -3338,7 +2897,6 @@ class MonitoringDataGenerator:
             chunks[i % self.num_workers].append(item)
 
         # Write directly to output directory (no temp files, no concatenation)
-        import shutil
         if not hasattr(self, '_output_path'):
             self._output_path = Path("fixtures/test_data")
         self._output_path.mkdir(parents=True, exist_ok=True)
@@ -3356,9 +2914,7 @@ class MonitoringDataGenerator:
                 self.error_codes,
                 self.error_messages,
                 output_dir,
-                deployment_schedule_data,
-                incidents_data,
-                dict(ENVIRONMENT_CONFIG),
+                model_data,
             )
             for worker_id in range(self.num_workers)
         ]
@@ -3408,8 +2964,8 @@ class MonitoringDataGenerator:
              open(metrics_file, 'w', encoding='utf-8') as metric_f:
 
             # Write deployment log events first
-            if self.deployment_schedule:
-                for dep_event in self.deployment_schedule.get_deployment_log_events():
+            if self.model:
+                for dep_event in self.model.get_deployment_log_events():
                     log_f.write(_deployment_event_to_log_json(dep_event) + "\n")
                     log_count += 1
 
@@ -3864,7 +3420,7 @@ def main():
     generator.generate_users()
     generator.generate_releases()
     txt_output = Path(args.txt_output) if args.txt_output else Path(args.output)
-    generator.write_fixture_tsvs(txt_output)
+    generator.model.write_fixture_tsvs(txt_output)
     generator.generate_incidents()
     events = generator.generate_events()
 
@@ -3872,27 +3428,26 @@ def main():
     output_path = Path(args.output)
     output_path.mkdir(parents=True, exist_ok=True)
     schedule_file = output_path / "deployment_schedule.json"
-    schedule_data = generator.deployment_schedule.to_serializable()
-    schedule_data["primary_deployment_targets"] = PRIMARY_DEPLOYMENT_TARGETS
+    schedule_data = generator.model.to_serializable()
     with open(schedule_file, 'w') as f:
         json.dump(schedule_data, f, indent=2)
     print(f"  Wrote deployment schedule to {schedule_file}")
 
     # Write incidents to output directory
     incidents_file = output_path / "incidents.json"
-    incidents_export = [
-        {
-            "service_key": inc.service_key,
-            "start_time": inc.start_time.isoformat(),
-            "end_time": inc.end_time.isoformat(),
-            "failure_rate": inc.failure_rate,
-            "error_codes": inc.error_codes,
-            "error_type": inc.error_type,
-            "error_message": inc.error_message,
-            "region_scope": inc.region_scope,
-        }
-        for inc in generator.incidents
-    ]
+    incidents_export = []
+    for svc in generator.model.services.values():
+        for inc in svc.incidents:
+            incidents_export.append({
+                "service_key": inc.service_key,
+                "start_time": inc.start_time.isoformat(),
+                "end_time": inc.end_time.isoformat(),
+                "failure_rate": inc.failure_rate,
+                "error_codes": inc.error_codes,
+                "error_type": inc.error_type,
+                "error_message": inc.error_message,
+                "region_scope": inc.region_scope,
+            })
     with open(incidents_file, 'w') as f:
         json.dump(incidents_export, f, indent=2)
     print(f"  Wrote {len(incidents_export)} incidents to {incidents_file}")

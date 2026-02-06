@@ -136,35 +136,7 @@ CONFIG_TEMPLATES = {
     'env': ['dotenv-base', 'dotenv-dev', 'dotenv-stg', 'dotenv-prod', 'dotenv-test'],
 }
 
-PRIMARY_DEPLOYMENT_TARGETS = [
-    # PROD — 2 AWS accounts × 2 regions, 2 GCP accounts × 2 regions, 2 Azure accounts × 2 regions (12 targets)
-    'prod:aws:111111111111:us-east-1:platform:eks:main',
-    'prod:aws:111111111111:us-west-2:platform:eks:main',
-    'prod:aws:111111111112:us-east-1:platform:eks:main',
-    'prod:aws:111111111112:us-west-2:platform:eks:main',
-    'prod:gcp:social-prod-001:us-central1:platform:gke:main',
-    'prod:gcp:social-prod-001:southamerica-east1:platform:gke:main',
-    'prod:gcp:social-prod-002:us-central1:platform:gke:main',
-    'prod:gcp:social-prod-002:us-east4:platform:gke:main',
-    'prod:azure:prod-sub-001:eastus:platform:aks:main',
-    'prod:azure:prod-sub-001:westeurope:platform:aks:main',
-    'prod:azure:prod-sub-002:eastus:platform:aks:main',
-    'prod:azure:prod-sub-002:westus2:platform:aks:main',
-    # STG — 1 each (3 targets)
-    'stg:aws:222222222221:us-east-1:platform:eks:main',
-    'stg:gcp:social-stg-001:us-central1:platform:gke:main',
-    'stg:azure:stg-sub-001:eastus:platform:aks:main',
-    # DEV — 1 each (3 targets)
-    'dev:aws:333333333331:us-east-1:platform:eks:main',
-    'dev:gcp:social-dev-001:us-central1:platform:gke:main',
-    'dev:azure:dev-sub-001:eastus:platform:aks:main',
-    # INT — 1 each (3 targets)
-    'int:aws:444444444441:us-east-1:platform:eks:main',
-    'int:gcp:social-int-001:us-central1:platform:gke:main',
-    'int:azure:int-sub-001:eastus:platform:aks:main',
-    # INFRA — AWS only (1 target)
-    'infra:aws:555555555555:us-east-1:platform:eks:main',
-]
+from qairon_model import PRIMARY_DEPLOYMENT_TARGETS
 
 CORE_SERVICES = [
     'social:user:identity',
