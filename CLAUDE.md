@@ -1,8 +1,5 @@
 # Claude Code Preferences
 
-## TODO
-- **Recursive child spans**: Child spans should recursively generate their own children by walking `SERVICE_DEPENDENCIES`. Currently only one level of downstream calls is generated per parent event. A `social:feed:timeline` trace should produce a full multi-level tree (e.g. timeline → content:posts → content:media, content:hashtags, feed:fanout → social:connections, search:indexer). Each child that has its own dependencies in `SERVICE_DEPENDENCIES` must spawn further child spans with proper `parent_span_id` linking, all sharing the same `trace_id`.
-
 ## Authoritative Data — CRITICAL
 Qairon is a single-source-of-truth system. ALL data — IDs, field names, dict keys, lookup tables, constants, internal data structures — MUST use canonical, authoritative forms. No shortcuts, no abbreviations, no shorthand, no prefixed/namespaced variants of authoritative field names. If a field is called `service` in the schema, it is `service` everywhere — in event dicts, lookup keys, function parameters, comments, and output. Never invent synthetic prefixes (e.g. `action_service`) or truncated forms (e.g. `stack:service` instead of `application:stack:service`). The authoritative form is the ONLY form.
 

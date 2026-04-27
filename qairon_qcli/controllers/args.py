@@ -19,7 +19,7 @@ def __gen_completers__(rest):
 
 
 def __gen_attr_completers__(rest, res, attr):
-    def completer(self, prefix, parsed_args, resource=res, attribute=attr):
+    def completer(self, prefix, action=None, parser=None, parsed_args=None, resource=res, attribute=attr):
         return rest.resource_get_attr_search(prefix, parsed_args, resource, attribute)
 
     name = "%s_%s_completer" % (res, attr)

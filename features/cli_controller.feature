@@ -1,3 +1,4 @@
+@db @cli
 Feature: CLI
 
   Scenario: provider hierarchy

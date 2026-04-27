@@ -21,7 +21,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Set
 from qairon_ids import validate_id, deployment_id_from_release_id, split_release_id
 
 
@@ -878,37 +878,32 @@ def generate_child_spans_for_event(
     select_release_func,
     error_codes: dict,
     error_messages: dict,
+    visited: Optional[Set[str]] = None,
 ) -> List[dict]:
     """
     Generate child span events for a parent event's service dependencies.
 
-    For each dependency in SERVICE_DEPENDENCIES, generates a child span event
-    with the same trace_id but a new span_id, linked via parent_span_id.
+    Recurses into each child's own dependencies to build a full multi-level
+    trace tree. visited is a per-branch ancestor set that prevents cycles while
+    allowing the same service to appear under multiple parents (diamond patterns).
 
-    Error propagation follows stack trace semantics:
-    - A leaf child that fails has error_source=None (it's the originator)
-    - A parent that fails because its child failed has error_source=child's deployment_id
-
-    Args:
-        parent_event: The root/parent event dict
-        rng: Random number generator
-        select_release_func: Function to select a release for a service
-        error_codes: Dict of error codes by type
-        error_messages: Dict of error messages by code
-
-    Returns:
-        List of child span event dicts
+    Error propagation: a child blamed by its parent fails as the originator
+    (error_source=None); its own children are generated as successful spans.
     """
-    service_key = f"{parent_event['action_application']}:{parent_event['action_stack']}:{parent_event['action_service']}"
+    service_key = f"{parent_event['application']}:{parent_event['stack']}:{parent_event['service']}"
     dependencies = SERVICE_DEPENDENCIES.get(service_key, [])
 
     if not dependencies:
         return []
 
+    if visited is None:
+        visited = set()
+    if service_key in visited:
+        return []
+    visited = visited | {service_key}
+
     child_spans = []
     parent_timestamp = parent_event['timestamp']
-
-    # Calculate parent latency for timing child spans
     parent_latency = parent_event['action_base_latency_ms'] * parent_event['latency_multiplier']
 
     for i, dep_service_id in enumerate(dependencies):
@@ -927,22 +922,17 @@ def generate_child_spans_for_event(
         child_span_id = generate_span_id(rng)
         child_request_id = uuid.uuid4().hex
 
-        # Select release for this dependency service
         child_release_result = select_release_func(dep_stack, dep_service, child_timestamp)
         child_release_id = child_release_result[0] if isinstance(child_release_result, tuple) else child_release_result
 
-        # Determine if child span has an error
         child_error_info = None
         child_success = True
 
-        # If parent failed due to this dependency (error_source is this child's deployment_id),
-        # or randomly based on error rate, the child fails as the originator (error_source=None)
         parent_error_source = (parent_event.get('error_info') or {}).get('error_source', '')
         child_deployment_id = deployment_id_from_release_id(child_release_id)
         parent_blames_child = parent_error_source == child_deployment_id
 
         if parent_blames_child:
-            # Child is the originator — no error_source (leaf of the stack trace)
             error_type = rng.choice(["server"])
             error_code = rng.choice(error_codes.get(error_type, ["500"]))
             child_error_info = {
@@ -984,6 +974,14 @@ def generate_child_spans_for_event(
         }
 
         child_spans.append(child_event)
+        child_spans.extend(generate_child_spans_for_event(
+            parent_event=child_event,
+            rng=rng,
+            select_release_func=select_release_func,
+            error_codes=error_codes,
+            error_messages=error_messages,
+            visited=visited,
+        ))
 
     return child_spans
 
@@ -2870,7 +2868,8 @@ class MonitoringDataGenerator:
         return all_events
 
     def _generate_child_spans_sequential(
-        self, parent_event: dict, action: 'ServiceAction', user: 'User', timestamp: datetime
+        self, parent_event: dict, action: 'ServiceAction', user: 'User', timestamp: datetime,
+        visited: Optional[Set[str]] = None,
     ) -> List[dict]:
         """Generate child span events for service dependencies (sequential format)."""
         service_key = action.service_id
@@ -2878,6 +2877,12 @@ class MonitoringDataGenerator:
 
         if not dependencies:
             return []
+
+        if visited is None:
+            visited = set()
+        if service_key in visited:
+            return []
+        visited = visited | {service_key}
 
         child_spans = []
         parent_latency = action.base_latency_ms * user.persona.latency_multiplier
@@ -2898,7 +2903,6 @@ class MonitoringDataGenerator:
             child_span_id = generate_span_id(self.rng)
             child_request_id = uuid.uuid4().hex
 
-            # Create a child ServiceAction for the dependency
             child_action = ServiceAction(
                 category="internal",
                 service=dep_service,
@@ -2918,7 +2922,6 @@ class MonitoringDataGenerator:
 
             child_release_id, _, _, _ = self.select_release(child_action, child_timestamp)
 
-            # Check if parent blames this child
             child_error_info = None
             child_success = True
             parent_error_source = (parent_event.get("error_info") or {}).get("error_source", "")
@@ -2948,6 +2951,9 @@ class MonitoringDataGenerator:
                 "release_id": child_release_id,
             }
             child_spans.append(child_event)
+            child_spans.extend(self._generate_child_spans_sequential(
+                child_event, child_action, user, child_timestamp, visited
+            ))
 
         return child_spans
 

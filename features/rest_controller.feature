@@ -1,3 +1,4 @@
+@db
 Feature: REST
 
   Scenario: provider hierarchy

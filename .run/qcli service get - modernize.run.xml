@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="qcli service get - modernize" type="PythonConfigurationType" factoryName="Python">
     <module name="qairon" />
+    <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
@@ -13,13 +14,15 @@
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
+    <option name="DEBUG_JUST_MY_CODE" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <EXTENSION ID="software.aws.toolkits.jetbrains.core.execution.PythonAwsConnectionExtension">
       <option name="credential" />
       <option name="region" />
       <option name="useCurrentConnection" value="false" />
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qcli/qcli.py" />
+    <option name="RUN_TOOL" value="" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qairon_qcli/qcli.py" />
     <option name="PARAMETERS" value="service get withme:services:abuse-reporter -o id" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
