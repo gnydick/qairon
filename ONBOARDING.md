@@ -11,13 +11,13 @@
 It is delivered as three cooperating interfaces over one PostgreSQL-backed model:
 - a **relational data model** (SQLAlchemy ORM),
 - a **REST API + Flask-Admin UI** (the `app.py` Flask app),
-- and a **pluggable Click CLI**, `qcli` (also embeddable as a Python module).
+- and a **pluggable CLI**, `qcli` (also embeddable as a Python module).
 
 | | |
 |---|---|
 | **Primary language** | Python 3.9+ (target 3.13 in CI/Docker) |
 | **Other languages** | YAML, Dockerfile, Gherkin (`.feature`), HTML/CSS, TOML |
-| **Frameworks** | Flask, SQLAlchemy, Alembic, Click, flask-restless-ng, Flask-Admin, behave, Docker |
+| **Frameworks** | Flask, SQLAlchemy, Alembic, flask-restless-ng, Flask-Admin, behave, Docker |
 | **Packaging** | setuptools distribution `qairon_qcli` exposing the `qcli` console script |
 
 ### The one idea that unlocks the codebase: canonical composite IDs
@@ -42,7 +42,7 @@ The core platform sorts into 6 layers. Dependency direction generally flows **to
 |---|---|
 | **Domain & ORM Models** | SQLAlchemy entities for the whole topology (providers → allocations, builds/releases/deployments), the shared `db` instance, and the dependencies-plugin models. |
 | **REST API & Admin UI** | `app.py` app factory / REST host, Flask-Admin `ModelView`s, serializers, CIDR converter, Jinja2 admin templates, static assets. |
-| **qcli Client & Plugins** | The Click/argparse CLI: controller stack, REST client, schema, tab-completion, and the `aws`/`bake`/`dependencies` plugins; plus `qcli_as_module` embedding examples. |
+| **qcli Client & Plugins** | The `qcli` command-line client: controller stack, REST client, schema, tab-completion, and the `aws`/`bake`/`dependencies` plugins; plus `qcli_as_module` embedding examples. |
 | **Infrastructure & Deployment** | `Dockerfile` (packages the app image) and the GitHub Actions CI pipeline. |
 | **Testing (behave BDD)** | Gherkin feature specs, step definitions, and the harness that bootstraps a fresh DB per feature. |
 | **Documentation & Project Config** | README/setup/audit docs, requirements, setuptools packaging, coverage, IDE descriptors. |
