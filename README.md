@@ -650,6 +650,8 @@ diff k8s_running.json qairon_intended.json
 
 ## Contributing
 
+New to the codebase? Start with the [Onboarding Guide](ONBOARDING.md) for a layer-by-layer tour of the core platform.
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ## License
