@@ -243,7 +243,13 @@ qcli deployment query '{"filters":[{"name":"service_id","op":"eq","val":"ecommer
 # Allocate a non-overlapping subnet (e.g., /22 from a /16 network)
 # network_id = <partition_id>:<name>
 qcli network allocate_subnet prod:aws:123456789012:us-east-1:us-east-1a:main-vpc 6 eks0
+
+# Import resources from CSV files
+qcli csv_import import_csv application applications.csv
+qcli csv_import import_csv stack stacks.csv --dry-run
 ```
+
+See [CSV_IMPORT.md](CSV_IMPORT.md) for detailed documentation on importing data from CSV files.
 
 ### As a Python Module
 
